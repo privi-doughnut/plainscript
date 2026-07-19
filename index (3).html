@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Plainscript — Medication Reference</title>
+<meta name="description" content="An educational tool that decodes medication names and checks drug interactions using FDA and NIH data. Not medical advice." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     PLAINSCRIPT — design tokens
+     Aesthetic: a calm clinical reference instrument, not a
+     consumer health app. Cool clinical paper, navy ink, one
+     restrained teal accent. Color is rationed: red/orange/amber
+     mean SEVERITY and nothing else, so an alarming color always
+     means an alarming thing.
+     ============================================================ */
+  :root{
+    --paper:#F4F6F8;
+    --card:#FFFFFF;
+    --ink:#16202E;
+    --ink-soft:#4A5A6E;
+    --ink-faint:#8194A6;
+    --line:#DCE3EA;
+    --line-soft:#E9EEF2;
+    --accent:#0F766E;
+    --accent-deep:#0B5752;
+    --accent-wash:#E6F1EF;
+
+    /* severity scale — used ONLY for interaction severity */
+    --major-bg:#FBEBEA; --major-bar:#C0392B; --major-ink:#8A241C;
+    --mod-bg:#FCF1E6;   --mod-bar:#D17A12;   --mod-ink:#8F4E08;
+    --minor-bg:#FBF6E6; --minor-bar:#B5920A; --minor-ink:#6F5905;
+    /* neutral states — label mentions and "nothing found" */
+    --note-bg:#EDF1F5;  --note-bar:#69788A;  --note-ink:#3A4759;
+
+    --radius:10px;
+    --shadow:0 1px 2px rgba(22,32,46,.04), 0 8px 24px rgba(22,32,46,.06);
+    --mono:"Spline Sans Mono",ui-monospace,Menlo,monospace;
+    --sans:"Spline Sans",system-ui,-apple-system,sans-serif;
+    --serif:"Newsreader",Georgia,serif;
+    --safety-bg:#16202E;
+  }
+
+  /* ---- dark theme: same sober clinical instrument, lights turned down.
+         Not neon — a calm, low-glare clinical dark. Starts on light. ---- */
+  [data-theme="dark"]{
+    --paper:#0F141A;
+    --card:#171E27;
+    --ink:#E4EAF1;
+    --ink-soft:#9DAABA;
+    --ink-faint:#6B7A8B;
+    --line:#273039;
+    --line-soft:#1D242D;
+    --accent:#35C4B8;
+    --accent-deep:#63D6CC;
+    --accent-wash:#123230;
+    --major-bg:#241413; --major-bar:#E5544A; --major-ink:#F1A9A3;
+    --mod-bg:#241910;   --mod-bar:#E08A2E;   --mod-ink:#F0C089;
+    --minor-bg:#211E10; --minor-bar:#D4B33C; --minor-ink:#E6D385;
+    --note-bg:#1A222C;  --note-bar:#7C8A9B;  --note-ink:#B7C3D0;
+    --safety-bg:#0A0E13;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.4);
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); font-size:16px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    transition:background-color .25s ease, color .25s ease;
+  }
+  .card,.verdict,.nofind,input[type=text],.themetoggle,.tab,.card-head,.row{
+    transition:background-color .25s ease, border-color .25s ease, color .25s ease;
+  }
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
+  .wrap{max-width:760px; margin:0 auto; padding:0 20px;}
+
+  /* eyebrow / data labels — the clinical "instrument" texture */
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint);
+  }
+
+  /* ---------- safety frame: persistent, calm but present ---------- */
+  .safetybar{
+    background:var(--safety-bg); color:#E8EDF2; font-size:13px;
+    border-bottom:1px solid #0c1420;
+  }
+  .safetybar .wrap{display:flex; gap:10px; align-items:center; padding:9px 20px;}
+  .safetybar strong{color:#fff; font-weight:600;}
+  .safetybar .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none;}
+
+  /* ---------- header ---------- */
+  header.site{padding:30px 0 18px; border-bottom:1px solid var(--line);}
+  .brand{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;}
+  .brand h1{
+    font-family:var(--serif); font-weight:600; font-size:30px;
+    letter-spacing:-.01em; margin:0; line-height:1;
+  }
+  .brand .tag{font-family:var(--mono); font-size:12px; color:var(--accent-deep); letter-spacing:.04em;}
+  .lede{margin:12px 0 0; color:var(--ink-soft); max-width:60ch; font-size:15.5px;}
+
+  .themetoggle{
+    margin-left:auto; align-self:center; appearance:none; cursor:pointer;
+    font-family:var(--mono); font-size:12px; letter-spacing:.03em;
+    display:inline-flex; align-items:center; gap:7px; padding:8px 13px;
+    border:1px solid var(--line); border-radius:20px; background:var(--card); color:var(--ink-soft);
+  }
+  .themetoggle:hover{border-color:var(--accent); color:var(--accent-deep);}
+  .themetoggle:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .themetoggle .ticon{font-size:13px; line-height:1;}
+
+  /* ---------- tabs ---------- */
+  .tabs{display:flex; gap:4px; margin:22px 0 0; border-bottom:1px solid var(--line);}
+  .tab{
+    appearance:none; background:none; border:none; cursor:pointer;
+    font-family:var(--sans); font-size:15px; font-weight:600; color:var(--ink-faint);
+    padding:11px 14px; border-bottom:2px solid transparent; margin-bottom:-1px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .tab:hover{color:var(--ink-soft);}
+  .tab[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent);}
+  .tab .num{font-family:var(--mono); font-size:11px; color:var(--accent); }
+  .tab:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px;}
+
+  main{padding:26px 0 60px;}
+  .panel[hidden]{display:none;}
+  .panel-intro{color:var(--ink-soft); font-size:15px; margin:0 0 18px;}
+
+  /* ---------- input row ---------- */
+  .field label{display:block; margin-bottom:7px;}
+  .inrow{display:flex; gap:9px; flex-wrap:wrap;}
+  input[type=text]{
+    flex:1 1 220px; min-width:0; font-family:var(--sans); font-size:16px;
+    padding:13px 14px; border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--card); color:var(--ink);
+  }
+  input[type=text]::placeholder{color:var(--ink-faint);}
+  input[type=text]:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-wash);}
+  button.go{
+    appearance:none; cursor:pointer; font-family:var(--sans); font-weight:600; font-size:15px;
+    padding:13px 20px; border-radius:var(--radius); border:1px solid var(--accent-deep);
+    background:var(--accent); color:#fff;
+  }
+  button.go:hover{background:var(--accent-deep);}
+  button.go:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+  button.ghost{
+    appearance:none; cursor:pointer; font-family:var(--sans); font-weight:600; font-size:14px;
+    padding:11px 14px; border-radius:var(--radius); border:1px dashed var(--line);
+    background:transparent; color:var(--accent-deep);
+  }
+  button.ghost:hover{border-color:var(--accent); background:var(--accent-wash);}
+
+  .druglist{display:flex; flex-direction:column; gap:9px; margin:0 0 12px;}
+  .drugrow{display:flex; gap:9px; align-items:center;}
+  .drugrow .rm{
+    appearance:none; border:1px solid var(--line); background:var(--card); cursor:pointer;
+    width:44px; height:44px; flex:none; border-radius:var(--radius); color:var(--ink-faint);
+    font-size:18px; line-height:1;
+  }
+  .drugrow .rm:hover{color:var(--major-bar); border-color:var(--major-bar);}
+  .checkbar{display:flex; gap:9px; align-items:center; flex-wrap:wrap; margin-top:4px;}
+
+  /* ---------- result: monograph card (the signature) ---------- */
+  .results{margin-top:24px; display:flex; flex-direction:column; gap:16px;}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); overflow:hidden; animation:rise .35s ease both;
+  }
+  @keyframes rise{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  @media (prefers-reduced-motion:reduce){ .card{animation:none;} }
+
+  .card-head{padding:18px 20px 14px; border-bottom:1px solid var(--line-soft);}
+  .card-head .name{font-family:var(--serif); font-size:23px; font-weight:600; line-height:1.15; margin:2px 0 0;}
+  .datastrip{
+    font-family:var(--mono); font-size:12px; color:var(--ink-soft);
+    display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:10px;
+  }
+  .datastrip b{color:var(--ink-faint); font-weight:500;}
+  .card-body{padding:6px 20px 18px;}
+  .row{padding:13px 0; border-bottom:1px solid var(--line-soft);}
+  .row:last-child{border-bottom:none;}
+  .row .eyebrow{display:block; margin-bottom:5px;}
+  .row p{margin:0; color:var(--ink); font-size:15px;}
+  .row .src{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:6px;}
+  .expand{
+    appearance:none; background:none; border:none; cursor:pointer; padding:0; margin-top:6px;
+    font-family:var(--mono); font-size:11.5px; color:var(--accent-deep); letter-spacing:.03em;
+  }
+  .expand:hover{text-decoration:underline;}
+  .pe-toggle{display:inline-flex; gap:6px; align-items:center; margin-top:8px; font-size:12.5px; color:var(--ink-faint); font-family:var(--mono);}
+
+  /* ---------- interaction verdict ---------- */
+  .verdict{display:flex; border-radius:var(--radius); overflow:hidden; border:1px solid var(--line); box-shadow:var(--shadow);}
+  .verdict .bar{width:6px; flex:none;}
+  .verdict .vbody{padding:15px 18px; flex:1;}
+  .verdict .pair{font-family:var(--mono); font-size:12.5px; color:var(--ink-soft); letter-spacing:.02em;}
+  .verdict .sev{font-family:var(--serif); font-size:19px; font-weight:600; margin:3px 0 0; display:flex; align-items:center; gap:9px;}
+  .sev .pill{font-family:var(--mono); font-size:10.5px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:3px 8px; border-radius:20px;}
+  .verdict p{margin:9px 0 0; font-size:14.5px;}
+  .verdict .mgmt{margin-top:8px; font-size:13.5px; color:var(--ink-soft);}
+  .verdict .src{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:9px;}
+
+  .v-major{background:var(--major-bg);} .v-major .bar{background:var(--major-bar);} .v-major .pill{background:var(--major-bar); color:#fff;} .v-major .sev{color:var(--major-ink);}
+  .v-moderate{background:var(--mod-bg);} .v-moderate .bar{background:var(--mod-bar);} .v-moderate .pill{background:var(--mod-bar); color:#fff;} .v-moderate .sev{color:var(--mod-ink);}
+  .v-minor{background:var(--minor-bg);} .v-minor .bar{background:var(--minor-bar);} .v-minor .pill{background:var(--minor-bar); color:#fff;} .v-minor .sev{color:var(--minor-ink);}
+  .v-note{background:var(--note-bg);} .v-note .bar{background:var(--note-bar);} .v-note .pill{background:var(--note-bar); color:#fff;} .v-note .sev{color:var(--note-ink); font-size:16px;}
+
+  /* the cautious "nothing found" state — deliberately NOT green */
+  .nofind{
+    background:var(--note-bg); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .nofind .eyebrow{color:var(--note-ink);}
+  .nofind h3{font-family:var(--serif); font-weight:600; font-size:18px; margin:4px 0 6px; color:var(--note-ink);}
+  .nofind p{margin:0; font-size:14.5px; color:var(--ink-soft);}
+
+  /* ---------- status / errors ---------- */
+  .status{font-family:var(--mono); font-size:13px; color:var(--ink-soft); padding:14px 0;}
+  .status .spin{display:inline-block; width:11px; height:11px; border:2px solid var(--line); border-top-color:var(--accent); border-radius:50%; animation:sp .7s linear infinite; vertical-align:-1px; margin-right:8px;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  @media (prefers-reduced-motion:reduce){ .spin{animation:none;} }
+  .err{background:var(--major-bg); border:1px solid var(--major-bar); color:var(--major-ink); padding:13px 16px; border-radius:var(--radius); font-size:14px;}
+
+  /* ---------- methodology accordion (credibility / sourcing) ---------- */
+  .method{margin-top:40px; border-top:1px solid var(--line); padding-top:8px;}
+  details{border-bottom:1px solid var(--line-soft); padding:4px 0;}
+  details summary{
+    cursor:pointer; list-style:none; padding:13px 2px; font-weight:600; font-size:15px;
+    display:flex; justify-content:space-between; align-items:center; color:var(--ink);
+  }
+  details summary::-webkit-details-marker{display:none;}
+  details summary .chev{font-family:var(--mono); color:var(--accent); transition:transform .2s;}
+  details[open] summary .chev{transform:rotate(90deg);}
+  details .content{padding:0 2px 16px; color:var(--ink-soft); font-size:14.5px;}
+  details .content p{margin:0 0 10px;} details .content p:last-child{margin:0;}
+  details .content a{color:var(--accent-deep);}
+  details .content code{font-family:var(--mono); font-size:12.5px; background:var(--line-soft); padding:1px 5px; border-radius:4px; color:var(--ink);}
+
+  footer{border-top:1px solid var(--line); padding:22px 0 40px; color:var(--ink-faint); font-size:12.5px; font-family:var(--mono);}
+  footer a{color:var(--accent-deep);}
+
+  @media (max-width:560px){
+    .brand h1{font-size:25px;}
+    .tab{padding:10px 9px; font-size:14px;}
+    .tab .label-full{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- persistent safety frame -->
+<div class="safetybar"><div class="wrap">
+  <span class="dot" aria-hidden="true"></span>
+  <span><strong>Educational reference only.</strong> Not medical advice. Always confirm with a pharmacist or doctor. Emergencies: call 911 · Poison Control 1‑800‑222‑1222.</span>
+</div></div>
+
+<header class="site"><div class="wrap">
+  <div class="brand">
+    <h1>Plainscript</h1>
+    <span class="tag">// medication reference</span>
+    <button id="theme-toggle" class="themetoggle" aria-label="Switch to dark theme" title="Toggle light / dark">
+      <span class="ticon" aria-hidden="true">☾</span><span class="tlabel">Dark</span>
+    </button>
+  </div>
+  <p class="lede">Type in a medication to find out what it actually is, or check whether two or more medications are known to interact — explained in plain language, sourced from FDA and NIH data.</p>
+
+  <div class="tabs" role="tablist" aria-label="Tools">
+    <button class="tab" id="tab-decode" role="tab" aria-selected="true" aria-controls="panel-decode">
+      <span class="num">01</span><span>Decode a medication</span>
+    </button>
+    <button class="tab" id="tab-check" role="tab" aria-selected="false" aria-controls="panel-check">
+      <span class="num">02</span><span>Check an <span class="label-full">interaction</span><span aria-hidden="true" style="display:none">interaction</span></span>
+    </button>
+  </div>
+</div></header>
+
+<main><div class="wrap">
+
+  <!-- ===================== PANEL 1: DECODE ===================== -->
+  <section class="panel" id="panel-decode" role="tabpanel" aria-labelledby="tab-decode">
+    <p class="panel-intro">Enter a brand or generic name (for example, <em>Lipitor</em> or <em>atorvastatin</em>).</p>
+    <div class="field">
+      <label class="eyebrow" for="decode-input">Medication name</label>
+      <div class="inrow">
+        <input type="text" id="decode-input" placeholder="e.g. Tylenol, metformin, Xanax" autocomplete="off" />
+        <button class="go" id="decode-btn">Decode</button>
+      </div>
+    </div>
+    <div class="results" id="decode-results" aria-live="polite"></div>
+  </section>
+
+  <!-- ===================== PANEL 2: CHECK ===================== -->
+  <section class="panel" id="panel-check" role="tabpanel" aria-labelledby="tab-check" hidden>
+    <p class="panel-intro">Add two or more medications. Plainscript checks them against a curated set of well‑documented interactions <em>and</em> cross‑references each drug's official FDA label.</p>
+    <div class="druglist" id="drug-list"></div>
+    <div class="checkbar">
+      <button class="ghost" id="add-drug">+ Add another medication</button>
+      <button class="go" id="check-btn">Check interactions</button>
+    </div>
+    <div class="results" id="check-results" aria-live="polite"></div>
+  </section>
+
+  <!-- ===================== METHODOLOGY ===================== -->
+  <div class="method">
+    <p class="eyebrow" style="margin-bottom:6px;">How this works &amp; what it can't do</p>
+    <details>
+      <summary>Where the data comes from <span class="chev">›</span></summary>
+      <div class="content">
+        <p><b>Drug facts</b> come from the U.S. FDA's <a href="https://open.fda.gov/apis/drug/label/" target="_blank" rel="noopener">openFDA drug label API</a> — the actual approved labeling for each medication (what it treats, how it works, side effects, brand/generic names, drug class).</p>
+        <p><b>Name matching</b> uses the NIH/NLM <a href="https://lhncbc.nlm.nih.gov/RxNav/APIs/" target="_blank" rel="noopener">RxNorm API</a>, which standardizes drug names and tolerates typos.</p>
+        <p><b>Interaction severity</b> comes from a hand‑curated set of well‑documented interactions, each reviewed against FDA prescribing information and standard clinical references.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why there's no simple "you're safe" result <span class="chev">›</span></summary>
+      <div class="content">
+        <p>In January 2024 the U.S. National Library of Medicine shut down its free drug‑interaction API. There is no longer a free, comprehensive, severity‑rated interaction database — paid clinical databases (DrugBank, Micromedex) hold that data now.</p>
+        <p>So this tool can confirm an interaction it knows about, but it can <b>never</b> prove that a combination is safe. A result of "nothing found" only means it wasn't in our curated set or the FDA labels we checked — not that the drugs are safe together. That's why you'll never see a green check here. Always confirm with a pharmacist.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Honest limitations <span class="chev">›</span></summary>
+      <div class="content">
+        <p>The curated set covers a few dozen of the most important interactions, not all of them. The FDA‑label layer only catches interactions a label names directly, and labels vary in detail. Doses, your health conditions, food, and supplements all matter and aren't considered here. This is a learning tool, not a clinical decision system.</p>
+      </div>
+    </details>
+  </div>
+
+</div></main>
+
+<footer><div class="wrap">
+  Plainscript · educational project · data from openFDA &amp; NIH RxNorm · not affiliated with the FDA or NIH ·
+  This product uses publicly available data from the U.S. National Library of Medicine and the U.S. Food and Drug Administration but is not endorsed by them.
+</div></footer>
+
+<!-- Keys & URLs. Safe to commit: the Supabase anon key is public by design
+     and protected by Row-Level Security. NEVER put your Anthropic key here —
+     it lives only as a Cloudflare Worker secret. -->
+<script src="config.js"></script>
+<script>
+/* ================================================================
+   PLAINSCRIPT — logic
+   Design rule that governs everything below: the app NEVER invents
+   medical facts. Every drug fact is fetched from FDA/NIH. The only
+   optional AI step (plain-English mode) is a *rephraser* of text we
+   already retrieved — it is told to add nothing.
+   ================================================================ */
+
+/* ---- CONFIG -------------------------------------------------------
+   Values come from config.js (window.PLAINSCRIPT_CONFIG). The app works
+   fully with all of these blank — Decode and the interaction check need
+   no keys. Fill them to unlock plain-English mode (Worker) and accounts.
+------------------------------------------------------------------- */
+const CFG = window.PLAINSCRIPT_CONFIG || {};
+const CLAUDE_PROXY_URL  = CFG.CLAUDE_PROXY_URL  || ""; // Cloudflare Worker (Claude proxy)
+const SUPABASE_URL      = CFG.SUPABASE_URL      || ""; // Phase 2
+const SUPABASE_ANON_KEY = CFG.SUPABASE_ANON_KEY || ""; // Phase 2 (public, RLS-protected)
+
+const FDA = "https://api.fda.gov/drug/label.json";
+const RXNORM = "https://rxnav.nlm.nih.gov/REST";
+
+/* ---- brand/ingredient aliases ------------------------------------
+   Lets the curated layer recognize common brand names offline.
+   Extend this freely — it's just a lookup of name -> ingredient token.
+------------------------------------------------------------------- */
+const ALIASES = {
+  coumadin:"warfarin", jantoven:"warfarin",
+  advil:"ibuprofen", motrin:"ibuprofen", aleve:"naproxen",
+  bayer:"aspirin", ecotrin:"aspirin",
+  viagra:"sildenafil", revatio:"sildenafil", cialis:"tadalafil", levitra:"vardenafil",
+  nitrostat:"nitroglycerin", "nitro-bid":"nitroglycerin", imdur:"isosorbide",
+  xanax:"alprazolam", valium:"diazepam", ativan:"lorazepam", klonopin:"clonazepam",
+  oxycontin:"oxycodone", percocet:"oxycodone", vicodin:"hydrocodone", norco:"hydrocodone",
+  "ms contin":"morphine", duragesic:"fentanyl", ultram:"tramadol",
+  prozac:"fluoxetine", zoloft:"sertraline", paxil:"paroxetine", celexa:"citalopram", lexapro:"escitalopram",
+  nardil:"phenelzine", parnate:"tranylcypromine",
+  imitrex:"sumatriptan", maxalt:"rizatriptan",
+  zocor:"simvastatin", lipitor:"atorvastatin", mevacor:"lovastatin", crestor:"rosuvastatin", pravachol:"pravastatin",
+  biaxin:"clarithromycin", nizoral:"ketoconazole", sporanox:"itraconazole", diflucan:"fluconazole",
+  prinivil:"lisinopril", zestril:"lisinopril", vasotec:"enalapril", altace:"ramipril",
+  aldactone:"spironolactone", inspra:"eplerenone",
+  plavix:"clopidogrel", prilosec:"omeprazole", nexium:"esomeprazole",
+  lanoxin:"digoxin", cordarone:"amiodarone", pacerone:"amiodarone",
+  microzide:"hydrochlorothiazide", hydrodiuril:"hydrochlorothiazide",
+  flagyl:"metronidazole", bactrim:"trimethoprim", septra:"trimethoprim", cipro:"ciprofloxacin",
+  glucophage:"metformin", eskalith:"lithium", lithobid:"lithium",
+  trexall:"methotrexate", rheumatrex:"methotrexate", "theo-dur":"theophylline"
+};
+
+/* ---- class groups: a token that stands for many drugs ------------ */
+const NSAIDS = ["ibuprofen","naproxen","diclofenac","meloxicam","celecoxib","ketorolac","indomethacin","aspirin"];
+const SSRIS  = ["fluoxetine","sertraline","paroxetine","citalopram","escitalopram","fluvoxamine"];
+const MAOIS  = ["phenelzine","tranylcypromine","isocarboxazid","selegiline","rasagiline"];
+const STATINS= ["simvastatin","atorvastatin","lovastatin"]; // CYP3A4-metabolized ones
+const NITRATES=["nitroglycerin","isosorbide"];
+const PDE5   = ["sildenafil","tadalafil","vardenafil","avanafil"];
+const OPIOIDS=["oxycodone","hydrocodone","morphine","fentanyl","tramadol","codeine","hydromorphone","oxymorphone"];
+const BENZOS =["alprazolam","diazepam","lorazepam","clonazepam","temazepam","midazolam"];
+const ACE    =["lisinopril","enalapril","ramipril","benazepril","captopril","quinapril"];
+const KSPARE =["spironolactone","eplerenone","amiloride","triamterene"];
+const AZOLES =["ketoconazole","itraconazole","fluconazole","voriconazole","posaconazole"];
+const MACRO  =["clarithromycin","erythromycin"];
+const THIAZ  =["hydrochlorothiazide","chlorthalidone","indapamide"];
+
+/* ---- CURATED INTERACTIONS ----------------------------------------
+   Each rule: if one drug matches `a` and another matches `b`, it fires.
+   severity: major | moderate | minor.  Plain-English, with a "why"
+   and a management note. Every entry is a textbook, well-documented
+   interaction. Add your own — this is the heart of the tool.
+------------------------------------------------------------------- */
+const INTERACTIONS = [
+  { a:["warfarin"], b:NSAIDS, severity:"major",
+    what:"Taking a blood thinner with an anti‑inflammatory painkiller sharply raises the risk of serious bleeding, including in the stomach.",
+    why:"NSAIDs irritate the stomach lining and also reduce platelet function, stacking on top of warfarin's blood‑thinning effect.",
+    mgmt:"Acetaminophen (Tylenol) is usually the safer pain option for people on warfarin — confirm with a pharmacist." },
+
+  { a:["warfarin"], b:["metronidazole","trimethoprim","sulfamethoxazole","fluconazole"], severity:"major",
+    what:"These antibiotics/antifungals can make warfarin much stronger, pushing blood‑thinning into a dangerous range.",
+    why:"They slow the liver enzymes that clear warfarin, so it builds up in the body.",
+    mgmt:"Doctors often check INR more closely and may adjust the warfarin dose during treatment." },
+
+  { a:NITRATES, b:PDE5, severity:"major",
+    what:"Combining a nitrate heart medicine with an erectile‑dysfunction drug can cause a sudden, dangerous drop in blood pressure.",
+    why:"Both relax and widen blood vessels; together the effect can collapse blood pressure to life‑threatening levels.",
+    mgmt:"This combination is contraindicated. Nitrates and PDE5 inhibitors should not be taken together — this is an emergency‑level interaction." },
+
+  { a:OPIOIDS, b:BENZOS, severity:"major",
+    what:"Opioid painkillers and benzodiazepine sedatives together can slow or stop breathing.",
+    why:"Both depress the central nervous system; combined, they can suppress the drive to breathe.",
+    mgmt:"The FDA places a boxed warning on this combination. It should only ever happen under direct medical supervision." },
+
+  { a:MAOIS, b:SSRIS, severity:"major",
+    what:"Two different antidepressant types together can trigger serotonin syndrome — a serious, sometimes fatal reaction.",
+    why:"Both raise serotonin levels; combined, serotonin can spike dangerously high.",
+    mgmt:"A washout period (often 2+ weeks) is required when switching between these drugs. Never overlap them without a prescriber's plan." },
+
+  { a:SSRIS, b:["sumatriptan","rizatriptan","zolmitriptan","tramadol","linezolid"], severity:"moderate",
+    what:"Adding a migraine triptan (or certain other serotonin‑raising drugs) to an SSRI can increase serotonin syndrome risk.",
+    why:"Each nudges serotonin upward; together the rise can become a problem in some people.",
+    mgmt:"Often used together with monitoring, but watch for agitation, racing heart, tremor, or fever and report them." },
+
+  { a:STATINS, b:MACRO, severity:"major",
+    what:"Certain cholesterol statins with certain antibiotics can cause severe muscle breakdown (rhabdomyolysis).",
+    why:"The antibiotic blocks the liver enzyme (CYP3A4) that clears the statin, so statin levels climb.",
+    mgmt:"Doctors may pause the statin during the antibiotic course. Report unexplained muscle pain or dark urine." },
+
+  { a:STATINS, b:AZOLES, severity:"major",
+    what:"Some statins with azole antifungals can cause severe muscle injury.",
+    why:"Azoles strongly inhibit the enzyme that breaks down the statin, letting it accumulate.",
+    mgmt:"A different statin or a temporary hold is often used. Watch for muscle pain or weakness." },
+
+  { a:ACE, b:KSPARE, severity:"major",
+    what:"This blood‑pressure combination can drive potassium too high, which can disturb heart rhythm.",
+    why:"Both raise potassium; stacked together, levels can become dangerous.",
+    mgmt:"Potassium and kidney function are usually monitored with blood tests when these are combined." },
+
+  { a:ACE, b:["potassium","losartan","valsartan","olmesartan","irbesartan","candesartan"], severity:"moderate",
+    what:"Pairing an ACE inhibitor with a potassium supplement or an ARB can raise potassium and stress the kidneys.",
+    why:"Both reduce how much potassium the body gets rid of.",
+    mgmt:"Generally avoided unless specifically directed and monitored with blood tests." },
+
+  { a:["methotrexate"], b:NSAIDS, severity:"major",
+    what:"Anti‑inflammatory painkillers can raise methotrexate to toxic levels, especially at higher methotrexate doses.",
+    why:"NSAIDs reduce how fast the kidneys clear methotrexate.",
+    mgmt:"Higher‑dose methotrexate and NSAIDs are a dangerous mix; low‑dose use needs a doctor's guidance." },
+
+  { a:["lithium"], b:NSAIDS, severity:"moderate",
+    what:"NSAIDs can push lithium levels up, and lithium has a narrow safe range.",
+    why:"NSAIDs reduce lithium clearance through the kidneys.",
+    mgmt:"Lithium levels are often checked if an NSAID is added. Watch for tremor, confusion, or nausea." },
+
+  { a:["lithium"], b:THIAZ, severity:"moderate",
+    what:"Thiazide water pills can raise lithium to toxic levels.",
+    why:"They make the kidneys hold on to lithium.",
+    mgmt:"Lithium monitoring and dose adjustment are common when a thiazide is started." },
+
+  { a:["digoxin"], b:["amiodarone"], severity:"major",
+    what:"Amiodarone can roughly double digoxin levels, and digoxin is toxic in excess.",
+    why:"Amiodarone reduces digoxin clearance and displaces it in the body.",
+    mgmt:"The digoxin dose is usually cut and levels monitored. Watch for nausea, visual changes, or palpitations." },
+
+  { a:["clopidogrel"], b:["omeprazole","esomeprazole"], severity:"moderate",
+    what:"Certain acid‑reflux drugs can make the blood thinner clopidogrel less effective.",
+    why:"They block the liver enzyme (CYP2C19) that activates clopidogrel.",
+    mgmt:"A different acid reducer (like pantoprazole or famotidine) is often preferred — ask a pharmacist." },
+
+  { a:["theophylline"], b:["ciprofloxacin"], severity:"moderate",
+    what:"This antibiotic can raise theophylline to toxic levels.",
+    why:"It inhibits the enzyme that clears theophylline.",
+    mgmt:"Levels are monitored and the dose may be lowered. Watch for nausea, racing heart, or tremor." },
+
+  { a:["metformin"], b:["iohexol","iopamidol","contrast","iodinated contrast"], severity:"moderate",
+    what:"Metformin is usually paused around imaging tests that use iodinated contrast dye.",
+    why:"If the dye temporarily affects the kidneys, metformin can build up and rarely cause lactic acidosis.",
+    mgmt:"Hospitals routinely hold metformin before/after contrast imaging per protocol." }
+];
+
+/* ---- helpers ----------------------------------------------------- */
+const $ = s => document.querySelector(s);
+const esc = s => (s||"").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const titlecase = s => (s||"").toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+
+/* turn a typed name into a set of tokens we can match on */
+function baseTokens(name){
+  const n = name.trim().toLowerCase();
+  const set = new Set([n]);
+  if (ALIASES[n]) set.add(ALIASES[n]);
+  // also split multiword brand like "ms contin"
+  if (ALIASES[n]) {} 
+  return set;
+}
+
+/* does a token set hit a rule side (list of ingredient/class tokens)? */
+function sideHit(tokens, side){
+  for (const t of tokens){
+    for (const s of side){
+      if (t === s) return true;
+      if (t.includes(s) || s.includes(t)) { if (s.length>=4) return true; }
+    }
+  }
+  return false;
+}
+
+/* ---- openFDA fetch ------------------------------------------------ */
+async function fetchLabel(name){
+  const q = encodeURIComponent(name.trim().toLowerCase());
+  const url = `${FDA}?search=(openfda.brand_name:"${q}"+openfda.generic_name:"${q}"+openfda.substance_name:"${q}")&limit=1`;
+  const res = await fetch(url);
+  if (res.status === 404) return null;          // openFDA returns 404 when nothing matches
+  if (!res.ok) throw new Error("FDA service error ("+res.status+")");
+  const data = await res.json();
+  return (data.results && data.results[0]) || null;
+}
+
+/* pull the human-meaningful pieces out of a raw label record */
+function parseLabel(rec){
+  const of = rec.openfda || {};
+  const first = a => Array.isArray(a) && a.length ? a[0] : null;
+  const cls = first(of.pharm_class_epc) || first(of.pharm_class_moa) || first(of.pharm_class_cs) || null;
+  return {
+    brand: first(of.brand_name),
+    generic: first(of.generic_name),
+    klass: cls ? cls.replace(/\s*\[.*?\]\s*/g,"").trim() : null,
+    rxcui: first(of.rxcui),
+    substances: (of.substance_name||[]).map(s=>s.toLowerCase()),
+    indications: first(rec.indications_and_usage),
+    moa: first(rec.mechanism_of_action),
+    adverse: first(rec.adverse_reactions),
+    interactionsText: (rec.drug_interactions||[]).join(" "),
+    boxed: first(rec.boxed_warning)
+  };
+}
+
+/* trim long FDA prose to a readable excerpt */
+function excerpt(t, n=480){
+  if (!t) return null;
+  t = t.replace(/\s+/g," ").trim();
+  if (t.length <= n) return t;
+  const cut = t.slice(0,n); const sp = cut.lastIndexOf(" ");
+  return cut.slice(0, sp>0?sp:n) + "…";
+}
+
+/* ---- OPTIONAL plain-English mode (Claude via your proxy) ----------
+   Strictly a rephraser. The system prompt forbids adding facts. The
+   original FDA text always stays available behind a toggle.
+------------------------------------------------------------------- */
+async function toPlainEnglish(text, label){
+  if (!CLAUDE_PROXY_URL || !text) return null;
+  // The safety-locked prompt lives in the Worker (worker.js), NOT here — so
+  // the proxy can only ever rephrase FDA text and can't be repurposed to
+  // generate medical claims. We just hand it the text and which section it is.
+  try{
+    const res = await fetch(CLAUDE_PROXY_URL, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ text, label })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data.plain || "").trim() || null;
+  }catch(e){ return null; }
+}
+
+/* =================================================================
+   DECODE
+   ================================================================= */
+async function decode(){
+  const name = $("#decode-input").value.trim();
+  const box = $("#decode-results");
+  if (!name){ box.innerHTML = `<div class="err">Type a medication name first.</div>`; return; }
+  box.innerHTML = `<div class="status"><span class="spin"></span>Looking up “${esc(name)}” in the FDA label database…</div>`;
+
+  let rec;
+  try{ rec = await fetchLabel(name); }
+  catch(e){ box.innerHTML = `<div class="err">${esc(e.message)}. Try again in a moment.</div>`; return; }
+
+  // typo rescue via RxNorm before giving up
+  if (!rec){
+    try{
+      const r = await fetch(`${RXNORM}/approximateTerm.json?term=${encodeURIComponent(name)}&maxEntries=1`);
+      const j = await r.json();
+      const cand = j.approximateGroup && j.approximateGroup.candidate && j.approximateGroup.candidate[0];
+      if (cand && cand.rxcui){
+        const r2 = await fetch(`${RXNORM}/rxcui/${cand.rxcui}/property.json?propName=RxNorm%20Name`);
+        const j2 = await r2.json();
+        const suggested = j2.propConceptGroup && j2.propConceptGroup.propConcept && j2.propConceptGroup.propConcept[0].propValue;
+        if (suggested && suggested.toLowerCase() !== name.toLowerCase()){
+          rec = await fetchLabel(suggested.split(" ")[0]);
+          if (rec) box.dataset.note = suggested;
+        }
+      }
+    }catch(e){/* fall through */}
+  }
+
+  if (!rec){
+    box.innerHTML = `<div class="nofind"><span class="eyebrow">No match</span>
+      <h3>Couldn't find “${esc(name)}”.</h3>
+      <p>Check the spelling, or try the other name form — if you searched a brand name, try the generic (or the other way around). Some compounded or very new products may not be in the FDA label database.</p></div>`;
+    return;
+  }
+
+  const d = parseLabel(rec);
+  const noteName = box.dataset.note; delete box.dataset.note;
+  const displayName = d.brand && d.generic && d.brand.toLowerCase()!==d.generic.toLowerCase()
+      ? titlecase(d.brand) : titlecase(d.generic||d.brand||name);
+
+  // build the monograph card
+  let strip = [];
+  if (d.generic) strip.push(`<span><b>generic</b> ${esc(titlecase(d.generic))}</span>`);
+  if (d.brand && d.brand.toLowerCase()!==(d.generic||"").toLowerCase()) strip.push(`<span><b>brand</b> ${esc(titlecase(d.brand))}</span>`);
+  if (d.klass) strip.push(`<span><b>class</b> ${esc(d.klass)}</span>`);
+  if (d.rxcui) strip.push(`<span><b>rxcui</b> ${esc(d.rxcui)}</span>`);
+
+  const rows = [];
+  rows.push(makeRow("What it's used for", d.indications, "FDA label · indications & usage"));
+  rows.push(makeRow("How it works", d.moa, "FDA label · mechanism of action"));
+  rows.push(makeRow("Common side effects", d.adverse, "FDA label · adverse reactions"));
+  if (d.boxed) rows.push(makeRow("⚠ Boxed warning", d.boxed, "FDA label · boxed warning", true));
+
+  box.innerHTML = `
+    ${noteName ? `<div class="status">Showing the closest match: <strong>${esc(titlecase(noteName))}</strong></div>`:""}
+    <article class="card">
+      <div class="card-head">
+        <span class="eyebrow">Medication</span>
+        <div class="name">${esc(displayName)}</div>
+        ${strip.length?`<div class="datastrip">${strip.join("")}</div>`:""}
+      </div>
+      <div class="card-body">${rows.filter(Boolean).join("")}</div>
+    </article>
+    <p class="status" style="padding-top:4px;">This is reference information from the medication's FDA label — not a recommendation about whether to take it. Talk to a pharmacist or doctor about your situation.</p>
+  `;
+
+  // optional: upgrade prose to plain English if proxy configured
+  enhanceRows(box, d);
+}
+
+function makeRow(label, text, src, warn){
+  if (!text) return "";
+  const ex = excerpt(text);
+  const full = text.replace(/\s+/g," ").trim();
+  const needExpand = full.length > ex.length;
+  const id = "r"+Math.random().toString(36).slice(2,8);
+  return `<div class="row" data-full="${esc(full)}" data-label="${esc(label)}">
+    <span class="eyebrow">${esc(label)}</span>
+    <p data-role="text">${esc(ex)}</p>
+    ${needExpand?`<button class="expand" data-target="${id}">Show full FDA text ▾</button><p id="${id}" data-role="full" hidden style="margin-top:8px;color:var(--ink-soft);">${esc(full)}</p>`:""}
+    <div class="src">${esc(src)}</div>
+  </div>`;
+}
+
+/* wire up expanders + (if enabled) plain-English rephrasing */
+async function enhanceRows(box, d){
+  box.querySelectorAll(".expand").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const t = box.querySelector("#"+btn.dataset.target);
+      const open = !t.hidden; t.hidden = open;
+      btn.textContent = open ? "Show full FDA text ▾" : "Hide full FDA text ▴";
+    });
+  });
+  if (!CLAUDE_PROXY_URL) return;
+  // rephrase each row's text in place, keeping original behind a toggle
+  for (const row of box.querySelectorAll(".row")){
+    const label = row.dataset.label, full = row.dataset.full;
+    const plain = await toPlainEnglish(full, label);
+    if (!plain) continue;
+    const p = row.querySelector('[data-role="text"]');
+    const orig = p.textContent;
+    p.textContent = plain;
+    const tog = document.createElement("button");
+    tog.className="expand"; tog.textContent="Show original FDA wording ▾";
+    let showing=false;
+    tog.addEventListener("click",()=>{ showing=!showing; p.textContent = showing?orig:plain; tog.textContent = showing?"Show plain English ▴":"Show original FDA wording ▾"; });
+    p.insertAdjacentElement("afterend", tog);
+    const tag = document.createElement("div"); tag.className="pe-toggle"; tag.textContent="↻ rephrased in plain English from the FDA text";
+    p.insertAdjacentElement("afterend", tag);
+  }
+}
+
+/* =================================================================
+   CHECK INTERACTIONS
+   ================================================================= */
+function drugRow(val=""){
+  const div = document.createElement("div");
+  div.className="drugrow";
+  div.innerHTML = `<input type="text" placeholder="Medication name" autocomplete="off" value="${esc(val)}" />
+    <button class="rm" title="Remove" aria-label="Remove medication">×</button>`;
+  div.querySelector(".rm").addEventListener("click",()=>{
+    if ($("#drug-list").children.length>2) div.remove();
+    else div.querySelector("input").value="";
+  });
+  return div;
+}
+
+async function checkInteractions(){
+  const inputs = [...$("#drug-list").querySelectorAll("input")].map(i=>i.value.trim()).filter(Boolean);
+  const box = $("#check-results");
+  if (inputs.length < 2){ box.innerHTML = `<div class="err">Enter at least two medications to compare.</div>`; return; }
+  box.innerHTML = `<div class="status"><span class="spin"></span>Checking ${inputs.length} medications against the curated set and their FDA labels…</div>`;
+
+  // resolve each drug: tokens for curated matching + label for FDA-mention layer
+  const drugs = [];
+  for (const name of inputs){
+    const tokens = baseTokens(name);
+    let label = null;
+    try{ const rec = await fetchLabel(name); if (rec){ label = parseLabel(rec); (label.substances||[]).forEach(s=>tokens.add(s)); if(label.generic) tokens.add(label.generic.toLowerCase()); } }
+    catch(e){ /* label optional */ }
+    drugs.push({ name, display:titlecase(name), tokens, label });
+  }
+
+  const findings = [];   // curated severity hits
+  const mentions = [];   // FDA-label cross-references
+
+  // all unique pairs
+  for (let i=0;i<drugs.length;i++){
+    for (let j=i+1;j<drugs.length;j++){
+      const A=drugs[i], B=drugs[j];
+
+      // layer 1: curated
+      let matched=false;
+      for (const rule of INTERACTIONS){
+        const ab = sideHit(A.tokens,rule.a) && sideHit(B.tokens,rule.b);
+        const ba = sideHit(A.tokens,rule.b) && sideHit(B.tokens,rule.a);
+        if (ab||ba){ findings.push({A,B,rule}); matched=true; break; }
+      }
+      if (matched) continue;
+
+      // layer 2: does A's FDA label name B (or vice versa)?
+      const m = labelMentions(A,B) || labelMentions(B,A);
+      if (m) mentions.push(m);
+    }
+  }
+
+  renderResults(box, drugs, findings, mentions);
+}
+
+/* check whether drug X's FDA interaction text names drug Y */
+function labelMentions(X, Y){
+  if (!X.label || !X.label.interactionsText) return null;
+  const text = X.label.interactionsText.toLowerCase();
+  const cands = [...Y.tokens].filter(t=>t.length>=5); // avoid short false hits
+  for (const t of cands){
+    const idx = text.indexOf(t);
+    if (idx>-1){
+      // grab the surrounding sentence as a snippet
+      let start = text.lastIndexOf(".", idx); start = start<0?0:start+1;
+      let end = text.indexOf(".", idx); end = end<0?Math.min(text.length, idx+160):end+1;
+      const snip = X.label.interactionsText.slice(start,end).replace(/\s+/g," ").trim();
+      return { from:X.display, to:Y.display, term:t, snippet: snip.length>220? snip.slice(0,220)+"…":snip };
+    }
+  }
+  return null;
+}
+
+function renderResults(box, drugs, findings, mentions){
+  let html = "";
+
+  // order curated findings by severity
+  const rank = {major:0,moderate:1,minor:2};
+  findings.sort((x,y)=>rank[x.rule.severity]-rank[y.rule.severity]);
+
+  if (findings.length){
+    html += `<p class="eyebrow" style="margin-bottom:2px;">Documented interactions · ${findings.length}</p>`;
+    for (const f of findings){
+      const s=f.rule.severity;
+      html += `<div class="verdict v-${s}">
+        <div class="bar"></div>
+        <div class="vbody">
+          <div class="pair">${esc(f.A.display)} ✕ ${esc(f.B.display)}</div>
+          <div class="sev"><span class="pill">${s}</span> ${s==="major"?"Major interaction":s==="moderate"?"Moderate interaction":"Minor interaction"}</div>
+          <p>${esc(f.rule.what)}</p>
+          <p class="mgmt"><b>Why:</b> ${esc(f.rule.why)}</p>
+          <p class="mgmt"><b>What people usually do:</b> ${esc(f.rule.mgmt)}</p>
+          <div class="src">Source: curated from FDA prescribing information &amp; standard clinical references</div>
+        </div>
+      </div>`;
+    }
+  }
+
+  if (mentions.length){
+    html += `<p class="eyebrow" style="margin:18px 0 2px;">Also noted on FDA labels · ${mentions.length}</p>`;
+    for (const m of mentions){
+      html += `<div class="verdict v-note">
+        <div class="bar"></div>
+        <div class="vbody">
+          <div class="pair">${esc(m.from)} → mentions → ${esc(m.to)}</div>
+          <div class="sev"><span class="pill">label</span> Named in the FDA label</div>
+          <p>${esc(m.from)}'s FDA label discusses ${esc(m.to)} in its drug‑interactions section. This isn't severity‑rated — it means the label flags something worth asking about.</p>
+          <p class="mgmt" style="font-style:italic;">“…${esc(m.snippet)}…”</p>
+          <div class="src">Source: openFDA drug label · drug interactions section</div>
+        </div>
+      </div>`;
+    }
+  }
+
+  // the cautious empty state — never a green "safe"
+  if (!findings.length && !mentions.length){
+    html += `<div class="nofind">
+      <span class="eyebrow">No interaction found</span>
+      <h3>Nothing turned up — but that doesn't mean it's safe.</h3>
+      <p>These medications weren't in our curated interaction set, and we didn't find one naming the other on its FDA label. That's reassuring, not conclusive. Interactions depend on dose, your health, and other things this tool can't see. Always confirm a new combination with a pharmacist.</p>
+    </div>`;
+  } else {
+    html += `<p class="status" style="padding-top:14px;">This list shows what was found — it is not a complete safety review. A pharmacist can check the full picture, including doses and your other medications.</p>`;
+  }
+
+  box.innerHTML = html;
+}
+
+/* =================================================================
+   WIRING
+   ================================================================= */
+function selectTab(which){
+  const isDecode = which==="decode";
+  $("#tab-decode").setAttribute("aria-selected", isDecode);
+  $("#tab-check").setAttribute("aria-selected", !isDecode);
+  $("#panel-decode").hidden = !isDecode;
+  $("#panel-check").hidden = isDecode;
+}
+$("#tab-decode").addEventListener("click",()=>selectTab("decode"));
+$("#tab-check").addEventListener("click",()=>selectTab("check"));
+
+$("#decode-btn").addEventListener("click", decode);
+$("#decode-input").addEventListener("keydown", e=>{ if(e.key==="Enter") decode(); });
+
+$("#drug-list").append(drugRow(), drugRow());
+$("#add-drug").addEventListener("click",()=>$("#drug-list").append(drugRow()));
+$("#check-btn").addEventListener("click", checkInteractions);
+$("#drug-list").addEventListener("keydown", e=>{ if(e.key==="Enter") checkInteractions(); });
+
+/* theme toggle — starts light. No persistence yet; it'll save to your
+   Supabase profile once accounts land (Phase 2), so it survives reloads. */
+(function(){
+  const root = document.documentElement, btn = $("#theme-toggle");
+  let dark = false;
+  btn.addEventListener("click", ()=>{
+    dark = !dark;
+    root.setAttribute("data-theme", dark ? "dark" : "light");
+    btn.querySelector(".ticon").textContent  = dark ? "☀" : "☾";
+    btn.querySelector(".tlabel").textContent = dark ? "Light" : "Dark";
+    btn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+  });
+})();
+</script>
+</body>
+</html>

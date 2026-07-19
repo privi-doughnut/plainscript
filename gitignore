@@ -1,0 +1,9 @@
+# No real secrets live in this repo — the Anthropic key is a Worker secret,
+# and the Supabase anon key in config.js is public by design (RLS protects it).
+# This just keeps local noise out.
+.DS_Store
+node_modules/
+.wrangler/
+*.log
+.env
+.env.*
