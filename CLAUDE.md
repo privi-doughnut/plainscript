@@ -72,7 +72,8 @@ Sober, clinical, trustworthy — credibility beats flair here. Cool clinical pap
 
 ## Current state
 - ✅ **Phase 0 shipped:** Decode, hybrid interaction check (curated + FDA-label), persistent safety frame, methodology section, dark theme, mobile/accessible.
-- **Next:** Phase 1 (plain-English via Worker — hook already wired) + Phase 2 (Supabase accounts + My Cabinet), then the flagship **Phase 3: Cabinet Scan** (whole-cabinet N×N interaction matrix + "what to ask your pharmacist" generator).
+- ✅ **Phase 2 built (code complete):** Supabase accounts + My Cabinet — OAuth sign-in (GitHub/Google), saved meds with FDA-resolved identifiers, per-med notes, theme sync to profile, all RLS-scoped. Implemented dependency-free (direct `fetch` to Supabase's auth/REST APIs — no supabase-js). Dormant until the Supabase URL + anon key land in `config.js`; one-time dashboard steps are at the top of `supabase/schema.sql`.
+- **Next:** Phase 1 (plain-English via Worker — hook already wired), then the flagship **Phase 3: Cabinet Scan** (whole-cabinet N×N interaction matrix + "what to ask your pharmacist" generator). A one-tap "check my whole cabinet" bridge into the existing checker already exists as the seed.
 - Full plan and sequencing in `PLAINSCRIPT_ROADMAP.md`.
 
 ## Non-goals (do NOT build)

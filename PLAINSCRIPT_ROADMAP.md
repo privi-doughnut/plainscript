@@ -26,13 +26,14 @@
 - ⬜ **"Explain it simpler" toggle** — 8th-grade vs "explain like I'm 10" on any result.
 - ⬜ **Plain-language glossary tooltips** — tap a scary word ("hepatic," "contraindicated") for a one-line plain definition.
 
-## Phase 2 — Accounts + My Cabinet (Supabase) ⬜
+## Phase 2 — Accounts + My Cabinet (Supabase) ✅ *(code complete — lights up when the Supabase URL + anon key land in `config.js`)*
 *The thing that turns a lookup tool into something people come back to.*
-- ⬜ Supabase auth — OAuth sign-in (GitHub is easiest; Google needs the verification dance you did for Rune Script).
-- ⬜ **My Cabinet** — save the meds you actually take, once.
-- ⬜ Per-med personal notes ("morning, with food").
-- ⬜ Persist theme + settings to the user profile (so dark mode survives reloads).
-- ⬜ Row-level security so a user only ever sees their own cabinet.
+- ✅ Supabase auth — OAuth sign-in with GitHub + Google buttons (enable either/both in the Supabase dashboard; setup steps at the top of `supabase/schema.sql`). Dependency-free: the app talks straight to Supabase's auth + REST APIs with `fetch` — no supabase-js.
+- ✅ **My Cabinet** — save meds from a decoded card or by typing a name; every save resolves against the real FDA label so the row carries sourced identifiers (generic, brand, RxCUI, class), with RxCUI-based duplicate detection.
+- ✅ Per-med personal notes ("morning, with food").
+- ✅ Theme persists — localStorage for everyone, plus the Supabase profile when signed in, so dark mode follows you across devices.
+- ✅ Row-level security so a user only ever sees their own cabinet (`supabase/schema.sql`).
+- ✅ Bonus: one-tap **"check my whole cabinet for interactions"** pours the saved list into the checker — the seed of Phase 3's Cabinet Scan.
 
 ## Phase 3 — 🚩 Cabinet Scan (the flagship) ⬜
 *This is the feature Google structurally cannot do. Build this before any breadth.*

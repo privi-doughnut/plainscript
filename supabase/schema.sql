@@ -2,6 +2,22 @@
 -- Paste into the Supabase SQL Editor and run.
 -- Everything below is scoped per-user by Row-Level Security: a signed-in user
 -- can only ever see or change their own rows.
+--
+-- ONE-TIME PROJECT SETUP (dashboard, ~5 minutes):
+-- 1. Run this file in the SQL Editor.
+-- 2. Authentication → Providers → enable GitHub (fast) and/or Google.
+--    For GitHub: create an OAuth app at github.com/settings/developers,
+--    set its callback URL to the one Supabase shows on that provider page,
+--    then paste the client ID + secret into Supabase.
+-- 3. Authentication → URL Configuration → add every URL the app runs at to
+--    "Redirect URLs" (e.g. http://localhost:8000, your GitHub Pages URL,
+--    your Netlify URL). If the app's URL isn't allow-listed, OAuth silently
+--    redirects to the Site URL instead — which looks like a broken login.
+-- 4. Project Settings → API → copy the Project URL and anon public key into
+--    config.js (SUPABASE_URL / SUPABASE_ANON_KEY).
+--
+-- The anon key is safe to publish: it only grants what these RLS policies
+-- allow, and every policy below is scoped to auth.uid().
 
 -- 1. Per-user profile (settings like theme preference) --------------------
 create table if not exists public.profiles (

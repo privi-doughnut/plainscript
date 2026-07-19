@@ -73,7 +73,7 @@
     -webkit-font-smoothing:antialiased;
     transition:background-color .25s ease, color .25s ease;
   }
-  .card,.verdict,.nofind,input[type=text],.themetoggle,.tab,.card-head,.row{
+  .card,.verdict,.nofind,input[type=text],.themetoggle,.tab,.card-head,.row,.mini,.provider,.signin,textarea{
     transition:background-color .25s ease, border-color .25s ease, color .25s ease;
   }
   @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
@@ -241,6 +241,52 @@
   details .content a{color:var(--accent-deep);}
   details .content code{font-family:var(--mono); font-size:12.5px; background:var(--line-soft); padding:1px 5px; border-radius:4px; color:var(--ink);}
 
+  /* ---------- accounts + My Cabinet (Phase 2) ---------- */
+  .acct{display:inline-flex; align-items:center; gap:8px; align-self:center;}
+  .acct .who{
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);
+    max-width:190px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .mini{
+    appearance:none; cursor:pointer; font-family:var(--mono); font-size:12px; letter-spacing:.03em;
+    padding:8px 13px; border:1px solid var(--line); border-radius:20px;
+    background:var(--card); color:var(--ink-soft);
+  }
+  .mini:hover{border-color:var(--accent); color:var(--accent-deep);}
+  .mini:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .mini:disabled{opacity:.6; cursor:default;}
+  .mini:disabled:hover{border-color:var(--line); color:var(--ink-soft);}
+
+  .signin{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:22px 20px;
+  }
+  .signin h3{font-family:var(--serif); font-size:20px; font-weight:600; margin:6px 0 8px;}
+  .signin p{margin:0 0 14px; color:var(--ink-soft); font-size:14.5px; max-width:58ch;}
+  .providers{display:flex; gap:9px; flex-wrap:wrap;}
+  .provider{
+    appearance:none; cursor:pointer; font-family:var(--sans); font-weight:600; font-size:14.5px;
+    padding:12px 18px; border-radius:var(--radius); border:1px solid var(--line);
+    background:var(--card); color:var(--ink); display:inline-flex; gap:9px; align-items:center;
+  }
+  .provider:hover{border-color:var(--accent); background:var(--accent-wash);}
+  .provider:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  .medrow .medgrid{display:flex; gap:12px; padding:16px 18px; align-items:flex-start;}
+  .medrow .medinfo{flex:1; min-width:0;}
+  .medrow .name{font-family:var(--serif); font-size:19px; font-weight:600; line-height:1.2;}
+  .medrow .datastrip{margin-top:6px;}
+  .mednote{margin-top:10px;}
+  .mednote p{margin:0 0 4px; font-size:14px; color:var(--ink-soft); font-style:italic;}
+  .mednote textarea{
+    width:100%; font-family:var(--sans); font-size:14.5px; padding:10px 12px;
+    border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink);
+    resize:vertical; min-height:64px;
+  }
+  .mednote textarea:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-wash);}
+  .notebtns{display:flex; gap:8px; margin-top:8px;}
+  .cab-tools{display:flex; gap:9px; flex-wrap:wrap; align-items:center; margin-top:18px;}
+
   footer{border-top:1px solid var(--line); padding:22px 0 40px; color:var(--ink-faint); font-size:12.5px; font-family:var(--mono);}
   footer a{color:var(--accent-deep);}
 
@@ -266,6 +312,8 @@
     <button id="theme-toggle" class="themetoggle" aria-label="Switch to dark theme" title="Toggle light / dark">
       <span class="ticon" aria-hidden="true">☾</span><span class="tlabel">Dark</span>
     </button>
+    <!-- account chip — stays empty until Supabase is configured (Phase 2) -->
+    <span class="acct" id="acct"></span>
   </div>
   <p class="lede">Type in a medication to find out what it actually is, or check whether two or more medications are known to interact — explained in plain language, sourced from FDA and NIH data.</p>
 
@@ -275,6 +323,9 @@
     </button>
     <button class="tab" id="tab-check" role="tab" aria-selected="false" aria-controls="panel-check">
       <span class="num">02</span><span>Check an <span class="label-full">interaction</span><span aria-hidden="true" style="display:none">interaction</span></span>
+    </button>
+    <button class="tab" id="tab-cabinet" role="tab" aria-selected="false" aria-controls="panel-cabinet">
+      <span class="num">03</span><span><span class="label-full">My </span>Cabinet</span>
     </button>
   </div>
 </div></header>
@@ -305,6 +356,13 @@
     <div class="results" id="check-results" aria-live="polite"></div>
   </section>
 
+  <!-- ===================== PANEL 3: MY CABINET (Phase 2) ===================== -->
+  <section class="panel" id="panel-cabinet" role="tabpanel" aria-labelledby="tab-cabinet" hidden>
+    <p class="panel-intro">Save the medications you actually take — once — with your own notes, so you can decode them or re‑check interactions any time. Your list is private to your account.</p>
+    <div id="cabinet-body"></div>
+    <p class="status" id="cabinet-status" role="status"></p>
+  </section>
+
   <!-- ===================== METHODOLOGY ===================== -->
   <div class="method">
     <p class="eyebrow" style="margin-bottom:6px;">How this works &amp; what it can't do</p>
@@ -321,6 +379,12 @@
       <div class="content">
         <p>In January 2024 the U.S. National Library of Medicine shut down its free drug‑interaction API. There is no longer a free, comprehensive, severity‑rated interaction database — paid clinical databases (DrugBank, Micromedex) hold that data now.</p>
         <p>So this tool can confirm an interaction it knows about, but it can <b>never</b> prove that a combination is safe. A result of "nothing found" only means it wasn't in our curated set or the FDA labels we checked — not that the drugs are safe together. That's why you'll never see a green check here. Always confirm with a pharmacist.</p>
+      </div>
+    </details>
+    <details>
+      <summary>What happens to my account data <span class="chev">›</span></summary>
+      <div class="content">
+        <p>Signing in is optional — Decode and the interaction check work without an account. If you do sign in (to use My Cabinet), the only things stored are the medications you chose to save and any notes you typed, in a <a href="https://supabase.com" target="_blank" rel="noopener">Supabase</a> database under your user ID. Row‑level security enforces, at the database level, that your rows are readable and writable only by you. Removing a medication deletes its row; there's no separate copy. Nothing about your searches is stored.</p>
       </div>
     </details>
     <details>
@@ -556,6 +620,30 @@ function parseLabel(rec){
   };
 }
 
+/* find a label, rescuing typos via RxNorm before giving up.
+   Shared by Decode and My Cabinet so both resolve names the same way. */
+async function resolveLabel(name){
+  let rec = await fetchLabel(name);
+  let suggested = null;
+  if (!rec){
+    try{
+      const r = await fetch(`${RXNORM}/approximateTerm.json?term=${encodeURIComponent(name)}&maxEntries=1`);
+      const j = await r.json();
+      const cand = j.approximateGroup && j.approximateGroup.candidate && j.approximateGroup.candidate[0];
+      if (cand && cand.rxcui){
+        const r2 = await fetch(`${RXNORM}/rxcui/${cand.rxcui}/property.json?propName=RxNorm%20Name`);
+        const j2 = await r2.json();
+        const s = j2.propConceptGroup && j2.propConceptGroup.propConcept && j2.propConceptGroup.propConcept[0].propValue;
+        if (s && s.toLowerCase() !== name.toLowerCase()){
+          rec = await fetchLabel(s.split(" ")[0]);
+          if (rec) suggested = s;
+        }
+      }
+    }catch(e){/* typo rescue is best-effort */}
+  }
+  return { rec, suggested };
+}
+
 /* trim long FDA prose to a readable excerpt */
 function excerpt(t, n=480){
   if (!t) return null;
@@ -594,27 +682,9 @@ async function decode(){
   if (!name){ box.innerHTML = `<div class="err">Type a medication name first.</div>`; return; }
   box.innerHTML = `<div class="status"><span class="spin"></span>Looking up “${esc(name)}” in the FDA label database…</div>`;
 
-  let rec;
-  try{ rec = await fetchLabel(name); }
+  let rec, noteName = null;
+  try{ const rr = await resolveLabel(name); rec = rr.rec; noteName = rr.suggested; }
   catch(e){ box.innerHTML = `<div class="err">${esc(e.message)}. Try again in a moment.</div>`; return; }
-
-  // typo rescue via RxNorm before giving up
-  if (!rec){
-    try{
-      const r = await fetch(`${RXNORM}/approximateTerm.json?term=${encodeURIComponent(name)}&maxEntries=1`);
-      const j = await r.json();
-      const cand = j.approximateGroup && j.approximateGroup.candidate && j.approximateGroup.candidate[0];
-      if (cand && cand.rxcui){
-        const r2 = await fetch(`${RXNORM}/rxcui/${cand.rxcui}/property.json?propName=RxNorm%20Name`);
-        const j2 = await r2.json();
-        const suggested = j2.propConceptGroup && j2.propConceptGroup.propConcept && j2.propConceptGroup.propConcept[0].propValue;
-        if (suggested && suggested.toLowerCase() !== name.toLowerCase()){
-          rec = await fetchLabel(suggested.split(" ")[0]);
-          if (rec) box.dataset.note = suggested;
-        }
-      }
-    }catch(e){/* fall through */}
-  }
 
   if (!rec){
     box.innerHTML = `<div class="nofind"><span class="eyebrow">No match</span>
@@ -624,7 +694,6 @@ async function decode(){
   }
 
   const d = parseLabel(rec);
-  const noteName = box.dataset.note; delete box.dataset.note;
   const displayName = d.brand && d.generic && d.brand.toLowerCase()!==d.generic.toLowerCase()
       ? titlecase(d.brand) : titlecase(d.generic||d.brand||name);
 
@@ -653,6 +722,9 @@ async function decode(){
     </article>
     <p class="status" style="padding-top:4px;">This is reference information from the medication's FDA label — not a recommendation about whether to take it. Talk to a pharmacist or doctor about your situation.</p>
   `;
+
+  // Phase 2: offer to save this med to the signed-in user's cabinet
+  addCabinetSave(box, d, name);
 
   // optional: upgrade prose to plain English if proxy configured
   enhanceRows(box, d);
@@ -833,15 +905,15 @@ function renderResults(box, drugs, findings, mentions){
 /* =================================================================
    WIRING
    ================================================================= */
+const TABS = ["decode","check","cabinet"];
 function selectTab(which){
-  const isDecode = which==="decode";
-  $("#tab-decode").setAttribute("aria-selected", isDecode);
-  $("#tab-check").setAttribute("aria-selected", !isDecode);
-  $("#panel-decode").hidden = !isDecode;
-  $("#panel-check").hidden = isDecode;
+  for (const t of TABS){
+    const on = t === which;
+    $("#tab-"+t).setAttribute("aria-selected", on);
+    $("#panel-"+t).hidden = !on;
+  }
 }
-$("#tab-decode").addEventListener("click",()=>selectTab("decode"));
-$("#tab-check").addEventListener("click",()=>selectTab("check"));
+TABS.forEach(t => $("#tab-"+t).addEventListener("click", ()=>selectTab(t)));
 
 $("#decode-btn").addEventListener("click", decode);
 $("#decode-input").addEventListener("keydown", e=>{ if(e.key==="Enter") decode(); });
@@ -851,18 +923,478 @@ $("#add-drug").addEventListener("click",()=>$("#drug-list").append(drugRow()));
 $("#check-btn").addEventListener("click", checkInteractions);
 $("#drug-list").addEventListener("keydown", e=>{ if(e.key==="Enter") checkInteractions(); });
 
-/* theme toggle — starts light. No persistence yet; it'll save to your
-   Supabase profile once accounts land (Phase 2), so it survives reloads. */
-(function(){
-  const root = document.documentElement, btn = $("#theme-toggle");
-  let dark = false;
-  btn.addEventListener("click", ()=>{
-    dark = !dark;
-    root.setAttribute("data-theme", dark ? "dark" : "light");
-    btn.querySelector(".ticon").textContent  = dark ? "☀" : "☾";
-    btn.querySelector(".tlabel").textContent = dark ? "Light" : "Dark";
-    btn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+/* =================================================================
+   THEME — light by default. Persists to localStorage always, and to
+   the Supabase profile when signed in (so it follows you across
+   devices). Profile wins over localStorage once it loads.
+   ================================================================= */
+const THEME_KEY = "plainscript.theme";
+
+function isDark(){ return document.documentElement.getAttribute("data-theme") === "dark"; }
+
+function applyTheme(dark, opts){
+  opts = opts || {};
+  const btn = $("#theme-toggle");
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+  btn.querySelector(".ticon").textContent  = dark ? "☀" : "☾";
+  btn.querySelector(".tlabel").textContent = dark ? "Light" : "Dark";
+  btn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+  if (opts.persist !== false){
+    try{ localStorage.setItem(THEME_KEY, dark ? "dark" : "light"); }catch(e){}
+    // upsert (not update) so it works even if the profile row doesn't exist yet
+    if (session) db("profiles", {
+      method:"POST", body:{ id: session.user.id, theme: dark?"dark":"light" },
+      prefer:"resolution=merge-duplicates,return=minimal"
+    }).catch(()=>{});
+  }
+}
+$("#theme-toggle").addEventListener("click", ()=>applyTheme(!isDark()));
+try{ if (localStorage.getItem(THEME_KEY) === "dark") applyTheme(true, {persist:false}); }catch(e){}
+
+/* =================================================================
+   PHASE 2 — ACCOUNTS + MY CABINET (Supabase)
+
+   Deliberately dependency-free: instead of shipping the supabase-js
+   library, we talk to Supabase's two HTTP APIs directly with fetch —
+   - GoTrue (auth):   /auth/v1/*  — OAuth redirect, token refresh, logout
+   - PostgREST (db):  /rest/v1/*  — the profiles + medications tables
+   Security model: the anon key is public by design; every table has
+   Row-Level Security scoped to auth.uid() (supabase/schema.sql), so
+   the access token — not this client code — is what limits reads and
+   writes to the signed-in user's own rows.
+
+   None of this touches the medical-data path: cabinet rows only store
+   what the user chose to save (name + FDA-resolved identifiers + their
+   own note). All drug FACTS still come from openFDA/RxNorm at view time.
+   ================================================================= */
+const SB_ENABLED  = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+const SESSION_KEY = "plainscript.session";
+
+let session   = null;  // {access_token, refresh_token, expires_at, user:{id,email}}
+let cabinet   = null;  // the signed-in user's saved meds, once loaded
+let authError = null;  // OAuth error passed back on the redirect, if any
+let refreshTimer = null;
+
+/* --- session plumbing -------------------------------------------- */
+
+/* read a JWT's payload (no verification needed client-side — the server
+   verifies the signature on every request; we just want email + user id) */
+function jwtPayload(token){
+  try{
+    const p = token.split(".")[1].replace(/-/g,"+").replace(/_/g,"/");
+    return JSON.parse(atob(p));
+  }catch(e){ return null; }
+}
+
+function saveSession(s){
+  try{
+    if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+    else   localStorage.removeItem(SESSION_KEY);
+  }catch(e){}
+}
+
+function loadStoredSession(){
+  try{
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (raw) session = JSON.parse(raw);
+  }catch(e){ session = null; }
+}
+
+/* after the OAuth round-trip, Supabase puts tokens in the URL fragment
+   (#access_token=…). Capture them, then scrub the URL so tokens never
+   sit in the address bar or browser history. Returns true if we just
+   arrived from a sign-in. */
+function captureOAuthRedirect(){
+  if (!location.hash || location.hash.length < 2) return false;
+  const h = new URLSearchParams(location.hash.slice(1));
+  if (h.get("error") || h.get("error_description")){
+    authError = h.get("error_description") || h.get("error");
+    history.replaceState(null, "", location.pathname + location.search);
+    return false;
+  }
+  const at = h.get("access_token");
+  if (!at) return false;
+  const payload = jwtPayload(at) || {};
+  session = {
+    access_token:  at,
+    refresh_token: h.get("refresh_token") || "",
+    expires_at:    Math.floor(Date.now()/1000) + (parseInt(h.get("expires_in"),10) || 3600),
+    user: { id: payload.sub || "", email: payload.email || "" }
+  };
+  saveSession(session);
+  history.replaceState(null, "", location.pathname + location.search);
+  return true;
+}
+
+async function refreshSession(){
+  if (!session || !session.refresh_token) throw new Error("signed out");
+  const res = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=refresh_token", {
+    method:"POST",
+    headers:{ apikey:SUPABASE_ANON_KEY, "Content-Type":"application/json" },
+    body: JSON.stringify({ refresh_token: session.refresh_token })
   });
+  if (!res.ok) throw new Error("session refresh failed");
+  const d = await res.json();
+  const payload = jwtPayload(d.access_token) || {};
+  session = {
+    access_token:  d.access_token,
+    refresh_token: d.refresh_token || session.refresh_token,
+    expires_at:    Math.floor(Date.now()/1000) + (d.expires_in || 3600),
+    user: {
+      id:    (d.user && d.user.id)    || payload.sub   || session.user.id,
+      email: (d.user && d.user.email) || payload.email || session.user.email
+    }
+  };
+  saveSession(session);
+  scheduleRefresh();
+}
+
+/* refresh a couple of minutes before the access token expires */
+function scheduleRefresh(){
+  clearTimeout(refreshTimer);
+  if (!session) return;
+  const secs = Math.max(30, session.expires_at - Math.floor(Date.now()/1000) - 120);
+  refreshTimer = setTimeout(()=>refreshSession().catch(localSignOut), secs*1000);
+}
+
+async function ensureFreshSession(){
+  if (!session) throw new Error("You're signed out — sign in to use your cabinet.");
+  if (Math.floor(Date.now()/1000) > session.expires_at - 60){
+    try{ await refreshSession(); }
+    catch(e){ localSignOut(); throw new Error("Your session expired — please sign in again."); }
+  }
+}
+
+function signIn(provider){
+  // GoTrue handles the whole OAuth dance; it sends the user back to this
+  // exact page with tokens in the URL fragment (captured above).
+  const back = encodeURIComponent(location.origin + location.pathname);
+  location.href = SUPABASE_URL + "/auth/v1/authorize?provider=" + provider + "&redirect_to=" + back;
+}
+
+function localSignOut(){
+  clearTimeout(refreshTimer);
+  session = null; cabinet = null;
+  saveSession(null);
+  renderAcct(); renderCabinet();
+}
+
+async function signOut(){
+  const t = session && session.access_token;
+  localSignOut(); // drop local state first so the UI never hangs on the network
+  if (t){
+    try{
+      await fetch(SUPABASE_URL + "/auth/v1/logout", {
+        method:"POST", headers:{ apikey:SUPABASE_ANON_KEY, Authorization:"Bearer "+t }
+      });
+    }catch(e){/* server-side revoke is best-effort */}
+  }
+}
+
+/* --- database calls (PostgREST) ---------------------------------- */
+async function db(path, opts){
+  opts = opts || {};
+  await ensureFreshSession();
+  const call = () => fetch(SUPABASE_URL + "/rest/v1/" + path, {
+    method: opts.method || "GET",
+    headers:{
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: "Bearer " + session.access_token,   // RLS keys off this
+      "Content-Type": "application/json",
+      Prefer: opts.prefer || "return=representation"
+    },
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  let res = await call();
+  if (res.status === 401){ // stale token → one refresh + retry
+    try{ await refreshSession(); }
+    catch(e){ localSignOut(); throw new Error("Your session expired — please sign in again."); }
+    res = await call();
+  }
+  if (!res.ok) throw new Error("Couldn't reach your cabinet (error "+res.status+") — try again.");
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function loadProfile(){
+  const rows = await db("profiles?select=theme&id=eq." + session.user.id);
+  const t = rows && rows[0] && rows[0].theme;
+  if (t === "dark" || t === "light"){
+    applyTheme(t === "dark", {persist:false});
+    try{ localStorage.setItem(THEME_KEY, t); }catch(e){}
+  }
+}
+
+async function loadCabinet(){
+  cabinet = (await db("medications?select=*&order=created_at.asc")) || [];
+}
+
+/* is this drug already saved? Match by RxCUI when we have it, else by
+   resolved generic/brand name, else by what was typed. */
+function findInCabinet(d, typed){
+  if (!cabinet) return null;
+  const rx  = d && d.rxcui;
+  const key = ((d && (d.generic || d.brand)) || typed || "").toLowerCase();
+  for (const m of cabinet){
+    if (rx && m.rxcui && m.rxcui === rx) return m;
+    const mkey = (m.generic || m.brand || m.name || "").toLowerCase();
+    if (key && mkey === key) return m;
+  }
+  return null;
+}
+
+async function insertMed(typed, d){
+  const rows = await db("medications", { method:"POST", body:{
+    user_id:    session.user.id,       // RLS double-checks this equals auth.uid()
+    name:       typed,
+    generic:    d && d.generic ? titlecase(d.generic) : null,
+    brand:      d && d.brand   ? titlecase(d.brand)   : null,
+    rxcui:      (d && d.rxcui) || null,
+    drug_class: (d && d.klass) || null
+  }});
+  if (rows && rows[0]){ cabinet = cabinet || []; cabinet.push(rows[0]); }
+  return rows && rows[0];
+}
+
+/* --- header account chip ----------------------------------------- */
+function renderAcct(){
+  const el = $("#acct");
+  if (!SB_ENABLED){ el.innerHTML = ""; return; }
+  if (session){
+    el.innerHTML = `<span class="who" title="${esc(session.user.email)}">${esc(session.user.email || "signed in")}</span>
+      <button class="mini" id="signout-btn">Sign out</button>`;
+    $("#signout-btn").addEventListener("click", signOut);
+  } else {
+    el.innerHTML = `<button class="mini" id="signin-btn">Sign in</button>`;
+    $("#signin-btn").addEventListener("click", ()=>selectTab("cabinet"));
+  }
+}
+
+/* --- "save to cabinet" button on a decoded card ------------------- */
+function addCabinetSave(box, d, typed){
+  if (!SB_ENABLED) return;
+  const head = box.querySelector(".card-head");
+  if (!head) return;
+  const btn = document.createElement("button");
+  btn.className = "mini";
+  btn.style.marginTop = "12px";
+  if (!session){
+    btn.textContent = "＋ Save to My Cabinet — sign in";
+    btn.addEventListener("click", ()=>selectTab("cabinet"));
+  } else if (findInCabinet(d, typed)){
+    btn.textContent = "✓ In your cabinet";
+    btn.disabled = true;
+  } else {
+    btn.textContent = "＋ Save to My Cabinet";
+    btn.addEventListener("click", async ()=>{
+      btn.disabled = true; btn.textContent = "Saving…";
+      try{
+        await insertMed(typed, d);
+        renderCabinet();
+        btn.textContent = "✓ Saved to your cabinet";
+      }catch(e){
+        btn.disabled = false; btn.textContent = "Couldn't save — try again";
+      }
+    });
+  }
+  head.appendChild(btn);
+}
+
+/* --- the cabinet panel ------------------------------------------- */
+function cabinetStatus(msg){ $("#cabinet-status").textContent = msg || ""; }
+
+function medRowHTML(m){
+  const display = m.generic || m.brand || m.name;
+  const strip = [];
+  if (m.generic && m.brand && m.brand.toLowerCase() !== m.generic.toLowerCase())
+    strip.push(`<span><b>brand</b> ${esc(m.brand)}</span>`);
+  if (m.drug_class) strip.push(`<span><b>class</b> ${esc(m.drug_class)}</span>`);
+  if (m.rxcui)      strip.push(`<span><b>rxcui</b> ${esc(m.rxcui)}</span>`);
+  if (!m.rxcui && !m.generic)
+    strip.push(`<span><b>note</b> not matched to an FDA label — check the spelling</span>`);
+  return `<article class="card medrow" data-id="${esc(m.id)}">
+    <div class="medgrid">
+      <div class="medinfo">
+        <div class="name">${esc(titlecase(display))}</div>
+        ${strip.length ? `<div class="datastrip">${strip.join("")}</div>` : ""}
+        <div class="mednote" data-role="note">
+          ${m.notes
+            ? `<p>“${esc(m.notes)}”</p><button class="expand" data-act="edit">Edit note</button>`
+            : `<button class="expand" data-act="edit">＋ Add a personal note (e.g. “morning, with food”)</button>`}
+        </div>
+      </div>
+      <button class="rm" data-act="remove" title="Remove" aria-label="Remove ${esc(titlecase(display))} from your cabinet">×</button>
+    </div>
+  </article>`;
+}
+
+function renderCabinet(){
+  const box = $("#cabinet-body");
+  cabinetStatus("");
+
+  if (!SB_ENABLED){
+    box.innerHTML = `<div class="nofind">
+      <span class="eyebrow">Not switched on yet</span>
+      <h3>Accounts aren't configured in this deployment.</h3>
+      <p>My Cabinet needs a (free) Supabase project behind it: run <code>supabase/schema.sql</code> there, then put the project URL and anon key into <code>config.js</code>. Everything else in Plainscript works without it.</p>
+    </div>`;
+    return;
+  }
+
+  if (!session){
+    box.innerHTML = `<div class="signin">
+      <span class="eyebrow">My Cabinet · sign in</span>
+      <h3>Keep your real medication list in one place.</h3>
+      <p>Save the meds you actually take, add your own reminders (like “morning, with food”), and re‑run the interaction check on all of them any time. Your list lives in your own account, protected by row‑level security — no one else can read it.</p>
+      ${authError ? `<div class="err" style="margin-bottom:12px;">Sign‑in didn't complete: ${esc(authError)}</div>` : ""}
+      <div class="providers">
+        <button class="provider" data-act="signin-github">Continue with GitHub</button>
+        <button class="provider" data-act="signin-google">Continue with Google</button>
+      </div>
+      <p class="status" style="padding:12px 0 0;">Sign‑in only exists to keep your list. Plainscript stores nothing beyond the medications and notes you save — searches aren't recorded.</p>
+    </div>`;
+    return;
+  }
+
+  let html = `<div class="field">
+    <label class="eyebrow" for="cab-input">Add a medication</label>
+    <div class="inrow">
+      <input type="text" id="cab-input" placeholder="e.g. metformin, Lipitor" autocomplete="off" />
+      <button class="go" id="cab-add-btn" data-act="add">Save to cabinet</button>
+    </div>
+  </div>`;
+
+  if (cabinet === null){
+    html += `<div class="status" style="margin-top:10px;"><span class="spin"></span>Loading your cabinet…</div>`;
+  } else if (!cabinet.length){
+    html += `<div class="nofind" style="margin-top:18px;">
+      <span class="eyebrow">Empty cabinet</span>
+      <h3>Nothing saved yet.</h3>
+      <p>Add a medication above, or decode one in tab 01 and hit “Save to My Cabinet”.</p>
+    </div>`;
+  } else {
+    html += `<div class="results">${cabinet.map(medRowHTML).join("")}</div>`;
+    if (cabinet.length >= 2){
+      html += `<div class="cab-tools">
+        <button class="ghost" data-act="tocheck">Check my whole cabinet for interactions →</button>
+      </div>`;
+    }
+    html += `<p class="status" style="padding-top:14px;">Your cabinet is a personal reference list, not a medical record — keep your pharmacist's list as the source of truth.</p>`;
+  }
+  box.innerHTML = html;
+}
+
+async function onAddMed(){
+  const input = $("#cab-input");
+  const typed = (input.value || "").trim();
+  if (!typed){ cabinetStatus("Type a medication name first."); input.focus(); return; }
+  const btn = $("#cab-add-btn");
+  btn.disabled = true;
+  cabinetStatus("Looking up “" + typed + "” in the FDA label database…");
+  // resolve against the real FDA label so the saved row carries sourced
+  // identifiers (generic, brand, RxCUI, class) — never made-up ones
+  let d = null;
+  try{ const rr = await resolveLabel(typed); if (rr.rec) d = parseLabel(rr.rec); }
+  catch(e){/* FDA hiccup — still allow saving the raw name */}
+  const dup = findInCabinet(d, typed);
+  if (dup){
+    cabinetStatus("Already in your cabinet as " + titlecase(dup.generic || dup.name) + ".");
+    btn.disabled = false;
+    return;
+  }
+  try{
+    await insertMed(typed, d);
+    renderCabinet();
+    cabinetStatus(d ? "Saved." : "Saved — but it didn't match an FDA label, so double-check the spelling.");
+  }catch(e){
+    cabinetStatus(e.message);
+    btn.disabled = false;
+  }
+}
+
+function openNoteEditor(card){
+  const m = cabinet.find(x => x.id === card.dataset.id);
+  if (!m) return;
+  const holder = card.querySelector('[data-role="note"]');
+  holder.innerHTML = `<textarea maxlength="500" aria-label="Personal note" placeholder="e.g. morning, with food">${esc(m.notes || "")}</textarea>
+    <div class="notebtns">
+      <button class="mini" data-act="note-save">Save note</button>
+      <button class="mini" data-act="note-cancel">Cancel</button>
+    </div>`;
+  holder.querySelector("textarea").focus();
+}
+
+async function saveNote(card){
+  const id = card.dataset.id;
+  const val = card.querySelector("textarea").value.trim();
+  try{
+    await db("medications?id=eq." + encodeURIComponent(id),
+      { method:"PATCH", body:{ notes: val || null }, prefer:"return=minimal" });
+    const m = cabinet.find(x => x.id === id);
+    if (m) m.notes = val || null;
+    renderCabinet();
+  }catch(e){ cabinetStatus(e.message); }
+}
+
+async function removeMed(card){
+  const id = card.dataset.id;
+  try{
+    await db("medications?id=eq." + encodeURIComponent(id),
+      { method:"DELETE", prefer:"return=minimal" });
+    cabinet = cabinet.filter(x => x.id !== id);
+    renderCabinet();
+  }catch(e){ cabinetStatus(e.message); }
+}
+
+/* one tap: pour the whole cabinet into the interaction checker.
+   (Phase 3 turns this into the full Cabinet Scan view.) */
+function checkCabinet(){
+  const list = $("#drug-list");
+  list.innerHTML = "";
+  cabinet.forEach(m => list.append(drugRow(titlecase(m.generic || m.brand || m.name))));
+  while (list.children.length < 2) list.append(drugRow());
+  selectTab("check");
+  checkInteractions();
+}
+
+/* one delegated listener covers every button the cabinet re-renders */
+$("#cabinet-body").addEventListener("click", e => {
+  const btn = e.target.closest("[data-act]");
+  if (!btn) return;
+  const act  = btn.dataset.act;
+  const card = btn.closest(".medrow");
+  if (act === "signin-github") signIn("github");
+  else if (act === "signin-google") signIn("google");
+  else if (act === "add")     onAddMed();
+  else if (act === "tocheck") checkCabinet();
+  else if (card && act === "edit")        openNoteEditor(card);
+  else if (card && act === "note-save")   saveNote(card);
+  else if (card && act === "note-cancel") renderCabinet();
+  else if (card && act === "remove")      removeMed(card);
+});
+$("#cabinet-body").addEventListener("keydown", e => {
+  if (e.key === "Enter" && e.target.id === "cab-input") onAddMed();
+});
+
+/* --- boot -------------------------------------------------------- */
+(async function initAccounts(){
+  if (!SB_ENABLED){ renderAcct(); renderCabinet(); return; }
+  const justSignedIn = captureOAuthRedirect();
+  if (!session) loadStoredSession();
+  if (session && Math.floor(Date.now()/1000) > session.expires_at - 60){
+    try{ await refreshSession(); }
+    catch(e){ session = null; saveSession(null); }
+  }
+  renderAcct();
+  renderCabinet();
+  if (authError) selectTab("cabinet"); // surface the sign-in error where it's explained
+  if (!session) return;
+  scheduleRefresh();
+  loadProfile().catch(()=>{/* theme falls back to localStorage */});
+  try{ await loadCabinet(); }
+  catch(e){ cabinet = []; cabinetStatus(e.message); }
+  renderCabinet();
+  if (justSignedIn) selectTab("cabinet"); // land the user on their cabinet after OAuth
 })();
 </script>
 </body>

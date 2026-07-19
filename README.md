@@ -10,8 +10,9 @@ Open `index.html` in a browser, or serve the folder (`python3 -m http.server`). 
 ## What works today
 - **Decode** — enter a brand or generic name; get what it treats, how it works, side effects, drug class, brand/generic, and boxed warnings, pulled live from the drug's FDA label. Fixes typos via RxNorm.
 - **Check interactions** — enter 2+ meds; get severity-rated, plain-English, sourced warnings from a curated interaction set plus a cross-reference of each drug's FDA label.
-- **Light / dark theme** — sober clinical styling; light by default.
+- **Light / dark theme** — sober clinical styling; light by default, and your choice survives reloads.
 - Mobile-first and accessible.
+- **My Cabinet** *(needs the free Supabase setup below)* — sign in with GitHub or Google, save the meds you actually take with your own notes, and re-check your whole cabinet for interactions in one tap. Your list is protected by row-level security: only you can read it.
 
 ## Full-feature setup (optional)
 1. **Plain-English mode** — deploy `worker.js` to Cloudflare, add your `ANTHROPIC_API_KEY` secret, then put the Worker URL in `config.js`.
