@@ -592,11 +592,53 @@
     </details>
   </div>
 
+  <!-- ===================== FAQ ===================== -->
+  <div class="method">
+    <p class="eyebrow" style="margin-bottom:6px;">Frequently asked questions</p>
+    <details>
+      <summary>Is this a substitute for my pharmacist or doctor? <span class="chev">›</span></summary>
+      <div class="content">
+        <p>No — never. Plainscript is a reference for understanding your medications and getting your bearings before a real conversation, not a replacement for one. A pharmacist knows your full history, your doses, and your other conditions; nothing here does.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why isn't my medication showing up in Decode? <span class="chev">›</span></summary>
+      <div class="content">
+        <p>Decode only shows what's in the FDA's openFDA label database. Some compounded medications, very new drugs, or products sold under an unusual name may not be indexed there yet. Try the generic name if you searched a brand (or the other way around) — the "did you mean" suggestions can help if it's a spelling issue.</p>
+      </div>
+    </details>
+    <details>
+      <summary>How current is the data? <span class="chev">›</span></summary>
+      <div class="content">
+        <p>Decode and the interaction checker's FDA-label layer are pulled live from openFDA every time you search — never cached or out of date on our end. The curated interaction, food/alcohol, and drug-class content is hand-reviewed periodically, not live-updated automatically, so it moves slower than the FDA label data itself.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Is it free? Will it stay free? <span class="chev">›</span></summary>
+      <div class="content">
+        <p>Yes, and that's the plan. Plainscript runs on free-tier infrastructure (openFDA and RxNorm are free and keyless; Supabase and Cloudflare have generous free tiers). There's no paid tier planned.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Can I use this for someone I'm caring for, not just myself? <span class="chev">›</span></summary>
+      <div class="content">
+        <p>Yes — Decode, the interaction checker, and the Symptoms tab all work for anyone's medications, signed in or not. My Cabinet is built around a single signed-in account and doesn't yet separate multiple people's medication lists — if you're managing more than one person's meds, keep that in mind for now.</p>
+      </div>
+    </details>
+    <details>
+      <summary>What if I find something wrong? <span class="chev">›</span></summary>
+      <div class="content">
+        <p>Please tell us — see "Report an error" in the footer below. Every curated fact here (interactions, drug-class explainers, food/alcohol notes) is reviewed against standard references, but mistakes are still possible, and a tool that can't be corrected isn't trustworthy. Corrections get reviewed and fixed, not ignored.</p>
+      </div>
+    </details>
+  </div>
+
 </div></main>
 
 <footer><div class="wrap">
   Plainscript · educational project · data from openFDA &amp; NIH RxNorm · not affiliated with the FDA or NIH ·
-  This product uses publicly available data from the U.S. National Library of Medicine and the U.S. Food and Drug Administration but is not endorsed by them.
+  This product uses publicly available data from the U.S. National Library of Medicine and the U.S. Food and Drug Administration but is not endorsed by them. ·
+  <a id="report-error-link" href="https://github.com/privi-doughnut/plainscript/issues/new?title=Bug%20report&amp;body=%2A%2AWhat%20page%20or%20medication%20were%20you%20looking%20at%3F%2A%2A%0A%0A%0A%2A%2AWhat%20did%20you%20expect%2C%20and%20what%20actually%20happened%3F%2A%2A%0A%0A%0A%2A%2ABrowser%2Fdevice%20%28optional%29%3A%2A%2A%0A" target="_blank" rel="noopener">Report an error</a>
 </div></footer>
 
 <!-- Keys & URLs. Safe to commit: the Supabase anon key is public by design

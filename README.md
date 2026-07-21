@@ -4,6 +4,14 @@ A plain-English medication reference. Decode what a drug actually is, and check 
 
 > **Educational reference only. Not medical advice.** Always confirm with a pharmacist or doctor. Emergencies: 911 · Poison Control 1-800-222-1222.
 
+## Why I built this
+
+*[PRIVI: voice this — write it yourself, first person, casual, the way you'd actually explain it to someone. Don't let this get filled in with generic AI copy; a few honest sentences beat a polished paragraph that doesn't sound like you. Things you could touch on, if any of them are true for you:*
+- *what got you thinking about this — a moment where a medication label or a drug interaction was confusing (yours, a family member's, anyone's)*
+- *why FDA/NIH data specifically, and why it mattered to you to never invent a fact*
+- *what you want a CAC/ISEF judge — or just a random visitor — to walk away understanding about the problem*
+*]*
+
 ## Run it
 Open `index.html` in a browser, or serve the folder (`python3 -m http.server`). No build step, no dependencies. Deploys as-is to GitHub Pages or Netlify.
 
