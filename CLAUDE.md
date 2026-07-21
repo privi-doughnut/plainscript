@@ -39,13 +39,19 @@ If a change would weaken any of the above, stop and flag it instead of doing it.
 ```
 plainscript/
 ├── CLAUDE.md                 # this file
-├── README.md                 # human-facing overview
+├── README.md                 # human-facing overview + "why I built this" (placeholder)
 ├── PLAINSCRIPT_ROADMAP.md    # phased plan; flagship = Cabinet Scan
+├── PROGRESS.md               # status dashboard: todos, recommendations, build log
 ├── index.html                # the app (single-file, works today)
 ├── config.js                 # URLs + Supabase anon key (safe to commit)
 ├── worker.js                 # Cloudflare Worker: Claude proxy (locked prompt)
+├── manifest.webmanifest       # PWA manifest
+├── sw.js                     # service worker (app-shell caching, offline support)
+├── icon-192.png, icon-512.png # PWA icons
+├── wrangler.jsonc             # Cloudflare Workers static-assets deploy config
+├── .assetsignore              # excludes dev docs from the public static deploy
 ├── supabase/
-│   └── schema.sql            # Phase 2 tables + RLS
+│   └── schema.sql            # tables + RLS: profiles, medications, cabinet_shares
 └── .gitignore
 ```
 
@@ -71,12 +77,13 @@ The NLM shut down its free drug-interaction API on **Jan 2, 2024** — don't go 
 Sober, clinical, trustworthy — credibility beats flair here. Cool clinical paper, navy ink, one restrained teal accent. Severity colors (amber → orange → red) are reserved ONLY for interaction severity, so an alarming color always means an alarming thing. **Light theme is default; a sober clinical dark theme toggles on.** Type: Newsreader (serif) for headings, Spline Sans for UI, Spline Sans Mono for data strips (the "structured drug-label" look is the signature). Mobile-first, accessible: visible focus states, `prefers-reduced-motion`, ARIA on the tabs/live regions.
 
 ## Current state
-- ✅ **Phase 0 shipped:** Decode, hybrid interaction check (curated + FDA-label), persistent safety frame, methodology section, dark theme, mobile/accessible.
-- ✅ **Phase 2 built (code complete):** Supabase accounts + My Cabinet — Google OAuth + passwordless email magic link (no GitHub — the audience here isn't developers), saved meds with FDA-resolved identifiers, per-med notes, theme sync to profile, all RLS-scoped. Implemented dependency-free (direct `fetch` to Supabase's auth/REST APIs — no supabase-js). `config.js` already has the real project URL + anon key; still needs the one-time dashboard steps at the top of `supabase/schema.sql` (run the schema, enable Google as an OAuth provider, allow-list redirect URLs — email sign-in needs no extra dashboard step, it's on by default) before sign-in actually works.
-- ✅ **Phase 3 built (code complete):** the flagship Cabinet Scan — "Scan my whole cabinet" in My Cabinet runs the same curated + FDA-label engine as the Check tab across every saved med (N×N), then shows a severity summary, a cabinet map, and a grounded "what to ask your pharmacist" generator. Replaces the old one-tap bridge into the pairwise Check tab.
-- 🔨 **Phase 4 started:** Decode now has a "Full FDA label details" card (active/inactive ingredients, contraindications, warnings, precautions, interactions prose, dosage & administration — all verbatim label text), a "Similar & related meds" popup (same drug class / other forms & strengths / in combination products, all openFDA-sourced), and multi-candidate "did you mean" spelling suggestions.
-- **Next:** Phase 1 (plain-English via Worker — hook already wired, needs a deployed Worker URL in `config.js`). Everything through Phase 3 — the CAC-worthy core — is code complete.
-- **Paused, needs Privi's call:** a symptom checker was requested 2026-07-21 (input symptoms → ranked probable causes + recommended action). This is the literal first item in this file's Non-goals ("No diagnosis or symptom-checker") — do not build it without Privi explicitly overriding that non-goal, and even then, treat it as a real liability/scope discussion, not a routine feature add. If asked to just "go ahead," re-surface this note rather than silently proceeding.
+As of 2026-07-21, **Phases 0–4 are code-complete and Phase 5/6 are nearly done** (~80% of the full roadmap). `PROGRESS.md` is the up-to-date status dashboard — trust it over this section for exact current state, since it gets refreshed every session. Highlights:
+- Decode, the hybrid interaction checker, My Cabinet (Google OAuth + passwordless email, no GitHub), Cabinet Scan, and the Symptoms tab (red-flag checklist + OTC-category lookup — see below) are all built.
+- Phase 4 (drug-class explainers, food/alcohol interactions, allergy cross-sensitivity, pregnancy/nursing fields, a general mechanism explainer) is complete.
+- Phase 5: PWA (installable, offline-capable), voice input, a printable cabinet one-pager, and a share-a-read-only-cabinet link/QR feature are all built. Spanish mode is the one deliberately-deferred item (makes more sense once Phase 1 is verified).
+- Phase 6: FAQ and "Report an error" are built; "Why I built this" is an explicit `[PRIVI: voice this]` placeholder in README.md — the one item on the whole roadmap that has to come from Privi himself.
+- **Not yet live-verified:** needs the one-time Supabase dashboard steps at the top of `supabase/schema.sql` (which now also includes the `cabinet_shares` table + `get_shared_cabinet()` function for the share-link feature — re-run the whole file, it's idempotent), and a deployed Worker URL in `config.js` for Phase 1's plain-English mode.
+- **Resolved:** a full ranked-differential-diagnosis symptom checker was requested 2026-07-21 and declined — it's the literal first item in this file's Non-goals ("No diagnosis or symptom-checker"). The Symptoms tab (static emergency red-flag list + curated symptom→OTC-category lookup, no ranked causes) was built as the safer alternative instead. If a full diagnostic version is requested again, this is settled precedent for declining it — don't silently build it.
 - Full plan and sequencing in `PLAINSCRIPT_ROADMAP.md`.
 
 ## Non-goals (do NOT build)

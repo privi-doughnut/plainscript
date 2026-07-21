@@ -76,3 +76,56 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- 5. Shareable read-only cabinet links (Phase 5) ----------------------------
+-- Lets a signed-in user generate an unguessable link that shows their
+-- cabinet, read-only, to someone with no account at all (a caregiver).
+--
+-- Security model, read this before changing anything here:
+--   - `token` is a random uuid (gen_random_uuid() — 122 bits of randomness),
+--     so it can't be guessed or brute-forced.
+--   - The anon (public, signed-out) role has ZERO policies on this table —
+--     it cannot SELECT/INSERT/UPDATE/DELETE cabinet_shares directly, at
+--     all. Only the owner (auth.uid() = user_id) can see or manage their
+--     own share rows.
+--   - The ONLY way anon ever reads shared data is get_shared_cabinet()
+--     below: a SECURITY DEFINER function that takes exactly one token and
+--     returns only the medications belonging to whoever owns that token
+--     (and only if it hasn't been revoked). There is no way to pass in a
+--     wildcard, list all tokens, or reach any row you don't already hold
+--     the exact token for. It also returns a deliberately narrow column
+--     set (generic/brand/class/notes) — never id, user_id, or rxcui.
+--   - Revoking is just setting revoked_at — the function checks that on
+--     every call, so a revoked link stops working immediately.
+create table if not exists public.cabinet_shares (
+  token      uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz default now(),
+  revoked_at timestamptz
+);
+
+create index if not exists cabinet_shares_user_idx on public.cabinet_shares(user_id);
+
+alter table public.cabinet_shares enable row level security;
+
+-- owner-only. No anon/public policy exists on this table on purpose.
+create policy "own shares: select" on public.cabinet_shares
+  for select using (auth.uid() = user_id);
+create policy "own shares: insert" on public.cabinet_shares
+  for insert with check (auth.uid() = user_id);
+create policy "own shares: update" on public.cabinet_shares
+  for update using (auth.uid() = user_id);
+
+create or replace function public.get_shared_cabinet(share_token uuid)
+returns table (generic text, brand text, drug_class text, notes text)
+language sql security definer stable set search_path = public, pg_temp as $$
+  select m.generic, m.brand, m.drug_class, m.notes
+  from public.medications m
+  join public.cabinet_shares s on s.user_id = m.user_id
+  where s.token = share_token and s.revoked_at is null;
+$$;
+
+-- anon = signed-out visitors following a share link; authenticated =
+-- someone who happens to be signed into their own account while viewing
+-- someone else's link. Both need EXECUTE; neither gets direct table access.
+grant execute on function public.get_shared_cabinet(uuid) to anon, authenticated;

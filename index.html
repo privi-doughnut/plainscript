@@ -1782,6 +1782,27 @@ async function db(path, opts){
   return text ? JSON.parse(text) : null;
 }
 
+/* unauthenticated variant of db() — used only for the share-link viewer
+   flow (Phase 5), which by design has no session at all. Talks to
+   PostgREST as the anon role, same as everything else that isn't
+   scoped to a signed-in user. */
+async function publicDb(path, opts){
+  opts = opts || {};
+  const res = await fetch(SUPABASE_URL + "/rest/v1/" + path, {
+    method: opts.method || "GET",
+    headers:{
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: "Bearer " + SUPABASE_ANON_KEY,
+      "Content-Type": "application/json",
+      Prefer: opts.prefer || "return=representation"
+    },
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  if (!res.ok) throw new Error("Couldn't reach that shared cabinet (error "+res.status+").");
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
 async function loadProfile(){
   const rows = await db("profiles?select=theme&id=eq." + session.user.id);
   const t = rows && rows[0] && rows[0].theme;
@@ -1809,6 +1830,141 @@ async function loadCabinet(){
     if (cached){ cabinet = cached; cabinetIsOffline = true; }
     else throw e;
   }
+}
+
+/* =================================================================
+   SHARE A READ-ONLY CABINET (Phase 5)
+   Full security model is documented in supabase/schema.sql next to the
+   cabinet_shares table and get_shared_cabinet() function — read that
+   before touching anything here. Short version: the share token is an
+   unguessable random uuid, anon has no direct table access at all, and
+   the only way in is a SECURITY DEFINER function that takes exactly
+   one token and returns a narrow, non-identifying column set.
+   ================================================================= */
+let shareToken = null; // the signed-in user's current active share, if any
+
+async function getActiveShare(){
+  const rows = await db("cabinet_shares?select=token&user_id=eq."+session.user.id+"&revoked_at=is.null&order=created_at.desc&limit=1");
+  return (rows && rows[0]) ? rows[0].token : null;
+}
+
+async function createShare(){
+  const rows = await db("cabinet_shares", { method:"POST", body:{ user_id: session.user.id } });
+  return (rows && rows[0]) ? rows[0].token : null;
+}
+
+async function revokeShare(token){
+  await db("cabinet_shares?token=eq."+encodeURIComponent(token), {
+    method:"PATCH", body:{ revoked_at: new Date().toISOString() }, prefer:"return=minimal"
+  });
+}
+
+async function renderSharePanel(){
+  const box = $("#share-panel");
+  if (!box) return;
+  box.innerHTML = `<div class="status"><span class="spin"></span>Checking for an existing share link…</div>`;
+  try{ shareToken = await getActiveShare(); }
+  catch(e){ shareToken = null; }
+  paintSharePanel();
+}
+
+function paintSharePanel(){
+  const box = $("#share-panel");
+  if (!box) return;
+  if (!shareToken){
+    box.innerHTML = `<p class="status" style="padding:6px 0 10px;">Generate a link that shows a read-only copy of your cabinet — no account needed on their end. Anyone with the link can view it, so only share it with people you trust.</p>
+      <button class="go" data-act="share-create">Create share link</button>`;
+    return;
+  }
+  const url = location.origin + location.pathname + "?share=" + encodeURIComponent(shareToken);
+  const qr  = "https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + encodeURIComponent(url);
+  box.innerHTML = `
+    <div class="field" style="margin-top:10px;">
+      <label class="eyebrow" for="share-link-input">Read-only share link</label>
+      <div class="inrow">
+        <input type="text" id="share-link-input" readonly value="${esc(url)}" />
+        <button class="ghost" data-act="share-copy">Copy</button>
+      </div>
+    </div>
+    <img src="${qr}" width="180" height="180" alt="QR code for the share link above" loading="lazy"
+      style="margin-top:12px; border-radius:8px; border:1px solid var(--line); display:block;"
+      onerror="this.style.display='none'" />
+    <p style="margin-top:12px;"><button class="mini" data-act="share-revoke">Revoke this link</button></p>`;
+}
+
+async function onCreateShare(){
+  const box = $("#share-panel");
+  box.innerHTML = `<div class="status"><span class="spin"></span>Creating your share link…</div>`;
+  try{ shareToken = await createShare(); paintSharePanel(); }
+  catch(e){ box.innerHTML = `<div class="err">Couldn't create a share link — try again.</div>`; }
+}
+
+async function onCopyShareLink(){
+  const input = $("#share-link-input");
+  if (!input) return;
+  input.select();
+  try{
+    await navigator.clipboard.writeText(input.value);
+    const btn = document.querySelector('[data-act="share-copy"]');
+    if (btn){ const orig = btn.textContent; btn.textContent = "Copied!"; setTimeout(()=>{ btn.textContent = orig; }, 1500); }
+  }catch(e){ /* clipboard API blocked — the input is already selected as a fallback */ }
+}
+
+async function onRevokeShare(){
+  if (!shareToken) return;
+  const box = $("#share-panel");
+  box.innerHTML = `<div class="status"><span class="spin"></span>Revoking…</div>`;
+  try{ await revokeShare(shareToken); shareToken = null; paintSharePanel(); }
+  catch(e){ box.innerHTML = `<div class="err">Couldn't revoke — try again.</div>`; }
+}
+
+/* --- the viewer side: someone opened a ?share=<token> link ---------- */
+async function checkSharedCabinetView(){
+  if (!SB_ENABLED) return false;
+  const token = new URLSearchParams(location.search).get("share");
+  if (!token) return false;
+  let rows = null;
+  try{ rows = await publicDb("rpc/get_shared_cabinet", { method:"POST", body:{ share_token: token } }); }
+  catch(e){ rows = null; }
+  renderSharedCabinetView(rows);
+  return true;
+}
+
+function renderSharedCabinetView(rows){
+  const tabsEl = document.querySelector("header.site .tabs");
+  if (tabsEl) tabsEl.style.display = "none";
+  document.querySelectorAll("main .panel").forEach(p => p.hidden = true);
+  const wrap = document.querySelector("main .wrap");
+  const div = document.createElement("div");
+  div.id = "shared-view";
+
+  if (!rows){
+    div.innerHTML = `<div class="nofind">
+      <span class="eyebrow">Link not available</span>
+      <h3>This share link isn't active.</h3>
+      <p>It may have been revoked, or the link is incorrect.</p>
+    </div>`;
+  } else if (!rows.length){
+    div.innerHTML = `<div class="nofind">
+      <span class="eyebrow">Shared cabinet</span>
+      <h3>This cabinet is empty.</h3>
+      <p>Nothing has been saved to it yet.</p>
+    </div>`;
+  } else {
+    div.innerHTML = `<p class="eyebrow" style="margin:20px 0 6px;">Shared with you · read-only</p>
+      <div class="results">${rows.map(r => `
+        <article class="card">
+          <div class="card-head">
+            <div class="name">${esc(titlecase(r.generic || r.brand || "Unknown medication"))}</div>
+            ${r.drug_class ? `<div class="datastrip"><span><b>class</b> ${esc(r.drug_class)}</span></div>` : ""}
+          </div>
+          ${r.notes ? `<div class="card-body"><div class="row"><span class="eyebrow">Note</span><p>${esc(r.notes)}</p></div></div>` : ""}
+        </article>`).join("")}
+      </div>
+      <p class="status" style="padding-top:16px;">This is a read-only view — nothing here can be edited from this link, and this list is a personal reference, not a medical record. Confirm anything important with a pharmacist.</p>`;
+  }
+  div.innerHTML += `<p style="margin-top:24px;"><a href="${esc(location.pathname)}">Open the full Plainscript app →</a></p>`;
+  wrap.insertBefore(div, wrap.firstChild);
 }
 
 /* is this drug already saved? Match by RxCUI when we have it, else by
@@ -2131,7 +2287,9 @@ function renderCabinet(){
     html += `<div class="results">${cabinet.map(medRowHTML).join("")}</div>
     <div class="cab-tools">
       <button class="ghost" data-act="print">🖨️ Print / save as PDF</button>
-    </div>`;
+      <button class="ghost" data-act="share">🔗 Share a read-only copy</button>
+    </div>
+    <div id="share-panel"></div>`;
     if (cabinet.length >= 2){
       html += `<div class="cab-tools">
         <button class="go" data-act="scan">🔎 Scan my whole cabinet</button>
@@ -2355,6 +2513,10 @@ $("#cabinet-body").addEventListener("click", e => {
   else if (act === "add")     onAddMed();
   else if (act === "scan")    runCabinetScan();
   else if (act === "print")   printCabinet();
+  else if (act === "share")        renderSharePanel();
+  else if (act === "share-create") onCreateShare();
+  else if (act === "share-copy")   onCopyShareLink();
+  else if (act === "share-revoke") onRevokeShare();
   else if (card && act === "edit")        openNoteEditor(card);
   else if (card && act === "note-save")   saveNote(card);
   else if (card && act === "note-cancel") renderCabinet();
@@ -2368,6 +2530,10 @@ $("#cabinet-body").addEventListener("keydown", e => {
 
 /* --- boot -------------------------------------------------------- */
 (async function initAccounts(){
+  // a ?share=<token> link takes over the whole page — no session, no
+  // sign-in, nothing else in this function is relevant to that visitor
+  if (await checkSharedCabinetView()) return;
+
   if (!SB_ENABLED){ renderAcct(); renderCabinet(); return; }
   const justSignedIn = captureOAuthRedirect();
   if (!session) loadStoredSession();

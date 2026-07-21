@@ -59,7 +59,7 @@
 - ✅ **PWA** — installable (manifest + icons), a service worker caches the app shell for offline use, and My Cabinet falls back to a locally cached copy (read-only) when offline.
 - ⬜ **Multi-language plain English** — Spanish first (huge real-world value; plays to your language work).
 - ✅ **Printable caregiver one-pager** — a "🖨️ Print / save as PDF" button in My Cabinet prints a clean, plain black-on-white sheet (name, notes, dosing info) with all the app chrome stripped out — scoped so it never affects printing from any other tab.
-- ⬜ **Share a read-only cabinet** via link/QR (for caregivers).
+- ✅ **Share a read-only cabinet** via link/QR (for caregivers) — a new `cabinet_shares` table + a `get_shared_cabinet()` SECURITY DEFINER function (see `supabase/schema.sql` §5 for the full security model: anon has zero direct table access, the token is a random uuid, and the function returns a deliberately narrow, non-identifying column set). Needs the updated schema re-run in Supabase before it'll work live.
 - ✅ **Voice input** — a mic button next to Decode, Check, and My Cabinet's inputs (Web Speech API, feature-detected — silently absent in browsers that don't support it, like Firefox). Decode auto-searches on speech since it's read-only; My Cabinet just fills the field so you can review before saving.
 
 ## Phase 6 — Trust & launch polish 🔨
