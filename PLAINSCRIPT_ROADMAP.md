@@ -28,7 +28,7 @@
 
 ## Phase 2 — Accounts + My Cabinet (Supabase) ✅ *(code complete — lights up when the Supabase URL + anon key land in `config.js`)*
 *The thing that turns a lookup tool into something people come back to.*
-- ✅ Supabase auth — OAuth sign-in with GitHub + Google buttons (enable either/both in the Supabase dashboard; setup steps at the top of `supabase/schema.sql`). Dependency-free: the app talks straight to Supabase's auth + REST APIs with `fetch` — no supabase-js.
+- ✅ Supabase auth — Google OAuth + passwordless email magic link (no GitHub — this audience doesn't have developer accounts). Google needs enabling in the Supabase dashboard (setup steps at the top of `supabase/schema.sql`); email sign-in is on by default, no dashboard step needed. Dependency-free: the app talks straight to Supabase's auth + REST APIs with `fetch` — no supabase-js.
 - ✅ **My Cabinet** — save meds from a decoded card or by typing a name; every save resolves against the real FDA label so the row carries sourced identifiers (generic, brand, RxCUI, class), with RxCUI-based duplicate detection.
 - ✅ Per-med personal notes ("morning, with food").
 - ✅ Theme persists — localStorage for everyone, plus the Supabase profile when signed in, so dark mode follows you across devices.
@@ -94,7 +94,7 @@ Writing these down *is* the project's maturity. An ISEF judge or pharmacist will
 
 ## What I need from you to start Phase 2
 1. Your **Supabase project URL + anon (public) key** — new project or reuse an existing one?
-2. Which **OAuth provider** to lead with — GitHub (fast) or Google (needs verification)?
+2. Your **Google OAuth client ID/secret** to enable Google sign-in (email magic-link needs nothing extra).
 3. Your **Cloudflare Worker URL** for the Claude proxy whenever you want to flip on Phase 1's plain-English mode.
 
 ## Suggested sequence to Oct 26

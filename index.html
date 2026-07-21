@@ -1004,6 +1004,7 @@ const SESSION_KEY = "plainscript.session";
 let session   = null;  // {access_token, refresh_token, expires_at, user:{id,email}}
 let cabinet   = null;  // the signed-in user's saved meds, once loaded
 let authError = null;  // OAuth error passed back on the redirect, if any
+let magicSent = null;  // email we just sent a magic link to, if any
 let refreshTimer = null;
 
 /* --- session plumbing -------------------------------------------- */
@@ -1103,9 +1104,44 @@ function signIn(provider){
   location.href = SUPABASE_URL + "/auth/v1/authorize?provider=" + provider + "&redirect_to=" + back;
 }
 
+/* passwordless email sign-in: GoTrue's /otp endpoint emails a magic link.
+   Clicking it redirects back here with tokens in the URL fragment — the
+   exact same shape as the OAuth redirect, so captureOAuthRedirect() above
+   handles both with no changes. No password to create, store, or reset. */
+async function sendMagicLink(email){
+  const back = location.origin + location.pathname;
+  const res = await fetch(SUPABASE_URL + "/auth/v1/otp?redirect_to=" + encodeURIComponent(back), {
+    method:"POST",
+    headers:{ apikey:SUPABASE_ANON_KEY, "Content-Type":"application/json" },
+    body: JSON.stringify({ email, create_user:true })
+  });
+  if (!res.ok){
+    let msg = "Couldn't send that link — try again.";
+    try{ const d = await res.json(); msg = d.msg || d.error_description || msg; }catch(e){}
+    throw new Error(msg);
+  }
+}
+
+async function onSendMagicLink(btn){
+  const input = $("#magic-email");
+  const email = (input.value || "").trim();
+  const statusEl = $("#magic-status");
+  if (!/^\S+@\S+\.\S+$/.test(email)){ statusEl.textContent = "Enter a valid email first."; input.focus(); return; }
+  btn.disabled = true;
+  statusEl.innerHTML = `<span class="spin"></span>Sending your sign‑in link…`;
+  try{
+    await sendMagicLink(email);
+    magicSent = email;
+    renderCabinet();
+  }catch(e){
+    statusEl.textContent = e.message;
+    btn.disabled = false;
+  }
+}
+
 function localSignOut(){
   clearTimeout(refreshTimer);
-  session = null; cabinet = null;
+  session = null; cabinet = null; magicSent = null;
   saveSession(null);
   renderAcct(); renderCabinet();
 }
@@ -1278,11 +1314,22 @@ function renderCabinet(){
       <h3>Keep your real medication list in one place.</h3>
       <p>Save the meds you actually take, add your own reminders (like “morning, with food”), and re‑run the interaction check on all of them any time. Your list lives in your own account, protected by row‑level security — no one else can read it.</p>
       ${authError ? `<div class="err" style="margin-bottom:12px;">Sign‑in didn't complete: ${esc(authError)}</div>` : ""}
+      ${magicSent ? `
+      <div class="status" style="padding:2px 0 12px;">Check <b>${esc(magicSent)}</b> for a sign‑in link — open it on this device and you'll land back here, signed in. (Didn't get it? Check spam, or just refresh this page to try again.)</div>
+      ` : `
       <div class="providers">
-        <button class="provider" data-act="signin-github">Continue with GitHub</button>
         <button class="provider" data-act="signin-google">Continue with Google</button>
       </div>
-      <p class="status" style="padding:12px 0 0;">Sign‑in only exists to keep your list. Plainscript stores nothing beyond the medications and notes you save — searches aren't recorded.</p>
+      <div class="field" style="margin-top:14px;">
+        <label class="eyebrow" for="magic-email">Or email me a sign‑in link</label>
+        <div class="inrow">
+          <input type="email" id="magic-email" placeholder="you@example.com" autocomplete="email" />
+          <button class="go" data-act="magic-send">Send link</button>
+        </div>
+      </div>
+      <div id="magic-status" class="status" role="status"></div>
+      `}
+      <p class="status" style="padding:12px 0 0;">Sign‑in only exists to keep your list. Plainscript stores nothing beyond the medications and notes you save — searches aren't recorded. No password to create or remember — a link emailed to you is all it takes.</p>
     </div>`;
     return;
   }
@@ -1511,8 +1558,8 @@ $("#cabinet-body").addEventListener("click", e => {
   if (!btn) return;
   const act  = btn.dataset.act;
   const card = btn.closest(".medrow");
-  if (act === "signin-github") signIn("github");
-  else if (act === "signin-google") signIn("google");
+  if (act === "signin-google") signIn("google");
+  else if (act === "magic-send") onSendMagicLink(btn);
   else if (act === "add")     onAddMed();
   else if (act === "scan")    runCabinetScan();
   else if (card && act === "edit")        openNoteEditor(card);
@@ -1521,7 +1568,9 @@ $("#cabinet-body").addEventListener("click", e => {
   else if (card && act === "remove")      removeMed(card);
 });
 $("#cabinet-body").addEventListener("keydown", e => {
-  if (e.key === "Enter" && e.target.id === "cab-input") onAddMed();
+  if (e.key !== "Enter") return;
+  if (e.target.id === "cab-input") onAddMed();
+  else if (e.target.id === "magic-email") onSendMagicLink($('[data-act="magic-send"]'));
 });
 
 /* --- boot -------------------------------------------------------- */

@@ -5,14 +5,15 @@
 --
 -- ONE-TIME PROJECT SETUP (dashboard, ~5 minutes):
 -- 1. Run this file in the SQL Editor.
--- 2. Authentication → Providers → enable GitHub (fast) and/or Google.
---    For GitHub: create an OAuth app at github.com/settings/developers,
---    set its callback URL to the one Supabase shows on that provider page,
---    then paste the client ID + secret into Supabase.
+-- 2. Authentication → Providers → enable Google. Create an OAuth client at
+--    console.cloud.google.com (APIs & Services → Credentials), set its
+--    authorized redirect URI to the callback URL Supabase shows on that
+--    provider page, then paste the client ID + secret into Supabase.
+--    (Email sign-in needs no extra step here — it's on by default.)
 -- 3. Authentication → URL Configuration → add every URL the app runs at to
---    "Redirect URLs" (e.g. http://localhost:8000, your GitHub Pages URL,
---    your Netlify URL). If the app's URL isn't allow-listed, OAuth silently
---    redirects to the Site URL instead — which looks like a broken login.
+--    "Redirect URLs" (e.g. http://localhost:8000, your deployed site URL).
+--    If the app's URL isn't allow-listed, sign-in silently redirects to the
+--    Site URL instead — which looks like a broken login.
 -- 4. Project Settings → API → copy the Project URL and anon public key into
 --    config.js (SUPABASE_URL / SUPABASE_ANON_KEY).
 --

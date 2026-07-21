@@ -12,7 +12,8 @@ Open `index.html` in a browser, or serve the folder (`python3 -m http.server`). 
 - **Check interactions** — enter 2+ meds; get severity-rated, plain-English, sourced warnings from a curated interaction set plus a cross-reference of each drug's FDA label.
 - **Light / dark theme** — sober clinical styling; light by default, and your choice survives reloads.
 - Mobile-first and accessible.
-- **My Cabinet** *(needs the free Supabase setup below)* — sign in with GitHub or Google, save the meds you actually take with your own notes, and re-check your whole cabinet for interactions in one tap. Your list is protected by row-level security: only you can read it.
+- **My Cabinet** *(needs the free Supabase setup below)* — sign in with Google or a passwordless email link, save the meds you actually take with your own notes. Your list is protected by row-level security: only you can read it.
+- **Cabinet Scan** — one tap scans everything in My Cabinet against everything else (not just a pair), with a severity summary, a scannable cabinet map, and a "what to ask your pharmacist" question list grounded in what was actually found.
 
 ## Full-feature setup (optional)
 1. **Plain-English mode** — deploy `worker.js` to Cloudflare, add your `ANTHROPIC_API_KEY` secret, then put the Worker URL in `config.js`.
