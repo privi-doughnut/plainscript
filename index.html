@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Plainscript — Medication Reference</title>
-<meta name="description" content="An educational tool that decodes medication names and checks drug interactions using FDA and NIH data. Not medical advice." />
+<meta name="description" content="An educational tool that decodes medications, checks drug interactions, and points to general symptom guidance, using FDA and NIH data. Not medical advice." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -355,6 +355,7 @@
     padding:18px 20px; margin-top:10px;
   }
   .redflag > .eyebrow{color:var(--major-ink); font-size:12.5px;}
+  .redflag h2{font-family:var(--serif); font-weight:600; font-size:21px; margin:4px 0 12px; color:var(--major-ink); line-height:1.25;}
   .redflag ul{margin:10px 0; padding-left:20px; display:flex; flex-direction:column; gap:6px;}
   .redflag li{font-size:14.5px; color:var(--major-ink);}
   .redflag p{margin:12px 0 0; font-size:13.5px; color:var(--ink-soft);}
@@ -362,7 +363,7 @@
 
   .symptom-list{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
   .symptom-chip{
-    display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:20px;
+    position:relative; display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:20px;
     border:1px solid var(--line); background:var(--card); cursor:pointer;
     font-size:14px; color:var(--ink-soft); user-select:none;
   }
@@ -455,7 +456,8 @@
     <p class="panel-intro">This tab doesn't diagnose anything — it points you toward the general kind of over‑the‑counter category people use for everyday symptoms, and it's never a substitute for a doctor or pharmacist.</p>
 
     <div class="redflag">
-      <span class="eyebrow">Stop — seek care now if you have any of these</span>
+      <span class="eyebrow">Emergency warning signs</span>
+      <h2>Stop — seek care now if you have any of these</h2>
       <ul>
         <li>Chest pain or pressure, or pain spreading to your arm, jaw, or back</li>
         <li>Trouble breathing or shortness of breath</li>
@@ -471,12 +473,12 @@
       <p>None of these are things this page — or any over‑the‑counter medication — can handle. Call <b>911</b> or go to the nearest ER. This is standard public‑health emergency guidance (the kind published by the CDC and Mayo Clinic), not a diagnosis of what you have.</p>
     </div>
 
-    <div class="field" style="margin-top:26px;">
-      <label class="eyebrow">For everyday, non‑emergency symptoms — what's going on?</label>
+    <fieldset class="field" style="margin-top:26px; border:none; padding:0;">
+      <legend class="eyebrow" style="padding:0;">For everyday, non‑emergency symptoms — what's going on?</legend>
       <p class="panel-intro" style="margin-top:4px;">Pick everything that applies. This only covers common, minor symptoms — anything else, or anything severe, unusual, or lasting more than a few days, needs a real visit, not this list.</p>
       <div id="symptom-list" class="symptom-list"></div>
       <button class="go" id="symptom-btn" style="margin-top:14px;">Show OTC categories</button>
-    </div>
+    </fieldset>
 
     <div class="results" id="symptom-results" aria-live="polite"></div>
   </section>
@@ -1653,6 +1655,7 @@ function similarPaneHTML(items, kind, emptyMsg){
 }
 
 async function openSimilarModal(d, displayName){
+  const trigger = document.activeElement; // restore focus here when the modal closes
   const overlay = document.createElement("div");
   overlay.className = "modal-overlay";
   overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-label="Similar and related medications">
@@ -1669,12 +1672,28 @@ async function openSimilarModal(d, displayName){
   </div>`;
   document.body.appendChild(overlay);
 
-  const close = () => overlay.remove();
+  // keep both listeners scoped to one open/close cycle — without this, every
+  // open added a new document-level keydown listener that never got cleaned
+  // up unless the user happened to close via Escape specifically
+  function onEsc(e){ if (e.key === "Escape") close(); }
+  function trapTab(e){
+    if (e.key !== "Tab") return;
+    const focusables = [...overlay.querySelectorAll('button, [href], input, [tabindex]:not([tabindex="-1"])')];
+    if (!focusables.length) return;
+    const first = focusables[0], last = focusables[focusables.length-1];
+    if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+  function close(){
+    overlay.remove();
+    document.removeEventListener("keydown", onEsc);
+    if (trigger && typeof trigger.focus === "function") trigger.focus();
+  }
+  document.addEventListener("keydown", onEsc);
+  overlay.addEventListener("keydown", trapTab);
   overlay.addEventListener("click", e => { if (e.target === overlay) close(); });
   overlay.querySelector('[data-act="close"]').addEventListener("click", close);
-  document.addEventListener("keydown", function onEsc(e){
-    if (e.key === "Escape"){ close(); document.removeEventListener("keydown", onEsc); }
-  });
+  overlay.querySelector('[data-act="close"]').focus();
 
   const data = await fetchSimilarAndRelated(d);
   const panes = {

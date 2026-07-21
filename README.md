@@ -8,12 +8,13 @@ A plain-English medication reference. Decode what a drug actually is, and check 
 Open `index.html` in a browser, or serve the folder (`python3 -m http.server`). No build step, no dependencies. Deploys as-is to GitHub Pages or Netlify.
 
 ## What works today
-- **Decode** — enter a brand or generic name; get what it treats, how it works, side effects, drug class, brand/generic, and boxed warnings, pulled live from the drug's FDA label. Fixes typos via RxNorm.
+- **Decode** — enter a brand or generic name; get what it treats, how it works, side effects, drug class, brand/generic, boxed warnings, and a full FDA label details section (ingredients, warnings, precautions, dosage as printed), pulled live from the drug's FDA label. Misspellings show close RxNorm matches to pick from instead of one silent guess. A "Similar & related meds" popup surfaces other drugs in the same class, other forms/strengths of the same ingredient, and combination products that contain it (so you can spot accidental double-dosing).
 - **Check interactions** — enter 2+ meds; get severity-rated, plain-English, sourced warnings from a curated interaction set plus a cross-reference of each drug's FDA label.
 - **Light / dark theme** — sober clinical styling; light by default, and your choice survives reloads.
 - Mobile-first and accessible.
 - **My Cabinet** *(needs the free Supabase setup below)* — sign in with Google or a passwordless email link, save the meds you actually take with your own notes. Your list is protected by row-level security: only you can read it.
 - **Cabinet Scan** — one tap scans everything in My Cabinet against everything else (not just a pair), with a severity summary, a scannable cabinet map, and a "what to ask your pharmacist" question list grounded in what was actually found.
+- **Symptoms** — an always-visible "seek care now" emergency checklist, plus a symptom → general OTC-category lookup (pain, allergies, cough, etc.) for everyday, non-emergency symptoms. Deliberately not a diagnosis tool — no ranked causes, no severity score.
 
 ## Full-feature setup (optional)
 1. **Plain-English mode** — deploy `worker.js` to Cloudflare, add your `ANTHROPIC_API_KEY` secret, then put the Worker URL in `config.js`.
