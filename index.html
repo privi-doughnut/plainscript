@@ -118,6 +118,26 @@
   .themetoggle:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
   .themetoggle .ticon{font-size:13px; line-height:1;}
 
+  /* language selector — same pill look as .themetoggle, but a real <select>
+     since a single click-toggle only scales to two languages */
+  .lang-select-wrap{
+    display:inline-flex; align-items:center; gap:6px;
+    border:1px solid var(--line); border-radius:20px; background:var(--card);
+    padding:0 12px 0 13px; align-self:center;
+  }
+  .lang-select-wrap:hover, .lang-select-wrap:focus-within{border-color:var(--accent);}
+  .lang-select-wrap .ticon{font-size:13px; line-height:1;}
+  .lang-select-wrap select{
+    appearance:none; -webkit-appearance:none; border:none; background:transparent;
+    font-family:var(--mono); font-size:12px; letter-spacing:.03em; color:var(--ink-soft);
+    cursor:pointer; padding:8px 2px; outline:none;
+  }
+  .lang-select-wrap select:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px;}
+  /* the dropdown's own option list renders with the OS/browser's native
+     styling regardless — that's expected and fine, only the closed pill
+     needs to match the app's look */
+  .lang-select-wrap select option{color:#000; background:#fff;}
+
   /* ---------- tabs ---------- */
   .tabs{display:flex; gap:4px; margin:22px 0 0; border-bottom:1px solid var(--line);}
   .tab{
@@ -448,9 +468,22 @@
     <button id="theme-toggle" class="themetoggle" aria-label="Switch to dark theme" title="Toggle light / dark">
       <span class="ticon" aria-hidden="true">☾</span><span class="tlabel" data-i18n="theme_dark">Dark</span>
     </button>
-    <button id="lang-toggle" class="themetoggle" aria-label="Switch language" title="Language / Idioma">
-      <span class="ticon" aria-hidden="true">🌐</span><span class="tlabel" id="lang-label">EN</span>
-    </button>
+    <div class="lang-select-wrap">
+      <span class="ticon" aria-hidden="true">🌐</span>
+      <select id="lang-select" aria-label="Switch language" title="Language">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="zh">中文</option>
+        <option value="vi">Tiếng Việt</option>
+        <option value="ar">العربية</option>
+        <option value="fr">Français</option>
+        <option value="ko">한국어</option>
+        <option value="ru">Русский</option>
+        <option value="pt">Português</option>
+        <option value="de">Deutsch</option>
+        <option value="ja">日本語</option>
+      </select>
+    </div>
     <!-- account chip — stays empty until Supabase is configured (Phase 2) -->
     <span class="acct" id="acct"></span>
   </div>
@@ -2302,10 +2335,23 @@ try{ if (localStorage.getItem(THEME_KEY) === "dark") applyTheme(true, {persist:f
    so it follows you across devices. Re-renders whatever dynamic
    content is currently on screen so switching language doesn't need a
    page reload.
+
+   SUPPORTED_LANGS is the single source of truth for which languages are
+   selectable — it must match the <option> values in the #lang-select
+   markup and the keys actually present in I18N. Adding a language means
+   adding it here, adding an <option>, adding an I18N.<code> block, and
+   adding {lang} fields to the 5 curated data arrays + one more
+   LOCKED_SYSTEM entry in worker.js — nothing else needs to change.
    ================================================================= */
+const SUPPORTED_LANGS = ["en","es","zh","vi","ar","fr","ko","ru","pt","de","ja"];
+const RTL_LANGS = ["ar"]; // right-to-left languages — flips document direction
+
 function applyLang(lang, opts){
   opts = opts || {};
-  uiLang = (lang === "es") ? "es" : "en";
+  uiLang = SUPPORTED_LANGS.includes(lang) ? lang : "en";
+  document.documentElement.dir = RTL_LANGS.includes(uiLang) ? "rtl" : "ltr";
+  const select = $("#lang-select");
+  if (select) select.value = uiLang;
   applyTranslations();
   applyTheme(isDark(), {persist:false}); // refresh the theme-toggle's own label text
   if (opts.persist !== false){
@@ -2327,7 +2373,7 @@ function refreshDynamicContentForLang(){
   if (typeof renderCabinet === "function" && SB_ENABLED) renderCabinet();
 }
 
-$("#lang-toggle").addEventListener("click", () => applyLang(uiLang === "en" ? "es" : "en"));
+$("#lang-select").addEventListener("change", e => applyLang(e.target.value));
 /* NOTE: the actual "restore stored language on load" call happens at the
    very bottom of this script (in initAccounts), not here — applyLang()
    touches SB_ENABLED/session/cabinet, which aren't declared yet at this
@@ -2565,7 +2611,7 @@ async function loadProfile(){
     try{ localStorage.setItem(THEME_KEY, savedTheme); }catch(e){}
   }
   const savedLang = row && row.lang;
-  if ((savedLang === "es" || savedLang === "en") && savedLang !== uiLang){
+  if (savedLang && SUPPORTED_LANGS.includes(savedLang) && savedLang !== uiLang){
     applyLang(savedLang, {persist:false});
   }
 }
@@ -3062,9 +3108,11 @@ function renderCabinet(){
 /* printable caregiver one-pager (Phase 5) — scopes print styling with a
    body class instead of touching @page globally, so printing from any
    other tab is completely unaffected. */
+const DATE_LOCALES = { en:"en-US", es:"es-ES", zh:"zh-CN", vi:"vi-VN", ar:"ar-SA", fr:"fr-FR", ko:"ko-KR", ru:"ru-RU", pt:"pt-BR", de:"de-DE", ja:"ja-JP" };
+
 function printCabinet(){
   selectTab("cabinet");
-  const locale = uiLang === "es" ? "es-ES" : "en-US";
+  const locale = DATE_LOCALES[uiLang] || "en-US";
   $("#print-date").textContent = t("printed_on") + " " + new Date().toLocaleDateString(locale, {year:"numeric", month:"long", day:"numeric"});
   document.body.classList.add("printing-cabinet");
   window.print();
@@ -3295,7 +3343,7 @@ $("#cabinet-body").addEventListener("keydown", e => {
   // restore a saved language preference before anything else renders
   try{
     const storedLang = localStorage.getItem(LANG_KEY);
-    if (storedLang === "es") applyLang("es", {persist:false});
+    if (storedLang && SUPPORTED_LANGS.includes(storedLang)) applyLang(storedLang, {persist:false});
   }catch(e){/* ignore — defaults to English */}
 
   // a ?share=<token> link takes over the whole page — no session, no
