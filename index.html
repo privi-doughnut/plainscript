@@ -349,6 +349,28 @@
   .mtab:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
   @media (max-width:560px){ .modal-box{padding:18px; max-height:90vh;} .modal-head h2{font-size:18px;} }
 
+  /* ---------- Symptoms tab (Phase 4) ---------- */
+  .redflag{
+    background:var(--major-bg); border:2px solid var(--major-bar); border-radius:var(--radius);
+    padding:18px 20px; margin-top:10px;
+  }
+  .redflag > .eyebrow{color:var(--major-ink); font-size:12.5px;}
+  .redflag ul{margin:10px 0; padding-left:20px; display:flex; flex-direction:column; gap:6px;}
+  .redflag li{font-size:14.5px; color:var(--major-ink);}
+  .redflag p{margin:12px 0 0; font-size:13.5px; color:var(--ink-soft);}
+  .redflag p b{color:var(--major-ink);}
+
+  .symptom-list{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
+  .symptom-chip{
+    display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:20px;
+    border:1px solid var(--line); background:var(--card); cursor:pointer;
+    font-size:14px; color:var(--ink-soft); user-select:none;
+  }
+  .symptom-chip input{ position:absolute; opacity:0; width:1px; height:1px; }
+  .symptom-chip:has(input:checked){ border-color:var(--accent); background:var(--accent-wash); color:var(--accent-deep); font-weight:600; }
+  .symptom-chip:hover{border-color:var(--accent);}
+  .symptom-chip:focus-within{outline:2px solid var(--accent); outline-offset:2px;}
+
   footer{border-top:1px solid var(--line); padding:22px 0 40px; color:var(--ink-faint); font-size:12.5px; font-family:var(--mono);}
   footer a{color:var(--accent-deep);}
 
@@ -389,6 +411,9 @@
     <button class="tab" id="tab-cabinet" role="tab" aria-selected="false" aria-controls="panel-cabinet">
       <span class="num">03</span><span><span class="label-full">My </span>Cabinet</span>
     </button>
+    <button class="tab" id="tab-symptoms" role="tab" aria-selected="false" aria-controls="panel-symptoms">
+      <span class="num">04</span><span>Symptoms</span>
+    </button>
   </div>
 </div></header>
 
@@ -425,6 +450,37 @@
     <p class="status" id="cabinet-status" role="status"></p>
   </section>
 
+  <!-- ===================== PANEL 4: SYMPTOMS ===================== -->
+  <section class="panel" id="panel-symptoms" role="tabpanel" aria-labelledby="tab-symptoms" hidden>
+    <p class="panel-intro">This tab doesn't diagnose anything — it points you toward the general kind of over‑the‑counter category people use for everyday symptoms, and it's never a substitute for a doctor or pharmacist.</p>
+
+    <div class="redflag">
+      <span class="eyebrow">Stop — seek care now if you have any of these</span>
+      <ul>
+        <li>Chest pain or pressure, or pain spreading to your arm, jaw, or back</li>
+        <li>Trouble breathing or shortness of breath</li>
+        <li>Sudden confusion, slurred speech, facial drooping, or weakness on one side of the body (think <b>FAST</b> — call 911)</li>
+        <li>Uncontrolled or heavy bleeding</li>
+        <li>Coughing up or vomiting blood</li>
+        <li>A severe allergic reaction — swelling of the face or throat, or hives with trouble breathing</li>
+        <li>A sudden, severe "worst headache of my life"</li>
+        <li>High fever with a stiff neck, or any fever in an infant under 3 months</li>
+        <li>Fainting, a seizure, or unresponsiveness</li>
+        <li>Thoughts of harming yourself — call or text <b>988</b> (Suicide &amp; Crisis Lifeline)</li>
+      </ul>
+      <p>None of these are things this page — or any over‑the‑counter medication — can handle. Call <b>911</b> or go to the nearest ER. This is standard public‑health emergency guidance (the kind published by the CDC and Mayo Clinic), not a diagnosis of what you have.</p>
+    </div>
+
+    <div class="field" style="margin-top:26px;">
+      <label class="eyebrow">For everyday, non‑emergency symptoms — what's going on?</label>
+      <p class="panel-intro" style="margin-top:4px;">Pick everything that applies. This only covers common, minor symptoms — anything else, or anything severe, unusual, or lasting more than a few days, needs a real visit, not this list.</p>
+      <div id="symptom-list" class="symptom-list"></div>
+      <button class="go" id="symptom-btn" style="margin-top:14px;">Show OTC categories</button>
+    </div>
+
+    <div class="results" id="symptom-results" aria-live="polite"></div>
+  </section>
+
   <!-- ===================== METHODOLOGY ===================== -->
   <div class="method">
     <p class="eyebrow" style="margin-bottom:6px;">How this works &amp; what it can't do</p>
@@ -447,6 +503,14 @@
       <summary>What happens to my account data <span class="chev">›</span></summary>
       <div class="content">
         <p>Signing in is optional — Decode and the interaction check work without an account. If you do sign in (to use My Cabinet), the only things stored are the medications you chose to save and any notes you typed, in a <a href="https://supabase.com" target="_blank" rel="noopener">Supabase</a> database under your user ID. Row‑level security enforces, at the database level, that your rows are readable and writable only by you. Removing a medication deletes its row; there's no separate copy. Nothing about your searches is stored.</p>
+      </div>
+    </details>
+    <details>
+      <summary>What the Symptoms tab actually is (and isn't) <span class="chev">›</span></summary>
+      <div class="content">
+        <p><b>It does not diagnose anything.</b> There's no ranked list of "probable causes," no severity score, and no AI guessing what's wrong with you. Picking "headache" and "runny nose" doesn't produce a condition — it produces the general categories of over‑the‑counter product people commonly use for those symptoms (e.g. "pain relievers," "decongestants"), the same kind of textbook‑level mapping used for a first‑aid guide.</p>
+        <p>That symptom‑to‑category mapping is a small, hand‑curated set reviewed against standard references — not invented on the fly. The actual example products shown under each category are pulled <b>live from openFDA</b> at the moment you search, the same way every other part of this app works.</p>
+        <p>The "seek care now" list is standard public‑health emergency guidance, not something computed from what you picked — it's shown in full regardless of your answers, because recognizing an emergency shouldn't depend on getting a questionnaire right.</p>
       </div>
     </details>
     <details>
@@ -624,6 +688,43 @@ const INTERACTIONS = [
     what:"Metformin is usually paused around imaging tests that use iodinated contrast dye.",
     why:"If the dye temporarily affects the kidneys, metformin can build up and rarely cause lactic acidosis.",
     mgmt:"Hospitals routinely hold metformin before/after contrast imaging per protocol." }
+];
+
+/* ---- SYMPTOM → OTC CATEGORY (Symptoms tab) -----------------------
+   This is NOT a diagnosis engine — it never ranks causes or severity.
+   It's a small, hand-curated mapping from a common symptom word to the
+   general category of over-the-counter product people use for it —
+   textbook-level, reviewed the same way the INTERACTIONS set above is,
+   not invented on the fly. The actual example products shown for each
+   category are always fetched live from openFDA at query time (see
+   runSymptomLookup), never hardcoded here. ------------------------- */
+const SYMPTOM_CATEGORIES = [
+  { symptom:"Headache", category:"Pain relievers (analgesics)", examples:["acetaminophen","ibuprofen","naproxen"],
+    note:"Common OTC options for everyday aches and headaches." },
+  { symptom:"Fever", category:"Fever reducers (antipyretics)", examples:["acetaminophen","ibuprofen"],
+    note:"The same analgesics used for pain are also used to bring down a fever." },
+  { symptom:"Muscle or joint aches", category:"Pain relievers (analgesics)", examples:["ibuprofen","naproxen","acetaminophen"],
+    note:"NSAIDs also target inflammation, not just pain." },
+  { symptom:"Runny or stuffy nose", category:"Decongestants", examples:["phenylephrine","pseudoephedrine"],
+    note:"Work by shrinking swollen nasal passages." },
+  { symptom:"Sneezing or itchy eyes", category:"Antihistamines", examples:["cetirizine","loratadine","fexofenadine","diphenhydramine"],
+    note:"Block the histamine response behind classic allergy symptoms." },
+  { symptom:"Cough", category:"Cough suppressants & expectorants", examples:["dextromethorphan","guaifenesin"],
+    note:"One quiets the cough reflex; the other helps loosen mucus." },
+  { symptom:"Sore throat", category:"Throat lozenges & topical anesthetics", examples:["benzocaine","menthol"],
+    note:"Numb or soothe throat irritation." },
+  { symptom:"Heartburn or acid reflux", category:"Acid reducers", examples:["famotidine","omeprazole","calcium carbonate"],
+    note:"Either neutralize acid quickly or reduce how much the stomach makes." },
+  { symptom:"Nausea", category:"Anti-nausea (antiemetics)", examples:["dimenhydrinate","meclizine"],
+    note:"Commonly used for motion sickness and mild nausea." },
+  { symptom:"Diarrhea", category:"Anti-diarrheal", examples:["loperamide","bismuth subsalicylate"],
+    note:"Slow the gut down or coat and soothe the digestive tract." },
+  { symptom:"Constipation", category:"Laxatives", examples:["polyethylene glycol","docusate","bisacodyl"],
+    note:"Different mechanisms — osmotic, stool softener, and stimulant." },
+  { symptom:"Trouble sleeping", category:"Sleep aids", examples:["diphenhydramine","doxylamine"],
+    note:"OTC sleep aids are antihistamines with a sedating side effect." },
+  { symptom:"Minor skin itching or rash", category:"Topical antihistamines & hydrocortisone", examples:["hydrocortisone","diphenhydramine"],
+    note:"Reduce itching and inflammation on the skin." }
 ];
 
 /* ---- helpers ----------------------------------------------------- */
@@ -1038,9 +1139,98 @@ function renderResults(box, drugs, findings, mentions){
 }
 
 /* =================================================================
+   SYMPTOMS TAB (Phase 4)
+   The red-flag list in the HTML is static, always shown, and never
+   computed from what's picked below — recognizing an emergency
+   shouldn't depend on getting a questionnaire right. Everything below
+   that is a symptom → OTC-category lookup, NOT a diagnosis: no ranked
+   causes, no severity score, no guessing what's wrong. See the
+   SYMPTOM_CATEGORIES comment above and the methodology accordion for
+   the sourcing rationale.
+   ================================================================= */
+function renderSymptomList(){
+  const symptoms = [...new Set(SYMPTOM_CATEGORIES.map(s=>s.symptom))];
+  $("#symptom-list").innerHTML = symptoms.map(s => `
+    <label class="symptom-chip">
+      <input type="checkbox" value="${esc(s)}" />
+      <span>${esc(s)}</span>
+    </label>
+  `).join("");
+}
+
+async function runSymptomLookup(){
+  const box = $("#symptom-results");
+  const checked = [...document.querySelectorAll('#symptom-list input:checked')].map(i => i.value);
+  if (!checked.length){ box.innerHTML = `<div class="err">Pick at least one symptom first.</div>`; return; }
+
+  // multiple picked symptoms can map to the same category (headache + fever
+  // both land on pain/fever relievers) — collapse to one section each
+  const matched = [];
+  const seenCategory = new Set();
+  for (const sym of checked){
+    const entry = SYMPTOM_CATEGORIES.find(s => s.symptom === sym);
+    if (!entry || seenCategory.has(entry.category)) continue;
+    seenCategory.add(entry.category);
+    matched.push(entry);
+  }
+
+  box.innerHTML = `<div class="status"><span class="spin"></span>Looking up real example products on openFDA…</div>`;
+
+  const sections = [];
+  for (const m of matched){
+    const items = [];
+    for (const ingredient of m.examples){
+      try{
+        const rec = await fetchLabel(ingredient);
+        if (rec){
+          const p = parseLabel(rec);
+          const label = titlecase(p.brand || p.generic || ingredient);
+          if (!items.some(x => x.name.toLowerCase() === label.toLowerCase())){
+            items.push({ name: label, generic: p.generic || ingredient });
+          }
+        }
+      }catch(e){ /* skip this one example, keep going */ }
+    }
+    sections.push({ ...m, items });
+  }
+
+  box.innerHTML = sections.map(s => `
+    <article class="card" style="margin-bottom:14px;">
+      <div class="card-head">
+        <span class="eyebrow">Symptom category · ${esc(s.symptom)}</span>
+        <div class="name" style="font-size:19px;">${esc(s.category)}</div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <p>${esc(s.note)}</p>
+          <div class="src">Category mapping: hand-curated, textbook-level — not personalized, not a diagnosis</div>
+        </div>
+        ${s.items.length ? `<div class="row">
+          <span class="eyebrow">Real examples, sourced live from openFDA</span>
+          <div class="cabinet-map" style="margin-top:8px;">
+            ${s.items.map(it => `<button class="map-chip" data-name="${esc(it.name)}"><b>${esc(it.name)}</b>${it.generic ? ` · ${esc(titlecase(it.generic))}` : ""}</button>`).join("")}
+          </div>
+        </div>` : ""}
+      </div>
+    </article>
+  `).join("") + `<p class="status" style="padding-top:6px;">This maps common symptoms to general OTC categories — it isn't a diagnosis, doesn't know your health history or other medications, and isn't personalized. A pharmacist can tell you which specific option actually fits you. Click any example above to decode it first.</p>`;
+
+  box.querySelectorAll("button.map-chip").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      selectTab("decode");
+      $("#decode-input").value = btn.dataset.name;
+      decode();
+    });
+  });
+}
+
+renderSymptomList();
+$("#symptom-btn").addEventListener("click", runSymptomLookup);
+
+/* =================================================================
    WIRING
    ================================================================= */
-const TABS = ["decode","check","cabinet"];
+const TABS = ["decode","check","cabinet","symptoms"];
 function selectTab(which){
   for (const t of TABS){
     const on = t === which;
