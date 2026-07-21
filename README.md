@@ -23,7 +23,7 @@ Open `index.html` in a browser, or serve the folder (`python3 -m http.server`). 
 ## How it's built
 Single-file vanilla JS/HTML/CSS. Data from the [openFDA drug label API](https://open.fda.gov/apis/drug/label/) and [NIH RxNorm](https://lhncbc.nlm.nih.gov/RxNav/APIs/). Interaction severity comes from a hand-curated set (in `index.html` → `INTERACTIONS`), because no free comprehensive interaction API exists.
 
-See **`CLAUDE.md`** for architecture, conventions, and safety rules, and **`PLAINSCRIPT_ROADMAP.md`** for what's next.
+See **`CLAUDE.md`** for architecture, conventions, and safety rules, **`PLAINSCRIPT_ROADMAP.md`** for the full phased plan, and **`PROGRESS.md`** for current status — what's on you, recommended next steps, and the build log.
 
 ---
 Uses public data from the U.S. FDA and NIH/NLM. Not affiliated with or endorsed by either.
