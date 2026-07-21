@@ -430,7 +430,6 @@
   @media (max-width:560px){
     .brand h1{font-size:25px;}
     .tab{padding:10px 9px; font-size:14px;}
-    .tab .label-full{display:none;}
   }
 </style>
 </head>
@@ -439,7 +438,7 @@
 <!-- persistent safety frame -->
 <div class="safetybar"><div class="wrap">
   <span class="dot" aria-hidden="true"></span>
-  <span><strong>Educational reference only.</strong> Not medical advice. Always confirm with a pharmacist or doctor. Emergencies: call 911 · Poison Control 1‑800‑222‑1222.</span>
+  <span data-i18n-html="safety_bar"></span>
 </div></div>
 
 <header class="site"><div class="wrap">
@@ -447,25 +446,28 @@
     <h1>Plainscript</h1>
     <span class="tag">// medication reference</span>
     <button id="theme-toggle" class="themetoggle" aria-label="Switch to dark theme" title="Toggle light / dark">
-      <span class="ticon" aria-hidden="true">☾</span><span class="tlabel">Dark</span>
+      <span class="ticon" aria-hidden="true">☾</span><span class="tlabel" data-i18n="theme_dark">Dark</span>
+    </button>
+    <button id="lang-toggle" class="themetoggle" aria-label="Switch language" title="Language / Idioma">
+      <span class="ticon" aria-hidden="true">🌐</span><span class="tlabel" id="lang-label">EN</span>
     </button>
     <!-- account chip — stays empty until Supabase is configured (Phase 2) -->
     <span class="acct" id="acct"></span>
   </div>
-  <p class="lede">Type in a medication to find out what it actually is, or check whether two or more medications are known to interact — explained in plain language, sourced from FDA and NIH data.</p>
+  <p class="lede" data-i18n="tagline"></p>
 
-  <div class="tabs" role="tablist" aria-label="Tools">
+  <div class="tabs" role="tablist" aria-label="Tools" data-i18n-aria-label="tools_aria">
     <button class="tab" id="tab-decode" role="tab" aria-selected="true" aria-controls="panel-decode">
-      <span class="num">01</span><span>Decode a medication</span>
+      <span class="num">01</span><span data-i18n="tab_decode"></span>
     </button>
     <button class="tab" id="tab-check" role="tab" aria-selected="false" aria-controls="panel-check">
-      <span class="num">02</span><span>Check an <span class="label-full">interaction</span><span aria-hidden="true" style="display:none">interaction</span></span>
+      <span class="num">02</span><span data-i18n="tab_check"></span>
     </button>
     <button class="tab" id="tab-cabinet" role="tab" aria-selected="false" aria-controls="panel-cabinet">
-      <span class="num">03</span><span><span class="label-full">My </span>Cabinet</span>
+      <span class="num">03</span><span data-i18n="tab_cabinet"></span>
     </button>
     <button class="tab" id="tab-symptoms" role="tab" aria-selected="false" aria-controls="panel-symptoms">
-      <span class="num">04</span><span>Symptoms</span>
+      <span class="num">04</span><span data-i18n="tab_symptoms"></span>
     </button>
   </div>
 </div></header>
@@ -474,12 +476,12 @@
 
   <!-- ===================== PANEL 1: DECODE ===================== -->
   <section class="panel" id="panel-decode" role="tabpanel" aria-labelledby="tab-decode">
-    <p class="panel-intro">Enter a brand or generic name (for example, <em>Lipitor</em> or <em>atorvastatin</em>).</p>
+    <p class="panel-intro" data-i18n-html="decode_intro"></p>
     <div class="field">
-      <label class="eyebrow" for="decode-input">Medication name</label>
+      <label class="eyebrow" for="decode-input" data-i18n="decode_label"></label>
       <div class="inrow">
-        <input type="text" id="decode-input" placeholder="e.g. Tylenol, metformin, Xanax" autocomplete="off" />
-        <button class="go" id="decode-btn">Decode</button>
+        <input type="text" id="decode-input" data-i18n-placeholder="decode_placeholder" autocomplete="off" />
+        <button class="go" id="decode-btn" data-i18n="decode_btn"></button>
       </div>
     </div>
     <div class="results" id="decode-results" aria-live="polite"></div>
@@ -487,22 +489,22 @@
 
   <!-- ===================== PANEL 2: CHECK ===================== -->
   <section class="panel" id="panel-check" role="tabpanel" aria-labelledby="tab-check" hidden>
-    <p class="panel-intro">Add two or more medications. Plainscript checks them against a curated set of well‑documented interactions <em>and</em> cross‑references each drug's official FDA label.</p>
+    <p class="panel-intro" data-i18n-html="check_intro"></p>
     <div class="druglist" id="drug-list"></div>
     <div class="checkbar">
-      <button class="ghost" id="add-drug">+ Add another medication</button>
-      <button class="go" id="check-btn">Check interactions</button>
+      <button class="ghost" id="add-drug" data-i18n="add_drug_btn"></button>
+      <button class="go" id="check-btn" data-i18n="check_btn"></button>
     </div>
     <div class="results" id="check-results" aria-live="polite"></div>
   </section>
 
   <!-- ===================== PANEL 3: MY CABINET (Phase 2) ===================== -->
   <section class="panel" id="panel-cabinet" role="tabpanel" aria-labelledby="tab-cabinet" hidden>
-    <p class="panel-intro">Save the medications you actually take — once — with your own notes, so you can decode them or re‑check interactions any time. Your list is private to your account.</p>
+    <p class="panel-intro" data-i18n="cabinet_intro"></p>
     <div id="print-header" class="print-only">
-      <h2>Plainscript — medication list</h2>
+      <h2 data-i18n="print_title"></h2>
       <p id="print-date"></p>
-      <p class="print-disclaimer">Educational reference only — not medical advice. Not a substitute for your pharmacist's records.</p>
+      <p class="print-disclaimer" data-i18n="print_disclaimer"></p>
     </div>
     <div id="cabinet-body"></div>
     <p class="status" id="cabinet-status" role="status"></p>
@@ -510,31 +512,20 @@
 
   <!-- ===================== PANEL 4: SYMPTOMS ===================== -->
   <section class="panel" id="panel-symptoms" role="tabpanel" aria-labelledby="tab-symptoms" hidden>
-    <p class="panel-intro">This tab doesn't diagnose anything — it points you toward the general kind of over‑the‑counter category people use for everyday symptoms, and it's never a substitute for a doctor or pharmacist.</p>
+    <p class="panel-intro" data-i18n="symptoms_intro"></p>
 
     <div class="redflag">
-      <span class="eyebrow">Emergency warning signs</span>
-      <h2>Stop — seek care now if you have any of these</h2>
-      <ul>
-        <li>Chest pain or pressure, or pain spreading to your arm, jaw, or back</li>
-        <li>Trouble breathing or shortness of breath</li>
-        <li>Sudden confusion, slurred speech, facial drooping, or weakness on one side of the body (think <b>FAST</b> — call 911)</li>
-        <li>Uncontrolled or heavy bleeding</li>
-        <li>Coughing up or vomiting blood</li>
-        <li>A severe allergic reaction — swelling of the face or throat, or hives with trouble breathing</li>
-        <li>A sudden, severe "worst headache of my life"</li>
-        <li>High fever with a stiff neck, or any fever in an infant under 3 months</li>
-        <li>Fainting, a seizure, or unresponsiveness</li>
-        <li>Thoughts of harming yourself — call or text <b>988</b> (Suicide &amp; Crisis Lifeline)</li>
-      </ul>
-      <p>None of these are things this page — or any over‑the‑counter medication — can handle. Call <b>911</b> or go to the nearest ER. This is standard public‑health emergency guidance (the kind published by the CDC and Mayo Clinic), not a diagnosis of what you have.</p>
+      <span class="eyebrow" data-i18n="redflag_eyebrow"></span>
+      <h2 data-i18n="redflag_headline"></h2>
+      <ul data-i18n-html="redflag_list"></ul>
+      <p data-i18n-html="redflag_footer"></p>
     </div>
 
     <fieldset class="field" style="margin-top:26px; border:none; padding:0;">
-      <legend class="eyebrow" style="padding:0;">For everyday, non‑emergency symptoms — what's going on?</legend>
-      <p class="panel-intro" style="margin-top:4px;">Pick everything that applies. This only covers common, minor symptoms — anything else, or anything severe, unusual, or lasting more than a few days, needs a real visit, not this list.</p>
+      <legend class="eyebrow" style="padding:0;" data-i18n="symptoms_picker_label"></legend>
+      <p class="panel-intro" style="margin-top:4px;" data-i18n="symptoms_picker_note"></p>
       <div id="symptom-list" class="symptom-list"></div>
-      <button class="go" id="symptom-btn" style="margin-top:14px;">Show OTC categories</button>
+      <button class="go" id="symptom-btn" style="margin-top:14px;" data-i18n="symptoms_btn"></button>
     </fieldset>
 
     <div class="results" id="symptom-results" aria-live="polite"></div>
@@ -542,103 +533,67 @@
 
   <!-- ===================== METHODOLOGY ===================== -->
   <div class="method">
-    <p class="eyebrow" style="margin-bottom:6px;">How this works &amp; what it can't do</p>
+    <p class="eyebrow" style="margin-bottom:6px;" data-i18n="method_heading"></p>
     <details>
-      <summary>Where the data comes from <span class="chev">›</span></summary>
-      <div class="content">
-        <p><b>Drug facts</b> come from the U.S. FDA's <a href="https://open.fda.gov/apis/drug/label/" target="_blank" rel="noopener">openFDA drug label API</a> — the actual approved labeling for each medication (what it treats, how it works, side effects, brand/generic names, drug class).</p>
-        <p><b>Name matching</b> uses the NIH/NLM <a href="https://lhncbc.nlm.nih.gov/RxNav/APIs/" target="_blank" rel="noopener">RxNorm API</a>, which standardizes drug names and tolerates typos.</p>
-        <p><b>Interaction severity</b> comes from a hand‑curated set of well‑documented interactions, each reviewed against FDA prescribing information and standard clinical references.</p>
-        <p><b>Drug‑class explainers, food/alcohol interactions, and allergy cross‑sensitivity notes</b> are Plainscript's own curated content, held to the same standard as the interaction set above — never FDA text, always labeled as ours wherever they appear.</p>
-      </div>
+      <summary><span data-i18n="method_source_summary"></span> <span class="chev">›</span></summary>
+      <div class="content" data-i18n-html="method_source_content"></div>
     </details>
     <details>
-      <summary>Why there's no simple "you're safe" result <span class="chev">›</span></summary>
-      <div class="content">
-        <p>In January 2024 the U.S. National Library of Medicine shut down its free drug‑interaction API. There is no longer a free, comprehensive, severity‑rated interaction database — paid clinical databases (DrugBank, Micromedex) hold that data now.</p>
-        <p>So this tool can confirm an interaction it knows about, but it can <b>never</b> prove that a combination is safe. A result of "nothing found" only means it wasn't in our curated set or the FDA labels we checked — not that the drugs are safe together. That's why you'll never see a green check here. Always confirm with a pharmacist.</p>
-      </div>
+      <summary><span data-i18n="method_safe_summary"></span> <span class="chev">›</span></summary>
+      <div class="content" data-i18n-html="method_safe_content"></div>
     </details>
     <details>
-      <summary>Why do drug interactions happen at all? <span class="chev">›</span></summary>
-      <div class="content">
-        <p>Every "why" explanation on this site traces back to one of a handful of recurring mechanisms. Knowing them makes the individual explanations click instead of feeling like random trivia:</p>
-        <p><b>Liver-enzyme competition.</b> Your liver clears most drugs using a family of enzymes called CYP450. Some drugs block or overload a specific CYP enzyme, so anything else that relies on that same enzyme builds up in your blood instead of clearing normally — this is behind most of the "raises the level of" interactions here (statins + certain antibiotics, warfarin + certain antifungals).</p>
-        <p><b>Additive (stacking) effects.</b> Two drugs that do a similar thing to your body — sedate the central nervous system, thin the blood, raise serotonin — don't just add up mildly when combined; the combined effect is often much stronger than either alone. This is why opioids + benzodiazepines, or two serotonin-raising drugs together, are treated as serious.</p>
-        <p><b>Electrolyte and kidney-clearance shifts.</b> Some drug pairs both push the same electrolyte (like potassium) in the same direction, or one changes how fast the kidneys clear the other — small individually, but the combination can push a level too high or too low.</p>
-        <p><b>Absorption or protein-binding interference.</b> Occasionally one substance physically blocks another from being absorbed, or displaces it from the proteins that carry it through the bloodstream, changing how much active drug is actually available.</p>
-        <p>Every specific interaction listed on this site names which of these is actually happening in its own "Why" line — this section is just the connect-the-dots version.</p>
-      </div>
+      <summary><span data-i18n="method_why_summary"></span> <span class="chev">›</span></summary>
+      <div class="content" data-i18n-html="method_why_content"></div>
     </details>
     <details>
-      <summary>What happens to my account data <span class="chev">›</span></summary>
-      <div class="content">
-        <p>Signing in is optional — Decode and the interaction check work without an account. If you do sign in (to use My Cabinet), the only things stored are the medications you chose to save and any notes you typed, in a <a href="https://supabase.com" target="_blank" rel="noopener">Supabase</a> database under your user ID. Row‑level security enforces, at the database level, that your rows are readable and writable only by you. Removing a medication deletes its row; there's no separate copy. Nothing about your searches is stored.</p>
-      </div>
+      <summary><span data-i18n="method_account_summary"></span> <span class="chev">›</span></summary>
+      <div class="content" data-i18n-html="method_account_content"></div>
     </details>
     <details>
-      <summary>What the Symptoms tab actually is (and isn't) <span class="chev">›</span></summary>
-      <div class="content">
-        <p><b>It does not diagnose anything.</b> There's no ranked list of "probable causes," no severity score, and no AI guessing what's wrong with you. Picking "headache" and "runny nose" doesn't produce a condition — it produces the general categories of over‑the‑counter product people commonly use for those symptoms (e.g. "pain relievers," "decongestants"), the same kind of textbook‑level mapping used for a first‑aid guide.</p>
-        <p>That symptom‑to‑category mapping is a small, hand‑curated set reviewed against standard references — not invented on the fly. The actual example products shown under each category are pulled <b>live from openFDA</b> at the moment you search, the same way every other part of this app works.</p>
-        <p>The "seek care now" list is standard public‑health emergency guidance, not something computed from what you picked — it's shown in full regardless of your answers, because recognizing an emergency shouldn't depend on getting a questionnaire right.</p>
-      </div>
+      <summary><span data-i18n="method_symptoms_summary"></span> <span class="chev">›</span></summary>
+      <div class="content" data-i18n-html="method_symptoms_content"></div>
     </details>
     <details>
-      <summary>Honest limitations <span class="chev">›</span></summary>
-      <div class="content">
-        <p>The curated set covers a few dozen of the most important interactions, not all of them. The FDA‑label layer only catches interactions a label names directly, and labels vary in detail. Doses, your health conditions, food, and supplements all matter and aren't considered here. This is a learning tool, not a clinical decision system.</p>
-      </div>
+      <summary><span data-i18n="method_limits_summary"></span> <span class="chev">›</span></summary>
+      <div class="content" data-i18n-html="method_limits_content"></div>
     </details>
   </div>
 
   <!-- ===================== FAQ ===================== -->
   <div class="method">
-    <p class="eyebrow" style="margin-bottom:6px;">Frequently asked questions</p>
+    <p class="eyebrow" style="margin-bottom:6px;" data-i18n="faq_heading"></p>
     <details>
-      <summary>Is this a substitute for my pharmacist or doctor? <span class="chev">›</span></summary>
-      <div class="content">
-        <p>No — never. Plainscript is a reference for understanding your medications and getting your bearings before a real conversation, not a replacement for one. A pharmacist knows your full history, your doses, and your other conditions; nothing here does.</p>
-      </div>
+      <summary><span data-i18n="faq_pharmacist_summary"></span> <span class="chev">›</span></summary>
+      <div class="content" data-i18n-html="faq_pharmacist_content"></div>
     </details>
     <details>
-      <summary>Why isn't my medication showing up in Decode? <span class="chev">›</span></summary>
-      <div class="content">
-        <p>Decode only shows what's in the FDA's openFDA label database. Some compounded medications, very new drugs, or products sold under an unusual name may not be indexed there yet. Try the generic name if you searched a brand (or the other way around) — the "did you mean" suggestions can help if it's a spelling issue.</p>
-      </div>
+      <summary><span data-i18n="faq_notfound_summary"></span> <span class="chev">›</span></summary>
+      <div class="content" data-i18n-html="faq_notfound_content"></div>
     </details>
     <details>
-      <summary>How current is the data? <span class="chev">›</span></summary>
-      <div class="content">
-        <p>Decode and the interaction checker's FDA-label layer are pulled live from openFDA every time you search — never cached or out of date on our end. The curated interaction, food/alcohol, and drug-class content is hand-reviewed periodically, not live-updated automatically, so it moves slower than the FDA label data itself.</p>
-      </div>
+      <summary><span data-i18n="faq_current_summary"></span> <span class="chev">›</span></summary>
+      <div class="content" data-i18n-html="faq_current_content"></div>
     </details>
     <details>
-      <summary>Is it free? Will it stay free? <span class="chev">›</span></summary>
-      <div class="content">
-        <p>Yes, and that's the plan. Plainscript runs on free-tier infrastructure (openFDA and RxNorm are free and keyless; Supabase and Cloudflare have generous free tiers). There's no paid tier planned.</p>
-      </div>
+      <summary><span data-i18n="faq_free_summary"></span> <span class="chev">›</span></summary>
+      <div class="content" data-i18n-html="faq_free_content"></div>
     </details>
     <details>
-      <summary>Can I use this for someone I'm caring for, not just myself? <span class="chev">›</span></summary>
-      <div class="content">
-        <p>Yes — Decode, the interaction checker, and the Symptoms tab all work for anyone's medications, signed in or not. My Cabinet is built around a single signed-in account and doesn't yet separate multiple people's medication lists — if you're managing more than one person's meds, keep that in mind for now.</p>
-      </div>
+      <summary><span data-i18n="faq_caregiver_summary"></span> <span class="chev">›</span></summary>
+      <div class="content" data-i18n-html="faq_caregiver_content"></div>
     </details>
     <details>
-      <summary>What if I find something wrong? <span class="chev">›</span></summary>
-      <div class="content">
-        <p>Please tell us — see "Report an error" in the footer below. Every curated fact here (interactions, drug-class explainers, food/alcohol notes) is reviewed against standard references, but mistakes are still possible, and a tool that can't be corrected isn't trustworthy. Corrections get reviewed and fixed, not ignored.</p>
-      </div>
+      <summary><span data-i18n="faq_error_summary"></span> <span class="chev">›</span></summary>
+      <div class="content" data-i18n-html="faq_error_content"></div>
     </details>
   </div>
 
 </div></main>
 
 <footer><div class="wrap">
-  Plainscript · educational project · data from openFDA &amp; NIH RxNorm · not affiliated with the FDA or NIH ·
-  This product uses publicly available data from the U.S. National Library of Medicine and the U.S. Food and Drug Administration but is not endorsed by them. ·
-  <a id="report-error-link" href="https://github.com/privi-doughnut/plainscript/issues/new?title=Bug%20report&amp;body=%2A%2AWhat%20page%20or%20medication%20were%20you%20looking%20at%3F%2A%2A%0A%0A%0A%2A%2AWhat%20did%20you%20expect%2C%20and%20what%20actually%20happened%3F%2A%2A%0A%0A%0A%2A%2ABrowser%2Fdevice%20%28optional%29%3A%2A%2A%0A" target="_blank" rel="noopener">Report an error</a>
+  <span data-i18n-html="footer_text"></span> ·
+  <a id="report-error-link" href="https://github.com/privi-doughnut/plainscript/issues/new?title=Bug%20report&amp;body=%2A%2AWhat%20page%20or%20medication%20were%20you%20looking%20at%3F%2A%2A%0A%0A%0A%2A%2AWhat%20did%20you%20expect%2C%20and%20what%20actually%20happened%3F%2A%2A%0A%0A%0A%2A%2ABrowser%2Fdevice%20%28optional%29%3A%2A%2A%0A" target="_blank" rel="noopener" data-i18n="report_error_link"></a>
 </div></footer>
 
 <!-- Keys & URLs. Safe to commit: the Supabase anon key is public by design
@@ -666,6 +621,629 @@ const SUPABASE_ANON_KEY = CFG.SUPABASE_ANON_KEY || ""; // Phase 2 (public, RLS-p
 
 const FDA = "https://api.fda.gov/drug/label.json";
 const RXNORM = "https://rxnav.nlm.nih.gov/REST";
+
+/* =================================================================
+   i18n (Phase 5 — Spanish, first of several languages)
+
+   Design, for whoever adds the next language: every UI string lives in
+   I18N[lang][key]. t(key) looks up the current language and falls back
+   to English if a key is ever missing, so a half-finished language
+   never shows a blank string. Static HTML uses data-i18n="key" (sets
+   textContent) or data-i18n-html="key" (sets innerHTML, for strings
+   that need inline <b>/<a>/<em> markup) — applyTranslations() walks the
+   DOM and fills them in. Dynamically-generated content (cabinet rows,
+   interaction cards, etc.) calls t() directly inside its own render
+   function instead, since there's no static element to attach an
+   attribute to.
+
+   IMPORTANT — what does NOT go through this dictionary:
+   - Raw FDA label text (indications, side effects, warnings, etc.) is
+     fetched live in English from openFDA and can't be pre-translated —
+     it's translated per-request through the Claude proxy Worker
+     instead (see toPlainEnglish(), which now takes a `lang`). Without
+     the Worker configured, that text just stays in English with a
+     small note explaining why (see enhanceRows()).
+   - The curated medical content (INTERACTIONS, FOOD_INTERACTIONS,
+     CROSS_SENSITIVITY, DRUG_CLASS_EXPLAINERS, SYMPTOM_CATEGORIES) has
+     its OWN {en, es} structure on each translatable field, picked via
+     pickLang(), since those are data arrays, not simple strings.
+   - "match"/"drugs"/"substances"/token-matching fields always stay in
+     English — they're compared against openFDA's English-language
+     field values, not shown to the user directly.
+   ================================================================= */
+const LANG_KEY = "plainscript.lang";
+let uiLang = "en";
+
+const I18N = {
+  en: {
+    safety_bar: "<strong>Educational reference only.</strong> Not medical advice. Always confirm with a pharmacist or doctor. Emergencies: call 911 · Poison Control 1‑800‑222‑1222.",
+    theme_dark: "Dark",
+    theme_light: "Light",
+    tagline: "Type in a medication to find out what it actually is, or check whether two or more medications are known to interact — explained in plain language, sourced from FDA and NIH data.",
+    tab_decode: "Decode a medication",
+    tab_check: "Check an interaction",
+    tab_cabinet: "My Cabinet",
+    tab_symptoms: "Symptoms",
+
+    decode_intro: "Enter a brand or generic name (for example, <em>Lipitor</em> or <em>atorvastatin</em>).",
+    decode_label: "Medication name",
+    decode_placeholder: "e.g. Tylenol, metformin, Xanax",
+    decode_btn: "Decode",
+
+    check_intro: "Add two or more medications. Plainscript checks them against a curated set of well‑documented interactions <em>and</em> cross‑references each drug's official FDA label.",
+    add_drug_btn: "+ Add another medication",
+    check_btn: "Check interactions",
+    drug_row_placeholder: "Medication name",
+
+    cabinet_intro: "Save the medications you actually take — once — with your own notes, so you can decode them or re‑check interactions any time. Your list is private to your account.",
+    print_title: "Plainscript — medication list",
+    print_disclaimer: "Educational reference only — not medical advice. Not a substitute for your pharmacist's records.",
+    printed_on: "Printed",
+
+    symptoms_intro: "This tab doesn't diagnose anything — it points you toward the general kind of over‑the‑counter category people use for everyday symptoms, and it's never a substitute for a doctor or pharmacist.",
+    redflag_eyebrow: "Emergency warning signs",
+    redflag_headline: "Stop — seek care now if you have any of these",
+    redflag_list: `
+      <li>Chest pain or pressure, or pain spreading to your arm, jaw, or back</li>
+      <li>Trouble breathing or shortness of breath</li>
+      <li>Sudden confusion, slurred speech, facial drooping, or weakness on one side of the body (think <b>FAST</b> — call 911)</li>
+      <li>Uncontrolled or heavy bleeding</li>
+      <li>Coughing up or vomiting blood</li>
+      <li>A severe allergic reaction — swelling of the face or throat, or hives with trouble breathing</li>
+      <li>A sudden, severe "worst headache of my life"</li>
+      <li>High fever with a stiff neck, or any fever in an infant under 3 months</li>
+      <li>Fainting, a seizure, or unresponsiveness</li>
+      <li>Thoughts of harming yourself — call or text <b>988</b> (Suicide &amp; Crisis Lifeline)</li>
+    `,
+    redflag_footer: `None of these are things this page — or any over‑the‑counter medication — can handle. Call <b>911</b> or go to the nearest ER. This is standard public‑health emergency guidance (the kind published by the CDC and Mayo Clinic), not a diagnosis of what you have.`,
+    symptoms_picker_label: "For everyday, non‑emergency symptoms — what's going on?",
+    symptoms_picker_note: "Pick everything that applies. This only covers common, minor symptoms — anything else, or anything severe, unusual, or lasting more than a few days, needs a real visit, not this list.",
+    symptoms_btn: "Show OTC categories",
+
+    method_heading: "How this works &amp; what it can't do",
+    method_source_summary: "Where the data comes from",
+    method_source_content: `
+      <p><b>Drug facts</b> come from the U.S. FDA's <a href="https://open.fda.gov/apis/drug/label/" target="_blank" rel="noopener">openFDA drug label API</a> — the actual approved labeling for each medication (what it treats, how it works, side effects, brand/generic names, drug class).</p>
+      <p><b>Name matching</b> uses the NIH/NLM <a href="https://lhncbc.nlm.nih.gov/RxNav/APIs/" target="_blank" rel="noopener">RxNorm API</a>, which standardizes drug names and tolerates typos.</p>
+      <p><b>Interaction severity</b> comes from a hand‑curated set of well‑documented interactions, each reviewed against FDA prescribing information and standard clinical references.</p>
+      <p><b>Drug‑class explainers, food/alcohol interactions, and allergy cross‑sensitivity notes</b> are Plainscript's own curated content, held to the same standard as the interaction set above — never FDA text, always labeled as ours wherever they appear.</p>
+    `,
+    method_safe_summary: `Why there's no simple "you're safe" result`,
+    method_safe_content: `
+      <p>In January 2024 the U.S. National Library of Medicine shut down its free drug‑interaction API. There is no longer a free, comprehensive, severity‑rated interaction database — paid clinical databases (DrugBank, Micromedex) hold that data now.</p>
+      <p>So this tool can confirm an interaction it knows about, but it can <b>never</b> prove that a combination is safe. A result of "nothing found" only means it wasn't in our curated set or the FDA labels we checked — not that the drugs are safe together. That's why you'll never see a green check here. Always confirm with a pharmacist.</p>
+    `,
+    method_why_summary: "Why do drug interactions happen at all?",
+    method_why_content: `
+      <p>Every "why" explanation on this site traces back to one of a handful of recurring mechanisms. Knowing them makes the individual explanations click instead of feeling like random trivia:</p>
+      <p><b>Liver-enzyme competition.</b> Your liver clears most drugs using a family of enzymes called CYP450. Some drugs block or overload a specific CYP enzyme, so anything else that relies on that same enzyme builds up in your blood instead of clearing normally — this is behind most of the "raises the level of" interactions here (statins + certain antibiotics, warfarin + certain antifungals).</p>
+      <p><b>Additive (stacking) effects.</b> Two drugs that do a similar thing to your body — sedate the central nervous system, thin the blood, raise serotonin — don't just add up mildly when combined; the combined effect is often much stronger than either alone. This is why opioids + benzodiazepines, or two serotonin-raising drugs together, are treated as serious.</p>
+      <p><b>Electrolyte and kidney-clearance shifts.</b> Some drug pairs both push the same electrolyte (like potassium) in the same direction, or one changes how fast the kidneys clear the other — small individually, but the combination can push a level too high or too low.</p>
+      <p><b>Absorption or protein-binding interference.</b> Occasionally one substance physically blocks another from being absorbed, or displaces it from the proteins that carry it through the bloodstream, changing how much active drug is actually available.</p>
+      <p>Every specific interaction listed on this site names which of these is actually happening in its own "Why" line — this section is just the connect-the-dots version.</p>
+    `,
+    method_account_summary: "What happens to my account data",
+    method_account_content: `<p>Signing in is optional — Decode and the interaction check work without an account. If you do sign in (to use My Cabinet), the only things stored are the medications you chose to save and any notes you typed, in a <a href="https://supabase.com" target="_blank" rel="noopener">Supabase</a> database under your user ID. Row‑level security enforces, at the database level, that your rows are readable and writable only by you. Removing a medication deletes its row; there's no separate copy. Nothing about your searches is stored.</p>`,
+    method_symptoms_summary: "What the Symptoms tab actually is (and isn't)",
+    method_symptoms_content: `
+      <p><b>It does not diagnose anything.</b> There's no ranked list of "probable causes," no severity score, and no AI guessing what's wrong with you. Picking "headache" and "runny nose" doesn't produce a condition — it produces the general categories of over‑the‑counter product people commonly use for those symptoms (e.g. "pain relievers," "decongestants"), the same kind of textbook‑level mapping used for a first‑aid guide.</p>
+      <p>That symptom‑to‑category mapping is a small, hand‑curated set reviewed against standard references — not invented on the fly. The actual example products shown under each category are pulled <b>live from openFDA</b> at the moment you search, the same way every other part of this app works.</p>
+      <p>The "seek care now" list is standard public‑health emergency guidance, not something computed from what you picked — it's shown in full regardless of your answers, because recognizing an emergency shouldn't depend on getting a questionnaire right.</p>
+    `,
+    method_limits_summary: "Honest limitations",
+    method_limits_content: `<p>The curated set covers a few dozen of the most important interactions, not all of them. The FDA‑label layer only catches interactions a label names directly, and labels vary in detail. Doses, your health conditions, food, and supplements all matter and aren't considered here. This is a learning tool, not a clinical decision system.</p>`,
+
+    faq_heading: "Frequently asked questions",
+    faq_pharmacist_summary: "Is this a substitute for my pharmacist or doctor?",
+    faq_pharmacist_content: `<p>No — never. Plainscript is a reference for understanding your medications and getting your bearings before a real conversation, not a replacement for one. A pharmacist knows your full history, your doses, and your other conditions; nothing here does.</p>`,
+    faq_notfound_summary: "Why isn't my medication showing up in Decode?",
+    faq_notfound_content: `<p>Decode only shows what's in the FDA's openFDA label database. Some compounded medications, very new drugs, or products sold under an unusual name may not be indexed there yet. Try the generic name if you searched a brand (or the other way around) — the "did you mean" suggestions can help if it's a spelling issue.</p>`,
+    faq_current_summary: "How current is the data?",
+    faq_current_content: `<p>Decode and the interaction checker's FDA-label layer are pulled live from openFDA every time you search — never cached or out of date on our end. The curated interaction, food/alcohol, and drug-class content is hand-reviewed periodically, not live-updated automatically, so it moves slower than the FDA label data itself.</p>`,
+    faq_free_summary: "Is it free? Will it stay free?",
+    faq_free_content: `<p>Yes, and that's the plan. Plainscript runs on free-tier infrastructure (openFDA and RxNorm are free and keyless; Supabase and Cloudflare have generous free tiers). There's no paid tier planned.</p>`,
+    faq_caregiver_summary: "Can I use this for someone I'm caring for, not just myself?",
+    faq_caregiver_content: `<p>Yes — Decode, the interaction checker, and the Symptoms tab all work for anyone's medications, signed in or not. My Cabinet is built around a single signed-in account and doesn't yet separate multiple people's medication lists — if you're managing more than one person's meds, keep that in mind for now.</p>`,
+    faq_error_summary: "What if I find something wrong?",
+    faq_error_content: `<p>Please tell us — see "Report an error" in the footer below. Every curated fact here (interactions, drug-class explainers, food/alcohol notes) is reviewed against standard references, but mistakes are still possible, and a tool that can't be corrected isn't trustworthy. Corrections get reviewed and fixed, not ignored.</p>`,
+
+    footer_text: `Plainscript · educational project · data from openFDA &amp; NIH RxNorm · not affiliated with the FDA or NIH · This product uses publicly available data from the U.S. National Library of Medicine and the U.S. Food and Drug Administration but is not endorsed by them.`,
+    report_error_link: "Report an error",
+
+    /* dynamic UI microcopy — used directly by render functions via t() */
+    signed_in_as: "Signed in as",
+    sign_out: "Sign out",
+    sign_in: "Sign in",
+    cabinet_signedout_title: "Keep your real medication list in one place.",
+    cabinet_signedout_body: "Save the meds you actually take, add your own reminders (like “morning, with food”), and re‑check the interaction check on all of them any time. Your list lives in your own account, protected by row‑level security — no one else can read it.",
+    cabinet_signin_error_prefix: "Sign‑in didn't complete:",
+    continue_google: "Continue with Google",
+    magic_email_label: "Or email me a sign‑in link",
+    magic_email_placeholder: "you@example.com",
+    magic_send_btn: "Send link",
+    magic_invalid_email: "Enter a valid email first.",
+    magic_sending: "Sending your sign‑in link…",
+    magic_sent_note_prefix: "Check",
+    magic_sent_note_suffix: "for a sign‑in link — open it on this device and you'll land back here, signed in. (Didn't get it? Check spam, or just refresh this page to try again.)",
+    cabinet_signin_footer: "Sign‑in only exists to keep your list. Plainscript stores nothing beyond the medications and notes you save — searches aren't recorded. No password to create or remember — a link emailed to you is all it takes.",
+    cabinet_not_configured_eyebrow: "Not switched on yet",
+    cabinet_not_configured_title: "Accounts aren't configured in this deployment.",
+    cabinet_not_configured_body: "My Cabinet needs a (free) Supabase project behind it: run <code>supabase/schema.sql</code> there, then put the project URL and anon key into <code>config.js</code>. Everything else in Plainscript works without it.",
+    add_med_label: "Add a medication",
+    add_med_placeholder: "e.g. metformin, Lipitor",
+    save_to_cabinet_btn: "Save to cabinet",
+    cabinet_loading: "Loading your cabinet…",
+    cabinet_empty_eyebrow: "Empty cabinet",
+    cabinet_empty_title: "Nothing saved yet.",
+    cabinet_empty_body: "Add a medication above, or decode one in tab 01 and hit “Save to My Cabinet”.",
+    cabinet_offline_note: "📡 Offline — showing your cabinet as of your last visit. Adding or editing needs a connection.",
+    print_btn: "🖨️ Print / save as PDF",
+    share_btn: "🔗 Share a read-only copy",
+    scan_btn: "🔎 Scan my whole cabinet",
+    scan_note: "Checks every medication against every other one — not just pairs.",
+    cabinet_footer_note: "Your cabinet is a personal reference list, not a medical record — keep your pharmacist's list as the source of truth.",
+
+    /* Check tab + interaction results */
+    check_min_two: "Enter at least two medications to compare.",
+    check_checking_prefix: "Checking",
+    check_checking_suffix: "medications against the curated set and their FDA labels…",
+    documented_interactions: "Documented interactions",
+    sev_major: "Major interaction", sev_moderate: "Moderate interaction", sev_minor: "Minor interaction",
+    why_label: "Why:", mgmt_label: "What people usually do:",
+    src_curated_interaction: "Source: curated from FDA prescribing information &amp; standard clinical references",
+    also_noted_fda: "Also noted on FDA labels",
+    named_in_label: "Named in the FDA label",
+    label_pill: "label",
+    mentions_text: "'s FDA label discusses",
+    mentions_text2: "in its drug‑interactions section. This isn't severity‑rated — it means the label flags something worth asking about.",
+    src_fda_mention: "Source: openFDA drug label · drug interactions section",
+    no_interaction_eyebrow: "No interaction found",
+    no_interaction_title: "Nothing turned up — but that doesn't mean it's safe.",
+    no_interaction_body: "These medications weren't in our curated interaction set, and we didn't find one naming the other on its FDA label. That's reassuring, not conclusive. Interactions depend on dose, your health, and other things this tool can't see. Always confirm a new combination with a pharmacist.",
+    check_results_note: "This list shows what was found — it is not a complete safety review. A pharmacist can check the full picture, including doses and your other medications.",
+
+    /* Symptoms tab lookup */
+    symptoms_pick_one: "Pick at least one symptom first.",
+    symptoms_looking_up: "Looking up real example products on openFDA…",
+    symptom_category_eyebrow: "Symptom category",
+    src_symptom_category: "Category mapping: hand-curated, textbook-level — not personalized, not a diagnosis",
+    real_examples_eyebrow: "Real examples, sourced live from openFDA",
+    symptoms_result_note: "This maps common symptoms to general OTC categories — it isn't a diagnosis, doesn't know your health history or other medications, and isn't personalized. A pharmacist can tell you which specific option actually fits you. Click any example above to decode it first.",
+
+    /* Cabinet Scan (Phase 3) */
+    scan_min_two: "Add at least two medications to scan.",
+    scan_scanning_prefix: "Scanning",
+    scan_pairs_word: "pair",
+    scan_pairs_word_plural: "pairs",
+    scan_summary_eyebrow: "Cabinet scan",
+    scan_flag_word: "flag",
+    scan_flags_word: "flags",
+    scan_found_suffix: "found",
+    scan_complete: "complete",
+    scan_all_clear: "Nothing flagged across your cabinet — that isn't the same as safe.",
+    scan_no_severity: "No severity-rated interactions — a few FDA-label mentions worth a look.",
+    scan_to_ask: "to ask a pharmacist about.",
+    scan_major_word: "major", scan_moderate_word: "moderate", scan_minor_word: "minor",
+    scan_label_mention: "label mention", scan_label_mentions: "label mentions",
+    scan_disclaimer: `"Nothing found" means it wasn't in our curated set or FDA labels — not that the combination is safe. Always confirm with a pharmacist.`,
+    your_cabinet_eyebrow: "Your cabinet",
+    medications_word: "medications",
+    ask_pharmacist_title: "What to ask your pharmacist",
+    ask_pharmacist_footer: "Generated only from what this scan actually found — not medical advice, and not a substitute for a real conversation.",
+    ask_q_finding: "I take",
+    ask_q_and: "and",
+    ask_q_together: "together — my scan flagged a",
+    ask_q_interaction: "interaction",
+    ask_q_watch: "Is this something I should watch for or ask about?",
+    ask_q_mention: "'s FDA label specifically mentions",
+    ask_q_mention2: "in its interactions section — is that combination something I should be careful with?",
+    ask_q_none: "I take these medications together and nothing was flagged — is there anything about this combination worth double-checking given my specific health history?",
+
+    /* Decode + did-you-mean + full label details */
+    decode_type_first: "Type a medication name first.",
+    try_again_moment: "Try again in a moment.",
+    similar_modal_aria: "Similar and related medications",
+    tools_aria: "Tools",
+    theme_aria_dark: "Switch to dark theme", theme_aria_light: "Switch to light theme",
+    remove_medication_aria: "Remove medication",
+    personal_note_aria: "Personal note",
+    decode_looking_up_prefix: "Looking up",
+    decode_looking_up_suffix: "in the FDA label database…",
+    decode_no_match_eyebrow: "No match",
+    decode_no_match_title_prefix: "Couldn't find",
+    decode_no_match_body: "Check the spelling, or try the other name form — if you searched a brand name, try the generic (or the other way around). Some compounded or very new products may not be in the FDA label database.",
+    decode_closest_match: "Showing the closest match:",
+    did_you_mean: "Other close spellings:",
+    overview_eyebrow: "Medication · overview",
+    row_used_for: "What it's used for", src_indications: "FDA label · indications & usage",
+    row_how_works: "How it works", src_moa: "FDA label · mechanism of action",
+    row_side_effects: "Common side effects", src_adverse: "FDA label · adverse reactions — typically mild; see Warnings below for the serious ones to call a doctor about",
+    row_boxed: "⚠ Boxed warning", src_boxed: "FDA label · boxed warning",
+    about_class_prefix: "About", src_class_explainer: "Plainscript — curated drug-class explainer, not FDA text",
+    full_label_eyebrow: "Full FDA label details",
+    full_label_title_prefix: "Everything else on", full_label_title_suffix: "'s label",
+    row_active_ingredient: "Active ingredient(s)", src_active_ingredient: "FDA label · active ingredient",
+    row_inactive_ingredient: "Inactive ingredients", src_inactive_ingredient: "FDA label · inactive ingredient",
+    row_contraindications: "Who shouldn't take this", src_contraindications: "FDA label · contraindications",
+    row_warnings: "Warnings — the serious ones to call a doctor about", src_warnings: "FDA label · warnings",
+    row_precautions: "Precautions", src_precautions: "FDA label · precautions",
+    row_interacts: "What it can interact with", src_interacts: "FDA label · drug interactions",
+    row_dosage: "Dosage & administration, as printed on the label", src_dosage: "FDA label · dosage and administration",
+    row_pregnancy: "Pregnancy", src_pregnancy: "FDA label · pregnancy",
+    row_nursing: "Breastfeeding / nursing", src_nursing: "FDA label · nursing mothers",
+    decode_footer_note: "This is reference information from the medication's FDA label — not a recommendation about whether to take it, and not dosing advice. Talk to a pharmacist or doctor about your situation.",
+    spanish_no_worker_note: "The FDA label text below is shown in its original English — translating it needs the plain-English Worker to be configured, which isn't set up on this deployment yet.",
+    show_full_text: "Show full FDA text ▾", hide_full_text: "Hide full FDA text ▴",
+    show_plain_english: "Show plain English ▴", show_original: "Show original FDA wording ▾",
+    rephrased_tag: "↻ rephrased in plain English from the FDA text",
+
+    /* Food/allergy card + similar & related modal */
+    food_allergy_eyebrow: "Food, drink &amp; allergy notes",
+    food_allergy_title_prefix: "Worth telling your pharmacist about",
+    food_drink_interaction: "Food/drink interaction",
+    food_allergy_combo_note: "These contain the same active ingredient — check you're not accidentally doubling up if you take more than one alongside this.",
+    similar_related_btn: "🔎 Similar &amp; related meds",
+    similar_related_title_suffix: "— similar &amp; related",
+    close_btn: "Close ✕",
+    tab_same_class: "Same drug class",
+    tab_other_forms: "Other forms &amp; strengths",
+    tab_combo_products: "In combination products",
+    similar_looking_up: "Looking up related medications on openFDA…",
+    similar_no_class: "No other drugs in this same FDA pharmacologic class turned up — many OTC products don't carry structured drug-class data in openFDA.",
+    similar_no_forms: "No other forms or strengths of this ingredient turned up in openFDA.",
+    similar_no_combos: "This ingredient wasn't found in any combination product in openFDA's database.",
+    similar_combo_note: "These contain the same active ingredient — check you're not accidentally doubling up if you take more than one alongside this.",
+    contains_word: "contains",
+
+    /* My Cabinet management */
+    signed_in_email_fallback: "signed in",
+    cabinet_save_btn_signin: "＋ Save to My Cabinet — sign in",
+    cabinet_in_cabinet: "✓ In your cabinet",
+    cabinet_save_btn: "＋ Save to My Cabinet",
+    cabinet_saving: "Saving…",
+    cabinet_saved: "✓ Saved to your cabinet",
+    cabinet_save_failed: "Couldn't save — try again",
+    med_note_class: "class", med_note_rxcui: "rxcui", med_note_brand: "brand",
+    med_note_unmatched: "not matched to an FDA label — check the spelling",
+    med_note_edit: "＋ Add a personal note (e.g. “morning, with food”)",
+    med_note_edit_existing: "Edit note",
+    med_note_remove_label_prefix: "Remove",
+    med_note_remove_from: "from your cabinet",
+    note_placeholder: "e.g. morning, with food",
+    note_save_btn: "Save note", note_cancel_btn: "Cancel",
+    cabinet_add_type_first: "Type a medication name first.",
+    cabinet_looking_up_prefix: "Looking up",
+    cabinet_already_have_prefix: "Already in your cabinet as",
+    cabinet_session_expired: "Your sign-in expired — sign in again.",
+    cabinet_saved_status: "Saved.",
+    cabinet_saved_no_match: "Saved — but it didn't match an FDA label, so double-check the spelling.",
+
+    /* share-a-cabinet */
+    share_checking: "Checking for an existing share link…",
+    share_intro: "Generate a link that shows a read-only copy of your cabinet — no account needed on their end. Anyone with the link can view it, so only share it with people you trust.",
+    share_create_btn: "Create share link",
+    share_link_label: "Read-only share link",
+    share_copy_btn: "Copy", share_copied: "Copied!",
+    share_revoke_btn: "Revoke this link",
+    share_creating: "Creating your share link…",
+    share_create_failed: "Couldn't create a share link — try again.",
+    share_revoking: "Revoking…",
+    share_revoke_failed: "Couldn't revoke — try again.",
+    shared_view_not_available_eyebrow: "Link not available",
+    shared_view_not_available_title: "This share link isn't active.",
+    shared_view_not_available_body: "It may have been revoked, or the link is incorrect.",
+    shared_view_empty_eyebrow: "Shared cabinet",
+    shared_view_empty_title: "This cabinet is empty.",
+    shared_view_empty_body: "Nothing has been saved to it yet.",
+    shared_view_eyebrow: "Shared with you · read-only",
+    shared_view_unknown_med: "Unknown medication",
+    shared_view_note_label: "Note",
+    shared_view_footer: "This is a read-only view — nothing here can be edited from this link, and this list is a personal reference, not a medical record. Confirm anything important with a pharmacist.",
+    shared_view_open_app: "Open the full Plainscript app →"
+  },
+
+  es: {
+    safety_bar: "<strong>Solo es una referencia educativa.</strong> No es un consejo médico. Siempre confirma con un farmacéutico o médico. Emergencias: llama al 911 · Centro de Toxicología 1‑800‑222‑1222.",
+    theme_dark: "Oscuro",
+    theme_light: "Claro",
+    tagline: "Escribe un medicamento para saber qué es en realidad, o revisa si dos o más medicamentos interactúan entre sí — explicado en lenguaje sencillo, con datos de la FDA y el NIH.",
+    tab_decode: "Descifrar un medicamento",
+    tab_check: "Revisar una interacción",
+    tab_cabinet: "Mi Botiquín",
+    tab_symptoms: "Síntomas",
+
+    decode_intro: "Escribe un nombre comercial o genérico (por ejemplo, <em>Lipitor</em> o <em>atorvastatina</em>).",
+    decode_label: "Nombre del medicamento",
+    decode_placeholder: "p. ej. Tylenol, metformina, Xanax",
+    decode_btn: "Descifrar",
+
+    check_intro: "Agrega dos o más medicamentos. Plainscript los revisa contra un conjunto curado de interacciones bien documentadas <em>y</em> las compara con la etiqueta oficial de la FDA de cada medicamento.",
+    add_drug_btn: "+ Agregar otro medicamento",
+    check_btn: "Revisar interacciones",
+    drug_row_placeholder: "Nombre del medicamento",
+
+    cabinet_intro: "Guarda los medicamentos que realmente tomas — una sola vez — con tus propias notas, para poder descifrarlos o volver a revisar interacciones cuando quieras. Tu lista es privada de tu cuenta.",
+    print_title: "Plainscript — lista de medicamentos",
+    print_disclaimer: "Solo es una referencia educativa — no es un consejo médico. No sustituye los registros de tu farmacéutico.",
+    printed_on: "Impreso el",
+
+    symptoms_intro: "Esta pestaña no diagnostica nada — te orienta hacia el tipo general de categoría de medicamento de venta libre que la gente usa para síntomas cotidianos, y nunca sustituye a un médico o farmacéutico.",
+    redflag_eyebrow: "Señales de alerta urgentes",
+    redflag_headline: "Detente — busca atención médica ahora si tienes alguno de estos síntomas",
+    redflag_list: `
+      <li>Dolor u opresión en el pecho, o dolor que se extiende al brazo, la mandíbula o la espalda</li>
+      <li>Dificultad para respirar o falta de aire</li>
+      <li>Confusión repentina, dificultad para hablar, caída facial, o debilidad de un lado del cuerpo (recuerda <b>RÁPIDO</b> — llama al 911)</li>
+      <li>Sangrado incontrolable o abundante</li>
+      <li>Toser o vomitar sangre</li>
+      <li>Una reacción alérgica grave — hinchazón de la cara o la garganta, o urticaria con dificultad para respirar</li>
+      <li>Un dolor de cabeza repentino y muy intenso, "el peor de mi vida"</li>
+      <li>Fiebre alta con rigidez en el cuello, o cualquier fiebre en un bebé menor de 3 meses</li>
+      <li>Desmayo, convulsión, o falta de respuesta</li>
+      <li>Pensamientos de hacerte daño — llama o envía un mensaje de texto al <b>988</b> (Línea de Prevención del Suicidio y Crisis)</li>
+    `,
+    redflag_footer: `Nada de esto es algo que esta página — ni ningún medicamento de venta libre — pueda resolver. Llama al <b>911</b> o ve a la sala de emergencias más cercana. Esta es una guía estándar de salud pública para emergencias (del tipo que publican los CDC y la Clínica Mayo), no un diagnóstico de lo que tienes.`,
+    symptoms_picker_label: "Para síntomas cotidianos, sin urgencia — ¿qué te está pasando?",
+    symptoms_picker_note: "Elige todo lo que corresponda. Esto solo cubre síntomas comunes y leves — cualquier otra cosa, o algo grave, inusual, o que dure más de unos días, necesita una consulta real, no esta lista.",
+    symptoms_btn: "Mostrar categorías de venta libre",
+
+    method_heading: "Cómo funciona esto y qué no puede hacer",
+    method_source_summary: "De dónde vienen los datos",
+    method_source_content: `
+      <p><b>Los datos de los medicamentos</b> vienen de la <a href="https://open.fda.gov/apis/drug/label/" target="_blank" rel="noopener">API de etiquetas de medicamentos de openFDA</a> de la FDA de EE. UU. — el etiquetado oficial aprobado de cada medicamento (para qué sirve, cómo funciona, efectos secundarios, nombres comerciales/genéricos, clase de medicamento).</p>
+      <p><b>La coincidencia de nombres</b> usa la <a href="https://lhncbc.nlm.nih.gov/RxNav/APIs/" target="_blank" rel="noopener">API RxNorm</a> del NIH/NLM, que estandariza nombres de medicamentos y tolera errores de escritura.</p>
+      <p><b>La gravedad de las interacciones</b> proviene de un conjunto curado a mano de interacciones bien documentadas, cada una revisada contra la información de prescripción de la FDA y referencias clínicas estándar.</p>
+      <p><b>Las explicaciones de clases de medicamentos, las interacciones con alimentos/alcohol, y las notas de sensibilidad cruzada a alergias</b> son contenido propio de Plainscript, sometido al mismo estándar que el conjunto de interacciones anterior — nunca es texto de la FDA, y siempre está etiquetado como nuestro dondequiera que aparezca.</p>
+    `,
+    method_safe_summary: `Por qué no hay un simple resultado de "estás a salvo"`,
+    method_safe_content: `
+      <p>En enero de 2024, la Biblioteca Nacional de Medicina de EE. UU. cerró su API gratuita de interacciones medicamentosas. Ya no existe una base de datos gratuita, integral y con clasificación de gravedad — las bases de datos clínicas de pago (DrugBank, Micromedex) tienen esos datos ahora.</p>
+      <p>Así que esta herramienta puede confirmar una interacción que conoce, pero <b>nunca</b> puede demostrar que una combinación es segura. Un resultado de "no se encontró nada" solo significa que no estaba en nuestro conjunto curado ni en las etiquetas de la FDA que revisamos — no que los medicamentos sean seguros juntos. Por eso nunca verás una marca verde aquí. Siempre confirma con un farmacéutico.</p>
+    `,
+    method_why_summary: "¿Por qué ocurren las interacciones medicamentosas?",
+    method_why_content: `
+      <p>Cada explicación de "por qué" en este sitio se remonta a uno de un puñado de mecanismos recurrentes. Conocerlos hace que las explicaciones individuales tengan sentido, en lugar de sentirse como datos sueltos:</p>
+      <p><b>Competencia de enzimas hepáticas.</b> Tu hígado elimina la mayoría de los medicamentos usando una familia de enzimas llamada CYP450. Algunos medicamentos bloquean o saturan una enzima CYP específica, así que cualquier otra cosa que dependa de esa misma enzima se acumula en tu sangre en lugar de eliminarse con normalidad — esto explica la mayoría de las interacciones de "eleva el nivel de" en este sitio (estatinas + ciertos antibióticos, warfarina + ciertos antimicóticos).</p>
+      <p><b>Efectos aditivos (acumulativos).</b> Dos medicamentos que le hacen algo similar a tu cuerpo — sedar el sistema nervioso central, adelgazar la sangre, elevar la serotonina — no simplemente se suman de forma leve al combinarse; el efecto combinado suele ser mucho más fuerte que cualquiera de los dos por separado. Por eso los opioides + benzodiazepinas, o dos medicamentos que elevan la serotonina juntos, se tratan como algo serio.</p>
+      <p><b>Cambios en electrolitos y en la eliminación renal.</b> Algunos pares de medicamentos empujan el mismo electrolito (como el potasio) en la misma dirección, o uno cambia qué tan rápido los riñones eliminan al otro — algo pequeño por separado, pero la combinación puede llevar un nivel demasiado alto o demasiado bajo.</p>
+      <p><b>Interferencia en la absorción o en la unión a proteínas.</b> A veces una sustancia bloquea físicamente la absorción de otra, o la desplaza de las proteínas que la transportan en el torrente sanguíneo, cambiando cuánto medicamento activo hay realmente disponible.</p>
+      <p>Cada interacción específica listada en este sitio indica cuál de estos mecanismos está ocurriendo en su propia línea de "Por qué" — esta sección solo conecta los puntos.</p>
+    `,
+    method_account_summary: "Qué pasa con los datos de mi cuenta",
+    method_account_content: `<p>Iniciar sesión es opcional — Descifrar y la revisión de interacciones funcionan sin una cuenta. Si inicias sesión (para usar Mi Botiquín), lo único que se guarda son los medicamentos que elegiste guardar y las notas que escribiste, en una base de datos de <a href="https://supabase.com" target="_blank" rel="noopener">Supabase</a> bajo tu ID de usuario. La seguridad a nivel de fila garantiza, a nivel de base de datos, que tus filas solo puedan ser leídas y modificadas por ti. Eliminar un medicamento borra su fila; no hay una copia aparte. Nada de tus búsquedas se guarda.</p>`,
+    method_symptoms_summary: "Qué es (y qué no es) la pestaña de Síntomas",
+    method_symptoms_content: `
+      <p><b>No diagnostica nada.</b> No hay una lista clasificada de "causas probables", ni una puntuación de gravedad, ni una IA adivinando qué te pasa. Elegir "dolor de cabeza" y "congestión nasal" no produce una condición médica — produce las categorías generales de productos de venta libre que la gente suele usar para esos síntomas (p. ej., "analgésicos", "descongestionantes"), el mismo tipo de mapeo a nivel de libro de texto que usaría una guía de primeros auxilios.</p>
+      <p>Ese mapeo de síntoma a categoría es un conjunto pequeño, curado a mano y revisado contra referencias estándar — no se inventa sobre la marcha. Los ejemplos de productos reales que se muestran en cada categoría se obtienen <b>en vivo de openFDA</b> en el momento en que buscas, igual que el resto de esta aplicación.</p>
+      <p>La lista de "busca atención ahora" es una guía estándar de salud pública para emergencias, no algo calculado a partir de lo que elegiste — se muestra completa sin importar tus respuestas, porque reconocer una emergencia no debería depender de acertar un cuestionario.</p>
+    `,
+    method_limits_summary: "Limitaciones honestas",
+    method_limits_content: `<p>El conjunto curado cubre unas pocas docenas de las interacciones más importantes, no todas. La capa de etiquetas de la FDA solo detecta interacciones que una etiqueta menciona directamente, y las etiquetas varían en su nivel de detalle. Las dosis, tus condiciones de salud, la alimentación y los suplementos importan y no se consideran aquí. Esta es una herramienta de aprendizaje, no un sistema de decisión clínica.</p>`,
+
+    faq_heading: "Preguntas frecuentes",
+    faq_pharmacist_summary: "¿Esto sustituye a mi farmacéutico o médico?",
+    faq_pharmacist_content: `<p>No — nunca. Plainscript es una referencia para entender tus medicamentos y orientarte antes de una conversación real, no un reemplazo de esa conversación. Un farmacéutico conoce tu historial completo, tus dosis y tus otras condiciones; nada aquí lo sabe.</p>`,
+    faq_notfound_summary: "¿Por qué mi medicamento no aparece en Descifrar?",
+    faq_notfound_content: `<p>Descifrar solo muestra lo que está en la base de datos de etiquetas openFDA de la FDA. Algunos medicamentos preparados por fórmula magistral, medicamentos muy nuevos, o productos vendidos con un nombre poco común, pueden no estar indexados todavía. Prueba el nombre genérico si buscaste una marca (o al revés) — las sugerencias de "quisiste decir" pueden ayudar si es un problema de ortografía.</p>`,
+    faq_current_summary: "¿Qué tan actualizados están los datos?",
+    faq_current_content: `<p>Descifrar y la capa de etiquetas de la FDA del revisor de interacciones se obtienen en vivo de openFDA cada vez que buscas — nunca están guardados en caché ni desactualizados de nuestro lado. El contenido curado de interacciones, alimentos/alcohol, y clases de medicamentos se revisa periódicamente a mano, no se actualiza en vivo automáticamente, así que avanza más lento que los datos de las etiquetas de la FDA.</p>`,
+    faq_free_summary: "¿Es gratis? ¿Seguirá siendo gratis?",
+    faq_free_content: `<p>Sí, y ese es el plan. Plainscript funciona con infraestructura de nivel gratuito (openFDA y RxNorm son gratuitos y no requieren clave; Supabase y Cloudflare tienen niveles gratuitos generosos). No hay ningún nivel de pago planeado.</p>`,
+    faq_caregiver_summary: "¿Puedo usar esto para alguien que cuido, no solo para mí?",
+    faq_caregiver_content: `<p>Sí — Descifrar, el revisor de interacciones, y la pestaña de Síntomas funcionan para los medicamentos de cualquier persona, con o sin sesión iniciada. Mi Botiquín está diseñado alrededor de una sola cuenta con sesión iniciada y todavía no separa las listas de medicamentos de varias personas — si estás manejando los medicamentos de más de una persona, ten esto en cuenta por ahora.</p>`,
+    faq_error_summary: "¿Qué pasa si encuentro algo incorrecto?",
+    faq_error_content: `<p>Por favor, avísanos — mira "Reportar un error" en el pie de página. Cada dato curado aquí (interacciones, explicaciones de clases de medicamentos, notas de alimentos/alcohol) se revisa contra referencias estándar, pero los errores siguen siendo posibles, y una herramienta que no se puede corregir no es confiable. Las correcciones se revisan y se corrigen, no se ignoran.</p>`,
+
+    footer_text: `Plainscript · proyecto educativo · datos de openFDA y NIH RxNorm · no afiliado con la FDA ni el NIH · Este producto usa datos disponibles públicamente de la Biblioteca Nacional de Medicina de EE. UU. y de la Administración de Alimentos y Medicamentos de EE. UU., pero no está respaldado por ellas.`,
+    report_error_link: "Reportar un error",
+
+    signed_in_as: "Sesión iniciada como",
+    sign_out: "Cerrar sesión",
+    sign_in: "Iniciar sesión",
+    cabinet_signedout_title: "Mantén tu lista real de medicamentos en un solo lugar.",
+    cabinet_signedout_body: "Guarda los medicamentos que realmente tomas, agrega tus propios recordatorios (como “en la mañana, con comida”), y vuelve a revisar interacciones entre todos ellos cuando quieras. Tu lista vive en tu propia cuenta, protegida por seguridad a nivel de fila — nadie más puede leerla.",
+    cabinet_signin_error_prefix: "El inicio de sesión no se completó:",
+    continue_google: "Continuar con Google",
+    magic_email_label: "O envíame un enlace de acceso por correo",
+    magic_email_placeholder: "tucorreo@ejemplo.com",
+    magic_send_btn: "Enviar enlace",
+    magic_invalid_email: "Escribe un correo válido primero.",
+    magic_sending: "Enviando tu enlace de acceso…",
+    magic_sent_note_prefix: "Revisa",
+    magic_sent_note_suffix: "para un enlace de acceso — ábrelo en este dispositivo y volverás aquí con la sesión iniciada. (¿No lo recibiste? Revisa spam, o simplemente actualiza esta página para intentarlo de nuevo.)",
+    cabinet_signin_footer: "Iniciar sesión solo existe para guardar tu lista. Plainscript no guarda nada más allá de los medicamentos y notas que guardas — las búsquedas no se registran. Sin contraseña que crear ni recordar — solo un enlace enviado por correo.",
+    cabinet_not_configured_eyebrow: "Aún no está activado",
+    cabinet_not_configured_title: "Las cuentas no están configuradas en esta versión.",
+    cabinet_not_configured_body: "Mi Botiquín necesita un proyecto (gratuito) de Supabase detrás: ejecuta <code>supabase/schema.sql</code> ahí, y luego coloca la URL del proyecto y la clave anónima en <code>config.js</code>. Todo lo demás en Plainscript funciona sin esto.",
+    add_med_label: "Agregar un medicamento",
+    add_med_placeholder: "p. ej. metformina, Lipitor",
+    save_to_cabinet_btn: "Guardar en el botiquín",
+    cabinet_loading: "Cargando tu botiquín…",
+    cabinet_empty_eyebrow: "Botiquín vacío",
+    cabinet_empty_title: "Todavía no hay nada guardado.",
+    cabinet_empty_body: "Agrega un medicamento arriba, o descifra uno en la pestaña 01 y presiona “Guardar en Mi Botiquín”.",
+    cabinet_offline_note: "📡 Sin conexión — mostrando tu botiquín tal como estaba en tu última visita. Agregar o editar necesita conexión.",
+    print_btn: "🖨️ Imprimir / guardar como PDF",
+    share_btn: "🔗 Compartir una copia de solo lectura",
+    scan_btn: "🔎 Revisar todo mi botiquín",
+    scan_note: "Revisa cada medicamento contra todos los demás — no solo pares.",
+    cabinet_footer_note: "Tu botiquín es una lista de referencia personal, no un registro médico — mantén la lista de tu farmacéutico como la fuente de verdad.",
+
+    check_min_two: "Ingresa al menos dos medicamentos para comparar.",
+    check_checking_prefix: "Revisando",
+    check_checking_suffix: "medicamentos contra el conjunto curado y sus etiquetas de la FDA…",
+    documented_interactions: "Interacciones documentadas",
+    sev_major: "Interacción grave", sev_moderate: "Interacción moderada", sev_minor: "Interacción leve",
+    why_label: "Por qué:", mgmt_label: "Qué suele hacerse:",
+    src_curated_interaction: "Fuente: curado a partir de información de prescripción de la FDA y referencias clínicas estándar",
+    also_noted_fda: "También mencionado en etiquetas de la FDA",
+    named_in_label: "Mencionado en la etiqueta de la FDA",
+    label_pill: "etiqueta",
+    mentions_text: "— la etiqueta de la FDA de",
+    mentions_text2: "menciona esto en su sección de interacciones. Esto no tiene clasificación de gravedad — significa que la etiqueta señala algo que vale la pena preguntar.",
+    src_fda_mention: "Fuente: etiqueta de medicamento de openFDA · sección de interacciones",
+    no_interaction_eyebrow: "No se encontró ninguna interacción",
+    no_interaction_title: "No se encontró nada — pero eso no significa que sea seguro.",
+    no_interaction_body: "Estos medicamentos no estaban en nuestro conjunto curado de interacciones, y no encontramos que uno mencionara al otro en su etiqueta de la FDA. Esto es tranquilizador, no concluyente. Las interacciones dependen de la dosis, tu salud, y otras cosas que esta herramienta no puede ver. Siempre confirma una combinación nueva con un farmacéutico.",
+    check_results_note: "Esta lista muestra lo que se encontró — no es una revisión de seguridad completa. Un farmacéutico puede revisar el panorama completo, incluyendo dosis y tus otros medicamentos.",
+
+    symptoms_pick_one: "Elige al menos un síntoma primero.",
+    symptoms_looking_up: "Buscando ejemplos de productos reales en openFDA…",
+    symptom_category_eyebrow: "Categoría de síntoma",
+    src_symptom_category: "Mapeo de categorías: curado a mano, a nivel de libro de texto — no personalizado, no es un diagnóstico",
+    real_examples_eyebrow: "Ejemplos reales, obtenidos en vivo de openFDA",
+    symptoms_result_note: "Esto relaciona síntomas comunes con categorías generales de venta libre — no es un diagnóstico, no conoce tu historial de salud ni tus otros medicamentos, y no está personalizado. Un farmacéutico puede decirte qué opción específica te conviene. Haz clic en cualquier ejemplo de arriba para descifrarlo primero.",
+
+    scan_min_two: "Agrega al menos dos medicamentos para revisar.",
+    scan_scanning_prefix: "Revisando",
+    scan_pairs_word: "par",
+    scan_pairs_word_plural: "pares",
+    scan_summary_eyebrow: "Revisión del botiquín",
+    scan_flag_word: "alerta",
+    scan_flags_word: "alertas",
+    scan_found_suffix: "encontrada(s)",
+    scan_complete: "completa",
+    scan_all_clear: "No se encontró nada en tu botiquín — eso no es lo mismo que seguro.",
+    scan_no_severity: "Sin interacciones con gravedad clasificada — algunas menciones en etiquetas de la FDA vale la pena revisar.",
+    scan_to_ask: "para preguntarle a un farmacéutico.",
+    scan_major_word: "grave", scan_moderate_word: "moderada(s)", scan_minor_word: "leve(s)",
+    scan_label_mention: "mención en etiqueta", scan_label_mentions: "menciones en etiquetas",
+    scan_disclaimer: `"No se encontró nada" significa que no estaba en nuestro conjunto curado ni en las etiquetas de la FDA — no que la combinación sea segura. Siempre confirma con un farmacéutico.`,
+    your_cabinet_eyebrow: "Tu botiquín",
+    medications_word: "medicamentos",
+    ask_pharmacist_title: "Qué preguntarle a tu farmacéutico",
+    ask_pharmacist_footer: "Generado solo a partir de lo que esta revisión realmente encontró — no es un consejo médico, y no sustituye una conversación real.",
+    ask_q_finding: "Tomo",
+    ask_q_and: "y",
+    ask_q_together: "juntos — mi revisión detectó una interacción",
+    ask_q_interaction: "",
+    ask_q_watch: "¿Es esto algo que debería vigilar o preguntar?",
+    ask_q_mention: "— la etiqueta de la FDA de",
+    ask_q_mention2: "menciona específicamente esto en su sección de interacciones — ¿es esa combinación algo con lo que debería tener cuidado?",
+    ask_q_none: "Tomo estos medicamentos juntos y no se detectó nada — ¿hay algo sobre esta combinación que valga la pena confirmar dado mi historial de salud específico?",
+
+    decode_type_first: "Escribe un nombre de medicamento primero.",
+    try_again_moment: "Inténtalo de nuevo en un momento.",
+    similar_modal_aria: "Medicamentos similares y relacionados",
+    tools_aria: "Herramientas",
+    theme_aria_dark: "Cambiar a tema oscuro", theme_aria_light: "Cambiar a tema claro",
+    remove_medication_aria: "Quitar medicamento",
+    personal_note_aria: "Nota personal",
+    decode_looking_up_prefix: "Buscando",
+    decode_looking_up_suffix: "en la base de datos de etiquetas de la FDA…",
+    decode_no_match_eyebrow: "Sin coincidencias",
+    decode_no_match_title_prefix: "No se pudo encontrar",
+    decode_no_match_body: "Revisa la ortografía, o prueba con la otra forma del nombre — si buscaste un nombre comercial, prueba el genérico (o al revés). Algunos productos preparados por fórmula magistral o muy nuevos pueden no estar en la base de datos de etiquetas de la FDA.",
+    decode_closest_match: "Mostrando la coincidencia más cercana:",
+    did_you_mean: "Otras ortografías parecidas:",
+    overview_eyebrow: "Medicamento · resumen",
+    row_used_for: "Para qué se usa", src_indications: "Etiqueta de la FDA · indicaciones y uso",
+    row_how_works: "Cómo funciona", src_moa: "Etiqueta de la FDA · mecanismo de acción",
+    row_side_effects: "Efectos secundarios comunes", src_adverse: "Etiqueta de la FDA · reacciones adversas — normalmente leves; consulta Advertencias abajo para las serias que requieren llamar a un médico",
+    row_boxed: "⚠ Advertencia destacada", src_boxed: "Etiqueta de la FDA · advertencia destacada",
+    about_class_prefix: "Sobre", src_class_explainer: "Plainscript — explicación curada de clase de medicamento, no es texto de la FDA",
+    full_label_eyebrow: "Detalles completos de la etiqueta de la FDA",
+    full_label_title_prefix: "Todo lo demás en la etiqueta de", full_label_title_suffix: "",
+    row_active_ingredient: "Ingrediente(s) activo(s)", src_active_ingredient: "Etiqueta de la FDA · ingrediente activo",
+    row_inactive_ingredient: "Ingredientes inactivos", src_inactive_ingredient: "Etiqueta de la FDA · ingrediente inactivo",
+    row_contraindications: "Quién no debería tomar esto", src_contraindications: "Etiqueta de la FDA · contraindicaciones",
+    row_warnings: "Advertencias — las serias que requieren llamar a un médico", src_warnings: "Etiqueta de la FDA · advertencias",
+    row_precautions: "Precauciones", src_precautions: "Etiqueta de la FDA · precauciones",
+    row_interacts: "Con qué puede interactuar", src_interacts: "Etiqueta de la FDA · interacciones medicamentosas",
+    row_dosage: "Dosis y administración, tal como aparece en la etiqueta", src_dosage: "Etiqueta de la FDA · dosis y administración",
+    row_pregnancy: "Embarazo", src_pregnancy: "Etiqueta de la FDA · embarazo",
+    row_nursing: "Lactancia", src_nursing: "Etiqueta de la FDA · lactancia",
+    decode_footer_note: "Esta es información de referencia de la etiqueta de la FDA del medicamento — no una recomendación sobre si tomarlo, y no es un consejo de dosificación. Habla con un farmacéutico o médico sobre tu situación.",
+    spanish_no_worker_note: "El texto de la etiqueta de la FDA abajo se muestra en su inglés original — traducirlo requiere que el Worker de español sencillo esté configurado, y eso todavía no está activado en esta versión.",
+    show_full_text: "Mostrar texto completo de la FDA ▾", hide_full_text: "Ocultar texto completo de la FDA ▴",
+    show_plain_english: "Mostrar en español sencillo ▴", show_original: "Mostrar texto original de la FDA ▾",
+    rephrased_tag: "↻ traducido/reescrito en español sencillo a partir del texto de la FDA",
+
+    food_allergy_eyebrow: "Notas de alimentos, bebidas y alergias",
+    food_allergy_title_prefix: "Vale la pena decirle a tu farmacéutico sobre",
+    food_drink_interaction: "Interacción con alimentos/bebidas",
+    food_allergy_combo_note: "Estos contienen el mismo ingrediente activo — revisa que no estés duplicando accidentalmente la dosis si tomas más de uno junto con este.",
+    similar_related_btn: "🔎 Medicamentos similares y relacionados",
+    similar_related_title_suffix: "— similares y relacionados",
+    close_btn: "Cerrar ✕",
+    tab_same_class: "Misma clase de medicamento",
+    tab_other_forms: "Otras formas y concentraciones",
+    tab_combo_products: "En productos combinados",
+    similar_looking_up: "Buscando medicamentos relacionados en openFDA…",
+    similar_no_class: "No se encontraron otros medicamentos en esta misma clase farmacológica de la FDA — muchos productos de venta libre no tienen datos estructurados de clase de medicamento en openFDA.",
+    similar_no_forms: "No se encontraron otras formas o concentraciones de este ingrediente en openFDA.",
+    similar_no_combos: "Este ingrediente no se encontró en ningún producto combinado en la base de datos de openFDA.",
+    similar_combo_note: "Estos contienen el mismo ingrediente activo — revisa que no estés duplicando accidentalmente la dosis si tomas más de uno junto con este.",
+    contains_word: "contiene",
+
+    signed_in_email_fallback: "sesión iniciada",
+    cabinet_save_btn_signin: "＋ Guardar en Mi Botiquín — iniciar sesión",
+    cabinet_in_cabinet: "✓ En tu botiquín",
+    cabinet_save_btn: "＋ Guardar en Mi Botiquín",
+    cabinet_saving: "Guardando…",
+    cabinet_saved: "✓ Guardado en tu botiquín",
+    cabinet_save_failed: "No se pudo guardar — intenta de nuevo",
+    med_note_class: "clase", med_note_rxcui: "rxcui", med_note_brand: "marca",
+    med_note_unmatched: "no coincide con ninguna etiqueta de la FDA — revisa la ortografía",
+    med_note_edit: "＋ Agregar una nota personal (p. ej., “en la mañana, con comida”)",
+    med_note_edit_existing: "Editar nota",
+    med_note_remove_label_prefix: "Quitar",
+    med_note_remove_from: "de tu botiquín",
+    note_placeholder: "p. ej. en la mañana, con comida",
+    note_save_btn: "Guardar nota", note_cancel_btn: "Cancelar",
+    cabinet_add_type_first: "Escribe un nombre de medicamento primero.",
+    cabinet_looking_up_prefix: "Buscando",
+    cabinet_already_have_prefix: "Ya está en tu botiquín como",
+    cabinet_session_expired: "Tu sesión expiró — inicia sesión de nuevo.",
+    cabinet_saved_status: "Guardado.",
+    cabinet_saved_no_match: "Guardado — pero no coincidió con ninguna etiqueta de la FDA, así que revisa la ortografía.",
+
+    share_checking: "Buscando un enlace para compartir existente…",
+    share_intro: "Genera un enlace que muestre una copia de solo lectura de tu botiquín — no necesitan cuenta. Cualquiera con el enlace puede verlo, así que compártelo solo con personas de confianza.",
+    share_create_btn: "Crear enlace para compartir",
+    share_link_label: "Enlace de solo lectura para compartir",
+    share_copy_btn: "Copiar", share_copied: "¡Copiado!",
+    share_revoke_btn: "Revocar este enlace",
+    share_creating: "Creando tu enlace para compartir…",
+    share_create_failed: "No se pudo crear el enlace — intenta de nuevo.",
+    share_revoking: "Revocando…",
+    share_revoke_failed: "No se pudo revocar — intenta de nuevo.",
+    shared_view_not_available_eyebrow: "Enlace no disponible",
+    shared_view_not_available_title: "Este enlace para compartir no está activo.",
+    shared_view_not_available_body: "Puede que haya sido revocado, o el enlace es incorrecto.",
+    shared_view_empty_eyebrow: "Botiquín compartido",
+    shared_view_empty_title: "Este botiquín está vacío.",
+    shared_view_empty_body: "Todavía no se ha guardado nada en él.",
+    shared_view_eyebrow: "Compartido contigo · solo lectura",
+    shared_view_unknown_med: "Medicamento desconocido",
+    shared_view_note_label: "Nota",
+    shared_view_footer: "Esta es una vista de solo lectura — nada aquí se puede editar desde este enlace, y esta lista es una referencia personal, no un registro médico. Confirma cualquier cosa importante con un farmacéutico.",
+    shared_view_open_app: "Abrir la aplicación completa de Plainscript →"
+  }
+};
+
+function t(key){
+  const dict = I18N[uiLang] || I18N.en;
+  return (key in dict) ? dict[key] : (I18N.en[key] || key);
+}
+
+/* picks the current-language version of a {en, es, ...} translatable
+   field on the curated data arrays below; falls back to English. */
+function pickLang(field){
+  if (!field) return "";
+  if (typeof field === "string") return field; // already-plain string, untranslated field
+  return field[uiLang] || field.en || "";
+}
+
+function applyTranslations(){
+  document.documentElement.lang = uiLang;
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach(el => { el.setAttribute("aria-label", t(el.dataset.i18nAriaLabel)); });
+  const langLabel = document.getElementById("lang-label");
+  if (langLabel) langLabel.textContent = uiLang.toUpperCase();
+}
 
 /* ---- brand/ingredient aliases ------------------------------------
    Lets the curated layer recognize common brand names offline.
@@ -716,91 +1294,145 @@ const THIAZ  =["hydrochlorothiazide","chlorthalidone","indapamide"];
    and a management note. Every entry is a textbook, well-documented
    interaction. Add your own — this is the heart of the tool.
 ------------------------------------------------------------------- */
+/* what/why/mgmt are {en, es} pairs, read through pickLang(); a/b (the
+   matching tokens) always stay English — they're compared against
+   openFDA field values, not shown to the user. */
 const INTERACTIONS = [
   { a:["warfarin"], b:NSAIDS, severity:"major",
-    what:"Taking a blood thinner with an anti‑inflammatory painkiller sharply raises the risk of serious bleeding, including in the stomach.",
-    why:"NSAIDs irritate the stomach lining and also reduce platelet function, stacking on top of warfarin's blood‑thinning effect.",
-    mgmt:"Acetaminophen (Tylenol) is usually the safer pain option for people on warfarin — confirm with a pharmacist." },
+    what:{en:"Taking a blood thinner with an anti‑inflammatory painkiller sharply raises the risk of serious bleeding, including in the stomach.",
+          es:"Tomar un anticoagulante junto con un analgésico antiinflamatorio aumenta considerablemente el riesgo de sangrado grave, incluso en el estómago."},
+    why:{en:"NSAIDs irritate the stomach lining and also reduce platelet function, stacking on top of warfarin's blood‑thinning effect.",
+         es:"Los AINE irritan el revestimiento del estómago y también reducen la función de las plaquetas, sumándose al efecto anticoagulante de la warfarina."},
+    mgmt:{en:"Acetaminophen (Tylenol) is usually the safer pain option for people on warfarin — confirm with a pharmacist.",
+          es:"El acetaminofén (paracetamol) suele ser la opción más segura para el dolor en personas que toman warfarina — confírmalo con un farmacéutico."} },
 
   { a:["warfarin"], b:["metronidazole","trimethoprim","sulfamethoxazole","fluconazole"], severity:"major",
-    what:"These antibiotics/antifungals can make warfarin much stronger, pushing blood‑thinning into a dangerous range.",
-    why:"They slow the liver enzymes that clear warfarin, so it builds up in the body.",
-    mgmt:"Doctors often check INR more closely and may adjust the warfarin dose during treatment." },
+    what:{en:"These antibiotics/antifungals can make warfarin much stronger, pushing blood‑thinning into a dangerous range.",
+          es:"Estos antibióticos/antimicóticos pueden hacer que la warfarina sea mucho más fuerte, llevando el efecto anticoagulante a un rango peligroso."},
+    why:{en:"They slow the liver enzymes that clear warfarin, so it builds up in the body.",
+         es:"Ralentizan las enzimas hepáticas que eliminan la warfarina, así que esta se acumula en el cuerpo."},
+    mgmt:{en:"Doctors often check INR more closely and may adjust the warfarin dose during treatment.",
+          es:"Los médicos suelen revisar el INR más de cerca y pueden ajustar la dosis de warfarina durante el tratamiento."} },
 
   { a:NITRATES, b:PDE5, severity:"major",
-    what:"Combining a nitrate heart medicine with an erectile‑dysfunction drug can cause a sudden, dangerous drop in blood pressure.",
-    why:"Both relax and widen blood vessels; together the effect can collapse blood pressure to life‑threatening levels.",
-    mgmt:"This combination is contraindicated. Nitrates and PDE5 inhibitors should not be taken together — this is an emergency‑level interaction." },
+    what:{en:"Combining a nitrate heart medicine with an erectile‑dysfunction drug can cause a sudden, dangerous drop in blood pressure.",
+          es:"Combinar un medicamento de nitrato para el corazón con un medicamento para la disfunción eréctil puede causar una caída repentina y peligrosa de la presión arterial."},
+    why:{en:"Both relax and widen blood vessels; together the effect can collapse blood pressure to life‑threatening levels.",
+         es:"Ambos relajan y ensanchan los vasos sanguíneos; juntos, el efecto puede hacer caer la presión arterial a niveles que ponen en riesgo la vida."},
+    mgmt:{en:"This combination is contraindicated. Nitrates and PDE5 inhibitors should not be taken together — this is an emergency‑level interaction.",
+          es:"Esta combinación está contraindicada. Los nitratos y los inhibidores de la PDE5 no deben tomarse juntos — esta es una interacción de nivel de emergencia."} },
 
   { a:OPIOIDS, b:BENZOS, severity:"major",
-    what:"Opioid painkillers and benzodiazepine sedatives together can slow or stop breathing.",
-    why:"Both depress the central nervous system; combined, they can suppress the drive to breathe.",
-    mgmt:"The FDA places a boxed warning on this combination. It should only ever happen under direct medical supervision." },
+    what:{en:"Opioid painkillers and benzodiazepine sedatives together can slow or stop breathing.",
+          es:"Los analgésicos opioides y los sedantes benzodiazepínicos juntos pueden ralentizar o detener la respiración."},
+    why:{en:"Both depress the central nervous system; combined, they can suppress the drive to breathe.",
+         es:"Ambos deprimen el sistema nervioso central; combinados, pueden suprimir el impulso de respirar."},
+    mgmt:{en:"The FDA places a boxed warning on this combination. It should only ever happen under direct medical supervision.",
+          es:"La FDA coloca una advertencia destacada en esta combinación. Solo debería ocurrir bajo supervisión médica directa."} },
 
   { a:MAOIS, b:SSRIS, severity:"major",
-    what:"Two different antidepressant types together can trigger serotonin syndrome — a serious, sometimes fatal reaction.",
-    why:"Both raise serotonin levels; combined, serotonin can spike dangerously high.",
-    mgmt:"A washout period (often 2+ weeks) is required when switching between these drugs. Never overlap them without a prescriber's plan." },
+    what:{en:"Two different antidepressant types together can trigger serotonin syndrome — a serious, sometimes fatal reaction.",
+          es:"Dos tipos diferentes de antidepresivos juntos pueden desencadenar el síndrome serotoninérgico — una reacción grave, a veces mortal."},
+    why:{en:"Both raise serotonin levels; combined, serotonin can spike dangerously high.",
+         es:"Ambos elevan los niveles de serotonina; combinados, la serotonina puede subir a niveles peligrosos."},
+    mgmt:{en:"A washout period (often 2+ weeks) is required when switching between these drugs. Never overlap them without a prescriber's plan.",
+          es:"Se requiere un período de lavado (a menudo 2+ semanas) al cambiar entre estos medicamentos. Nunca los combines sin un plan de tu médico."} },
 
   { a:SSRIS, b:["sumatriptan","rizatriptan","zolmitriptan","tramadol","linezolid"], severity:"moderate",
-    what:"Adding a migraine triptan (or certain other serotonin‑raising drugs) to an SSRI can increase serotonin syndrome risk.",
-    why:"Each nudges serotonin upward; together the rise can become a problem in some people.",
-    mgmt:"Often used together with monitoring, but watch for agitation, racing heart, tremor, or fever and report them." },
+    what:{en:"Adding a migraine triptan (or certain other serotonin‑raising drugs) to an SSRI can increase serotonin syndrome risk.",
+          es:"Agregar un triptán para la migraña (u otros medicamentos que elevan la serotonina) a un ISRS puede aumentar el riesgo de síndrome serotoninérgico."},
+    why:{en:"Each nudges serotonin upward; together the rise can become a problem in some people.",
+         es:"Cada uno eleva un poco la serotonina; juntos, el aumento puede ser un problema en algunas personas."},
+    mgmt:{en:"Often used together with monitoring, but watch for agitation, racing heart, tremor, or fever and report them.",
+          es:"A menudo se usan juntos con supervisión, pero vigila la agitación, el corazón acelerado, el temblor, o la fiebre, y repórtalos."} },
 
   { a:STATINS, b:MACRO, severity:"major",
-    what:"Certain cholesterol statins with certain antibiotics can cause severe muscle breakdown (rhabdomyolysis).",
-    why:"The antibiotic blocks the liver enzyme (CYP3A4) that clears the statin, so statin levels climb.",
-    mgmt:"Doctors may pause the statin during the antibiotic course. Report unexplained muscle pain or dark urine." },
+    what:{en:"Certain cholesterol statins with certain antibiotics can cause severe muscle breakdown (rhabdomyolysis).",
+          es:"Ciertas estatinas para el colesterol con ciertos antibióticos pueden causar una descomposición muscular grave (rabdomiólisis)."},
+    why:{en:"The antibiotic blocks the liver enzyme (CYP3A4) that clears the statin, so statin levels climb.",
+         es:"El antibiótico bloquea la enzima hepática (CYP3A4) que elimina la estatina, así que los niveles de la estatina suben."},
+    mgmt:{en:"Doctors may pause the statin during the antibiotic course. Report unexplained muscle pain or dark urine.",
+          es:"Los médicos pueden pausar la estatina durante el tratamiento con el antibiótico. Reporta dolor muscular inexplicado u orina oscura."} },
 
   { a:STATINS, b:AZOLES, severity:"major",
-    what:"Some statins with azole antifungals can cause severe muscle injury.",
-    why:"Azoles strongly inhibit the enzyme that breaks down the statin, letting it accumulate.",
-    mgmt:"A different statin or a temporary hold is often used. Watch for muscle pain or weakness." },
+    what:{en:"Some statins with azole antifungals can cause severe muscle injury.",
+          es:"Algunas estatinas con antimicóticos azólicos pueden causar una lesión muscular grave."},
+    why:{en:"Azoles strongly inhibit the enzyme that breaks down the statin, letting it accumulate.",
+         es:"Los azoles inhiben fuertemente la enzima que descompone la estatina, permitiendo que se acumule."},
+    mgmt:{en:"A different statin or a temporary hold is often used. Watch for muscle pain or weakness.",
+          es:"A menudo se usa una estatina diferente o se pausa temporalmente. Vigila el dolor o la debilidad muscular."} },
 
   { a:ACE, b:KSPARE, severity:"major",
-    what:"This blood‑pressure combination can drive potassium too high, which can disturb heart rhythm.",
-    why:"Both raise potassium; stacked together, levels can become dangerous.",
-    mgmt:"Potassium and kidney function are usually monitored with blood tests when these are combined." },
+    what:{en:"This blood‑pressure combination can drive potassium too high, which can disturb heart rhythm.",
+          es:"Esta combinación de medicamentos para la presión arterial puede elevar demasiado el potasio, lo cual puede alterar el ritmo cardíaco."},
+    why:{en:"Both raise potassium; stacked together, levels can become dangerous.",
+         es:"Ambos elevan el potasio; combinados, los niveles pueden volverse peligrosos."},
+    mgmt:{en:"Potassium and kidney function are usually monitored with blood tests when these are combined.",
+          es:"El potasio y la función renal suelen monitorearse con análisis de sangre cuando se combinan estos medicamentos."} },
 
   { a:ACE, b:["potassium","losartan","valsartan","olmesartan","irbesartan","candesartan"], severity:"moderate",
-    what:"Pairing an ACE inhibitor with a potassium supplement or an ARB can raise potassium and stress the kidneys.",
-    why:"Both reduce how much potassium the body gets rid of.",
-    mgmt:"Generally avoided unless specifically directed and monitored with blood tests." },
+    what:{en:"Pairing an ACE inhibitor with a potassium supplement or an ARB can raise potassium and stress the kidneys.",
+          es:"Combinar un inhibidor de la ECA con un suplemento de potasio o un ARA-II puede elevar el potasio y estresar los riñones."},
+    why:{en:"Both reduce how much potassium the body gets rid of.",
+         es:"Ambos reducen cuánto potasio elimina el cuerpo."},
+    mgmt:{en:"Generally avoided unless specifically directed and monitored with blood tests.",
+          es:"Generalmente se evita a menos que sea indicado específicamente y monitoreado con análisis de sangre."} },
 
   { a:["methotrexate"], b:NSAIDS, severity:"major",
-    what:"Anti‑inflammatory painkillers can raise methotrexate to toxic levels, especially at higher methotrexate doses.",
-    why:"NSAIDs reduce how fast the kidneys clear methotrexate.",
-    mgmt:"Higher‑dose methotrexate and NSAIDs are a dangerous mix; low‑dose use needs a doctor's guidance." },
+    what:{en:"Anti‑inflammatory painkillers can raise methotrexate to toxic levels, especially at higher methotrexate doses.",
+          es:"Los analgésicos antiinflamatorios pueden elevar el metotrexato a niveles tóxicos, especialmente con dosis más altas de metotrexato."},
+    why:{en:"NSAIDs reduce how fast the kidneys clear methotrexate.",
+         es:"Los AINE reducen qué tan rápido los riñones eliminan el metotrexato."},
+    mgmt:{en:"Higher‑dose methotrexate and NSAIDs are a dangerous mix; low‑dose use needs a doctor's guidance.",
+          es:"El metotrexato en dosis altas y los AINE son una mezcla peligrosa; el uso en dosis bajas necesita la guía de un médico."} },
 
   { a:["lithium"], b:NSAIDS, severity:"moderate",
-    what:"NSAIDs can push lithium levels up, and lithium has a narrow safe range.",
-    why:"NSAIDs reduce lithium clearance through the kidneys.",
-    mgmt:"Lithium levels are often checked if an NSAID is added. Watch for tremor, confusion, or nausea." },
+    what:{en:"NSAIDs can push lithium levels up, and lithium has a narrow safe range.",
+          es:"Los AINE pueden elevar los niveles de litio, y el litio tiene un rango seguro muy estrecho."},
+    why:{en:"NSAIDs reduce lithium clearance through the kidneys.",
+         es:"Los AINE reducen la eliminación de litio a través de los riñones."},
+    mgmt:{en:"Lithium levels are often checked if an NSAID is added. Watch for tremor, confusion, or nausea.",
+          es:"Los niveles de litio suelen revisarse si se agrega un AINE. Vigila el temblor, la confusión, o las náuseas."} },
 
   { a:["lithium"], b:THIAZ, severity:"moderate",
-    what:"Thiazide water pills can raise lithium to toxic levels.",
-    why:"They make the kidneys hold on to lithium.",
-    mgmt:"Lithium monitoring and dose adjustment are common when a thiazide is started." },
+    what:{en:"Thiazide water pills can raise lithium to toxic levels.",
+          es:"Los diuréticos tiazídicos pueden elevar el litio a niveles tóxicos."},
+    why:{en:"They make the kidneys hold on to lithium.",
+         es:"Hacen que los riñones retengan el litio."},
+    mgmt:{en:"Lithium monitoring and dose adjustment are common when a thiazide is started.",
+          es:"El monitoreo de litio y el ajuste de dosis son comunes cuando se inicia una tiazida."} },
 
   { a:["digoxin"], b:["amiodarone"], severity:"major",
-    what:"Amiodarone can roughly double digoxin levels, and digoxin is toxic in excess.",
-    why:"Amiodarone reduces digoxin clearance and displaces it in the body.",
-    mgmt:"The digoxin dose is usually cut and levels monitored. Watch for nausea, visual changes, or palpitations." },
+    what:{en:"Amiodarone can roughly double digoxin levels, and digoxin is toxic in excess.",
+          es:"La amiodarona puede aproximadamente duplicar los niveles de digoxina, y la digoxina es tóxica en exceso."},
+    why:{en:"Amiodarone reduces digoxin clearance and displaces it in the body.",
+         es:"La amiodarona reduce la eliminación de la digoxina y la desplaza en el cuerpo."},
+    mgmt:{en:"The digoxin dose is usually cut and levels monitored. Watch for nausea, visual changes, or palpitations.",
+          es:"La dosis de digoxina generalmente se reduce y se monitorean los niveles. Vigila las náuseas, los cambios visuales, o las palpitaciones."} },
 
   { a:["clopidogrel"], b:["omeprazole","esomeprazole"], severity:"moderate",
-    what:"Certain acid‑reflux drugs can make the blood thinner clopidogrel less effective.",
-    why:"They block the liver enzyme (CYP2C19) that activates clopidogrel.",
-    mgmt:"A different acid reducer (like pantoprazole or famotidine) is often preferred — ask a pharmacist." },
+    what:{en:"Certain acid‑reflux drugs can make the blood thinner clopidogrel less effective.",
+          es:"Ciertos medicamentos para el reflujo ácido pueden hacer que el anticoagulante clopidogrel sea menos efectivo."},
+    why:{en:"They block the liver enzyme (CYP2C19) that activates clopidogrel.",
+         es:"Bloquean la enzima hepática (CYP2C19) que activa el clopidogrel."},
+    mgmt:{en:"A different acid reducer (like pantoprazole or famotidine) is often preferred — ask a pharmacist.",
+          es:"A menudo se prefiere un reductor de ácido diferente (como pantoprazol o famotidina) — pregúntale a un farmacéutico."} },
 
   { a:["theophylline"], b:["ciprofloxacin"], severity:"moderate",
-    what:"This antibiotic can raise theophylline to toxic levels.",
-    why:"It inhibits the enzyme that clears theophylline.",
-    mgmt:"Levels are monitored and the dose may be lowered. Watch for nausea, racing heart, or tremor." },
+    what:{en:"This antibiotic can raise theophylline to toxic levels.",
+          es:"Este antibiótico puede elevar la teofilina a niveles tóxicos."},
+    why:{en:"It inhibits the enzyme that clears theophylline.",
+         es:"Inhibe la enzima que elimina la teofilina."},
+    mgmt:{en:"Levels are monitored and the dose may be lowered. Watch for nausea, racing heart, or tremor.",
+          es:"Los niveles se monitorean y la dosis puede reducirse. Vigila las náuseas, el corazón acelerado, o el temblor."} },
 
   { a:["metformin"], b:["iohexol","iopamidol","contrast","iodinated contrast"], severity:"moderate",
-    what:"Metformin is usually paused around imaging tests that use iodinated contrast dye.",
-    why:"If the dye temporarily affects the kidneys, metformin can build up and rarely cause lactic acidosis.",
-    mgmt:"Hospitals routinely hold metformin before/after contrast imaging per protocol." }
+    what:{en:"Metformin is usually paused around imaging tests that use iodinated contrast dye.",
+          es:"La metformina generalmente se pausa alrededor de estudios de imagen que usan tinte de contraste yodado."},
+    why:{en:"If the dye temporarily affects the kidneys, metformin can build up and rarely cause lactic acidosis.",
+         es:"Si el tinte afecta temporalmente los riñones, la metformina puede acumularse y rara vez causar acidosis láctica."},
+    mgmt:{en:"Hospitals routinely hold metformin before/after contrast imaging per protocol.",
+          es:"Los hospitales rutinariamente pausan la metformina antes/después de estudios con contraste, según el protocolo."} }
 ];
 
 /* ---- SYMPTOM → OTC CATEGORY (Symptoms tab) -----------------------
@@ -811,33 +1443,64 @@ const INTERACTIONS = [
    not invented on the fly. The actual example products shown for each
    category are always fetched live from openFDA at query time (see
    runSymptomLookup), never hardcoded here. ------------------------- */
+/* `key`/`catKey` are stable, language-neutral identifiers used for
+   matching/dedup (checkbox values, "same category" collapsing). Every
+   user-visible field (symptom/category/note) is a {en, es} pair, read
+   through pickLang(). "examples" stays English — those are ingredient
+   names looked up live against openFDA, which is English-only data. */
 const SYMPTOM_CATEGORIES = [
-  { symptom:"Headache", category:"Pain relievers (analgesics)", examples:["acetaminophen","ibuprofen","naproxen"],
-    note:"Common OTC options for everyday aches and headaches." },
-  { symptom:"Fever", category:"Fever reducers (antipyretics)", examples:["acetaminophen","ibuprofen"],
-    note:"The same analgesics used for pain are also used to bring down a fever." },
-  { symptom:"Muscle or joint aches", category:"Pain relievers (analgesics)", examples:["ibuprofen","naproxen","acetaminophen"],
-    note:"NSAIDs also target inflammation, not just pain." },
-  { symptom:"Runny or stuffy nose", category:"Decongestants", examples:["phenylephrine","pseudoephedrine"],
-    note:"Work by shrinking swollen nasal passages." },
-  { symptom:"Sneezing or itchy eyes", category:"Antihistamines", examples:["cetirizine","loratadine","fexofenadine","diphenhydramine"],
-    note:"Block the histamine response behind classic allergy symptoms." },
-  { symptom:"Cough", category:"Cough suppressants & expectorants", examples:["dextromethorphan","guaifenesin"],
-    note:"One quiets the cough reflex; the other helps loosen mucus." },
-  { symptom:"Sore throat", category:"Throat lozenges & topical anesthetics", examples:["benzocaine","menthol"],
-    note:"Numb or soothe throat irritation." },
-  { symptom:"Heartburn or acid reflux", category:"Acid reducers", examples:["famotidine","omeprazole","calcium carbonate"],
-    note:"Either neutralize acid quickly or reduce how much the stomach makes." },
-  { symptom:"Nausea", category:"Anti-nausea (antiemetics)", examples:["dimenhydrinate","meclizine"],
-    note:"Commonly used for motion sickness and mild nausea." },
-  { symptom:"Diarrhea", category:"Anti-diarrheal", examples:["loperamide","bismuth subsalicylate"],
-    note:"Slow the gut down or coat and soothe the digestive tract." },
-  { symptom:"Constipation", category:"Laxatives", examples:["polyethylene glycol","docusate","bisacodyl"],
-    note:"Different mechanisms — osmotic, stool softener, and stimulant." },
-  { symptom:"Trouble sleeping", category:"Sleep aids", examples:["diphenhydramine","doxylamine"],
-    note:"OTC sleep aids are antihistamines with a sedating side effect." },
-  { symptom:"Minor skin itching or rash", category:"Topical antihistamines & hydrocortisone", examples:["hydrocortisone","diphenhydramine"],
-    note:"Reduce itching and inflammation on the skin." }
+  { key:"headache", catKey:"pain", examples:["acetaminophen","ibuprofen","naproxen"],
+    symptom:{en:"Headache", es:"Dolor de cabeza"},
+    category:{en:"Pain relievers (analgesics)", es:"Analgésicos (para el dolor)"},
+    note:{en:"Common OTC options for everyday aches and headaches.", es:"Opciones comunes de venta libre para dolores y dolores de cabeza cotidianos."} },
+  { key:"fever", catKey:"fever", examples:["acetaminophen","ibuprofen"],
+    symptom:{en:"Fever", es:"Fiebre"},
+    category:{en:"Fever reducers (antipyretics)", es:"Antifebriles (antipiréticos)"},
+    note:{en:"The same analgesics used for pain are also used to bring down a fever.", es:"Los mismos analgésicos que se usan para el dolor también se usan para bajar la fiebre."} },
+  { key:"muscle_aches", catKey:"pain", examples:["ibuprofen","naproxen","acetaminophen"],
+    symptom:{en:"Muscle or joint aches", es:"Dolores musculares o articulares"},
+    category:{en:"Pain relievers (analgesics)", es:"Analgésicos (para el dolor)"},
+    note:{en:"NSAIDs also target inflammation, not just pain.", es:"Los AINE también atacan la inflamación, no solo el dolor."} },
+  { key:"congestion", catKey:"decongestant", examples:["phenylephrine","pseudoephedrine"],
+    symptom:{en:"Runny or stuffy nose", es:"Nariz que moquea o congestionada"},
+    category:{en:"Decongestants", es:"Descongestionantes"},
+    note:{en:"Work by shrinking swollen nasal passages.", es:"Funcionan reduciendo la hinchazón de las vías nasales."} },
+  { key:"allergy", catKey:"antihistamine", examples:["cetirizine","loratadine","fexofenadine","diphenhydramine"],
+    symptom:{en:"Sneezing or itchy eyes", es:"Estornudos u ojos que pican"},
+    category:{en:"Antihistamines", es:"Antihistamínicos"},
+    note:{en:"Block the histamine response behind classic allergy symptoms.", es:"Bloquean la respuesta de histamina detrás de los síntomas clásicos de alergia."} },
+  { key:"cough", catKey:"cough", examples:["dextromethorphan","guaifenesin"],
+    symptom:{en:"Cough", es:"Tos"},
+    category:{en:"Cough suppressants & expectorants", es:"Antitusivos y expectorantes"},
+    note:{en:"One quiets the cough reflex; the other helps loosen mucus.", es:"Uno calma el reflejo de la tos; el otro ayuda a aflojar la mucosidad."} },
+  { key:"sore_throat", catKey:"throat", examples:["benzocaine","menthol"],
+    symptom:{en:"Sore throat", es:"Dolor de garganta"},
+    category:{en:"Throat lozenges & topical anesthetics", es:"Pastillas para la garganta y anestésicos tópicos"},
+    note:{en:"Numb or soothe throat irritation.", es:"Adormecen o calman la irritación de la garganta."} },
+  { key:"heartburn", catKey:"acid", examples:["famotidine","omeprazole","calcium carbonate"],
+    symptom:{en:"Heartburn or acid reflux", es:"Acidez o reflujo ácido"},
+    category:{en:"Acid reducers", es:"Reductores de ácido"},
+    note:{en:"Either neutralize acid quickly or reduce how much the stomach makes.", es:"Neutralizan el ácido rápidamente o reducen cuánto produce el estómago."} },
+  { key:"nausea", catKey:"nausea", examples:["dimenhydrinate","meclizine"],
+    symptom:{en:"Nausea", es:"Náuseas"},
+    category:{en:"Anti-nausea (antiemetics)", es:"Antináuseas (antieméticos)"},
+    note:{en:"Commonly used for motion sickness and mild nausea.", es:"Se usan comúnmente para el mareo por movimiento y náuseas leves."} },
+  { key:"diarrhea", catKey:"diarrhea", examples:["loperamide","bismuth subsalicylate"],
+    symptom:{en:"Diarrhea", es:"Diarrea"},
+    category:{en:"Anti-diarrheal", es:"Antidiarreicos"},
+    note:{en:"Slow the gut down or coat and soothe the digestive tract.", es:"Ralentizan el intestino o recubren y calman el tracto digestivo."} },
+  { key:"constipation", catKey:"laxative", examples:["polyethylene glycol","docusate","bisacodyl"],
+    symptom:{en:"Constipation", es:"Estreñimiento"},
+    category:{en:"Laxatives", es:"Laxantes"},
+    note:{en:"Different mechanisms — osmotic, stool softener, and stimulant.", es:"Diferentes mecanismos — osmótico, ablandador de heces, y estimulante."} },
+  { key:"insomnia", catKey:"sleep", examples:["diphenhydramine","doxylamine"],
+    symptom:{en:"Trouble sleeping", es:"Dificultad para dormir"},
+    category:{en:"Sleep aids", es:"Ayudas para dormir"},
+    note:{en:"OTC sleep aids are antihistamines with a sedating side effect.", es:"Las ayudas para dormir de venta libre son antihistamínicos con un efecto secundario sedante."} },
+  { key:"skin_itch", catKey:"skin", examples:["hydrocortisone","diphenhydramine"],
+    symptom:{en:"Minor skin itching or rash", es:"Picazón o sarpullido leve en la piel"},
+    category:{en:"Topical antihistamines & hydrocortisone", es:"Antihistamínicos tópicos e hidrocortisona"},
+    note:{en:"Reduce itching and inflammation on the skin.", es:"Reducen la picazón y la inflamación de la piel."} }
 ];
 
 /* ---- DRUG-CLASS EXPLAINERS (Phase 4) ------------------------------
@@ -846,38 +1509,54 @@ const SYMPTOM_CATEGORIES = [
    is Plainscript's OWN content, not FDA text, so it's always labeled
    that way wherever it's shown (never attributed to the FDA label). ---- */
 const DRUG_CLASS_EXPLAINERS = [
-  { match:["nonsteroidal anti-inflammatory"], name:"NSAIDs (nonsteroidal anti-inflammatory drugs)",
-    text:"NSAIDs treat pain, fever, and inflammation by blocking COX enzymes your body uses to make inflammatory chemicals. The same mechanism that helps also irritates the stomach lining and can affect kidney blood flow, especially with long-term or high-dose use." },
-  { match:["selective serotonin reuptake inhibitor"], name:"SSRIs (selective serotonin reuptake inhibitors)",
-    text:"SSRIs treat depression and anxiety by leaving more serotonin available in the brain's signaling gaps. They typically take several weeks to reach full effect, and stopping abruptly can cause withdrawal-like symptoms — tapering under a doctor's guidance is standard." },
-  { match:["serotonin and norepinephrine reuptake","snri"], name:"SNRIs",
-    text:"SNRIs work like SSRIs but also boost norepinephrine, another mood- and pain-related brain chemical — which is why some SNRIs are also used for certain chronic pain conditions." },
-  { match:["monoamine oxidase inhibitor"], name:"MAOIs",
-    text:"MAOIs block an enzyme that breaks down mood-related brain chemicals, raising their levels. That broad effect is why MAOIs interact seriously with many other medications — and with certain foods (see \"Food & drink to know about\" below, if any apply)." },
-  { match:["ace inhibitor","angiotensin converting enzyme"], name:"ACE inhibitors",
-    text:"ACE inhibitors lower blood pressure by blocking an enzyme that narrows blood vessels. A dry, persistent cough is a well-known side effect for some people, caused by the same enzyme pathway." },
-  { match:["angiotensin ii receptor","angiotensin receptor blocker"], name:"ARBs (angiotensin receptor blockers)",
-    text:"ARBs lower blood pressure in a similar way to ACE inhibitors, but by blocking the receptor those chemicals act on instead of the enzyme that makes them — which is why ARBs cause the dry cough far less often." },
-  { match:["hmg-coa reductase"], name:"Statins",
-    text:"Statins lower cholesterol by blocking a liver enzyme (HMG-CoA reductase) your body uses to make it. Muscle aches are the most talked-about side effect, and a few statins interact with drugs that compete for the same liver-clearance pathway." },
-  { match:["benzodiazepine"], name:"Benzodiazepines",
-    text:"Benzodiazepines calm the central nervous system by boosting a natural inhibitory brain chemical (GABA). That's why they treat anxiety and seizures, and also why combining them with other sedatives (opioids, alcohol) is dangerous — the effects stack." },
-  { match:["opioid"], name:"Opioids",
-    text:"Opioids relieve pain by activating receptors in the brain and spinal cord that also happen to control breathing rate — which is the source of their most serious risk, especially combined with other sedatives." },
-  { match:["proton pump inhibitor"], name:"Proton pump inhibitors (PPIs)",
-    text:"PPIs reduce stomach acid by shutting down the pump cells use to produce it — more completely and longer-lasting than older antacids, which is why they're often used for ongoing reflux rather than occasional heartburn." },
-  { match:["histamine-2","h2-receptor antagonist"], name:"H2 blockers",
-    text:"H2 blockers reduce stomach acid by blocking the histamine signal that tells acid-producing cells to turn on — a gentler, often faster-acting option than PPIs for many people." },
-  { match:["macrolide"], name:"Macrolide antibiotics",
-    text:"Macrolides stop bacteria from making proteins they need to survive. Several of them (like clarithromycin and erythromycin) also block a liver enzyme many other drugs rely on to clear from the body, which is why they're behind a number of drug interactions." },
-  { match:["quinolone"], name:"Fluoroquinolone antibiotics",
-    text:"Fluoroquinolones stop bacteria from copying their own DNA. The FDA has added warnings about tendon and nerve side effects, so these are generally reserved for infections other antibiotics can't handle." },
-  { match:["antihistamine"], name:"Antihistamines",
-    text:"Antihistamines block histamine, the chemical behind allergy symptoms like sneezing and itching. Older ones cross into the brain and cause drowsiness (which is also why they show up in OTC sleep aids); newer ones are designed not to." },
-  { match:["thiazide"], name:"Thiazide diuretics",
-    text:"Thiazides lower blood pressure by helping the kidneys release more salt and water. They can also shift potassium and other electrolyte levels, which is why blood tests are common while taking them." },
-  { match:["potassium-sparing"], name:"Potassium-sparing diuretics",
-    text:"These water pills help the body release fluid without losing potassium the way other diuretics do — useful, but it means combining one with something else that raises potassium can push levels too high." }
+  { match:["nonsteroidal anti-inflammatory"], name:{en:"NSAIDs (nonsteroidal anti-inflammatory drugs)", es:"AINE (antiinflamatorios no esteroideos)"},
+    text:{en:"NSAIDs treat pain, fever, and inflammation by blocking COX enzymes your body uses to make inflammatory chemicals. The same mechanism that helps also irritates the stomach lining and can affect kidney blood flow, especially with long-term or high-dose use.",
+          es:"Los AINE tratan el dolor, la fiebre, y la inflamación bloqueando las enzimas COX que tu cuerpo usa para producir sustancias inflamatorias. El mismo mecanismo que ayuda también irrita el revestimiento del estómago y puede afectar el flujo sanguíneo renal, especialmente con uso prolongado o en dosis altas."} },
+  { match:["selective serotonin reuptake inhibitor"], name:{en:"SSRIs (selective serotonin reuptake inhibitors)", es:"ISRS (inhibidores selectivos de la recaptación de serotonina)"},
+    text:{en:"SSRIs treat depression and anxiety by leaving more serotonin available in the brain's signaling gaps. They typically take several weeks to reach full effect, and stopping abruptly can cause withdrawal-like symptoms — tapering under a doctor's guidance is standard.",
+          es:"Los ISRS tratan la depresión y la ansiedad dejando más serotonina disponible en los espacios de señalización del cerebro. Suelen tardar varias semanas en alcanzar el efecto completo, y suspenderlos de golpe puede causar síntomas parecidos a la abstinencia — reducir la dosis gradualmente bajo la guía de un médico es lo estándar."} },
+  { match:["serotonin and norepinephrine reuptake","snri"], name:{en:"SNRIs", es:"IRSN"},
+    text:{en:"SNRIs work like SSRIs but also boost norepinephrine, another mood- and pain-related brain chemical — which is why some SNRIs are also used for certain chronic pain conditions.",
+          es:"Los IRSN funcionan como los ISRS pero también elevan la norepinefrina, otra sustancia cerebral relacionada con el ánimo y el dolor — por eso algunos IRSN también se usan para ciertas condiciones de dolor crónico."} },
+  { match:["monoamine oxidase inhibitor"], name:{en:"MAOIs", es:"IMAO"},
+    text:{en:"MAOIs block an enzyme that breaks down mood-related brain chemicals, raising their levels. That broad effect is why MAOIs interact seriously with many other medications — and with certain foods (see \"Food & drink to know about\" below, if any apply).",
+          es:"Los IMAO bloquean una enzima que descompone sustancias cerebrales relacionadas con el ánimo, elevando sus niveles. Ese efecto amplio es la razón por la que los IMAO interactúan seriamente con muchos otros medicamentos — y con ciertos alimentos (mira \"Notas de alimentos y bebidas\" abajo, si aplica alguna)."} },
+  { match:["ace inhibitor","angiotensin converting enzyme"], name:{en:"ACE inhibitors", es:"Inhibidores de la ECA"},
+    text:{en:"ACE inhibitors lower blood pressure by blocking an enzyme that narrows blood vessels. A dry, persistent cough is a well-known side effect for some people, caused by the same enzyme pathway.",
+          es:"Los inhibidores de la ECA bajan la presión arterial bloqueando una enzima que estrecha los vasos sanguíneos. Una tos seca y persistente es un efecto secundario bien conocido en algunas personas, causado por esa misma vía enzimática."} },
+  { match:["angiotensin ii receptor","angiotensin receptor blocker"], name:{en:"ARBs (angiotensin receptor blockers)", es:"ARA-II (bloqueadores del receptor de angiotensina)"},
+    text:{en:"ARBs lower blood pressure in a similar way to ACE inhibitors, but by blocking the receptor those chemicals act on instead of the enzyme that makes them — which is why ARBs cause the dry cough far less often.",
+          es:"Los ARA-II bajan la presión arterial de forma similar a los inhibidores de la ECA, pero bloqueando el receptor sobre el que actúan esas sustancias en lugar de la enzima que las produce — por eso los ARA-II causan la tos seca con mucha menos frecuencia."} },
+  { match:["hmg-coa reductase"], name:{en:"Statins", es:"Estatinas"},
+    text:{en:"Statins lower cholesterol by blocking a liver enzyme (HMG-CoA reductase) your body uses to make it. Muscle aches are the most talked-about side effect, and a few statins interact with drugs that compete for the same liver-clearance pathway.",
+          es:"Las estatinas bajan el colesterol bloqueando una enzima hepática (HMG-CoA reductasa) que tu cuerpo usa para producirlo. Los dolores musculares son el efecto secundario más comentado, y algunas estatinas interactúan con medicamentos que compiten por la misma vía de eliminación hepática."} },
+  { match:["benzodiazepine"], name:{en:"Benzodiazepines", es:"Benzodiazepinas"},
+    text:{en:"Benzodiazepines calm the central nervous system by boosting a natural inhibitory brain chemical (GABA). That's why they treat anxiety and seizures, and also why combining them with other sedatives (opioids, alcohol) is dangerous — the effects stack.",
+          es:"Las benzodiazepinas calman el sistema nervioso central potenciando una sustancia cerebral inhibitoria natural (GABA). Por eso tratan la ansiedad y las convulsiones, y también por eso combinarlas con otros sedantes (opioides, alcohol) es peligroso — los efectos se acumulan."} },
+  { match:["opioid"], name:{en:"Opioids", es:"Opioides"},
+    text:{en:"Opioids relieve pain by activating receptors in the brain and spinal cord that also happen to control breathing rate — which is the source of their most serious risk, especially combined with other sedatives.",
+          es:"Los opioides alivian el dolor activando receptores en el cerebro y la médula espinal que también controlan la frecuencia respiratoria — de ahí viene su riesgo más grave, especialmente combinados con otros sedantes."} },
+  { match:["proton pump inhibitor"], name:{en:"Proton pump inhibitors (PPIs)", es:"Inhibidores de la bomba de protones (IBP)"},
+    text:{en:"PPIs reduce stomach acid by shutting down the pump cells use to produce it — more completely and longer-lasting than older antacids, which is why they're often used for ongoing reflux rather than occasional heartburn.",
+          es:"Los IBP reducen el ácido estomacal apagando la bomba que las células usan para producirlo — de forma más completa y duradera que los antiácidos antiguos, por eso a menudo se usan para el reflujo continuo en lugar de la acidez ocasional."} },
+  { match:["histamine-2","h2-receptor antagonist"], name:{en:"H2 blockers", es:"Bloqueadores H2"},
+    text:{en:"H2 blockers reduce stomach acid by blocking the histamine signal that tells acid-producing cells to turn on — a gentler, often faster-acting option than PPIs for many people.",
+          es:"Los bloqueadores H2 reducen el ácido estomacal bloqueando la señal de histamina que le dice a las células productoras de ácido que se activen — una opción más suave, y a menudo de acción más rápida, que los IBP para muchas personas."} },
+  { match:["macrolide"], name:{en:"Macrolide antibiotics", es:"Antibióticos macrólidos"},
+    text:{en:"Macrolides stop bacteria from making proteins they need to survive. Several of them (like clarithromycin and erythromycin) also block a liver enzyme many other drugs rely on to clear from the body, which is why they're behind a number of drug interactions.",
+          es:"Los macrólidos impiden que las bacterias produzcan las proteínas que necesitan para sobrevivir. Varios de ellos (como la claritromicina y la eritromicina) también bloquean una enzima hepática de la que dependen muchos otros medicamentos para eliminarse del cuerpo, por eso están detrás de varias interacciones medicamentosas."} },
+  { match:["quinolone"], name:{en:"Fluoroquinolone antibiotics", es:"Antibióticos fluoroquinolonas"},
+    text:{en:"Fluoroquinolones stop bacteria from copying their own DNA. The FDA has added warnings about tendon and nerve side effects, so these are generally reserved for infections other antibiotics can't handle.",
+          es:"Las fluoroquinolonas impiden que las bacterias copien su propio ADN. La FDA ha agregado advertencias sobre efectos secundarios en tendones y nervios, así que generalmente se reservan para infecciones que otros antibióticos no pueden tratar."} },
+  { match:["antihistamine"], name:{en:"Antihistamines", es:"Antihistamínicos"},
+    text:{en:"Antihistamines block histamine, the chemical behind allergy symptoms like sneezing and itching. Older ones cross into the brain and cause drowsiness (which is also why they show up in OTC sleep aids); newer ones are designed not to.",
+          es:"Los antihistamínicos bloquean la histamina, la sustancia detrás de los síntomas de alergia como los estornudos y la picazón. Los más antiguos cruzan al cerebro y causan somnolencia (por eso también aparecen en ayudas para dormir de venta libre); los más nuevos están diseñados para no hacerlo."} },
+  { match:["thiazide"], name:{en:"Thiazide diuretics", es:"Diuréticos tiazídicos"},
+    text:{en:"Thiazides lower blood pressure by helping the kidneys release more salt and water. They can also shift potassium and other electrolyte levels, which is why blood tests are common while taking them.",
+          es:"Las tiazidas bajan la presión arterial ayudando a los riñones a liberar más sal y agua. También pueden alterar el potasio y otros niveles de electrolitos, por eso los análisis de sangre son comunes mientras se toman."} },
+  { match:["potassium-sparing"], name:{en:"Potassium-sparing diuretics", es:"Diuréticos ahorradores de potasio"},
+    text:{en:"These water pills help the body release fluid without losing potassium the way other diuretics do — useful, but it means combining one with something else that raises potassium can push levels too high.",
+          es:"Estos diuréticos ayudan al cuerpo a liberar líquido sin perder potasio como hacen otros diuréticos — útil, pero significa que combinarlos con algo más que eleva el potasio puede llevar los niveles demasiado alto."} }
 ];
 
 function findClassExplainer(klass){
@@ -890,32 +1569,57 @@ function findClassExplainer(klass){
    Same curated-set standard as INTERACTIONS: well-documented, textbook
    food/alcohol interactions, reviewed against standard clinical
    references. Matched against a drug's own tokens, same as the
-   drug-drug engine, and shown wherever that specific drug is decoded. */
+   drug-drug engine, and shown wherever that specific drug is decoded.
+   food/what/why/mgmt are {en, es}; drugs (matching tokens) stay English. */
 const FOOD_INTERACTIONS = [
-  { drugs:["warfarin"], food:"Vitamin K-rich foods (leafy greens — kale, spinach, broccoli)", severity:"moderate",
-    what:"Sudden, large swings in how much vitamin K you eat can throw off how well warfarin thins your blood.",
-    why:"Vitamin K is what your body uses to make clotting factors — warfarin works by blocking that process, so big changes in vitamin K intake shift the balance either way.",
-    mgmt:"Doctors don't usually say \"avoid greens\" — the standard advice is to keep vitamin K intake roughly consistent week to week, not to cut it out." },
-  { drugs:STATINS, food:"Grapefruit and grapefruit juice", severity:"moderate",
-    what:"Grapefruit can raise blood levels of certain statins, increasing the risk of muscle-related side effects.",
-    why:"Grapefruit blocks the same liver enzyme (CYP3A4) that clears these statins, so the drug builds up.",
-    mgmt:"This mainly affects simvastatin, atorvastatin, and lovastatin — not all statins. Ask your pharmacist if yours is affected before assuming you need to avoid grapefruit." },
-  { drugs:MAOIS, food:"Aged, fermented, or cured foods high in tyramine (aged cheese, cured meats, tap beer, soy sauce)", severity:"major",
-    what:"Eating tyramine-rich foods while on an MAOI can spike blood pressure to dangerous levels — a \"hypertensive crisis.\"",
-    why:"MAOIs block the enzyme that normally breaks down tyramine, so it builds up and triggers a surge of norepinephrine.",
-    mgmt:"Anyone prescribed an MAOI is typically given a specific low-tyramine food list by their prescriber — this is one of the most well-established food-drug interactions in medicine, not a minor caution." },
-  { drugs:["metronidazole"], food:"Alcohol", severity:"major",
-    what:"Alcohol during (and for a while after) metronidazole can cause a severe reaction — flushing, nausea, vomiting, a racing heart.",
-    why:"Metronidazole blocks an enzyme the body needs to fully break down alcohol, so a toxic byproduct builds up (a disulfiram-like reaction).",
-    mgmt:"Standard guidance is to avoid alcohol during treatment and for at least 24–72 hours after the last dose." },
-  { drugs:OPIOIDS.concat(BENZOS), food:"Alcohol", severity:"major",
-    what:"Alcohol adds directly to the sedation and breathing-suppression risk of opioids and benzodiazepines.",
-    why:"All three depress the central nervous system through overlapping pathways, so the effects stack rather than just adding up mildly.",
-    mgmt:"This combination is a leading cause of preventable overdose deaths — it's treated as a hard no by prescribers, not a soft caution." },
-  { drugs:["acetaminophen"], food:"Alcohol (regular or heavy use)", severity:"moderate",
-    what:"Regular heavy alcohol use raises the risk of liver damage from acetaminophen, even at normal doses.",
-    why:"Both are processed by the liver, and chronic alcohol use changes how the liver metabolizes acetaminophen into a byproduct that's harder on liver cells.",
-    mgmt:"Occasional moderate drinking isn't the same risk as daily heavy use — ask a pharmacist if you drink regularly and take acetaminophen often." }
+  { drugs:["warfarin"], severity:"moderate",
+    food:{en:"Vitamin K-rich foods (leafy greens — kale, spinach, broccoli)", es:"Alimentos ricos en vitamina K (verduras de hoja verde — col rizada, espinaca, brócoli)"},
+    what:{en:"Sudden, large swings in how much vitamin K you eat can throw off how well warfarin thins your blood.",
+          es:"Cambios repentinos y grandes en cuánta vitamina K comes pueden alterar qué tan bien la warfarina adelgaza tu sangre."},
+    why:{en:"Vitamin K is what your body uses to make clotting factors — warfarin works by blocking that process, so big changes in vitamin K intake shift the balance either way.",
+         es:"La vitamina K es lo que tu cuerpo usa para producir factores de coagulación — la warfarina funciona bloqueando ese proceso, así que cambios grandes en la ingesta de vitamina K alteran el equilibrio en cualquier dirección."},
+    mgmt:{en:"Doctors don't usually say \"avoid greens\" — the standard advice is to keep vitamin K intake roughly consistent week to week, not to cut it out.",
+          es:"Los médicos generalmente no dicen \"evita las verduras\" — el consejo estándar es mantener la ingesta de vitamina K más o menos constante semana a semana, no eliminarla."} },
+  { drugs:STATINS, severity:"moderate",
+    food:{en:"Grapefruit and grapefruit juice", es:"Toronja (pomelo) y su jugo"},
+    what:{en:"Grapefruit can raise blood levels of certain statins, increasing the risk of muscle-related side effects.",
+          es:"La toronja puede elevar los niveles en sangre de ciertas estatinas, aumentando el riesgo de efectos secundarios musculares."},
+    why:{en:"Grapefruit blocks the same liver enzyme (CYP3A4) that clears these statins, so the drug builds up.",
+         es:"La toronja bloquea la misma enzima hepática (CYP3A4) que elimina estas estatinas, así que el medicamento se acumula."},
+    mgmt:{en:"This mainly affects simvastatin, atorvastatin, and lovastatin — not all statins. Ask your pharmacist if yours is affected before assuming you need to avoid grapefruit.",
+          es:"Esto afecta principalmente a la simvastatina, la atorvastatina, y la lovastatina — no a todas las estatinas. Pregúntale a tu farmacéutico si la tuya está afectada antes de asumir que debes evitar la toronja."} },
+  { drugs:MAOIS, severity:"major",
+    food:{en:"Aged, fermented, or cured foods high in tyramine (aged cheese, cured meats, tap beer, soy sauce)", es:"Alimentos añejados, fermentados, o curados con alto contenido de tiramina (queso añejo, carnes curadas, cerveza de barril, salsa de soya)"},
+    what:{en:"Eating tyramine-rich foods while on an MAOI can spike blood pressure to dangerous levels — a \"hypertensive crisis.\"",
+          es:"Comer alimentos ricos en tiramina mientras tomas un IMAO puede elevar la presión arterial a niveles peligrosos — una \"crisis hipertensiva\"."},
+    why:{en:"MAOIs block the enzyme that normally breaks down tyramine, so it builds up and triggers a surge of norepinephrine.",
+         es:"Los IMAO bloquean la enzima que normalmente descompone la tiramina, así que se acumula y desencadena un aumento repentino de norepinefrina."},
+    mgmt:{en:"Anyone prescribed an MAOI is typically given a specific low-tyramine food list by their prescriber — this is one of the most well-established food-drug interactions in medicine, not a minor caution.",
+          es:"A cualquiera que le receten un IMAO generalmente se le da una lista específica de alimentos bajos en tiramina — esta es una de las interacciones alimento-medicamento más establecidas en la medicina, no una precaución menor."} },
+  { drugs:["metronidazole"], severity:"major",
+    food:{en:"Alcohol", es:"Alcohol"},
+    what:{en:"Alcohol during (and for a while after) metronidazole can cause a severe reaction — flushing, nausea, vomiting, a racing heart.",
+          es:"El alcohol durante (y por un tiempo después de) tomar metronidazol puede causar una reacción grave — enrojecimiento, náuseas, vómitos, corazón acelerado."},
+    why:{en:"Metronidazole blocks an enzyme the body needs to fully break down alcohol, so a toxic byproduct builds up (a disulfiram-like reaction).",
+         es:"El metronidazol bloquea una enzima que el cuerpo necesita para descomponer completamente el alcohol, así que se acumula un subproducto tóxico (una reacción similar al disulfiram)."},
+    mgmt:{en:"Standard guidance is to avoid alcohol during treatment and for at least 24–72 hours after the last dose.",
+          es:"El consejo estándar es evitar el alcohol durante el tratamiento y por al menos 24–72 horas después de la última dosis."} },
+  { drugs:OPIOIDS.concat(BENZOS), severity:"major",
+    food:{en:"Alcohol", es:"Alcohol"},
+    what:{en:"Alcohol adds directly to the sedation and breathing-suppression risk of opioids and benzodiazepines.",
+          es:"El alcohol se suma directamente al riesgo de sedación y supresión respiratoria de los opioides y las benzodiazepinas."},
+    why:{en:"All three depress the central nervous system through overlapping pathways, so the effects stack rather than just adding up mildly.",
+         es:"Los tres deprimen el sistema nervioso central a través de vías que se superponen, así que los efectos se acumulan en lugar de simplemente sumarse levemente."},
+    mgmt:{en:"This combination is a leading cause of preventable overdose deaths — it's treated as a hard no by prescribers, not a soft caution.",
+          es:"Esta combinación es una causa principal de muertes por sobredosis prevenibles — los médicos la tratan como un no rotundo, no como una precaución leve."} },
+  { drugs:["acetaminophen"], severity:"moderate",
+    food:{en:"Alcohol (regular or heavy use)", es:"Alcohol (uso regular o excesivo)"},
+    what:{en:"Regular heavy alcohol use raises the risk of liver damage from acetaminophen, even at normal doses.",
+          es:"El uso regular y excesivo de alcohol aumenta el riesgo de daño hepático por acetaminofén, incluso en dosis normales."},
+    why:{en:"Both are processed by the liver, and chronic alcohol use changes how the liver metabolizes acetaminophen into a byproduct that's harder on liver cells.",
+         es:"Ambos son procesados por el hígado, y el uso crónico de alcohol cambia cómo el hígado metaboliza el acetaminofén en un subproducto más dañino para las células hepáticas."},
+    mgmt:{en:"Occasional moderate drinking isn't the same risk as daily heavy use — ask a pharmacist if you drink regularly and take acetaminophen often.",
+          es:"Beber ocasionalmente con moderación no es el mismo riesgo que el uso diario excesivo — pregúntale a un farmacéutico si bebes regularmente y tomas acetaminofén a menudo."} }
 ];
 
 function foodInteractionsFor(tokens){
@@ -927,14 +1631,18 @@ function foodInteractionsFor(tokens){
    cautions, not personalized allergy advice — framed as "worth telling
    your prescriber," never as a diagnosis of what you're allergic to. */
 const CROSS_SENSITIVITY = [
-  { drugs:["cephalexin","cefuroxime","cefdinir","cefixime","ceftriaxone"], allergyName:"Penicillin allergy",
-    note:"A small percentage of people with a penicillin allergy also react to cephalosporin antibiotics like this one (partial cross-reactivity) — true cross-reactivity is now understood to be lower than once thought, but it's worth telling your prescriber about any penicillin allergy before starting this." },
-  { drugs:["amoxicillin","ampicillin","penicillin"], allergyName:"Penicillin allergy",
-    note:"If you have a known penicillin allergy, this is directly in that family — tell your prescriber before taking it." },
-  { drugs:["sulfamethoxazole","trimethoprim"], allergyName:"Sulfa allergy",
-    note:"A \"sulfa allergy\" most reliably refers to sulfonamide antibiotics like this one. It doesn't reliably predict a reaction to other sulfur-containing drugs (like some diuretics) — a common mix-up worth clarifying with your prescriber rather than assuming." },
-  { drugs:NSAIDS, allergyName:"Aspirin/NSAID sensitivity",
-    note:"Some people with asthma or nasal polyps have a specific NSAID sensitivity (aspirin-exacerbated respiratory disease) that can trigger breathing symptoms — different from a typical allergy, and worth flagging to your prescriber if you have asthma." }
+  { drugs:["cephalexin","cefuroxime","cefdinir","cefixime","ceftriaxone"], allergyName:{en:"Penicillin allergy", es:"Alergia a la penicilina"},
+    note:{en:"A small percentage of people with a penicillin allergy also react to cephalosporin antibiotics like this one (partial cross-reactivity) — true cross-reactivity is now understood to be lower than once thought, but it's worth telling your prescriber about any penicillin allergy before starting this.",
+          es:"Un pequeño porcentaje de personas con alergia a la penicilina también reacciona a antibióticos cefalosporínicos como este (reactividad cruzada parcial) — hoy se entiende que la reactividad cruzada real es menor de lo que se pensaba, pero vale la pena decirle a tu médico sobre cualquier alergia a la penicilina antes de empezar esto."} },
+  { drugs:["amoxicillin","ampicillin","penicillin"], allergyName:{en:"Penicillin allergy", es:"Alergia a la penicilina"},
+    note:{en:"If you have a known penicillin allergy, this is directly in that family — tell your prescriber before taking it.",
+          es:"Si tienes una alergia conocida a la penicilina, esto está directamente en esa familia — díselo a tu médico antes de tomarlo."} },
+  { drugs:["sulfamethoxazole","trimethoprim"], allergyName:{en:"Sulfa allergy", es:"Alergia a las sulfas"},
+    note:{en:"A \"sulfa allergy\" most reliably refers to sulfonamide antibiotics like this one. It doesn't reliably predict a reaction to other sulfur-containing drugs (like some diuretics) — a common mix-up worth clarifying with your prescriber rather than assuming.",
+          es:"Una \"alergia a las sulfas\" se refiere más confiablemente a antibióticos sulfonamídicos como este. No predice de forma confiable una reacción a otros medicamentos que contienen azufre (como algunos diuréticos) — una confusión común que vale la pena aclarar con tu médico en lugar de asumir."} },
+  { drugs:NSAIDS, allergyName:{en:"Aspirin/NSAID sensitivity", es:"Sensibilidad a la aspirina/AINE"},
+    note:{en:"Some people with asthma or nasal polyps have a specific NSAID sensitivity (aspirin-exacerbated respiratory disease) that can trigger breathing symptoms — different from a typical allergy, and worth flagging to your prescriber if you have asthma.",
+          es:"Algunas personas con asma o pólipos nasales tienen una sensibilidad específica a los AINE (enfermedad respiratoria exacerbada por aspirina) que puede desencadenar síntomas respiratorios — diferente de una alergia típica, y vale la pena mencionarlo a tu médico si tienes asma."} }
 ];
 
 function crossSensitivityFor(tokens){
@@ -1058,18 +1766,21 @@ function excerpt(t, n=480){
 }
 
 /* ---- OPTIONAL plain-English mode (Claude via your proxy) ----------
-   Strictly a rephraser. The system prompt forbids adding facts. The
-   original FDA text always stays available behind a toggle.
+   Strictly a rephraser (or, in Spanish mode, a translator+rephraser).
+   The system prompt forbids adding facts, in every language — locked
+   server-side in worker.js, keyed by `lang`. The original FDA text
+   always stays available behind a toggle.
 ------------------------------------------------------------------- */
-async function toPlainEnglish(text, label){
+async function toPlainEnglish(text, label, lang){
   if (!CLAUDE_PROXY_URL || !text) return null;
   // The safety-locked prompt lives in the Worker (worker.js), NOT here — so
-  // the proxy can only ever rephrase FDA text and can't be repurposed to
-  // generate medical claims. We just hand it the text and which section it is.
+  // the proxy can only ever rephrase/translate FDA text and can't be
+  // repurposed to generate medical claims. We just hand it the text, which
+  // section it is, and which language to render it in.
   try{
     const res = await fetch(CLAUDE_PROXY_URL, {
       method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ text, label })
+      body: JSON.stringify({ text, label, lang: lang || "en" })
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -1083,17 +1794,17 @@ async function toPlainEnglish(text, label){
 async function decode(){
   const name = $("#decode-input").value.trim();
   const box = $("#decode-results");
-  if (!name){ box.innerHTML = `<div class="err">Type a medication name first.</div>`; return; }
-  box.innerHTML = `<div class="status"><span class="spin"></span>Looking up “${esc(name)}” in the FDA label database…</div>`;
+  if (!name){ box.innerHTML = `<div class="err">${esc(t("decode_type_first"))}</div>`; return; }
+  box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("decode_looking_up_prefix"))} “${esc(name)}” ${esc(t("decode_looking_up_suffix"))}</div>`;
 
   let rec, noteName = null, altNames = [];
   try{ const rr = await resolveLabel(name); rec = rr.rec; noteName = rr.suggested; altNames = rr.alternates || []; }
-  catch(e){ box.innerHTML = `<div class="err">${esc(e.message)}. Try again in a moment.</div>`; return; }
+  catch(e){ box.innerHTML = `<div class="err">${esc(e.message)}. ${esc(t("try_again_moment"))}</div>`; return; }
 
   if (!rec){
-    box.innerHTML = `<div class="nofind"><span class="eyebrow">No match</span>
-      <h3>Couldn't find “${esc(name)}”.</h3>
-      <p>Check the spelling, or try the other name form — if you searched a brand name, try the generic (or the other way around). Some compounded or very new products may not be in the FDA label database.</p></div>
+    box.innerHTML = `<div class="nofind"><span class="eyebrow">${esc(t("decode_no_match_eyebrow"))}</span>
+      <h3>${esc(t("decode_no_match_title_prefix"))} “${esc(name)}”.</h3>
+      <p>${esc(t("decode_no_match_body"))}</p></div>
       ${altNames.length ? didYouMeanHTML(altNames) : ""}`;
     wireDidYouMean(box);
     return;
@@ -1121,33 +1832,34 @@ async function decode(){
 
   // Overview — the same core fields Plainscript has always shown
   const rows = [];
-  rows.push(makeRow("What it's used for", d.indications, "FDA label · indications & usage"));
-  rows.push(makeRow("How it works", d.moa, "FDA label · mechanism of action"));
-  if (classExplainer) rows.push(makeRow(`About ${classExplainer.name}`, classExplainer.text, "Plainscript — curated drug-class explainer, not FDA text"));
-  rows.push(makeRow("Common side effects", d.adverse, "FDA label · adverse reactions — typically mild; see Warnings below for the serious ones to call a doctor about"));
-  if (d.boxed) rows.push(makeRow("⚠ Boxed warning", d.boxed, "FDA label · boxed warning", true));
+  rows.push(makeRow(t("row_used_for"), d.indications, t("src_indications")));
+  rows.push(makeRow(t("row_how_works"), d.moa, t("src_moa")));
+  if (classExplainer) rows.push(makeRow(`${t("about_class_prefix")} ${pickLang(classExplainer.name)}`, pickLang(classExplainer.text), t("src_class_explainer")));
+  rows.push(makeRow(t("row_side_effects"), d.adverse, t("src_adverse")));
+  if (d.boxed) rows.push(makeRow(t("row_boxed"), d.boxed, t("src_boxed"), true));
 
   // Full label details — everything else on the label, verbatim. This is
   // reference text straight from the FDA label, same as the rows above —
   // not a recommendation, not a calculated dose, just what the label says.
   const fullRows = [];
-  fullRows.push(makeRow("Active ingredient(s)", d.activeIngredient, "FDA label · active ingredient"));
-  fullRows.push(makeRow("Inactive ingredients", d.inactiveIngredient, "FDA label · inactive ingredient"));
-  fullRows.push(makeRow("Who shouldn't take this", d.contraindications, "FDA label · contraindications"));
-  fullRows.push(makeRow("Warnings — the serious ones to call a doctor about", d.warnings, "FDA label · warnings"));
-  fullRows.push(makeRow("Precautions", d.precautions, "FDA label · precautions"));
-  fullRows.push(makeRow("What it can interact with", d.interactionsProse, "FDA label · drug interactions"));
-  fullRows.push(makeRow("Dosage & administration, as printed on the label", d.dosage, "FDA label · dosage and administration"));
-  fullRows.push(makeRow("Pregnancy", d.pregnancy, "FDA label · pregnancy"));
-  fullRows.push(makeRow("Breastfeeding / nursing", d.nursing, "FDA label · nursing mothers"));
+  fullRows.push(makeRow(t("row_active_ingredient"), d.activeIngredient, t("src_active_ingredient")));
+  fullRows.push(makeRow(t("row_inactive_ingredient"), d.inactiveIngredient, t("src_inactive_ingredient")));
+  fullRows.push(makeRow(t("row_contraindications"), d.contraindications, t("src_contraindications")));
+  fullRows.push(makeRow(t("row_warnings"), d.warnings, t("src_warnings")));
+  fullRows.push(makeRow(t("row_precautions"), d.precautions, t("src_precautions")));
+  fullRows.push(makeRow(t("row_interacts"), d.interactionsProse, t("src_interacts")));
+  fullRows.push(makeRow(t("row_dosage"), d.dosage, t("src_dosage")));
+  fullRows.push(makeRow(t("row_pregnancy"), d.pregnancy, t("src_pregnancy")));
+  fullRows.push(makeRow(t("row_nursing"), d.nursing, t("src_nursing")));
   const hasFullRows = fullRows.some(Boolean);
 
   box.innerHTML = `
-    ${noteName ? `<div class="status">Showing the closest match: <strong>${esc(titlecase(noteName))}</strong></div>`:""}
+    ${noteName ? `<div class="status">${esc(t("decode_closest_match"))} <strong>${esc(titlecase(noteName))}</strong></div>`:""}
     ${altNames.length>1 ? didYouMeanHTML(altNames.filter(n=>n.toLowerCase()!==noteName.toLowerCase())) : ""}
+    ${(uiLang==="es" && !CLAUDE_PROXY_URL) ? `<div class="status" style="padding-bottom:10px;">🌐 ${esc(t("spanish_no_worker_note"))}</div>` : ""}
     <article class="card">
       <div class="card-head">
-        <span class="eyebrow">Medication · overview</span>
+        <span class="eyebrow">${esc(t("overview_eyebrow"))}</span>
         <div class="name">${esc(displayName)}</div>
         ${strip.length?`<div class="datastrip">${strip.join("")}</div>`:""}
       </div>
@@ -1156,13 +1868,13 @@ async function decode(){
     ${hasFullRows ? `
     <article class="card">
       <div class="card-head">
-        <span class="eyebrow">Full FDA label details</span>
-        <div class="name" style="font-size:19px;">Everything else on ${esc(displayName)}'s label</div>
+        <span class="eyebrow">${esc(t("full_label_eyebrow"))}</span>
+        <div class="name" style="font-size:19px;">${esc(t("full_label_title_prefix"))} ${esc(displayName)}${esc(t("full_label_title_suffix"))}</div>
       </div>
       <div class="card-body">${fullRows.filter(Boolean).join("")}</div>
     </article>` : ""}
     ${(foodHits.length || sensitivityHits.length) ? renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits) : ""}
-    <p class="status" style="padding-top:4px;">This is reference information from the medication's FDA label — not a recommendation about whether to take it, and not dosing advice. Talk to a pharmacist or doctor about your situation.</p>
+    <p class="status" style="padding-top:4px;">${esc(t("decode_footer_note"))}</p>
   `;
 
   // Phase 2: offer to save this med to the signed-in user's cabinet
@@ -1185,7 +1897,7 @@ function makeRow(label, text, src, warn){
   return `<div class="row" data-full="${esc(full)}" data-label="${esc(label)}">
     <span class="eyebrow">${esc(label)}</span>
     <p data-role="text">${esc(ex)}</p>
-    ${needExpand?`<button class="expand" data-target="${id}">Show full FDA text ▾</button><p id="${id}" data-role="full" hidden style="margin-top:8px;color:var(--ink-soft);">${esc(full)}</p>`:""}
+    ${needExpand?`<button class="expand" data-target="${id}">${esc(t("show_full_text"))}</button><p id="${id}" data-role="full" hidden style="margin-top:8px;color:var(--ink-soft);">${esc(full)}</p>`:""}
     <div class="src">${esc(src)}</div>
   </div>`;
 }
@@ -1199,26 +1911,26 @@ function renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits){
     <div class="verdict v-${f.severity}" style="margin-bottom:10px;">
       <div class="bar"></div>
       <div class="vbody">
-        <div class="pair">${esc(displayName)} ✕ ${esc(f.food)}</div>
-        <div class="sev"><span class="pill">${esc(f.severity)}</span> Food/drink interaction</div>
-        <p>${esc(f.what)}</p>
-        <p class="mgmt"><b>Why:</b> ${esc(f.why)}</p>
-        <p class="mgmt"><b>What people usually do:</b> ${esc(f.mgmt)}</p>
-        <div class="src">Source: Plainscript — curated food/alcohol interaction, reviewed against standard clinical references</div>
+        <div class="pair">${esc(displayName)} ✕ ${esc(pickLang(f.food))}</div>
+        <div class="sev"><span class="pill">${esc(f.severity)}</span> ${esc(t("food_drink_interaction"))}</div>
+        <p>${esc(pickLang(f.what))}</p>
+        <p class="mgmt"><b>${esc(t("why_label"))}</b> ${esc(pickLang(f.why))}</p>
+        <p class="mgmt"><b>${esc(t("mgmt_label"))}</b> ${esc(pickLang(f.mgmt))}</p>
+        <div class="src">${esc(t("src_curated_interaction"))}</div>
       </div>
     </div>`).join("");
 
   const sensRows = sensitivityHits.map(s => `
     <div class="row">
-      <span class="eyebrow">${esc(s.allergyName)}</span>
-      <p>${esc(s.note)}</p>
-      <div class="src">Source: Plainscript — curated allergy/cross-sensitivity note, not a diagnosis of your allergies</div>
+      <span class="eyebrow">${esc(pickLang(s.allergyName))}</span>
+      <p>${esc(pickLang(s.note))}</p>
+      <div class="src">${esc(t("src_class_explainer"))}</div>
     </div>`).join("");
 
   return `<article class="card">
     <div class="card-head">
-      <span class="eyebrow">Food, drink &amp; allergy notes</span>
-      <div class="name" style="font-size:19px;">Worth telling your pharmacist about ${esc(displayName)}</div>
+      <span class="eyebrow">${t("food_allergy_eyebrow")}</span>
+      <div class="name" style="font-size:19px;">${esc(t("food_allergy_title_prefix"))} ${esc(displayName)}</div>
     </div>
     <div class="card-body">${foodRows}${sensRows}</div>
   </article>`;
@@ -1226,28 +1938,31 @@ function renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits){
 
 /* wire up expanders + (if enabled) plain-English rephrasing */
 async function enhanceRows(box, d){
+  const fullLabel = t("show_full_text"), hideLabel = t("hide_full_text");
   box.querySelectorAll(".expand").forEach(btn=>{
     btn.addEventListener("click",()=>{
-      const t = box.querySelector("#"+btn.dataset.target);
-      const open = !t.hidden; t.hidden = open;
-      btn.textContent = open ? "Show full FDA text ▾" : "Hide full FDA text ▴";
+      const target = box.querySelector("#"+btn.dataset.target);
+      const open = !target.hidden; target.hidden = open;
+      btn.textContent = open ? fullLabel : hideLabel;
     });
   });
   if (!CLAUDE_PROXY_URL) return;
-  // rephrase each row's text in place, keeping original behind a toggle
+  // rephrase (or, in Spanish mode, translate) each row's text in place,
+  // keeping the original FDA wording available behind a toggle
+  const plainLabel = t("show_plain_english"), origLabel = t("show_original"), rephrasedTag = t("rephrased_tag");
   for (const row of box.querySelectorAll(".row")){
     const label = row.dataset.label, full = row.dataset.full;
-    const plain = await toPlainEnglish(full, label);
+    const plain = await toPlainEnglish(full, label, uiLang);
     if (!plain) continue;
     const p = row.querySelector('[data-role="text"]');
     const orig = p.textContent;
     p.textContent = plain;
     const tog = document.createElement("button");
-    tog.className="expand"; tog.textContent="Show original FDA wording ▾";
+    tog.className="expand"; tog.textContent = origLabel;
     let showing=false;
-    tog.addEventListener("click",()=>{ showing=!showing; p.textContent = showing?orig:plain; tog.textContent = showing?"Show plain English ▴":"Show original FDA wording ▾"; });
+    tog.addEventListener("click",()=>{ showing=!showing; p.textContent = showing?orig:plain; tog.textContent = showing?plainLabel:origLabel; });
     p.insertAdjacentElement("afterend", tog);
-    const tag = document.createElement("div"); tag.className="pe-toggle"; tag.textContent="↻ rephrased in plain English from the FDA text";
+    const tag = document.createElement("div"); tag.className="pe-toggle"; tag.textContent = rephrasedTag;
     p.insertAdjacentElement("afterend", tag);
   }
 }
@@ -1256,7 +1971,7 @@ async function enhanceRows(box, d){
    clickable chips instead of silently guessing just one and stopping. */
 function didYouMeanHTML(names){
   if (!names.length) return "";
-  return `<div class="status" style="padding:6px 0 14px;">Other close spellings:
+  return `<div class="status" style="padding:6px 0 14px;">${esc(t("did_you_mean"))}
     ${names.map(n=>`<button class="chip-btn" data-name="${esc(n)}">${esc(titlecase(n))}</button>`).join(" ")}</div>`;
 }
 function wireDidYouMean(box){
@@ -1311,8 +2026,8 @@ function addVoiceButton(inputEl, autoSubmit){
 function drugRow(val=""){
   const div = document.createElement("div");
   div.className="drugrow";
-  div.innerHTML = `<input type="text" placeholder="Medication name" autocomplete="off" value="${esc(val)}" />
-    <button class="rm" title="Remove" aria-label="Remove medication">×</button>`;
+  div.innerHTML = `<input type="text" placeholder="${esc(t('drug_row_placeholder'))}" autocomplete="off" value="${esc(val)}" />
+    <button class="rm" title="${esc(t('med_note_remove_label_prefix'))}" aria-label="${esc(t('remove_medication_aria'))}">×</button>`;
   div.querySelector(".rm").addEventListener("click",()=>{
     if ($("#drug-list").children.length>2) div.remove();
     else div.querySelector("input").value="";
@@ -1359,8 +2074,8 @@ function analyzeDrugPairs(drugs){
 async function checkInteractions(){
   const inputs = [...$("#drug-list").querySelectorAll("input")].map(i=>i.value.trim()).filter(Boolean);
   const box = $("#check-results");
-  if (inputs.length < 2){ box.innerHTML = `<div class="err">Enter at least two medications to compare.</div>`; return; }
-  box.innerHTML = `<div class="status"><span class="spin"></span>Checking ${inputs.length} medications against the curated set and their FDA labels…</div>`;
+  if (inputs.length < 2){ box.innerHTML = `<div class="err">${esc(t("check_min_two"))}</div>`; return; }
+  box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("check_checking_prefix"))} ${inputs.length} ${esc(t("check_checking_suffix"))}</div>`;
 
   const drugs = [];
   for (const name of inputs) drugs.push(await resolveForAnalysis(name));
@@ -1395,34 +2110,35 @@ function renderResults(box, drugs, findings, mentions){
   findings.sort((x,y)=>rank[x.rule.severity]-rank[y.rule.severity]);
 
   if (findings.length){
-    html += `<p class="eyebrow" style="margin-bottom:2px;">Documented interactions · ${findings.length}</p>`;
+    html += `<p class="eyebrow" style="margin-bottom:2px;">${esc(t("documented_interactions"))} · ${findings.length}</p>`;
     for (const f of findings){
       const s=f.rule.severity;
+      const sevLabel = s==="major"?t("sev_major"):s==="moderate"?t("sev_moderate"):t("sev_minor");
       html += `<div class="verdict v-${s}">
         <div class="bar"></div>
         <div class="vbody">
           <div class="pair">${esc(f.A.display)} ✕ ${esc(f.B.display)}</div>
-          <div class="sev"><span class="pill">${s}</span> ${s==="major"?"Major interaction":s==="moderate"?"Moderate interaction":"Minor interaction"}</div>
-          <p>${esc(f.rule.what)}</p>
-          <p class="mgmt"><b>Why:</b> ${esc(f.rule.why)}</p>
-          <p class="mgmt"><b>What people usually do:</b> ${esc(f.rule.mgmt)}</p>
-          <div class="src">Source: curated from FDA prescribing information &amp; standard clinical references</div>
+          <div class="sev"><span class="pill">${s}</span> ${esc(sevLabel)}</div>
+          <p>${esc(pickLang(f.rule.what))}</p>
+          <p class="mgmt"><b>${esc(t("why_label"))}</b> ${esc(pickLang(f.rule.why))}</p>
+          <p class="mgmt"><b>${esc(t("mgmt_label"))}</b> ${esc(pickLang(f.rule.mgmt))}</p>
+          <div class="src">${t("src_curated_interaction")}</div>
         </div>
       </div>`;
     }
   }
 
   if (mentions.length){
-    html += `<p class="eyebrow" style="margin:18px 0 2px;">Also noted on FDA labels · ${mentions.length}</p>`;
+    html += `<p class="eyebrow" style="margin:18px 0 2px;">${esc(t("also_noted_fda"))} · ${mentions.length}</p>`;
     for (const m of mentions){
       html += `<div class="verdict v-note">
         <div class="bar"></div>
         <div class="vbody">
           <div class="pair">${esc(m.from)} → mentions → ${esc(m.to)}</div>
-          <div class="sev"><span class="pill">label</span> Named in the FDA label</div>
-          <p>${esc(m.from)}'s FDA label discusses ${esc(m.to)} in its drug‑interactions section. This isn't severity‑rated — it means the label flags something worth asking about.</p>
+          <div class="sev"><span class="pill">${esc(t("label_pill"))}</span> ${esc(t("named_in_label"))}</div>
+          <p>${esc(m.from)}${esc(t("mentions_text"))} ${esc(m.to)} ${esc(t("mentions_text2"))}</p>
           <p class="mgmt" style="font-style:italic;">“…${esc(m.snippet)}…”</p>
-          <div class="src">Source: openFDA drug label · drug interactions section</div>
+          <div class="src">${esc(t("src_fda_mention"))}</div>
         </div>
       </div>`;
     }
@@ -1431,12 +2147,12 @@ function renderResults(box, drugs, findings, mentions){
   // the cautious empty state — never a green "safe"
   if (!findings.length && !mentions.length){
     html += `<div class="nofind">
-      <span class="eyebrow">No interaction found</span>
-      <h3>Nothing turned up — but that doesn't mean it's safe.</h3>
-      <p>These medications weren't in our curated interaction set, and we didn't find one naming the other on its FDA label. That's reassuring, not conclusive. Interactions depend on dose, your health, and other things this tool can't see. Always confirm a new combination with a pharmacist.</p>
+      <span class="eyebrow">${esc(t("no_interaction_eyebrow"))}</span>
+      <h3>${esc(t("no_interaction_title"))}</h3>
+      <p>${esc(t("no_interaction_body"))}</p>
     </div>`;
   } else {
-    html += `<p class="status" style="padding-top:14px;">This list shows what was found — it is not a complete safety review. A pharmacist can check the full picture, including doses and your other medications.</p>`;
+    html += `<p class="status" style="padding-top:14px;">${esc(t("check_results_note"))}</p>`;
   }
 
   box.innerHTML = html;
@@ -1453,11 +2169,10 @@ function renderResults(box, drugs, findings, mentions){
    the sourcing rationale.
    ================================================================= */
 function renderSymptomList(){
-  const symptoms = [...new Set(SYMPTOM_CATEGORIES.map(s=>s.symptom))];
-  $("#symptom-list").innerHTML = symptoms.map(s => `
+  $("#symptom-list").innerHTML = SYMPTOM_CATEGORIES.map(s => `
     <label class="symptom-chip">
-      <input type="checkbox" value="${esc(s)}" />
-      <span>${esc(s)}</span>
+      <input type="checkbox" value="${esc(s.key)}" />
+      <span>${esc(pickLang(s.symptom))}</span>
     </label>
   `).join("");
 }
@@ -1465,20 +2180,20 @@ function renderSymptomList(){
 async function runSymptomLookup(){
   const box = $("#symptom-results");
   const checked = [...document.querySelectorAll('#symptom-list input:checked')].map(i => i.value);
-  if (!checked.length){ box.innerHTML = `<div class="err">Pick at least one symptom first.</div>`; return; }
+  if (!checked.length){ box.innerHTML = `<div class="err">${esc(t("symptoms_pick_one"))}</div>`; return; }
 
   // multiple picked symptoms can map to the same category (headache + fever
   // both land on pain/fever relievers) — collapse to one section each
   const matched = [];
   const seenCategory = new Set();
-  for (const sym of checked){
-    const entry = SYMPTOM_CATEGORIES.find(s => s.symptom === sym);
-    if (!entry || seenCategory.has(entry.category)) continue;
-    seenCategory.add(entry.category);
+  for (const key of checked){
+    const entry = SYMPTOM_CATEGORIES.find(s => s.key === key);
+    if (!entry || seenCategory.has(entry.catKey)) continue;
+    seenCategory.add(entry.catKey);
     matched.push(entry);
   }
 
-  box.innerHTML = `<div class="status"><span class="spin"></span>Looking up real example products on openFDA…</div>`;
+  box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("symptoms_looking_up"))}</div>`;
 
   const sections = [];
   for (const m of matched){
@@ -1501,23 +2216,23 @@ async function runSymptomLookup(){
   box.innerHTML = sections.map(s => `
     <article class="card" style="margin-bottom:14px;">
       <div class="card-head">
-        <span class="eyebrow">Symptom category · ${esc(s.symptom)}</span>
-        <div class="name" style="font-size:19px;">${esc(s.category)}</div>
+        <span class="eyebrow">${esc(t("symptom_category_eyebrow"))} · ${esc(pickLang(s.symptom))}</span>
+        <div class="name" style="font-size:19px;">${esc(pickLang(s.category))}</div>
       </div>
       <div class="card-body">
         <div class="row">
-          <p>${esc(s.note)}</p>
-          <div class="src">Category mapping: hand-curated, textbook-level — not personalized, not a diagnosis</div>
+          <p>${esc(pickLang(s.note))}</p>
+          <div class="src">${esc(t("src_symptom_category"))}</div>
         </div>
         ${s.items.length ? `<div class="row">
-          <span class="eyebrow">Real examples, sourced live from openFDA</span>
+          <span class="eyebrow">${esc(t("real_examples_eyebrow"))}</span>
           <div class="cabinet-map" style="margin-top:8px;">
             ${s.items.map(it => `<button class="map-chip" data-name="${esc(it.name)}"><b>${esc(it.name)}</b>${it.generic ? ` · ${esc(titlecase(it.generic))}` : ""}</button>`).join("")}
           </div>
         </div>` : ""}
       </div>
     </article>
-  `).join("") + `<p class="status" style="padding-top:6px;">This maps common symptoms to general OTC categories — it isn't a diagnosis, doesn't know your health history or other medications, and isn't personalized. A pharmacist can tell you which specific option actually fits you. Click any example above to decode it first.</p>`;
+  `).join("") + `<p class="status" style="padding-top:6px;">${esc(t("symptoms_result_note"))}</p>`;
 
   box.querySelectorAll("button.map-chip").forEach(btn=>{
     btn.addEventListener("click", ()=>{
@@ -1567,8 +2282,8 @@ function applyTheme(dark, opts){
   const btn = $("#theme-toggle");
   document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
   btn.querySelector(".ticon").textContent  = dark ? "☀" : "☾";
-  btn.querySelector(".tlabel").textContent = dark ? "Light" : "Dark";
-  btn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+  btn.querySelector(".tlabel").textContent = dark ? t("theme_light") : t("theme_dark");
+  btn.setAttribute("aria-label", dark ? t("theme_aria_light") : t("theme_aria_dark"));
   if (opts.persist !== false){
     try{ localStorage.setItem(THEME_KEY, dark ? "dark" : "light"); }catch(e){}
     // upsert (not update) so it works even if the profile row doesn't exist yet
@@ -1580,6 +2295,44 @@ function applyTheme(dark, opts){
 }
 $("#theme-toggle").addEventListener("click", ()=>applyTheme(!isDark()));
 try{ if (localStorage.getItem(THEME_KEY) === "dark") applyTheme(true, {persist:false}); }catch(e){}
+
+/* =================================================================
+   LANGUAGE (Phase 5 — i18n) — same persistence pattern as theme:
+   localStorage always, synced to the Supabase profile when signed in
+   so it follows you across devices. Re-renders whatever dynamic
+   content is currently on screen so switching language doesn't need a
+   page reload.
+   ================================================================= */
+function applyLang(lang, opts){
+  opts = opts || {};
+  uiLang = (lang === "es") ? "es" : "en";
+  applyTranslations();
+  applyTheme(isDark(), {persist:false}); // refresh the theme-toggle's own label text
+  if (opts.persist !== false){
+    try{ localStorage.setItem(LANG_KEY, uiLang); }catch(e){}
+    if (session) db("profiles", {
+      method:"POST", body:{ id: session.user.id, lang: uiLang },
+      prefer:"resolution=merge-duplicates,return=minimal"
+    }).catch(()=>{});
+  }
+  refreshDynamicContentForLang();
+}
+
+/* re-renders anything already on screen that was built from JS template
+   strings (not data-i18n), so a language switch mid-session doesn't
+   leave stale-language content sitting next to freshly-translated chrome */
+function refreshDynamicContentForLang(){
+  renderSymptomList();
+  if (typeof renderAcct === "function") renderAcct();
+  if (typeof renderCabinet === "function" && SB_ENABLED) renderCabinet();
+}
+
+$("#lang-toggle").addEventListener("click", () => applyLang(uiLang === "en" ? "es" : "en"));
+/* NOTE: the actual "restore stored language on load" call happens at the
+   very bottom of this script (in initAccounts), not here — applyLang()
+   touches SB_ENABLED/session/cabinet, which aren't declared yet at this
+   point in the file. Calling it this early would throw (temporal dead
+   zone) and abort the rest of the script. */
 
 /* =================================================================
    PHASE 2 — ACCOUNTS + MY CABINET (Supabase)
@@ -1725,9 +2478,9 @@ async function onSendMagicLink(btn){
   const input = $("#magic-email");
   const email = (input.value || "").trim();
   const statusEl = $("#magic-status");
-  if (!/^\S+@\S+\.\S+$/.test(email)){ statusEl.textContent = "Enter a valid email first."; input.focus(); return; }
+  if (!/^\S+@\S+\.\S+$/.test(email)){ statusEl.textContent = t("magic_invalid_email"); input.focus(); return; }
   btn.disabled = true;
-  statusEl.innerHTML = `<span class="spin"></span>Sending your sign‑in link…`;
+  statusEl.innerHTML = `<span class="spin"></span>${esc(t("magic_sending"))}`;
   try{
     await sendMagicLink(email);
     magicSent = email;
@@ -1804,11 +2557,16 @@ async function publicDb(path, opts){
 }
 
 async function loadProfile(){
-  const rows = await db("profiles?select=theme&id=eq." + session.user.id);
-  const t = rows && rows[0] && rows[0].theme;
-  if (t === "dark" || t === "light"){
-    applyTheme(t === "dark", {persist:false});
-    try{ localStorage.setItem(THEME_KEY, t); }catch(e){}
+  const rows = await db("profiles?select=theme,lang&id=eq." + session.user.id);
+  const row = rows && rows[0];
+  const savedTheme = row && row.theme;
+  if (savedTheme === "dark" || savedTheme === "light"){
+    applyTheme(savedTheme === "dark", {persist:false});
+    try{ localStorage.setItem(THEME_KEY, savedTheme); }catch(e){}
+  }
+  const savedLang = row && row.lang;
+  if ((savedLang === "es" || savedLang === "en") && savedLang !== uiLang){
+    applyLang(savedLang, {persist:false});
   }
 }
 
@@ -1862,7 +2620,7 @@ async function revokeShare(token){
 async function renderSharePanel(){
   const box = $("#share-panel");
   if (!box) return;
-  box.innerHTML = `<div class="status"><span class="spin"></span>Checking for an existing share link…</div>`;
+  box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("share_checking"))}</div>`;
   try{ shareToken = await getActiveShare(); }
   catch(e){ shareToken = null; }
   paintSharePanel();
@@ -1872,31 +2630,31 @@ function paintSharePanel(){
   const box = $("#share-panel");
   if (!box) return;
   if (!shareToken){
-    box.innerHTML = `<p class="status" style="padding:6px 0 10px;">Generate a link that shows a read-only copy of your cabinet — no account needed on their end. Anyone with the link can view it, so only share it with people you trust.</p>
-      <button class="go" data-act="share-create">Create share link</button>`;
+    box.innerHTML = `<p class="status" style="padding:6px 0 10px;">${esc(t("share_intro"))}</p>
+      <button class="go" data-act="share-create">${esc(t("share_create_btn"))}</button>`;
     return;
   }
   const url = location.origin + location.pathname + "?share=" + encodeURIComponent(shareToken);
   const qr  = "https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + encodeURIComponent(url);
   box.innerHTML = `
     <div class="field" style="margin-top:10px;">
-      <label class="eyebrow" for="share-link-input">Read-only share link</label>
+      <label class="eyebrow" for="share-link-input">${esc(t("share_link_label"))}</label>
       <div class="inrow">
         <input type="text" id="share-link-input" readonly value="${esc(url)}" />
-        <button class="ghost" data-act="share-copy">Copy</button>
+        <button class="ghost" data-act="share-copy">${esc(t("share_copy_btn"))}</button>
       </div>
     </div>
     <img src="${qr}" width="180" height="180" alt="QR code for the share link above" loading="lazy"
       style="margin-top:12px; border-radius:8px; border:1px solid var(--line); display:block;"
       onerror="this.style.display='none'" />
-    <p style="margin-top:12px;"><button class="mini" data-act="share-revoke">Revoke this link</button></p>`;
+    <p style="margin-top:12px;"><button class="mini" data-act="share-revoke">${esc(t("share_revoke_btn"))}</button></p>`;
 }
 
 async function onCreateShare(){
   const box = $("#share-panel");
-  box.innerHTML = `<div class="status"><span class="spin"></span>Creating your share link…</div>`;
+  box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("share_creating"))}</div>`;
   try{ shareToken = await createShare(); paintSharePanel(); }
-  catch(e){ box.innerHTML = `<div class="err">Couldn't create a share link — try again.</div>`; }
+  catch(e){ box.innerHTML = `<div class="err">${esc(t("share_create_failed"))}</div>`; }
 }
 
 async function onCopyShareLink(){
@@ -1906,16 +2664,16 @@ async function onCopyShareLink(){
   try{
     await navigator.clipboard.writeText(input.value);
     const btn = document.querySelector('[data-act="share-copy"]');
-    if (btn){ const orig = btn.textContent; btn.textContent = "Copied!"; setTimeout(()=>{ btn.textContent = orig; }, 1500); }
+    if (btn){ const orig = btn.textContent; btn.textContent = t("share_copied"); setTimeout(()=>{ btn.textContent = orig; }, 1500); }
   }catch(e){ /* clipboard API blocked — the input is already selected as a fallback */ }
 }
 
 async function onRevokeShare(){
   if (!shareToken) return;
   const box = $("#share-panel");
-  box.innerHTML = `<div class="status"><span class="spin"></span>Revoking…</div>`;
+  box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("share_revoking"))}</div>`;
   try{ await revokeShare(shareToken); shareToken = null; paintSharePanel(); }
-  catch(e){ box.innerHTML = `<div class="err">Couldn't revoke — try again.</div>`; }
+  catch(e){ box.innerHTML = `<div class="err">${esc(t("share_revoke_failed"))}</div>`; }
 }
 
 /* --- the viewer side: someone opened a ?share=<token> link ---------- */
@@ -1940,30 +2698,30 @@ function renderSharedCabinetView(rows){
 
   if (!rows){
     div.innerHTML = `<div class="nofind">
-      <span class="eyebrow">Link not available</span>
-      <h3>This share link isn't active.</h3>
-      <p>It may have been revoked, or the link is incorrect.</p>
+      <span class="eyebrow">${esc(t("shared_view_not_available_eyebrow"))}</span>
+      <h3>${esc(t("shared_view_not_available_title"))}</h3>
+      <p>${esc(t("shared_view_not_available_body"))}</p>
     </div>`;
   } else if (!rows.length){
     div.innerHTML = `<div class="nofind">
-      <span class="eyebrow">Shared cabinet</span>
-      <h3>This cabinet is empty.</h3>
-      <p>Nothing has been saved to it yet.</p>
+      <span class="eyebrow">${esc(t("shared_view_empty_eyebrow"))}</span>
+      <h3>${esc(t("shared_view_empty_title"))}</h3>
+      <p>${esc(t("shared_view_empty_body"))}</p>
     </div>`;
   } else {
-    div.innerHTML = `<p class="eyebrow" style="margin:20px 0 6px;">Shared with you · read-only</p>
+    div.innerHTML = `<p class="eyebrow" style="margin:20px 0 6px;">${esc(t("shared_view_eyebrow"))}</p>
       <div class="results">${rows.map(r => `
         <article class="card">
           <div class="card-head">
-            <div class="name">${esc(titlecase(r.generic || r.brand || "Unknown medication"))}</div>
-            ${r.drug_class ? `<div class="datastrip"><span><b>class</b> ${esc(r.drug_class)}</span></div>` : ""}
+            <div class="name">${esc(titlecase(r.generic || r.brand || t("shared_view_unknown_med")))}</div>
+            ${r.drug_class ? `<div class="datastrip"><span><b>${esc(t("med_note_class"))}</b> ${esc(r.drug_class)}</span></div>` : ""}
           </div>
-          ${r.notes ? `<div class="card-body"><div class="row"><span class="eyebrow">Note</span><p>${esc(r.notes)}</p></div></div>` : ""}
+          ${r.notes ? `<div class="card-body"><div class="row"><span class="eyebrow">${esc(t("shared_view_note_label"))}</span><p>${esc(r.notes)}</p></div></div>` : ""}
         </article>`).join("")}
       </div>
-      <p class="status" style="padding-top:16px;">This is a read-only view — nothing here can be edited from this link, and this list is a personal reference, not a medical record. Confirm anything important with a pharmacist.</p>`;
+      <p class="status" style="padding-top:16px;">${esc(t("shared_view_footer"))}</p>`;
   }
-  div.innerHTML += `<p style="margin-top:24px;"><a href="${esc(location.pathname)}">Open the full Plainscript app →</a></p>`;
+  div.innerHTML += `<p style="margin-top:24px;"><a href="${esc(location.pathname)}">${esc(t("shared_view_open_app"))}</a></p>`;
   wrap.insertBefore(div, wrap.firstChild);
 }
 
@@ -1999,11 +2757,11 @@ function renderAcct(){
   const el = $("#acct");
   if (!SB_ENABLED){ el.innerHTML = ""; return; }
   if (session){
-    el.innerHTML = `<span class="who" title="${esc(session.user.email)}">${esc(session.user.email || "signed in")}</span>
-      <button class="mini" id="signout-btn">Sign out</button>`;
+    el.innerHTML = `<span class="who" title="${esc(session.user.email)}">${esc(session.user.email || t("signed_in_email_fallback"))}</span>
+      <button class="mini" id="signout-btn">${esc(t("sign_out"))}</button>`;
     $("#signout-btn").addEventListener("click", signOut);
   } else {
-    el.innerHTML = `<button class="mini" id="signin-btn">Sign in</button>`;
+    el.innerHTML = `<button class="mini" id="signin-btn">${esc(t("sign_in"))}</button>`;
     $("#signin-btn").addEventListener("click", ()=>selectTab("cabinet"));
   }
 }
@@ -2017,21 +2775,21 @@ function addCabinetSave(box, d, typed){
   btn.className = "mini";
   btn.style.marginTop = "12px";
   if (!session){
-    btn.textContent = "＋ Save to My Cabinet — sign in";
+    btn.textContent = t("cabinet_save_btn_signin");
     btn.addEventListener("click", ()=>selectTab("cabinet"));
   } else if (findInCabinet(d, typed)){
-    btn.textContent = "✓ In your cabinet";
+    btn.textContent = t("cabinet_in_cabinet");
     btn.disabled = true;
   } else {
-    btn.textContent = "＋ Save to My Cabinet";
+    btn.textContent = t("cabinet_save_btn");
     btn.addEventListener("click", async ()=>{
-      btn.disabled = true; btn.textContent = "Saving…";
+      btn.disabled = true; btn.textContent = t("cabinet_saving");
       try{
         await insertMed(typed, d);
         renderCabinet();
-        btn.textContent = "✓ Saved to your cabinet";
+        btn.textContent = t("cabinet_saved");
       }catch(e){
-        btn.disabled = false; btn.textContent = "Couldn't save — try again";
+        btn.disabled = false; btn.textContent = t("cabinet_save_failed");
       }
     });
   }
@@ -2059,7 +2817,7 @@ function addSimilarButton(box, d, displayName){
   btn.className = "mini";
   btn.style.marginTop = "12px";
   btn.style.marginLeft = "8px";
-  btn.textContent = "🔎 Similar & related meds";
+  btn.innerHTML = t("similar_related_btn");
   btn.addEventListener("click", ()=> openSimilarModal(d, displayName));
   head.appendChild(btn);
 }
@@ -2119,13 +2877,11 @@ function similarPaneHTML(items, kind, emptyMsg){
   if (!items.length) return `<p class="status" style="padding:8px 0;">${esc(emptyMsg)}</p>`;
   const chips = items.map(it=>{
     const sub = kind==="combos"
-      ? ` · contains ${esc((it.substances||[]).map(titlecase).join(" + "))}`
+      ? ` · ${esc(t("contains_word"))} ${esc((it.substances||[]).map(titlecase).join(" + "))}`
       : (kind==="class" && it.generic ? ` · ${esc(titlecase(it.generic))}` : "");
     return `<button class="map-chip" data-name="${esc(it.name)}"><b>${esc(it.name)}</b>${sub}</button>`;
   }).join("");
-  const note = kind==="combos"
-    ? `<p class="status" style="padding-top:10px;">These contain the same active ingredient — check you're not accidentally doubling up if you take more than one alongside this.</p>`
-    : "";
+  const note = kind==="combos" ? `<p class="status" style="padding-top:10px;">${esc(t("similar_combo_note"))}</p>` : "";
   return `<div class="cabinet-map">${chips}</div>${note}`;
 }
 
@@ -2133,17 +2889,17 @@ async function openSimilarModal(d, displayName){
   const trigger = document.activeElement; // restore focus here when the modal closes
   const overlay = document.createElement("div");
   overlay.className = "modal-overlay";
-  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-label="Similar and related medications">
+  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-label="${esc(t("similar_modal_aria"))}">
     <div class="modal-head">
-      <h2>${esc(displayName)} — similar &amp; related</h2>
-      <button class="mini" data-act="close">Close ✕</button>
+      <h2>${esc(displayName)} ${t("similar_related_title_suffix")}</h2>
+      <button class="mini" data-act="close">${t("close_btn")}</button>
     </div>
     <div class="modal-tabs" role="tablist">
-      <button class="mtab" role="tab" data-tab="class" aria-selected="true">Same drug class</button>
-      <button class="mtab" role="tab" data-tab="forms" aria-selected="false">Other forms &amp; strengths</button>
-      <button class="mtab" role="tab" data-tab="combos" aria-selected="false">In combination products</button>
+      <button class="mtab" role="tab" data-tab="class" aria-selected="true">${t("tab_same_class")}</button>
+      <button class="mtab" role="tab" data-tab="forms" aria-selected="false">${t("tab_other_forms")}</button>
+      <button class="mtab" role="tab" data-tab="combos" aria-selected="false">${t("tab_combo_products")}</button>
     </div>
-    <div class="modal-body" aria-live="polite"><div class="status"><span class="spin"></span>Looking up related medications on openFDA…</div></div>
+    <div class="modal-body" aria-live="polite"><div class="status"><span class="spin"></span>${esc(t("similar_looking_up"))}</div></div>
   </div>`;
   document.body.appendChild(overlay);
 
@@ -2172,9 +2928,9 @@ async function openSimilarModal(d, displayName){
 
   const data = await fetchSimilarAndRelated(d);
   const panes = {
-    class: similarPaneHTML(data.sameClass, "class", "No other drugs in this same FDA pharmacologic class turned up — many OTC products don't carry structured drug-class data in openFDA."),
-    forms: similarPaneHTML(data.otherForms, "forms", "No other forms or strengths of this ingredient turned up in openFDA."),
-    combos: similarPaneHTML(data.combos, "combos", "This ingredient wasn't found in any combination product in openFDA's database.")
+    class: similarPaneHTML(data.sameClass, "class", t("similar_no_class")),
+    forms: similarPaneHTML(data.otherForms, "forms", t("similar_no_forms")),
+    combos: similarPaneHTML(data.combos, "combos", t("similar_no_combos"))
   };
   const body = overlay.querySelector(".modal-body");
   function renderPane(tab){
@@ -2204,11 +2960,11 @@ function medRowHTML(m){
   const display = m.generic || m.brand || m.name;
   const strip = [];
   if (m.generic && m.brand && m.brand.toLowerCase() !== m.generic.toLowerCase())
-    strip.push(`<span><b>brand</b> ${esc(m.brand)}</span>`);
-  if (m.drug_class) strip.push(`<span><b>class</b> ${esc(m.drug_class)}</span>`);
-  if (m.rxcui)      strip.push(`<span><b>rxcui</b> ${esc(m.rxcui)}</span>`);
+    strip.push(`<span><b>${esc(t("med_note_brand"))}</b> ${esc(m.brand)}</span>`);
+  if (m.drug_class) strip.push(`<span><b>${esc(t("med_note_class"))}</b> ${esc(m.drug_class)}</span>`);
+  if (m.rxcui)      strip.push(`<span><b>${esc(t("med_note_rxcui"))}</b> ${esc(m.rxcui)}</span>`);
   if (!m.rxcui && !m.generic)
-    strip.push(`<span><b>note</b> not matched to an FDA label — check the spelling</span>`);
+    strip.push(`<span><b>${esc(t("med_note_class"))}</b> ${esc(t("med_note_unmatched"))}</span>`);
   return `<article class="card medrow" data-id="${esc(m.id)}">
     <div class="medgrid">
       <div class="medinfo">
@@ -2216,11 +2972,11 @@ function medRowHTML(m){
         ${strip.length ? `<div class="datastrip">${strip.join("")}</div>` : ""}
         <div class="mednote" data-role="note">
           ${m.notes
-            ? `<p>“${esc(m.notes)}”</p><button class="expand" data-act="edit">Edit note</button>`
-            : `<button class="expand" data-act="edit">＋ Add a personal note (e.g. “morning, with food”)</button>`}
+            ? `<p>“${esc(m.notes)}”</p><button class="expand" data-act="edit">${esc(t("med_note_edit_existing"))}</button>`
+            : `<button class="expand" data-act="edit">${t("med_note_edit")}</button>`}
         </div>
       </div>
-      <button class="rm" data-act="remove" title="Remove" aria-label="Remove ${esc(titlecase(display))} from your cabinet">×</button>
+      <button class="rm" data-act="remove" title="${esc(t("med_note_remove_label_prefix"))}" aria-label="${esc(t("med_note_remove_label_prefix"))} ${esc(titlecase(display))} ${esc(t("med_note_remove_from"))}">×</button>
     </div>
   </article>`;
 }
@@ -2231,73 +2987,73 @@ function renderCabinet(){
 
   if (!SB_ENABLED){
     box.innerHTML = `<div class="nofind">
-      <span class="eyebrow">Not switched on yet</span>
-      <h3>Accounts aren't configured in this deployment.</h3>
-      <p>My Cabinet needs a (free) Supabase project behind it: run <code>supabase/schema.sql</code> there, then put the project URL and anon key into <code>config.js</code>. Everything else in Plainscript works without it.</p>
+      <span class="eyebrow">${esc(t("cabinet_not_configured_eyebrow"))}</span>
+      <h3>${esc(t("cabinet_not_configured_title"))}</h3>
+      <p>${t("cabinet_not_configured_body")}</p>
     </div>`;
     return;
   }
 
   if (!session){
     box.innerHTML = `<div class="signin">
-      <span class="eyebrow">My Cabinet · sign in</span>
-      <h3>Keep your real medication list in one place.</h3>
-      <p>Save the meds you actually take, add your own reminders (like “morning, with food”), and re‑run the interaction check on all of them any time. Your list lives in your own account, protected by row‑level security — no one else can read it.</p>
-      ${authError ? `<div class="err" style="margin-bottom:12px;">Sign‑in didn't complete: ${esc(authError)}</div>` : ""}
+      <span class="eyebrow">${esc(t("tab_cabinet"))} · ${esc(t("sign_in"))}</span>
+      <h3>${esc(t("cabinet_signedout_title"))}</h3>
+      <p>${esc(t("cabinet_signedout_body"))}</p>
+      ${authError ? `<div class="err" style="margin-bottom:12px;">${esc(t("cabinet_signin_error_prefix"))} ${esc(authError)}</div>` : ""}
       ${magicSent ? `
-      <div class="status" style="padding:2px 0 12px;">Check <b>${esc(magicSent)}</b> for a sign‑in link — open it on this device and you'll land back here, signed in. (Didn't get it? Check spam, or just refresh this page to try again.)</div>
+      <div class="status" style="padding:2px 0 12px;">${esc(t("magic_sent_note_prefix"))} <b>${esc(magicSent)}</b> ${esc(t("magic_sent_note_suffix"))}</div>
       ` : `
       <div class="providers">
-        <button class="provider" data-act="signin-google">Continue with Google</button>
+        <button class="provider" data-act="signin-google">${esc(t("continue_google"))}</button>
       </div>
       <div class="field" style="margin-top:14px;">
-        <label class="eyebrow" for="magic-email">Or email me a sign‑in link</label>
+        <label class="eyebrow" for="magic-email">${esc(t("magic_email_label"))}</label>
         <div class="inrow">
-          <input type="email" id="magic-email" placeholder="you@example.com" autocomplete="email" />
-          <button class="go" data-act="magic-send">Send link</button>
+          <input type="email" id="magic-email" placeholder="${esc(t("magic_email_placeholder"))}" autocomplete="email" />
+          <button class="go" data-act="magic-send">${esc(t("magic_send_btn"))}</button>
         </div>
       </div>
       <div id="magic-status" class="status" role="status"></div>
       `}
-      <p class="status" style="padding:12px 0 0;">Sign‑in only exists to keep your list. Plainscript stores nothing beyond the medications and notes you save — searches aren't recorded. No password to create or remember — a link emailed to you is all it takes.</p>
+      <p class="status" style="padding:12px 0 0;">${esc(t("cabinet_signin_footer"))}</p>
     </div>`;
     return;
   }
 
   let html = cabinetIsOffline
-    ? `<div class="status" style="padding:0 0 14px;">📡 Offline — showing your cabinet as of your last visit. Adding or editing needs a connection.</div>`
+    ? `<div class="status" style="padding:0 0 14px;">${esc(t("cabinet_offline_note"))}</div>`
     : "";
   html += `<div class="field">
-    <label class="eyebrow" for="cab-input">Add a medication</label>
+    <label class="eyebrow" for="cab-input">${esc(t("add_med_label"))}</label>
     <div class="inrow">
-      <input type="text" id="cab-input" placeholder="e.g. metformin, Lipitor" autocomplete="off" />
-      <button class="go" id="cab-add-btn" data-act="add">Save to cabinet</button>
+      <input type="text" id="cab-input" placeholder="${esc(t("add_med_placeholder"))}" autocomplete="off" />
+      <button class="go" id="cab-add-btn" data-act="add">${esc(t("save_to_cabinet_btn"))}</button>
     </div>
   </div>`;
 
   if (cabinet === null){
-    html += `<div class="status" style="margin-top:10px;"><span class="spin"></span>Loading your cabinet…</div>`;
+    html += `<div class="status" style="margin-top:10px;"><span class="spin"></span>${esc(t("cabinet_loading"))}</div>`;
   } else if (!cabinet.length){
     html += `<div class="nofind" style="margin-top:18px;">
-      <span class="eyebrow">Empty cabinet</span>
-      <h3>Nothing saved yet.</h3>
-      <p>Add a medication above, or decode one in tab 01 and hit “Save to My Cabinet”.</p>
+      <span class="eyebrow">${esc(t("cabinet_empty_eyebrow"))}</span>
+      <h3>${esc(t("cabinet_empty_title"))}</h3>
+      <p>${esc(t("cabinet_empty_body"))}</p>
     </div>`;
   } else {
     html += `<div class="results">${cabinet.map(medRowHTML).join("")}</div>
     <div class="cab-tools">
-      <button class="ghost" data-act="print">🖨️ Print / save as PDF</button>
-      <button class="ghost" data-act="share">🔗 Share a read-only copy</button>
+      <button class="ghost" data-act="print">${t("print_btn")}</button>
+      <button class="ghost" data-act="share">${t("share_btn")}</button>
     </div>
     <div id="share-panel"></div>`;
     if (cabinet.length >= 2){
       html += `<div class="cab-tools">
-        <button class="go" data-act="scan">🔎 Scan my whole cabinet</button>
-        <span class="status" style="padding:0;">Checks every medication against every other one — not just pairs.</span>
+        <button class="go" data-act="scan">${t("scan_btn")}</button>
+        <span class="status" style="padding:0;">${esc(t("scan_note"))}</span>
       </div>
       <div id="scan-results" aria-live="polite"></div>`;
     }
-    html += `<p class="status" style="padding-top:14px;">Your cabinet is a personal reference list, not a medical record — keep your pharmacist's list as the source of truth.</p>`;
+    html += `<p class="status" style="padding-top:14px;">${esc(t("cabinet_footer_note"))}</p>`;
   }
   box.innerHTML = html;
   addVoiceButton($("#cab-input")); // fills the field — user still reviews before saving
@@ -2308,7 +3064,8 @@ function renderCabinet(){
    other tab is completely unaffected. */
 function printCabinet(){
   selectTab("cabinet");
-  $("#print-date").textContent = "Printed " + new Date().toLocaleDateString(undefined, {year:"numeric", month:"long", day:"numeric"});
+  const locale = uiLang === "es" ? "es-ES" : "en-US";
+  $("#print-date").textContent = t("printed_on") + " " + new Date().toLocaleDateString(locale, {year:"numeric", month:"long", day:"numeric"});
   document.body.classList.add("printing-cabinet");
   window.print();
 }
@@ -2317,10 +3074,10 @@ window.addEventListener("afterprint", () => document.body.classList.remove("prin
 async function onAddMed(){
   const input = $("#cab-input");
   const typed = (input.value || "").trim();
-  if (!typed){ cabinetStatus("Type a medication name first."); input.focus(); return; }
+  if (!typed){ cabinetStatus(t("cabinet_add_type_first")); input.focus(); return; }
   const btn = $("#cab-add-btn");
   btn.disabled = true;
-  cabinetStatus("Looking up “" + typed + "” in the FDA label database…");
+  cabinetStatus(t("cabinet_looking_up_prefix") + " “" + typed + "” " + t("decode_looking_up_suffix"));
   // resolve against the real FDA label so the saved row carries sourced
   // identifiers (generic, brand, RxCUI, class) — never made-up ones
   let d = null;
@@ -2328,14 +3085,14 @@ async function onAddMed(){
   catch(e){/* FDA hiccup — still allow saving the raw name */}
   const dup = findInCabinet(d, typed);
   if (dup){
-    cabinetStatus("Already in your cabinet as " + titlecase(dup.generic || dup.name) + ".");
+    cabinetStatus(t("cabinet_already_have_prefix") + " " + titlecase(dup.generic || dup.name) + ".");
     btn.disabled = false;
     return;
   }
   try{
     await insertMed(typed, d);
     renderCabinet();
-    cabinetStatus(d ? "Saved." : "Saved — but it didn't match an FDA label, so double-check the spelling.");
+    cabinetStatus(d ? t("cabinet_saved_status") : t("cabinet_saved_no_match"));
   }catch(e){
     cabinetStatus(e.message);
     btn.disabled = false;
@@ -2346,10 +3103,10 @@ function openNoteEditor(card){
   const m = cabinet.find(x => x.id === card.dataset.id);
   if (!m) return;
   const holder = card.querySelector('[data-role="note"]');
-  holder.innerHTML = `<textarea maxlength="500" aria-label="Personal note" placeholder="e.g. morning, with food">${esc(m.notes || "")}</textarea>
+  holder.innerHTML = `<textarea maxlength="500" aria-label="${esc(t("personal_note_aria"))}" placeholder="${esc(t("note_placeholder"))}">${esc(m.notes || "")}</textarea>
     <div class="notebtns">
-      <button class="mini" data-act="note-save">Save note</button>
-      <button class="mini" data-act="note-cancel">Cancel</button>
+      <button class="mini" data-act="note-save">${esc(t("note_save_btn"))}</button>
+      <button class="mini" data-act="note-cancel">${esc(t("note_cancel_btn"))}</button>
     </div>`;
   holder.querySelector("textarea").focus();
 }
@@ -2386,9 +3143,10 @@ async function removeMed(card){
    ================================================================= */
 async function runCabinetScan(){
   const box = $("#scan-results");
-  if (!cabinet || cabinet.length < 2){ box.innerHTML = `<div class="err">Add at least two medications to scan.</div>`; return; }
+  if (!cabinet || cabinet.length < 2){ box.innerHTML = `<div class="err">${esc(t("scan_min_two"))}</div>`; return; }
   const pairCount = cabinet.length*(cabinet.length-1)/2;
-  box.innerHTML = `<div class="status"><span class="spin"></span>Scanning ${cabinet.length} medications — ${pairCount} pair${pairCount>1?"s":""}…</div>`;
+  const pairWord = pairCount>1 ? t("scan_pairs_word_plural") : t("scan_pairs_word");
+  box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("scan_scanning_prefix"))} ${cabinet.length} ${esc(t("medications_word"))} — ${pairCount} ${esc(pairWord)}…</div>`;
 
   const drugs = [];
   for (const m of cabinet) drugs.push(await resolveForAnalysis(m.generic || m.brand || m.name));
@@ -2408,27 +3166,28 @@ function renderScanSummary(findings, mentions){
   let headline;
 
   if (totalFlags===0 && !mentions.length){
-    headline = "Nothing flagged across your cabinet — that isn't the same as safe.";
+    headline = t("scan_all_clear");
   } else {
     const parts = [];
-    if (counts.major)    { parts.push(`${counts.major} major`);    pills.push(`<span class="count-pill cpill-major">${counts.major} major</span>`); }
-    if (counts.moderate) { parts.push(`${counts.moderate} moderate`); pills.push(`<span class="count-pill cpill-mod">${counts.moderate} moderate</span>`); }
-    if (counts.minor)    { parts.push(`${counts.minor} minor`);     pills.push(`<span class="count-pill cpill-minor">${counts.minor} minor</span>`); }
-    headline = parts.length ? `${parts.join(", ")} to ask a pharmacist about.` : "No severity-rated interactions — a few FDA-label mentions worth a look.";
+    if (counts.major)    { parts.push(`${counts.major} ${t("scan_major_word")}`);    pills.push(`<span class="count-pill cpill-major">${counts.major} ${esc(t("scan_major_word"))}</span>`); }
+    if (counts.moderate) { parts.push(`${counts.moderate} ${t("scan_moderate_word")}`); pills.push(`<span class="count-pill cpill-mod">${counts.moderate} ${esc(t("scan_moderate_word"))}</span>`); }
+    if (counts.minor)    { parts.push(`${counts.minor} ${t("scan_minor_word")}`);     pills.push(`<span class="count-pill cpill-minor">${counts.minor} ${esc(t("scan_minor_word"))}</span>`); }
+    headline = parts.length ? `${parts.join(", ")} ${t("scan_to_ask")}` : t("scan_no_severity");
   }
-  if (mentions.length) pills.push(`<span class="count-pill cpill-note">${mentions.length} label mention${mentions.length>1?"s":""}</span>`);
+  if (mentions.length) pills.push(`<span class="count-pill cpill-note">${mentions.length} ${esc(mentions.length>1?t("scan_label_mentions"):t("scan_label_mention"))}</span>`);
 
   const flagCount = findings.length+mentions.length;
+  const flagText = flagCount ? `${flagCount} ${flagCount>1?t("scan_flags_word"):t("scan_flag_word")} ${t("scan_found_suffix")}` : t("scan_complete");
   return `<div class="scan-summary">
-    <span class="eyebrow">Cabinet scan · ${flagCount? flagCount+" flag"+(flagCount>1?"s":"")+" found" : "complete"}</span>
+    <span class="eyebrow">${esc(t("scan_summary_eyebrow"))} · ${esc(flagText)}</span>
     <div class="headline">${esc(headline)}</div>
     ${pills.length?`<div class="counts">${pills.join("")}</div>`:""}
-    <p class="status" style="padding:10px 0 0;">"Nothing found" means it wasn't in our curated set or FDA labels — not that the combination is safe. Always confirm with a pharmacist.</p>
+    <p class="status" style="padding:10px 0 0;">${esc(t("scan_disclaimer"))}</p>
   </div>`;
 }
 
 function renderCabinetMap(meds){
-  return `<p class="eyebrow" style="margin:20px 0 2px;">Your cabinet · ${meds.length} medications</p>
+  return `<p class="eyebrow" style="margin:20px 0 2px;">${esc(t("your_cabinet_eyebrow"))} · ${meds.length} ${esc(t("medications_word"))}</p>
     <div class="cabinet-map">
       ${meds.map(m=>`<span class="map-chip"><b>${esc(titlecase(m.generic||m.name))}</b>${m.drug_class?` · ${esc(m.drug_class)}`:""}</span>`).join("")}
     </div>`;
@@ -2441,33 +3200,34 @@ function renderScanMatrix(findings, mentions){
   const sorted = [...findings].sort((x,y)=>rank[x.rule.severity]-rank[y.rule.severity]);
   let html = "";
   if (sorted.length){
-    html += `<p class="eyebrow" style="margin:20px 0 2px;">Documented interactions · ${sorted.length}</p>`;
+    html += `<p class="eyebrow" style="margin:20px 0 2px;">${esc(t("documented_interactions"))} · ${sorted.length}</p>`;
     for (const f of sorted){
       const s=f.rule.severity;
+      const sevLabel = s==="major"?t("sev_major"):s==="moderate"?t("sev_moderate"):t("sev_minor");
       html += `<div class="verdict v-${s}">
         <div class="bar"></div>
         <div class="vbody">
           <div class="pair">${esc(f.A.display)} ✕ ${esc(f.B.display)}</div>
-          <div class="sev"><span class="pill">${s}</span> ${s==="major"?"Major interaction":s==="moderate"?"Moderate interaction":"Minor interaction"}</div>
-          <p>${esc(f.rule.what)}</p>
-          <p class="mgmt"><b>Why:</b> ${esc(f.rule.why)}</p>
-          <p class="mgmt"><b>What people usually do:</b> ${esc(f.rule.mgmt)}</p>
-          <div class="src">Source: curated from FDA prescribing information &amp; standard clinical references</div>
+          <div class="sev"><span class="pill">${s}</span> ${esc(sevLabel)}</div>
+          <p>${esc(pickLang(f.rule.what))}</p>
+          <p class="mgmt"><b>${esc(t("why_label"))}</b> ${esc(pickLang(f.rule.why))}</p>
+          <p class="mgmt"><b>${esc(t("mgmt_label"))}</b> ${esc(pickLang(f.rule.mgmt))}</p>
+          <div class="src">${t("src_curated_interaction")}</div>
         </div>
       </div>`;
     }
   }
   if (mentions.length){
-    html += `<p class="eyebrow" style="margin:18px 0 2px;">Also noted on FDA labels · ${mentions.length}</p>`;
+    html += `<p class="eyebrow" style="margin:18px 0 2px;">${esc(t("also_noted_fda"))} · ${mentions.length}</p>`;
     for (const m of mentions){
       html += `<div class="verdict v-note">
         <div class="bar"></div>
         <div class="vbody">
           <div class="pair">${esc(m.from)} → mentions → ${esc(m.to)}</div>
-          <div class="sev"><span class="pill">label</span> Named in the FDA label</div>
-          <p>${esc(m.from)}'s FDA label discusses ${esc(m.to)} in its drug‑interactions section. This isn't severity‑rated — it means the label flags something worth asking about.</p>
+          <div class="sev"><span class="pill">${esc(t("label_pill"))}</span> ${esc(t("named_in_label"))}</div>
+          <p>${esc(m.from)}${esc(t("mentions_text"))} ${esc(m.to)} ${esc(t("mentions_text2"))}</p>
           <p class="mgmt" style="font-style:italic;">"…${esc(m.snippet)}…"</p>
-          <div class="src">Source: openFDA drug label · drug interactions section</div>
+          <div class="src">${esc(t("src_fda_mention"))}</div>
         </div>
       </div>`;
     }
@@ -2482,23 +3242,25 @@ function renderPharmacistQuestions(findings, mentions){
   const rank = {major:0,moderate:1,minor:2};
   const sorted = [...findings].sort((x,y)=>rank[x.rule.severity]-rank[y.rule.severity]);
   const qs = [];
+  const sevWordFor = s => s==="major"?t("scan_major_word"):s==="moderate"?t("scan_moderate_word"):t("scan_minor_word");
 
   for (const f of sorted.slice(0,4)){
-    qs.push(`I take <b>${esc(f.A.display)}</b> and <b>${esc(f.B.display)}</b> together — my scan flagged a <b>${f.rule.severity}</b> interaction (${esc(f.rule.what.replace(/\.$/,"").toLowerCase())}). Is this something I should watch for or ask about?`);
+    const whatText = pickLang(f.rule.what).replace(/\.$/,"").toLowerCase();
+    qs.push(`${esc(t("ask_q_finding"))} <b>${esc(f.A.display)}</b> ${esc(t("ask_q_and"))} <b>${esc(f.B.display)}</b> ${esc(t("ask_q_together"))} <b>${esc(sevWordFor(f.rule.severity))}</b> ${esc(t("ask_q_interaction"))} (${esc(whatText)}). ${esc(t("ask_q_watch"))}`);
   }
   if (qs.length < 4){
     for (const m of mentions.slice(0, 4-qs.length)){
-      qs.push(`${esc(m.from)}'s FDA label specifically mentions ${esc(m.to)} in its interactions section — is that combination something I should be careful with?`);
+      qs.push(`${esc(m.from)}${esc(t("ask_q_mention"))} ${esc(m.to)} ${esc(t("ask_q_mention2"))}`);
     }
   }
   if (!qs.length){
-    qs.push(`I take these medications together and nothing was flagged — is there anything about this combination worth double-checking given my specific health history?`);
+    qs.push(esc(t("ask_q_none")));
   }
 
   return `<div class="askpharmacist">
-    <h3>What to ask your pharmacist</h3>
+    <h3>${esc(t("ask_pharmacist_title"))}</h3>
     <ol>${qs.map(q=>`<li>${q}</li>`).join("")}</ol>
-    <p class="status" style="padding:10px 0 0;">Generated only from what this scan actually found — not medical advice, and not a substitute for a real conversation.</p>
+    <p class="status" style="padding:10px 0 0;">${esc(t("ask_pharmacist_footer"))}</p>
   </div>`;
 }
 
@@ -2530,6 +3292,12 @@ $("#cabinet-body").addEventListener("keydown", e => {
 
 /* --- boot -------------------------------------------------------- */
 (async function initAccounts(){
+  // restore a saved language preference before anything else renders
+  try{
+    const storedLang = localStorage.getItem(LANG_KEY);
+    if (storedLang === "es") applyLang("es", {persist:false});
+  }catch(e){/* ignore — defaults to English */}
+
   // a ?share=<token> link takes over the whole page — no session, no
   // sign-in, nothing else in this function is relevant to that visitor
   if (await checkSharedCabinetView()) return;

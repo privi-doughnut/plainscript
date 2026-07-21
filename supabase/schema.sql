@@ -20,12 +20,15 @@
 -- The anon key is safe to publish: it only grants what these RLS policies
 -- allow, and every policy below is scoped to auth.uid().
 
--- 1. Per-user profile (settings like theme preference) --------------------
+-- 1. Per-user profile (settings like theme + language preference) ---------
 create table if not exists public.profiles (
   id         uuid primary key references auth.users(id) on delete cascade,
   theme      text default 'light',
+  lang       text default 'en',
   created_at timestamptz default now()
 );
+-- safe to re-run against an existing table that predates the `lang` column
+alter table public.profiles add column if not exists lang text default 'en';
 
 -- 2. A medication saved in a user's cabinet -------------------------------
 create table if not exists public.medications (
