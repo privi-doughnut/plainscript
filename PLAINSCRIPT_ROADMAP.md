@@ -55,12 +55,12 @@
 - ✅ **Pregnancy / breastfeeding label info** — factual label data (`pregnancy`, `nursing_mothers` fields), shown only when openFDA actually has it for that drug.
 - 🔬 **Symptom checker** — requested 2026-07-21; conflicts directly with the Non-goals below ("No diagnosis or symptom-checker"). Declined; built the Symptoms tab (red-flag checklist + OTC-category lookup) as the safer alternative instead — see Phase 3.5 note in `PROGRESS.md`.
 
-## Phase 5 — Breadth & reach ⬜
-- ⬜ **PWA** — installable, works offline for saved cabinet + curated set.
+## Phase 5 — Breadth & reach 🔨
+- ✅ **PWA** — installable (manifest + icons), a service worker caches the app shell for offline use, and My Cabinet falls back to a locally cached copy (read-only) when offline.
 - ⬜ **Multi-language plain English** — Spanish first (huge real-world value; plays to your language work).
-- ⬜ **Printable caregiver one-pager** — a clean sheet to hand a pharmacist or an elderly parent.
+- ✅ **Printable caregiver one-pager** — a "🖨️ Print / save as PDF" button in My Cabinet prints a clean, plain black-on-white sheet (name, notes, dosing info) with all the app chrome stripped out — scoped so it never affects printing from any other tab.
 - ⬜ **Share a read-only cabinet** via link/QR (for caregivers).
-- ⬜ **Voice input** — say the drug name (you live in voice-to-text; your users will too).
+- ✅ **Voice input** — a mic button next to Decode, Check, and My Cabinet's inputs (Web Speech API, feature-detected — silently absent in browsers that don't support it, like Firefox). Decode auto-searches on speech since it's read-only; My Cabinet just fills the field so you can review before saving.
 
 ## Phase 6 — Trust & launch polish ⬜
 - ⬜ **"Why I built this"** — in *your* voice, first person, not AI copy.

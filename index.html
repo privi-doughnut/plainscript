@@ -391,6 +391,39 @@
   .symptom-chip:hover{border-color:var(--accent);}
   .symptom-chip:focus-within{outline:2px solid var(--accent); outline-offset:2px;}
 
+  /* ---------- voice input (Phase 5) ---------- */
+  .mic-btn{
+    appearance:none; cursor:pointer; border:1px solid var(--line); background:var(--card);
+    color:var(--ink-faint); width:44px; height:44px; flex:none; border-radius:var(--radius); font-size:16px;
+  }
+  .mic-btn:hover{border-color:var(--accent); color:var(--accent-deep);}
+  .mic-btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .mic-btn.listening{border-color:var(--major-bar); color:var(--major-bar); animation:micpulse 1s ease-in-out infinite;}
+  @keyframes micpulse{ 50%{opacity:.4;} }
+  @media (prefers-reduced-motion:reduce){ .mic-btn.listening{animation:none;} }
+
+  /* ---------- printable cabinet (Phase 5) ---------- */
+  .print-only{display:none;}
+  @media print{
+    body.printing-cabinet .safetybar, body.printing-cabinet header .tabs,
+    body.printing-cabinet .themetoggle, body.printing-cabinet #acct,
+    body.printing-cabinet .lede, body.printing-cabinet .method, body.printing-cabinet footer,
+    body.printing-cabinet .cab-tools, body.printing-cabinet .field,
+    body.printing-cabinet .mc-rm, body.printing-cabinet #scan-results,
+    body.printing-cabinet #panel-decode, body.printing-cabinet #panel-check,
+    body.printing-cabinet #panel-symptoms
+    { display:none !important; }
+    body.printing-cabinet, body.printing-cabinet [data-theme]{ background:#fff !important; color:#000 !important; }
+    body.printing-cabinet .print-only{ display:block; }
+    body.printing-cabinet .print-only h2{ font-family:var(--serif); font-size:20px; margin:0 0 4px; }
+    body.printing-cabinet .print-only p{ margin:0 0 4px; font-size:13px; color:#333; }
+    body.printing-cabinet .print-disclaimer{ font-style:italic; margin-bottom:16px !important; }
+    body.printing-cabinet .card, body.printing-cabinet .medrow{
+      box-shadow:none !important; border:1px solid #999 !important; break-inside:avoid;
+    }
+    body.printing-cabinet a{ color:#000 !important; }
+  }
+
   footer{border-top:1px solid var(--line); padding:22px 0 40px; color:var(--ink-faint); font-size:12.5px; font-family:var(--mono);}
   footer a{color:var(--accent-deep);}
 
@@ -466,6 +499,11 @@
   <!-- ===================== PANEL 3: MY CABINET (Phase 2) ===================== -->
   <section class="panel" id="panel-cabinet" role="tabpanel" aria-labelledby="tab-cabinet" hidden>
     <p class="panel-intro">Save the medications you actually take — once — with your own notes, so you can decode them or re‑check interactions any time. Your list is private to your account.</p>
+    <div id="print-header" class="print-only">
+      <h2>Plainscript — medication list</h2>
+      <p id="print-date"></p>
+      <p class="print-disclaimer">Educational reference only — not medical advice. Not a substitute for your pharmacist's records.</p>
+    </div>
     <div id="cabinet-body"></div>
     <p class="status" id="cabinet-status" role="status"></p>
   </section>
@@ -1188,6 +1226,46 @@ function wireDidYouMean(box){
 /* =================================================================
    CHECK INTERACTIONS
    ================================================================= */
+/* ---- voice input (Phase 5) ----------------------------------------
+   Feature-detected: Firefox and some browsers don't support the Web
+   Speech API at all, so the mic button simply never appears there —
+   no broken UI, no dependency, nothing to configure. Chrome/Edge/Safari
+   (recent versions) support it natively. */
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+/* attaches a mic button right after `inputEl`. If `autoSubmit` is given,
+   it's called automatically once speech is recognized (fine for a
+   read-only action like Decode); if not, the field is just filled and
+   the user reviews before submitting themselves (used for My Cabinet,
+   where auto-submitting a mis-heard drug name would silently save it). */
+function addVoiceButton(inputEl, autoSubmit){
+  if (!SpeechRec) return;
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "mic-btn";
+  btn.title = "Speak instead of typing";
+  btn.setAttribute("aria-label", "Use voice input instead of typing");
+  btn.textContent = "🎤";
+  btn.addEventListener("click", () => {
+    if (btn.classList.contains("listening")) return; // already listening — ignore a second tap
+    const rec = new SpeechRec();
+    rec.lang = "en-US";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    btn.classList.add("listening");
+    btn.textContent = "●";
+    rec.onresult = (e) => {
+      const text = e.results[0][0].transcript;
+      inputEl.value = text;
+      if (autoSubmit) autoSubmit();
+    };
+    rec.onerror = () => {};
+    rec.onend = () => { btn.classList.remove("listening"); btn.textContent = "🎤"; };
+    try{ rec.start(); }catch(e){ btn.classList.remove("listening"); btn.textContent = "🎤"; }
+  });
+  inputEl.insertAdjacentElement("afterend", btn);
+}
+
 function drugRow(val=""){
   const div = document.createElement("div");
   div.className="drugrow";
@@ -1197,6 +1275,7 @@ function drugRow(val=""){
     if ($("#drug-list").children.length>2) div.remove();
     else div.querySelector("input").value="";
   });
+  addVoiceButton(div.querySelector("input")); // just fills the field — checking needs 2+ filled first
   return div;
 }
 
@@ -1425,6 +1504,7 @@ TABS.forEach(t => $("#tab-"+t).addEventListener("click", ()=>selectTab(t)));
 
 $("#decode-btn").addEventListener("click", decode);
 $("#decode-input").addEventListener("keydown", e=>{ if(e.key==="Enter") decode(); });
+addVoiceButton($("#decode-input"), decode); // auto-decodes on speech — read-only, no side effect
 
 $("#drug-list").append(drugRow(), drugRow());
 $("#add-drug").addEventListener("click",()=>$("#drug-list").append(drugRow()));
@@ -2006,7 +2086,10 @@ function renderCabinet(){
       <p>Add a medication above, or decode one in tab 01 and hit “Save to My Cabinet”.</p>
     </div>`;
   } else {
-    html += `<div class="results">${cabinet.map(medRowHTML).join("")}</div>`;
+    html += `<div class="results">${cabinet.map(medRowHTML).join("")}</div>
+    <div class="cab-tools">
+      <button class="ghost" data-act="print">🖨️ Print / save as PDF</button>
+    </div>`;
     if (cabinet.length >= 2){
       html += `<div class="cab-tools">
         <button class="go" data-act="scan">🔎 Scan my whole cabinet</button>
@@ -2017,7 +2100,19 @@ function renderCabinet(){
     html += `<p class="status" style="padding-top:14px;">Your cabinet is a personal reference list, not a medical record — keep your pharmacist's list as the source of truth.</p>`;
   }
   box.innerHTML = html;
+  addVoiceButton($("#cab-input")); // fills the field — user still reviews before saving
 }
+
+/* printable caregiver one-pager (Phase 5) — scopes print styling with a
+   body class instead of touching @page globally, so printing from any
+   other tab is completely unaffected. */
+function printCabinet(){
+  selectTab("cabinet");
+  $("#print-date").textContent = "Printed " + new Date().toLocaleDateString(undefined, {year:"numeric", month:"long", day:"numeric"});
+  document.body.classList.add("printing-cabinet");
+  window.print();
+}
+window.addEventListener("afterprint", () => document.body.classList.remove("printing-cabinet"));
 
 async function onAddMed(){
   const input = $("#cab-input");
@@ -2217,6 +2312,7 @@ $("#cabinet-body").addEventListener("click", e => {
   else if (act === "magic-send") onSendMagicLink(btn);
   else if (act === "add")     onAddMed();
   else if (act === "scan")    runCabinetScan();
+  else if (act === "print")   printCabinet();
   else if (card && act === "edit")        openNoteEditor(card);
   else if (card && act === "note-save")   saveNote(card);
   else if (card && act === "note-cancel") renderCabinet();
