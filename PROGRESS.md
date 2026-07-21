@@ -1,9 +1,11 @@
 # Plainscript — Progress & Status
 
-*Last updated: 2026-07-21 (after the "let's finish this app" build session)*
+*Last updated: 2026-07-21 (after the Spanish localization pass)*
 
-**Completion: ~74% of the full roadmap · Phases 0–5 are code-complete. Only Phase 6's remaining polish (analytics, CAC packaging) and Spanish mode are left, both deliberately deferred — see below.**
+**Completion: ~76% of the full roadmap · Phases 0–5 are fully code-complete, including Spanish. Only Phase 6's analytics + CAC packaging remain, both low-priority/deferred — see below.**
 **97 days to the Congressional App Challenge deadline (Oct 26, 2026).**
+
+**New: Spanish is live** — a 🌐 toggle in the header switches the entire UI, the full curated medical content (interactions, food/alcohol notes, allergy notes, drug-class explainers, symptom categories), and (once the Phase 1 Worker is configured) live FDA label text too. Built as a proper i18n framework, not a one-off — the next language Privi wants is "add a dictionary column," not a rebuild. See the build log below for what's covered.
 
 This file is the quick status view. `PLAINSCRIPT_ROADMAP.md` has the full phased plan and reasoning; `CLAUDE.md` has the architecture and safety rules.
 
@@ -29,21 +31,29 @@ This file is the quick status view. `PLAINSCRIPT_ROADMAP.md` has the full phased
 - [ ] The severity-pill and `.eyebrow` color changes from the accessibility pass — computed the contrast math but haven't visually confirmed them.
 - [ ] The printable cabinet one-pager — CSS print styling is notoriously browser-inconsistent; worth a real print-preview check.
 - [ ] The share-a-cabinet feature end to end, once the schema is re-run: create a link, open it in an incognito window, confirm it shows the right (and only the right) data, then revoke it and confirm the link stops working.
+- [ ] Click through the app in Spanish (🌐 toggle in the header) — I validated the dictionary programmatically (every key resolves in both languages, no missing translations) but haven't seen it render in a live browser this session.
 
 ---
 
 ## 2. Recommendations — what's left
 
 **Deliberately not built — explaining why rather than silently skipping:**
-- **Spanish plain-English mode.** The infrastructure for this would be easy (add a language parameter to the Phase 1 Worker's rephrase call), but a real Spanish mode needs the *entire* app translated — every button, disclaimer, FAQ answer, and safety message, reviewed for accurate medical Spanish — not just the FDA-text rephrasing pathway. Shipping a toggle that only translates some of the text would feel more broken than not having it at all. This deserves its own focused pass, not a rushed add-on.
 - **Light, privacy-respecting analytics.** Genuinely low priority — plenty of CAC/ISEF submissions ship with none at all. A simple Supabase page-view counter is the cheapest option if you want it later.
 - **CAC packaging** (demo video, written description, deploy checklist) — the video needs you regardless. I can draft a technical written description once you want one, but I don't know the exact official CAC submission form fields, so I didn't want to guess and hand you something that doesn't match what they actually ask for.
+- **A third language** — you mentioned wanting a couple more, each as its own pass. The framework is ready (add a language object to `I18N`, add `{lang}` fields to the 5 curated data arrays, add one more `LOCKED_SYSTEM` entry in `worker.js`) — just say which language and I'll do the same careful pass Spanish got.
 
 **Everything else on the original roadmap is now built.** See the build log below.
 
 ---
 
 ## 3. Everything already built (build log)
+
+### 2026-07-21 — Spanish localization ("take a full pass at spanish")
+- Built a real i18n framework: 230-key `I18N` dictionary (English + Spanish), `t()`/`pickLang()` lookup, `applyTranslations()` DOM-attribute pass, a 🌐 header toggle persisted via localStorage + a new `lang` profile column (same pattern as theme).
+- Translated every static UI string, every JS-rendered dynamic string, and all 5 curated medical data arrays (INTERACTIONS, FOOD_INTERACTIONS, CROSS_SENSITIVITY, DRUG_CLASS_EXPLAINERS, SYMPTOM_CATEGORIES) — real reviewed translations, not machine-translated on the fly.
+- `worker.js` now supports a `lang` parameter for translating live FDA text (still constrained to "use only the provided text," in either language); without the Worker configured, Spanish mode shows FDA text in English with a visible explanatory note rather than looking broken.
+- Found and fixed two latent bugs while doing this: two functions (`enhanceRows`, `loadProfile`) each had a local variable literally named `t` that would have silently shadowed the global translation function the moment either tried to call it.
+- Framework built so the next language (Privi wants a couple more, each its own pass) is "add a dictionary column," not a rebuild.
 
 ### 2026-07-21 — a full build session ("let's finish this app")
 Starting from ~43% complete (Phases 0–3 done, Phase 4 partial), this session:
