@@ -492,6 +492,7 @@
         <p><b>Drug facts</b> come from the U.S. FDA's <a href="https://open.fda.gov/apis/drug/label/" target="_blank" rel="noopener">openFDA drug label API</a> — the actual approved labeling for each medication (what it treats, how it works, side effects, brand/generic names, drug class).</p>
         <p><b>Name matching</b> uses the NIH/NLM <a href="https://lhncbc.nlm.nih.gov/RxNav/APIs/" target="_blank" rel="noopener">RxNorm API</a>, which standardizes drug names and tolerates typos.</p>
         <p><b>Interaction severity</b> comes from a hand‑curated set of well‑documented interactions, each reviewed against FDA prescribing information and standard clinical references.</p>
+        <p><b>Drug‑class explainers, food/alcohol interactions, and allergy cross‑sensitivity notes</b> are Plainscript's own curated content, held to the same standard as the interaction set above — never FDA text, always labeled as ours wherever they appear.</p>
       </div>
     </details>
     <details>
@@ -499,6 +500,17 @@
       <div class="content">
         <p>In January 2024 the U.S. National Library of Medicine shut down its free drug‑interaction API. There is no longer a free, comprehensive, severity‑rated interaction database — paid clinical databases (DrugBank, Micromedex) hold that data now.</p>
         <p>So this tool can confirm an interaction it knows about, but it can <b>never</b> prove that a combination is safe. A result of "nothing found" only means it wasn't in our curated set or the FDA labels we checked — not that the drugs are safe together. That's why you'll never see a green check here. Always confirm with a pharmacist.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Why do drug interactions happen at all? <span class="chev">›</span></summary>
+      <div class="content">
+        <p>Every "why" explanation on this site traces back to one of a handful of recurring mechanisms. Knowing them makes the individual explanations click instead of feeling like random trivia:</p>
+        <p><b>Liver-enzyme competition.</b> Your liver clears most drugs using a family of enzymes called CYP450. Some drugs block or overload a specific CYP enzyme, so anything else that relies on that same enzyme builds up in your blood instead of clearing normally — this is behind most of the "raises the level of" interactions here (statins + certain antibiotics, warfarin + certain antifungals).</p>
+        <p><b>Additive (stacking) effects.</b> Two drugs that do a similar thing to your body — sedate the central nervous system, thin the blood, raise serotonin — don't just add up mildly when combined; the combined effect is often much stronger than either alone. This is why opioids + benzodiazepines, or two serotonin-raising drugs together, are treated as serious.</p>
+        <p><b>Electrolyte and kidney-clearance shifts.</b> Some drug pairs both push the same electrolyte (like potassium) in the same direction, or one changes how fast the kidneys clear the other — small individually, but the combination can push a level too high or too low.</p>
+        <p><b>Absorption or protein-binding interference.</b> Occasionally one substance physically blocks another from being absorbed, or displaces it from the proteins that carry it through the bloodstream, changing how much active drug is actually available.</p>
+        <p>Every specific interaction listed on this site names which of these is actually happening in its own "Why" line — this section is just the connect-the-dots version.</p>
       </div>
     </details>
     <details>
@@ -729,6 +741,107 @@ const SYMPTOM_CATEGORIES = [
     note:"Reduce itching and inflammation on the skin." }
 ];
 
+/* ---- DRUG-CLASS EXPLAINERS (Phase 4) ------------------------------
+   Plain-English "what this class of drug actually is" — textbook-level,
+   the same standard of curation and review as INTERACTIONS above. This
+   is Plainscript's OWN content, not FDA text, so it's always labeled
+   that way wherever it's shown (never attributed to the FDA label). ---- */
+const DRUG_CLASS_EXPLAINERS = [
+  { match:["nonsteroidal anti-inflammatory"], name:"NSAIDs (nonsteroidal anti-inflammatory drugs)",
+    text:"NSAIDs treat pain, fever, and inflammation by blocking COX enzymes your body uses to make inflammatory chemicals. The same mechanism that helps also irritates the stomach lining and can affect kidney blood flow, especially with long-term or high-dose use." },
+  { match:["selective serotonin reuptake inhibitor"], name:"SSRIs (selective serotonin reuptake inhibitors)",
+    text:"SSRIs treat depression and anxiety by leaving more serotonin available in the brain's signaling gaps. They typically take several weeks to reach full effect, and stopping abruptly can cause withdrawal-like symptoms — tapering under a doctor's guidance is standard." },
+  { match:["serotonin and norepinephrine reuptake","snri"], name:"SNRIs",
+    text:"SNRIs work like SSRIs but also boost norepinephrine, another mood- and pain-related brain chemical — which is why some SNRIs are also used for certain chronic pain conditions." },
+  { match:["monoamine oxidase inhibitor"], name:"MAOIs",
+    text:"MAOIs block an enzyme that breaks down mood-related brain chemicals, raising their levels. That broad effect is why MAOIs interact seriously with many other medications — and with certain foods (see \"Food & drink to know about\" below, if any apply)." },
+  { match:["ace inhibitor","angiotensin converting enzyme"], name:"ACE inhibitors",
+    text:"ACE inhibitors lower blood pressure by blocking an enzyme that narrows blood vessels. A dry, persistent cough is a well-known side effect for some people, caused by the same enzyme pathway." },
+  { match:["angiotensin ii receptor","angiotensin receptor blocker"], name:"ARBs (angiotensin receptor blockers)",
+    text:"ARBs lower blood pressure in a similar way to ACE inhibitors, but by blocking the receptor those chemicals act on instead of the enzyme that makes them — which is why ARBs cause the dry cough far less often." },
+  { match:["hmg-coa reductase"], name:"Statins",
+    text:"Statins lower cholesterol by blocking a liver enzyme (HMG-CoA reductase) your body uses to make it. Muscle aches are the most talked-about side effect, and a few statins interact with drugs that compete for the same liver-clearance pathway." },
+  { match:["benzodiazepine"], name:"Benzodiazepines",
+    text:"Benzodiazepines calm the central nervous system by boosting a natural inhibitory brain chemical (GABA). That's why they treat anxiety and seizures, and also why combining them with other sedatives (opioids, alcohol) is dangerous — the effects stack." },
+  { match:["opioid"], name:"Opioids",
+    text:"Opioids relieve pain by activating receptors in the brain and spinal cord that also happen to control breathing rate — which is the source of their most serious risk, especially combined with other sedatives." },
+  { match:["proton pump inhibitor"], name:"Proton pump inhibitors (PPIs)",
+    text:"PPIs reduce stomach acid by shutting down the pump cells use to produce it — more completely and longer-lasting than older antacids, which is why they're often used for ongoing reflux rather than occasional heartburn." },
+  { match:["histamine-2","h2-receptor antagonist"], name:"H2 blockers",
+    text:"H2 blockers reduce stomach acid by blocking the histamine signal that tells acid-producing cells to turn on — a gentler, often faster-acting option than PPIs for many people." },
+  { match:["macrolide"], name:"Macrolide antibiotics",
+    text:"Macrolides stop bacteria from making proteins they need to survive. Several of them (like clarithromycin and erythromycin) also block a liver enzyme many other drugs rely on to clear from the body, which is why they're behind a number of drug interactions." },
+  { match:["quinolone"], name:"Fluoroquinolone antibiotics",
+    text:"Fluoroquinolones stop bacteria from copying their own DNA. The FDA has added warnings about tendon and nerve side effects, so these are generally reserved for infections other antibiotics can't handle." },
+  { match:["antihistamine"], name:"Antihistamines",
+    text:"Antihistamines block histamine, the chemical behind allergy symptoms like sneezing and itching. Older ones cross into the brain and cause drowsiness (which is also why they show up in OTC sleep aids); newer ones are designed not to." },
+  { match:["thiazide"], name:"Thiazide diuretics",
+    text:"Thiazides lower blood pressure by helping the kidneys release more salt and water. They can also shift potassium and other electrolyte levels, which is why blood tests are common while taking them." },
+  { match:["potassium-sparing"], name:"Potassium-sparing diuretics",
+    text:"These water pills help the body release fluid without losing potassium the way other diuretics do — useful, but it means combining one with something else that raises potassium can push levels too high." }
+];
+
+function findClassExplainer(klass){
+  if (!klass) return null;
+  const k = klass.toLowerCase();
+  return DRUG_CLASS_EXPLAINERS.find(e => e.match.some(m => k.includes(m))) || null;
+}
+
+/* ---- FOOD & ALCOHOL INTERACTIONS (Phase 4) ------------------------
+   Same curated-set standard as INTERACTIONS: well-documented, textbook
+   food/alcohol interactions, reviewed against standard clinical
+   references. Matched against a drug's own tokens, same as the
+   drug-drug engine, and shown wherever that specific drug is decoded. */
+const FOOD_INTERACTIONS = [
+  { drugs:["warfarin"], food:"Vitamin K-rich foods (leafy greens — kale, spinach, broccoli)", severity:"moderate",
+    what:"Sudden, large swings in how much vitamin K you eat can throw off how well warfarin thins your blood.",
+    why:"Vitamin K is what your body uses to make clotting factors — warfarin works by blocking that process, so big changes in vitamin K intake shift the balance either way.",
+    mgmt:"Doctors don't usually say \"avoid greens\" — the standard advice is to keep vitamin K intake roughly consistent week to week, not to cut it out." },
+  { drugs:STATINS, food:"Grapefruit and grapefruit juice", severity:"moderate",
+    what:"Grapefruit can raise blood levels of certain statins, increasing the risk of muscle-related side effects.",
+    why:"Grapefruit blocks the same liver enzyme (CYP3A4) that clears these statins, so the drug builds up.",
+    mgmt:"This mainly affects simvastatin, atorvastatin, and lovastatin — not all statins. Ask your pharmacist if yours is affected before assuming you need to avoid grapefruit." },
+  { drugs:MAOIS, food:"Aged, fermented, or cured foods high in tyramine (aged cheese, cured meats, tap beer, soy sauce)", severity:"major",
+    what:"Eating tyramine-rich foods while on an MAOI can spike blood pressure to dangerous levels — a \"hypertensive crisis.\"",
+    why:"MAOIs block the enzyme that normally breaks down tyramine, so it builds up and triggers a surge of norepinephrine.",
+    mgmt:"Anyone prescribed an MAOI is typically given a specific low-tyramine food list by their prescriber — this is one of the most well-established food-drug interactions in medicine, not a minor caution." },
+  { drugs:["metronidazole"], food:"Alcohol", severity:"major",
+    what:"Alcohol during (and for a while after) metronidazole can cause a severe reaction — flushing, nausea, vomiting, a racing heart.",
+    why:"Metronidazole blocks an enzyme the body needs to fully break down alcohol, so a toxic byproduct builds up (a disulfiram-like reaction).",
+    mgmt:"Standard guidance is to avoid alcohol during treatment and for at least 24–72 hours after the last dose." },
+  { drugs:OPIOIDS.concat(BENZOS), food:"Alcohol", severity:"major",
+    what:"Alcohol adds directly to the sedation and breathing-suppression risk of opioids and benzodiazepines.",
+    why:"All three depress the central nervous system through overlapping pathways, so the effects stack rather than just adding up mildly.",
+    mgmt:"This combination is a leading cause of preventable overdose deaths — it's treated as a hard no by prescribers, not a soft caution." },
+  { drugs:["acetaminophen"], food:"Alcohol (regular or heavy use)", severity:"moderate",
+    what:"Regular heavy alcohol use raises the risk of liver damage from acetaminophen, even at normal doses.",
+    why:"Both are processed by the liver, and chronic alcohol use changes how the liver metabolizes acetaminophen into a byproduct that's harder on liver cells.",
+    mgmt:"Occasional moderate drinking isn't the same risk as daily heavy use — ask a pharmacist if you drink regularly and take acetaminophen often." }
+];
+
+function foodInteractionsFor(tokens){
+  return FOOD_INTERACTIONS.filter(f => sideHit(tokens, f.drugs));
+}
+
+/* ---- ALLERGY & CROSS-SENSITIVITY NOTES (Phase 4) -------------------
+   Same curation standard again. These are well-established clinical
+   cautions, not personalized allergy advice — framed as "worth telling
+   your prescriber," never as a diagnosis of what you're allergic to. */
+const CROSS_SENSITIVITY = [
+  { drugs:["cephalexin","cefuroxime","cefdinir","cefixime","ceftriaxone"], allergyName:"Penicillin allergy",
+    note:"A small percentage of people with a penicillin allergy also react to cephalosporin antibiotics like this one (partial cross-reactivity) — true cross-reactivity is now understood to be lower than once thought, but it's worth telling your prescriber about any penicillin allergy before starting this." },
+  { drugs:["amoxicillin","ampicillin","penicillin"], allergyName:"Penicillin allergy",
+    note:"If you have a known penicillin allergy, this is directly in that family — tell your prescriber before taking it." },
+  { drugs:["sulfamethoxazole","trimethoprim"], allergyName:"Sulfa allergy",
+    note:"A \"sulfa allergy\" most reliably refers to sulfonamide antibiotics like this one. It doesn't reliably predict a reaction to other sulfur-containing drugs (like some diuretics) — a common mix-up worth clarifying with your prescriber rather than assuming." },
+  { drugs:NSAIDS, allergyName:"Aspirin/NSAID sensitivity",
+    note:"Some people with asthma or nasal polyps have a specific NSAID sensitivity (aspirin-exacerbated respiratory disease) that can trigger breathing symptoms — different from a typical allergy, and worth flagging to your prescriber if you have asthma." }
+];
+
+function crossSensitivityFor(tokens){
+  return CROSS_SENSITIVITY.filter(c => sideHit(tokens, c.drugs));
+}
+
 /* ---- helpers ----------------------------------------------------- */
 const $ = s => document.querySelector(s);
 const esc = s => (s||"").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -791,7 +904,9 @@ function parseLabel(rec){
     warnings: first(rec.warnings) || first(rec.warnings_and_cautions),
     precautions: first(rec.precautions),
     interactionsProse: first(rec.drug_interactions), // the label's own interactions text, for display
-    dosage: first(rec.dosage_and_administration)
+    dosage: first(rec.dosage_and_administration),
+    pregnancy: first(rec.pregnancy) || first(rec.pregnancy_or_breast_feeding) || first(rec.teratogenic_effects),
+    nursing: first(rec.nursing_mothers)
   };
 }
 
@@ -896,11 +1011,21 @@ async function decode(){
   if (d.klass) strip.push(`<span><b>class</b> ${esc(d.klass)}</span>`);
   if (d.rxcui) strip.push(`<span><b>rxcui</b> ${esc(d.rxcui)}</span>`);
 
+  // tokens for this drug, same shape the drug-drug engine uses — lets us
+  // check the food/alcohol and cross-sensitivity curated sets too
+  const tokens = baseTokens(name);
+  (d.substances||[]).forEach(s=>tokens.add(s));
+  if (d.generic) tokens.add(d.generic.toLowerCase());
+  const classExplainer = findClassExplainer(d.klass);
+  const foodHits = foodInteractionsFor(tokens);
+  const sensitivityHits = crossSensitivityFor(tokens);
+
   // Overview — the same core fields Plainscript has always shown
   const rows = [];
   rows.push(makeRow("What it's used for", d.indications, "FDA label · indications & usage"));
   rows.push(makeRow("How it works", d.moa, "FDA label · mechanism of action"));
-  rows.push(makeRow("Common side effects", d.adverse, "FDA label · adverse reactions"));
+  if (classExplainer) rows.push(makeRow(`About ${classExplainer.name}`, classExplainer.text, "Plainscript — curated drug-class explainer, not FDA text"));
+  rows.push(makeRow("Common side effects", d.adverse, "FDA label · adverse reactions — typically mild; see Warnings below for the serious ones to call a doctor about"));
   if (d.boxed) rows.push(makeRow("⚠ Boxed warning", d.boxed, "FDA label · boxed warning", true));
 
   // Full label details — everything else on the label, verbatim. This is
@@ -910,10 +1035,12 @@ async function decode(){
   fullRows.push(makeRow("Active ingredient(s)", d.activeIngredient, "FDA label · active ingredient"));
   fullRows.push(makeRow("Inactive ingredients", d.inactiveIngredient, "FDA label · inactive ingredient"));
   fullRows.push(makeRow("Who shouldn't take this", d.contraindications, "FDA label · contraindications"));
-  fullRows.push(makeRow("Warnings", d.warnings, "FDA label · warnings"));
+  fullRows.push(makeRow("Warnings — the serious ones to call a doctor about", d.warnings, "FDA label · warnings"));
   fullRows.push(makeRow("Precautions", d.precautions, "FDA label · precautions"));
   fullRows.push(makeRow("What it can interact with", d.interactionsProse, "FDA label · drug interactions"));
   fullRows.push(makeRow("Dosage & administration, as printed on the label", d.dosage, "FDA label · dosage and administration"));
+  fullRows.push(makeRow("Pregnancy", d.pregnancy, "FDA label · pregnancy"));
+  fullRows.push(makeRow("Breastfeeding / nursing", d.nursing, "FDA label · nursing mothers"));
   const hasFullRows = fullRows.some(Boolean);
 
   box.innerHTML = `
@@ -935,6 +1062,7 @@ async function decode(){
       </div>
       <div class="card-body">${fullRows.filter(Boolean).join("")}</div>
     </article>` : ""}
+    ${(foodHits.length || sensitivityHits.length) ? renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits) : ""}
     <p class="status" style="padding-top:4px;">This is reference information from the medication's FDA label — not a recommendation about whether to take it, and not dosing advice. Talk to a pharmacist or doctor about your situation.</p>
   `;
 
@@ -961,6 +1089,40 @@ function makeRow(label, text, src, warn){
     ${needExpand?`<button class="expand" data-target="${id}">Show full FDA text ▾</button><p id="${id}" data-role="full" hidden style="margin-top:8px;color:var(--ink-soft);">${esc(full)}</p>`:""}
     <div class="src">${esc(src)}</div>
   </div>`;
+}
+
+/* the food/alcohol and allergy cross-sensitivity card on a Decode result —
+   both curated sets (FOOD_INTERACTIONS, CROSS_SENSITIVITY), not FDA text,
+   always labeled as Plainscript's own reviewed content. */
+function renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits){
+  const rank = {major:0,moderate:1,minor:2};
+  const foodRows = [...foodHits].sort((a,b)=>rank[a.severity]-rank[b.severity]).map(f => `
+    <div class="verdict v-${f.severity}" style="margin-bottom:10px;">
+      <div class="bar"></div>
+      <div class="vbody">
+        <div class="pair">${esc(displayName)} ✕ ${esc(f.food)}</div>
+        <div class="sev"><span class="pill">${esc(f.severity)}</span> Food/drink interaction</div>
+        <p>${esc(f.what)}</p>
+        <p class="mgmt"><b>Why:</b> ${esc(f.why)}</p>
+        <p class="mgmt"><b>What people usually do:</b> ${esc(f.mgmt)}</p>
+        <div class="src">Source: Plainscript — curated food/alcohol interaction, reviewed against standard clinical references</div>
+      </div>
+    </div>`).join("");
+
+  const sensRows = sensitivityHits.map(s => `
+    <div class="row">
+      <span class="eyebrow">${esc(s.allergyName)}</span>
+      <p>${esc(s.note)}</p>
+      <div class="src">Source: Plainscript — curated allergy/cross-sensitivity note, not a diagnosis of your allergies</div>
+    </div>`).join("");
+
+  return `<article class="card">
+    <div class="card-head">
+      <span class="eyebrow">Food, drink &amp; allergy notes</span>
+      <div class="name" style="font-size:19px;">Worth telling your pharmacist about ${esc(displayName)}</div>
+    </div>
+    <div class="card-body">${foodRows}${sensRows}</div>
+  </article>`;
 }
 
 /* wire up expanders + (if enabled) plain-English rephrasing */
