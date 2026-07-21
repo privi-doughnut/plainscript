@@ -312,6 +312,43 @@
   .askpharmacist ol{margin:0; padding-left:20px; display:flex; flex-direction:column; gap:9px;}
   .askpharmacist li{font-size:14.5px; color:var(--ink);}
 
+  /* ---------- "did you mean" spelling chips (Phase 4) ---------- */
+  .chip-btn{
+    appearance:none; cursor:pointer; font-family:var(--mono); font-size:12px;
+    padding:5px 10px; margin:2px 4px 2px 0; border-radius:20px;
+    border:1px solid var(--line); background:var(--card); color:var(--accent-deep);
+  }
+  .chip-btn:hover{border-color:var(--accent); background:var(--accent-wash);}
+  .chip-btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* clickable variant of the (otherwise informational) cabinet-map chip,
+     used in the similar/related modal to jump straight to that drug */
+  button.map-chip{cursor:pointer; appearance:none;}
+  button.map-chip:hover{border-color:var(--accent); background:var(--accent-wash);}
+  button.map-chip:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* ---------- similar & related modal (Phase 4) ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(10,14,20,.55); backdrop-filter:blur(2px);
+    display:flex; align-items:center; justify-content:center; padding:24px; z-index:1000;
+  }
+  .modal-box{
+    background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+    width:100%; max-width:720px; max-height:85vh; overflow-y:auto; padding:22px 24px 26px;
+  }
+  .modal-head{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:14px;}
+  .modal-head h2{font-family:var(--serif); font-size:21px; font-weight:600; margin:0;}
+  .modal-tabs{display:flex; gap:4px; border-bottom:1px solid var(--line); margin-bottom:16px; flex-wrap:wrap;}
+  .mtab{
+    appearance:none; background:none; border:none; cursor:pointer; font-family:var(--sans);
+    font-size:13.5px; font-weight:600; color:var(--ink-faint); padding:9px 10px;
+    border-bottom:2px solid transparent; margin-bottom:-1px;
+  }
+  .mtab[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent);}
+  .mtab:hover{color:var(--ink-soft);}
+  .mtab:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  @media (max-width:560px){ .modal-box{padding:18px; max-height:90vh;} .modal-head h2{font-size:18px;} }
+
   footer{border-top:1px solid var(--line); padding:22px 0 40px; color:var(--ink-faint); font-size:12.5px; font-family:var(--mono);}
   footer a{color:var(--accent-deep);}
 
@@ -630,43 +667,68 @@ async function fetchLabel(name){
 function parseLabel(rec){
   const of = rec.openfda || {};
   const first = a => Array.isArray(a) && a.length ? a[0] : null;
-  const cls = first(of.pharm_class_epc) || first(of.pharm_class_moa) || first(of.pharm_class_cs) || null;
+  const clsRaw = first(of.pharm_class_epc) || first(of.pharm_class_moa) || first(of.pharm_class_cs) || null;
   return {
     brand: first(of.brand_name),
     generic: first(of.generic_name),
-    klass: cls ? cls.replace(/\s*\[.*?\]\s*/g,"").trim() : null,
+    klass: clsRaw ? clsRaw.replace(/\s*\[.*?\]\s*/g,"").trim() : null,
+    klassRaw: clsRaw, // unstripped — needed to re-query openFDA for same-class drugs
     rxcui: first(of.rxcui),
     substances: (of.substance_name||[]).map(s=>s.toLowerCase()),
     indications: first(rec.indications_and_usage),
     moa: first(rec.mechanism_of_action),
     adverse: first(rec.adverse_reactions),
-    interactionsText: (rec.drug_interactions||[]).join(" "),
-    boxed: first(rec.boxed_warning)
+    interactionsText: (rec.drug_interactions||[]).join(" "), // used for curated/label-mention matching
+    boxed: first(rec.boxed_warning),
+    // full-label-details fields (Phase 4): same sourcing rule as everything
+    // else here — shown verbatim from the label, never summarized into advice
+    activeIngredient: first(rec.active_ingredient),
+    inactiveIngredient: first(rec.inactive_ingredient),
+    contraindications: first(rec.contraindications),
+    warnings: first(rec.warnings) || first(rec.warnings_and_cautions),
+    precautions: first(rec.precautions),
+    interactionsProse: first(rec.drug_interactions), // the label's own interactions text, for display
+    dosage: first(rec.dosage_and_administration)
   };
 }
 
-/* find a label, rescuing typos via RxNorm before giving up.
-   Shared by Decode and My Cabinet so both resolve names the same way. */
+/* find a label, rescuing typos via RxNorm before giving up. Shared by
+   Decode and My Cabinet so both resolve names the same way.
+
+   Instead of silently committing to RxNorm's single best guess, this
+   collects up to 5 similarly-spelled candidate names and returns them
+   as `alternates` — the UI shows these as "did you mean" choices so a
+   misspelling doesn't just guess once and stop. */
 async function resolveLabel(name){
   let rec = await fetchLabel(name);
   let suggested = null;
+  let alternates = [];
   if (!rec){
     try{
-      const r = await fetch(`${RXNORM}/approximateTerm.json?term=${encodeURIComponent(name)}&maxEntries=1`);
+      const r = await fetch(`${RXNORM}/approximateTerm.json?term=${encodeURIComponent(name)}&maxEntries=8`);
       const j = await r.json();
-      const cand = j.approximateGroup && j.approximateGroup.candidate && j.approximateGroup.candidate[0];
-      if (cand && cand.rxcui){
-        const r2 = await fetch(`${RXNORM}/rxcui/${cand.rxcui}/property.json?propName=RxNorm%20Name`);
-        const j2 = await r2.json();
-        const s = j2.propConceptGroup && j2.propConceptGroup.propConcept && j2.propConceptGroup.propConcept[0].propValue;
-        if (s && s.toLowerCase() !== name.toLowerCase()){
-          rec = await fetchLabel(s.split(" ")[0]);
-          if (rec) suggested = s;
-        }
+      const cands = (j.approximateGroup && j.approximateGroup.candidate) || [];
+      const seenRxcui = new Set();
+      for (const c of cands){
+        if (!c.rxcui || seenRxcui.has(c.rxcui)) continue;
+        seenRxcui.add(c.rxcui);
+        try{
+          const r2 = await fetch(`${RXNORM}/rxcui/${c.rxcui}/property.json?propName=RxNorm%20Name`);
+          const j2 = await r2.json();
+          const s = j2.propConceptGroup && j2.propConceptGroup.propConcept && j2.propConceptGroup.propConcept[0].propValue;
+          if (s && s.toLowerCase() !== name.toLowerCase() && !alternates.some(a=>a.toLowerCase()===s.toLowerCase())){
+            alternates.push(s);
+          }
+        }catch(e){/* skip this candidate, try the next */}
+        if (alternates.length >= 5) break;
+      }
+      if (alternates.length){
+        suggested = alternates[0];
+        rec = await fetchLabel(alternates[0].split(" ")[0]);
       }
     }catch(e){/* typo rescue is best-effort */}
   }
-  return { rec, suggested };
+  return { rec, suggested, alternates };
 }
 
 /* trim long FDA prose to a readable excerpt */
@@ -707,14 +769,16 @@ async function decode(){
   if (!name){ box.innerHTML = `<div class="err">Type a medication name first.</div>`; return; }
   box.innerHTML = `<div class="status"><span class="spin"></span>Looking up “${esc(name)}” in the FDA label database…</div>`;
 
-  let rec, noteName = null;
-  try{ const rr = await resolveLabel(name); rec = rr.rec; noteName = rr.suggested; }
+  let rec, noteName = null, altNames = [];
+  try{ const rr = await resolveLabel(name); rec = rr.rec; noteName = rr.suggested; altNames = rr.alternates || []; }
   catch(e){ box.innerHTML = `<div class="err">${esc(e.message)}. Try again in a moment.</div>`; return; }
 
   if (!rec){
     box.innerHTML = `<div class="nofind"><span class="eyebrow">No match</span>
       <h3>Couldn't find “${esc(name)}”.</h3>
-      <p>Check the spelling, or try the other name form — if you searched a brand name, try the generic (or the other way around). Some compounded or very new products may not be in the FDA label database.</p></div>`;
+      <p>Check the spelling, or try the other name form — if you searched a brand name, try the generic (or the other way around). Some compounded or very new products may not be in the FDA label database.</p></div>
+      ${altNames.length ? didYouMeanHTML(altNames) : ""}`;
+    wireDidYouMean(box);
     return;
   }
 
@@ -729,27 +793,54 @@ async function decode(){
   if (d.klass) strip.push(`<span><b>class</b> ${esc(d.klass)}</span>`);
   if (d.rxcui) strip.push(`<span><b>rxcui</b> ${esc(d.rxcui)}</span>`);
 
+  // Overview — the same core fields Plainscript has always shown
   const rows = [];
   rows.push(makeRow("What it's used for", d.indications, "FDA label · indications & usage"));
   rows.push(makeRow("How it works", d.moa, "FDA label · mechanism of action"));
   rows.push(makeRow("Common side effects", d.adverse, "FDA label · adverse reactions"));
   if (d.boxed) rows.push(makeRow("⚠ Boxed warning", d.boxed, "FDA label · boxed warning", true));
 
+  // Full label details — everything else on the label, verbatim. This is
+  // reference text straight from the FDA label, same as the rows above —
+  // not a recommendation, not a calculated dose, just what the label says.
+  const fullRows = [];
+  fullRows.push(makeRow("Active ingredient(s)", d.activeIngredient, "FDA label · active ingredient"));
+  fullRows.push(makeRow("Inactive ingredients", d.inactiveIngredient, "FDA label · inactive ingredient"));
+  fullRows.push(makeRow("Who shouldn't take this", d.contraindications, "FDA label · contraindications"));
+  fullRows.push(makeRow("Warnings", d.warnings, "FDA label · warnings"));
+  fullRows.push(makeRow("Precautions", d.precautions, "FDA label · precautions"));
+  fullRows.push(makeRow("What it can interact with", d.interactionsProse, "FDA label · drug interactions"));
+  fullRows.push(makeRow("Dosage & administration, as printed on the label", d.dosage, "FDA label · dosage and administration"));
+  const hasFullRows = fullRows.some(Boolean);
+
   box.innerHTML = `
     ${noteName ? `<div class="status">Showing the closest match: <strong>${esc(titlecase(noteName))}</strong></div>`:""}
+    ${altNames.length>1 ? didYouMeanHTML(altNames.filter(n=>n.toLowerCase()!==noteName.toLowerCase())) : ""}
     <article class="card">
       <div class="card-head">
-        <span class="eyebrow">Medication</span>
+        <span class="eyebrow">Medication · overview</span>
         <div class="name">${esc(displayName)}</div>
         ${strip.length?`<div class="datastrip">${strip.join("")}</div>`:""}
       </div>
       <div class="card-body">${rows.filter(Boolean).join("")}</div>
     </article>
-    <p class="status" style="padding-top:4px;">This is reference information from the medication's FDA label — not a recommendation about whether to take it. Talk to a pharmacist or doctor about your situation.</p>
+    ${hasFullRows ? `
+    <article class="card">
+      <div class="card-head">
+        <span class="eyebrow">Full FDA label details</span>
+        <div class="name" style="font-size:19px;">Everything else on ${esc(displayName)}'s label</div>
+      </div>
+      <div class="card-body">${fullRows.filter(Boolean).join("")}</div>
+    </article>` : ""}
+    <p class="status" style="padding-top:4px;">This is reference information from the medication's FDA label — not a recommendation about whether to take it, and not dosing advice. Talk to a pharmacist or doctor about your situation.</p>
   `;
 
   // Phase 2: offer to save this med to the signed-in user's cabinet
   addCabinetSave(box, d, name);
+
+  // similar/related medications — same-class, other forms/strengths, and
+  // combination products that share this ingredient (Phase 4)
+  addSimilarButton(box, d, displayName);
 
   // optional: upgrade prose to plain English if proxy configured
   enhanceRows(box, d);
@@ -795,6 +886,19 @@ async function enhanceRows(box, d){
     const tag = document.createElement("div"); tag.className="pe-toggle"; tag.textContent="↻ rephrased in plain English from the FDA text";
     p.insertAdjacentElement("afterend", tag);
   }
+}
+
+/* "did you mean" — up to 5 similarly-spelled RxNorm candidates, shown as
+   clickable chips instead of silently guessing just one and stopping. */
+function didYouMeanHTML(names){
+  if (!names.length) return "";
+  return `<div class="status" style="padding:6px 0 14px;">Other close spellings:
+    ${names.map(n=>`<button class="chip-btn" data-name="${esc(n)}">${esc(titlecase(n))}</button>`).join(" ")}</div>`;
+}
+function wireDidYouMean(box){
+  box.querySelectorAll(".chip-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{ $("#decode-input").value = btn.dataset.name; decode(); });
+  });
 }
 
 /* =================================================================
@@ -1265,6 +1369,148 @@ function addCabinetSave(box, d, typed){
     });
   }
   head.appendChild(btn);
+}
+
+/* =================================================================
+   SIMILAR & RELATED MEDICATIONS (Phase 4)
+   Three FDA/RxNorm-sourced views on a decoded drug, opened from a button
+   on the overview card:
+   - Same drug class   — other drugs sharing this drug's openFDA
+                          pharm_class (real FDA pharmacologic classification).
+   - Other forms & strengths — other branded/generic products with the
+                          SAME active ingredient (e.g. Tylenol Extra Strength).
+   - In combination products — products where this ingredient shows up
+                          alongside OTHER actives (e.g. cold medicines) —
+                          directly useful for spotting accidental double-dosing.
+   Nothing here is invented: every list comes straight from an openFDA
+   query, same sourcing rule as the rest of the app.
+   ================================================================= */
+function addSimilarButton(box, d, displayName){
+  const head = box.querySelector(".card-head");
+  if (!head) return;
+  const btn = document.createElement("button");
+  btn.className = "mini";
+  btn.style.marginTop = "12px";
+  btn.style.marginLeft = "8px";
+  btn.textContent = "🔎 Similar & related meds";
+  btn.addEventListener("click", ()=> openSimilarModal(d, displayName));
+  head.appendChild(btn);
+}
+
+/* one openFDA query on substance_name serves both "other forms" and
+   "combination products" — partitioned client-side by how many active
+   ingredients each result actually has. */
+async function fetchSimilarAndRelated(d){
+  const out = { sameClass: [], otherForms: [], combos: [] };
+
+  if (d.klassRaw){
+    try{
+      const res = await fetch(`${FDA}?search=openfda.pharm_class_epc:"${encodeURIComponent(d.klassRaw)}"&limit=10`);
+      if (res.ok){
+        const data = await res.json();
+        const seen = new Set();
+        for (const rec of (data.results||[])){
+          const p = parseLabel(rec);
+          const label = titlecase(p.brand || p.generic || "");
+          const key = (p.generic || label).toLowerCase();
+          if (!label || !key || key === (d.generic||"").toLowerCase() || seen.has(key)) continue;
+          seen.add(key);
+          out.sameClass.push({ name:label, generic:p.generic });
+          if (out.sameClass.length >= 8) break;
+        }
+      }
+    }catch(e){/* best-effort */}
+  }
+
+  const primarySubstance = (d.substances && d.substances[0]) || (d.generic||"").toLowerCase();
+  if (primarySubstance){
+    try{
+      const res = await fetch(`${FDA}?search=openfda.substance_name:"${encodeURIComponent(primarySubstance)}"&limit=25`);
+      if (res.ok){
+        const data = await res.json();
+        const seen = new Set();
+        for (const rec of (data.results||[])){
+          const p = parseLabel(rec);
+          const label = titlecase(p.brand || p.generic || "");
+          const key = label.toLowerCase();
+          if (!label || seen.has(key)) continue;
+          if (key === (d.brand||"").toLowerCase() || key === (d.generic||"").toLowerCase()) continue;
+          seen.add(key);
+          const entry = { name:label, substances:p.substances||[] };
+          if ((p.substances||[]).length > 1) out.combos.push(entry);
+          else out.otherForms.push(entry);
+        }
+        out.otherForms = out.otherForms.slice(0,10);
+        out.combos = out.combos.slice(0,10);
+      }
+    }catch(e){/* best-effort */}
+  }
+  return out;
+}
+
+function similarPaneHTML(items, kind, emptyMsg){
+  if (!items.length) return `<p class="status" style="padding:8px 0;">${esc(emptyMsg)}</p>`;
+  const chips = items.map(it=>{
+    const sub = kind==="combos"
+      ? ` · contains ${esc((it.substances||[]).map(titlecase).join(" + "))}`
+      : (kind==="class" && it.generic ? ` · ${esc(titlecase(it.generic))}` : "");
+    return `<button class="map-chip" data-name="${esc(it.name)}"><b>${esc(it.name)}</b>${sub}</button>`;
+  }).join("");
+  const note = kind==="combos"
+    ? `<p class="status" style="padding-top:10px;">These contain the same active ingredient — check you're not accidentally doubling up if you take more than one alongside this.</p>`
+    : "";
+  return `<div class="cabinet-map">${chips}</div>${note}`;
+}
+
+async function openSimilarModal(d, displayName){
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-label="Similar and related medications">
+    <div class="modal-head">
+      <h2>${esc(displayName)} — similar &amp; related</h2>
+      <button class="mini" data-act="close">Close ✕</button>
+    </div>
+    <div class="modal-tabs" role="tablist">
+      <button class="mtab" data-tab="class" aria-selected="true">Same drug class</button>
+      <button class="mtab" data-tab="forms" aria-selected="false">Other forms &amp; strengths</button>
+      <button class="mtab" data-tab="combos" aria-selected="false">In combination products</button>
+    </div>
+    <div class="modal-body"><div class="status"><span class="spin"></span>Looking up related medications on openFDA…</div></div>
+  </div>`;
+  document.body.appendChild(overlay);
+
+  const close = () => overlay.remove();
+  overlay.addEventListener("click", e => { if (e.target === overlay) close(); });
+  overlay.querySelector('[data-act="close"]').addEventListener("click", close);
+  document.addEventListener("keydown", function onEsc(e){
+    if (e.key === "Escape"){ close(); document.removeEventListener("keydown", onEsc); }
+  });
+
+  const data = await fetchSimilarAndRelated(d);
+  const panes = {
+    class: similarPaneHTML(data.sameClass, "class", "No other drugs in this same FDA pharmacologic class turned up — many OTC products don't carry structured drug-class data in openFDA."),
+    forms: similarPaneHTML(data.otherForms, "forms", "No other forms or strengths of this ingredient turned up in openFDA."),
+    combos: similarPaneHTML(data.combos, "combos", "This ingredient wasn't found in any combination product in openFDA's database.")
+  };
+  const body = overlay.querySelector(".modal-body");
+  function renderPane(tab){
+    body.innerHTML = panes[tab];
+    body.querySelectorAll("button.map-chip").forEach(chip=>{
+      chip.addEventListener("click", ()=>{
+        close();
+        selectTab("decode");
+        $("#decode-input").value = chip.dataset.name;
+        decode();
+      });
+    });
+  }
+  renderPane("class");
+  overlay.querySelectorAll(".mtab").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      overlay.querySelectorAll(".mtab").forEach(b=>b.setAttribute("aria-selected", String(b===btn)));
+      renderPane(btn.dataset.tab);
+    });
+  });
 }
 
 /* --- the cabinet panel ------------------------------------------- */

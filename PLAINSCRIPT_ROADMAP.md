@@ -42,14 +42,18 @@
 - ✅ **Cabinet map** — every saved med in one scannable chip row (name + drug class).
 - ✅ **"What to ask your pharmacist" generator** — up to 4 questions, worst severity first, built only from what the scan actually found — never advice about what to do.
 
-## Phase 4 — Depth & teaching ⬜
+## Phase 4 — Depth & teaching 🔨
 *Own the "why," which is where you obliterate content-farm pages.*
+- ✅ **Full FDA label details** — the Decode overview card now has a second card below it: active/inactive ingredients, who shouldn't take it (contraindications), warnings, precautions, what it interacts with (the label's own prose), and dosage & administration exactly as printed on the label. Same sourcing rule as everything else — verbatim FDA text, never a calculated dose or personalized recommendation.
+- ✅ **Similar & related medications** — a "🔎 Similar & related meds" button on the Decode card opens a popup with 3 tabs, all openFDA-sourced: **same drug class** (shares an FDA pharm_class), **other forms & strengths** (same active ingredient, different brand/strength — e.g. Tylenol Extra Strength), and **in combination products** (other products that contain this ingredient alongside others — flags accidental double-dosing risk, e.g. acetaminophen hiding in a cold medicine).
+- ✅ **"Did you mean" spelling suggestions** — a misspelled search now shows up to 5 similarly-spelled RxNorm matches as clickable chips instead of silently guessing one and stopping.
 - ⬜ **Mechanism explainers** — *why* an interaction happens, in plain English (the CYP450 story, told like a human).
-- ⬜ **Drug-class explainers** — "what statins/ACE inhibitors/SSRIs even are."
+- ⬜ **Drug-class explainers (narrative)** — "what statins/ACE inhibitors/SSRIs even are," in prose (the same-class *list* above is data, not an explainer).
 - ⬜ **Food & alcohol interactions** — surfaced from FDA labels.
 - ⬜ **Allergy / cross-sensitivity flags** — e.g. penicillin-class awareness.
 - ⬜ **Side effects sorted** — "common and mild" vs "call your doctor."
 - ⬜ **Pregnancy / breastfeeding label info** — factual label data, carefully framed as label info, not advice.
+- 🔬 **Symptom checker** — requested 2026-07-21; conflicts directly with the Non-goals below ("No diagnosis or symptom-checker"). Paused pending Privi's call — see CLAUDE.md's golden rules note and the conversation for the safer-alternative options discussed.
 
 ## Phase 5 — Breadth & reach ⬜
 - ⬜ **PWA** — installable, works offline for saved cabinet + curated set.
