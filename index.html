@@ -22,7 +22,7 @@
     --card:#FFFFFF;
     --ink:#16202E;
     --ink-soft:#4A5A6E;
-    --ink-faint:#8194A6;
+    --ink-faint:#546678; /* darkened from #8194A6 — that was 2.88:1 on --paper, failing WCAG AA for text */
     --line:#DCE3EA;
     --line-soft:#E9EEF2;
     --accent:#0F766E;
@@ -34,7 +34,7 @@
     --mod-bg:#FCF1E6;   --mod-bar:#D17A12;   --mod-ink:#8F4E08;
     --minor-bg:#FBF6E6; --minor-bar:#B5920A; --minor-ink:#6F5905;
     /* neutral states — label mentions and "nothing found" */
-    --note-bg:#EDF1F5;  --note-bar:#69788A;  --note-ink:#3A4759;
+    --note-bg:#EDF1F5;  --note-bar:#54606E;  --note-ink:#3A4759; /* note-bar darkened from #69788A for safe contrast with white pill text */
 
     --radius:10px;
     --shadow:0 1px 2px rgba(22,32,46,.04), 0 8px 24px rgba(22,32,46,.06);
@@ -51,7 +51,7 @@
     --card:#171E27;
     --ink:#E4EAF1;
     --ink-soft:#9DAABA;
-    --ink-faint:#6B7A8B;
+    --ink-faint:#8693A2; /* lightened from #6B7A8B — that was 4.21:1 on dark --paper, failing WCAG AA for text */
     --line:#273039;
     --line-soft:#1D242D;
     --accent:#35C4B8;
@@ -154,15 +154,20 @@
     background:transparent; color:var(--accent-deep);
   }
   button.ghost:hover{border-color:var(--accent); background:var(--accent-wash);}
+  button.ghost:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
 
   .druglist{display:flex; flex-direction:column; gap:9px; margin:0 0 12px;}
   .drugrow{display:flex; gap:9px; align-items:center;}
-  .drugrow .rm{
+  /* .rm is reused for both the pairwise Check-tab row AND the My Cabinet
+     med-card remove button — was scoped to .drugrow .rm only, so the
+     cabinet one was rendering with zero styling. Un-scoped it. */
+  .rm{
     appearance:none; border:1px solid var(--line); background:var(--card); cursor:pointer;
     width:44px; height:44px; flex:none; border-radius:var(--radius); color:var(--ink-faint);
     font-size:18px; line-height:1;
   }
-  .drugrow .rm:hover{color:var(--major-bar); border-color:var(--major-bar);}
+  .rm:hover{color:var(--major-bar); border-color:var(--major-bar);}
+  .rm:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
   .checkbar{display:flex; gap:9px; align-items:center; flex-wrap:wrap; margin-top:4px;}
 
   /* ---------- result: monograph card (the signature) ---------- */
@@ -192,6 +197,7 @@
     font-family:var(--mono); font-size:11.5px; color:var(--accent-deep); letter-spacing:.03em;
   }
   .expand:hover{text-decoration:underline;}
+  .expand:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
   .pe-toggle{display:inline-flex; gap:6px; align-items:center; margin-top:8px; font-size:12.5px; color:var(--ink-faint); font-family:var(--mono);}
 
   /* ---------- interaction verdict ---------- */
@@ -205,10 +211,19 @@
   .verdict .mgmt{margin-top:8px; font-size:13.5px; color:var(--ink-soft);}
   .verdict .src{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:9px;}
 
+  /* pill text colors are picked per severity to actually hit 4.5:1 against
+     that pill's own background — white doesn't work for every bar color
+     (verified: moderate/minor bars only clear ~3:1 with white, which fails
+     WCAG AA for text this small; dark ink clears 5:1+ on those two). */
   .v-major{background:var(--major-bg);} .v-major .bar{background:var(--major-bar);} .v-major .pill{background:var(--major-bar); color:#fff;} .v-major .sev{color:var(--major-ink);}
-  .v-moderate{background:var(--mod-bg);} .v-moderate .bar{background:var(--mod-bar);} .v-moderate .pill{background:var(--mod-bar); color:#fff;} .v-moderate .sev{color:var(--mod-ink);}
-  .v-minor{background:var(--minor-bg);} .v-minor .bar{background:var(--minor-bar);} .v-minor .pill{background:var(--minor-bar); color:#fff;} .v-minor .sev{color:var(--minor-ink);}
+  .v-moderate{background:var(--mod-bg);} .v-moderate .bar{background:var(--mod-bar);} .v-moderate .pill{background:var(--mod-bar); color:var(--ink);} .v-moderate .sev{color:var(--mod-ink);}
+  .v-minor{background:var(--minor-bg);} .v-minor .bar{background:var(--minor-bar);} .v-minor .pill{background:var(--minor-bar); color:var(--ink);} .v-minor .sev{color:var(--minor-ink);}
   .v-note{background:var(--note-bg);} .v-note .bar{background:var(--note-bar);} .v-note .pill{background:var(--note-bar); color:#fff;} .v-note .sev{color:var(--note-ink); font-size:16px;}
+
+  /* dark theme's severity bars are brighter/more saturated than light
+     theme's, so white pill text fails contrast across the board there —
+     verified all four need dark text in dark mode specifically. */
+  [data-theme="dark"] .sev .pill{color:var(--safety-bg);}
 
   /* the cautious "nothing found" state — deliberately NOT green */
   .nofind{
@@ -1826,11 +1841,11 @@ async function openSimilarModal(d, displayName){
       <button class="mini" data-act="close">Close ✕</button>
     </div>
     <div class="modal-tabs" role="tablist">
-      <button class="mtab" data-tab="class" aria-selected="true">Same drug class</button>
-      <button class="mtab" data-tab="forms" aria-selected="false">Other forms &amp; strengths</button>
-      <button class="mtab" data-tab="combos" aria-selected="false">In combination products</button>
+      <button class="mtab" role="tab" data-tab="class" aria-selected="true">Same drug class</button>
+      <button class="mtab" role="tab" data-tab="forms" aria-selected="false">Other forms &amp; strengths</button>
+      <button class="mtab" role="tab" data-tab="combos" aria-selected="false">In combination products</button>
     </div>
-    <div class="modal-body"><div class="status"><span class="spin"></span>Looking up related medications on openFDA…</div></div>
+    <div class="modal-body" aria-live="polite"><div class="status"><span class="spin"></span>Looking up related medications on openFDA…</div></div>
   </div>`;
   document.body.appendChild(overlay);
 
