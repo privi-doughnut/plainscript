@@ -33,14 +33,14 @@
 - ✅ Per-med personal notes ("morning, with food").
 - ✅ Theme persists — localStorage for everyone, plus the Supabase profile when signed in, so dark mode follows you across devices.
 - ✅ Row-level security so a user only ever sees their own cabinet (`supabase/schema.sql`).
-- ✅ Bonus: one-tap **"check my whole cabinet for interactions"** pours the saved list into the checker — the seed of Phase 3's Cabinet Scan.
+- ✅ ~~Bonus: one-tap "check my whole cabinet for interactions" pours the saved list into the checker~~ — superseded by the real Phase 3 view below.
 
-## Phase 3 — 🚩 Cabinet Scan (the flagship) ⬜
+## Phase 3 — 🚩 Cabinet Scan (the flagship) ✅ *(code complete — same engine as Phase 0's Check tab, just run across the whole cabinet)*
 *This is the feature Google structurally cannot do. Build this before any breadth.*
-- ⬜ **Whole-cabinet interaction matrix** — one tap scans every drug against every other drug (N×N), not just a pair.
-- ⬜ **Readable severity summary** — "1 major, 2 moderate to ask about" at the top, details below.
-- ⬜ **Cabinet map** — every med decoded in one clean, scannable view.
-- ⬜ **"What to ask your pharmacist" generator** — turns the findings into 3–4 specific questions to bring to a real professional (grounded in the findings; never advice).
+- ✅ **Whole-cabinet interaction matrix** — one tap scans every drug against every other drug (N×N), not just a pair. The "Scan my whole cabinet" button in My Cabinet reuses the exact curated + FDA-label engine, just applied to every pair instead of one.
+- ✅ **Readable severity summary** — "2 major, 1 moderate to ask a pharmacist about" at the top; an all-clear scan still says "that isn't the same as safe," never green.
+- ✅ **Cabinet map** — every saved med in one scannable chip row (name + drug class).
+- ✅ **"What to ask your pharmacist" generator** — up to 4 questions, worst severity first, built only from what the scan actually found — never advice about what to do.
 
 ## Phase 4 — Depth & teaching ⬜
 *Own the "why," which is where you obliterate content-farm pages.*

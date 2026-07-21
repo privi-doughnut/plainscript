@@ -72,8 +72,9 @@ Sober, clinical, trustworthy — credibility beats flair here. Cool clinical pap
 
 ## Current state
 - ✅ **Phase 0 shipped:** Decode, hybrid interaction check (curated + FDA-label), persistent safety frame, methodology section, dark theme, mobile/accessible.
-- ✅ **Phase 2 built (code complete):** Supabase accounts + My Cabinet — OAuth sign-in (GitHub/Google), saved meds with FDA-resolved identifiers, per-med notes, theme sync to profile, all RLS-scoped. Implemented dependency-free (direct `fetch` to Supabase's auth/REST APIs — no supabase-js). Dormant until the Supabase URL + anon key land in `config.js`; one-time dashboard steps are at the top of `supabase/schema.sql`.
-- **Next:** Phase 1 (plain-English via Worker — hook already wired), then the flagship **Phase 3: Cabinet Scan** (whole-cabinet N×N interaction matrix + "what to ask your pharmacist" generator). A one-tap "check my whole cabinet" bridge into the existing checker already exists as the seed.
+- ✅ **Phase 2 built (code complete):** Supabase accounts + My Cabinet — OAuth sign-in (GitHub/Google), saved meds with FDA-resolved identifiers, per-med notes, theme sync to profile, all RLS-scoped. Implemented dependency-free (direct `fetch` to Supabase's auth/REST APIs — no supabase-js). `config.js` already has the real project URL + anon key; still needs the one-time dashboard steps at the top of `supabase/schema.sql` (run the schema, enable an OAuth provider, allow-list redirect URLs) before sign-in actually works.
+- ✅ **Phase 3 built (code complete):** the flagship Cabinet Scan — "Scan my whole cabinet" in My Cabinet runs the same curated + FDA-label engine as the Check tab across every saved med (N×N), then shows a severity summary, a cabinet map, and a grounded "what to ask your pharmacist" generator. Replaces the old one-tap bridge into the pairwise Check tab.
+- **Next:** Phase 1 (plain-English via Worker — hook already wired, needs a deployed Worker URL in `config.js`). Everything through Phase 3 — the CAC-worthy core — is now code complete.
 - Full plan and sequencing in `PLAINSCRIPT_ROADMAP.md`.
 
 ## Non-goals (do NOT build)

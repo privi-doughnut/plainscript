@@ -1,0 +1,11 @@
+# Only index.html + config.js need to be served publicly by the static
+# assets deploy (Cloudflare Workers/Pages). Everything else here is either
+# dev docs or the separate Claude-proxy Worker's source, not the site itself.
+CLAUDE.md
+PLAINSCRIPT_ROADMAP.md
+README.md
+worker.js
+wrangler.jsonc
+supabase/
+.gitignore
+.assetsignore

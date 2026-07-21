@@ -287,6 +287,31 @@
   .notebtns{display:flex; gap:8px; margin-top:8px;}
   .cab-tools{display:flex; gap:9px; flex-wrap:wrap; align-items:center; margin-top:18px;}
 
+  /* ---------- Cabinet Scan (Phase 3) ---------- */
+  .scan-summary{
+    border-radius:var(--radius); border:1px solid var(--line); box-shadow:var(--shadow);
+    padding:16px 18px; margin:18px 0; background:var(--card);
+  }
+  .scan-summary .headline{font-family:var(--serif); font-size:20px; font-weight:600; margin:2px 0 0;}
+  .scan-summary .counts{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .scan-summary .count-pill{font-family:var(--mono); font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:20px;}
+  .cpill-major{background:var(--major-bg); color:var(--major-ink); border:1px solid var(--major-bar);}
+  .cpill-mod{background:var(--mod-bg); color:var(--mod-ink); border:1px solid var(--mod-bar);}
+  .cpill-minor{background:var(--minor-bg); color:var(--minor-ink); border:1px solid var(--minor-bar);}
+  .cpill-note{background:var(--note-bg); color:var(--note-ink); border:1px solid var(--note-bar);}
+
+  .cabinet-map{display:flex; flex-wrap:wrap; gap:8px; margin:16px 0;}
+  .map-chip{font-family:var(--mono); font-size:12.5px; padding:6px 11px; border-radius:20px; border:1px solid var(--line); background:var(--paper); color:var(--ink-soft);}
+  .map-chip b{color:var(--ink); font-weight:600;}
+
+  .askpharmacist{
+    border-radius:var(--radius); border:1px dashed var(--accent-deep); background:var(--accent-wash);
+    padding:16px 18px; margin:18px 0;
+  }
+  .askpharmacist h3{font-family:var(--serif); font-size:17px; font-weight:600; margin:2px 0 10px; color:var(--accent-deep);}
+  .askpharmacist ol{margin:0; padding-left:20px; display:flex; flex-direction:column; gap:9px;}
+  .askpharmacist li{font-size:14.5px; color:var(--ink);}
+
   footer{border-top:1px solid var(--line); padding:22px 0 40px; color:var(--ink-faint); font-size:12.5px; font-family:var(--mono);}
   footer a{color:var(--accent-deep);}
 
@@ -787,31 +812,26 @@ function drugRow(val=""){
   return div;
 }
 
-async function checkInteractions(){
-  const inputs = [...$("#drug-list").querySelectorAll("input")].map(i=>i.value.trim()).filter(Boolean);
-  const box = $("#check-results");
-  if (inputs.length < 2){ box.innerHTML = `<div class="err">Enter at least two medications to compare.</div>`; return; }
-  box.innerHTML = `<div class="status"><span class="spin"></span>Checking ${inputs.length} medications against the curated set and their FDA labels…</div>`;
+/* resolve one name into curated-matching tokens + its FDA label. Shared by
+   the pairwise Check tab and the whole-cabinet Scan (Phase 3) so both run
+   the exact same resolution. */
+async function resolveForAnalysis(name){
+  const tokens = baseTokens(name);
+  let label = null;
+  try{ const rec = await fetchLabel(name); if (rec){ label = parseLabel(rec); (label.substances||[]).forEach(s=>tokens.add(s)); if(label.generic) tokens.add(label.generic.toLowerCase()); } }
+  catch(e){ /* label optional */ }
+  return { name, display:titlecase(name), tokens, label };
+}
 
-  // resolve each drug: tokens for curated matching + label for FDA-mention layer
-  const drugs = [];
-  for (const name of inputs){
-    const tokens = baseTokens(name);
-    let label = null;
-    try{ const rec = await fetchLabel(name); if (rec){ label = parseLabel(rec); (label.substances||[]).forEach(s=>tokens.add(s)); if(label.generic) tokens.add(label.generic.toLowerCase()); } }
-    catch(e){ /* label optional */ }
-    drugs.push({ name, display:titlecase(name), tokens, label });
-  }
-
+/* run every unique pair of resolved drugs through the curated set, then the
+   FDA-label mention layer. Shared by the Check tab and Cabinet Scan. */
+function analyzeDrugPairs(drugs){
   const findings = [];   // curated severity hits
   const mentions = [];   // FDA-label cross-references
-
-  // all unique pairs
   for (let i=0;i<drugs.length;i++){
     for (let j=i+1;j<drugs.length;j++){
       const A=drugs[i], B=drugs[j];
 
-      // layer 1: curated
       let matched=false;
       for (const rule of INTERACTIONS){
         const ab = sideHit(A.tokens,rule.a) && sideHit(B.tokens,rule.b);
@@ -820,12 +840,23 @@ async function checkInteractions(){
       }
       if (matched) continue;
 
-      // layer 2: does A's FDA label name B (or vice versa)?
       const m = labelMentions(A,B) || labelMentions(B,A);
       if (m) mentions.push(m);
     }
   }
+  return { findings, mentions };
+}
 
+async function checkInteractions(){
+  const inputs = [...$("#drug-list").querySelectorAll("input")].map(i=>i.value.trim()).filter(Boolean);
+  const box = $("#check-results");
+  if (inputs.length < 2){ box.innerHTML = `<div class="err">Enter at least two medications to compare.</div>`; return; }
+  box.innerHTML = `<div class="status"><span class="spin"></span>Checking ${inputs.length} medications against the curated set and their FDA labels…</div>`;
+
+  const drugs = [];
+  for (const name of inputs) drugs.push(await resolveForAnalysis(name));
+
+  const { findings, mentions } = analyzeDrugPairs(drugs);
   renderResults(box, drugs, findings, mentions);
 }
 
@@ -1276,8 +1307,10 @@ function renderCabinet(){
     html += `<div class="results">${cabinet.map(medRowHTML).join("")}</div>`;
     if (cabinet.length >= 2){
       html += `<div class="cab-tools">
-        <button class="ghost" data-act="tocheck">Check my whole cabinet for interactions →</button>
-      </div>`;
+        <button class="go" data-act="scan">🔎 Scan my whole cabinet</button>
+        <span class="status" style="padding:0;">Checks every medication against every other one — not just pairs.</span>
+      </div>
+      <div id="scan-results" aria-live="polite"></div>`;
     }
     html += `<p class="status" style="padding-top:14px;">Your cabinet is a personal reference list, not a medical record — keep your pharmacist's list as the source of truth.</p>`;
   }
@@ -1346,15 +1379,130 @@ async function removeMed(card){
   }catch(e){ cabinetStatus(e.message); }
 }
 
-/* one tap: pour the whole cabinet into the interaction checker.
-   (Phase 3 turns this into the full Cabinet Scan view.) */
-function checkCabinet(){
-  const list = $("#drug-list");
-  list.innerHTML = "";
-  cabinet.forEach(m => list.append(drugRow(titlecase(m.generic || m.brand || m.name))));
-  while (list.children.length < 2) list.append(drugRow());
-  selectTab("check");
-  checkInteractions();
+/* =================================================================
+   PHASE 3 — 🚩 CABINET SCAN (the flagship)
+   Runs the exact same analyzeDrugPairs engine the Check tab uses, just
+   across the whole saved cabinet (N×N instead of a pair), then reduces
+   the result into a severity summary, a scannable cabinet map, and
+   grounded pharmacist questions. No new medical logic — same rules,
+   same sourcing, just applied to everything at once.
+   ================================================================= */
+async function runCabinetScan(){
+  const box = $("#scan-results");
+  if (!cabinet || cabinet.length < 2){ box.innerHTML = `<div class="err">Add at least two medications to scan.</div>`; return; }
+  const pairCount = cabinet.length*(cabinet.length-1)/2;
+  box.innerHTML = `<div class="status"><span class="spin"></span>Scanning ${cabinet.length} medications — ${pairCount} pair${pairCount>1?"s":""}…</div>`;
+
+  const drugs = [];
+  for (const m of cabinet) drugs.push(await resolveForAnalysis(m.generic || m.brand || m.name));
+  const { findings, mentions } = analyzeDrugPairs(drugs);
+
+  box.innerHTML = renderScanSummary(findings, mentions)
+    + renderCabinetMap(cabinet)
+    + renderScanMatrix(findings, mentions)
+    + renderPharmacistQuestions(findings, mentions);
+}
+
+function renderScanSummary(findings, mentions){
+  const counts = { major:0, moderate:0, minor:0 };
+  findings.forEach(f => counts[f.rule.severity]++);
+  const totalFlags = counts.major+counts.moderate+counts.minor;
+  const pills = [];
+  let headline;
+
+  if (totalFlags===0 && !mentions.length){
+    headline = "Nothing flagged across your cabinet — that isn't the same as safe.";
+  } else {
+    const parts = [];
+    if (counts.major)    { parts.push(`${counts.major} major`);    pills.push(`<span class="count-pill cpill-major">${counts.major} major</span>`); }
+    if (counts.moderate) { parts.push(`${counts.moderate} moderate`); pills.push(`<span class="count-pill cpill-mod">${counts.moderate} moderate</span>`); }
+    if (counts.minor)    { parts.push(`${counts.minor} minor`);     pills.push(`<span class="count-pill cpill-minor">${counts.minor} minor</span>`); }
+    headline = parts.length ? `${parts.join(", ")} to ask a pharmacist about.` : "No severity-rated interactions — a few FDA-label mentions worth a look.";
+  }
+  if (mentions.length) pills.push(`<span class="count-pill cpill-note">${mentions.length} label mention${mentions.length>1?"s":""}</span>`);
+
+  const flagCount = findings.length+mentions.length;
+  return `<div class="scan-summary">
+    <span class="eyebrow">Cabinet scan · ${flagCount? flagCount+" flag"+(flagCount>1?"s":"")+" found" : "complete"}</span>
+    <div class="headline">${esc(headline)}</div>
+    ${pills.length?`<div class="counts">${pills.join("")}</div>`:""}
+    <p class="status" style="padding:10px 0 0;">"Nothing found" means it wasn't in our curated set or FDA labels — not that the combination is safe. Always confirm with a pharmacist.</p>
+  </div>`;
+}
+
+function renderCabinetMap(meds){
+  return `<p class="eyebrow" style="margin:20px 0 2px;">Your cabinet · ${meds.length} medications</p>
+    <div class="cabinet-map">
+      ${meds.map(m=>`<span class="map-chip"><b>${esc(titlecase(m.generic||m.name))}</b>${m.drug_class?` · ${esc(m.drug_class)}`:""}</span>`).join("")}
+    </div>`;
+}
+
+/* same verdict-card markup renderResults uses for the pairwise Check tab —
+   one rendering path for both, so a finding always looks and reads the same */
+function renderScanMatrix(findings, mentions){
+  const rank = {major:0,moderate:1,minor:2};
+  const sorted = [...findings].sort((x,y)=>rank[x.rule.severity]-rank[y.rule.severity]);
+  let html = "";
+  if (sorted.length){
+    html += `<p class="eyebrow" style="margin:20px 0 2px;">Documented interactions · ${sorted.length}</p>`;
+    for (const f of sorted){
+      const s=f.rule.severity;
+      html += `<div class="verdict v-${s}">
+        <div class="bar"></div>
+        <div class="vbody">
+          <div class="pair">${esc(f.A.display)} ✕ ${esc(f.B.display)}</div>
+          <div class="sev"><span class="pill">${s}</span> ${s==="major"?"Major interaction":s==="moderate"?"Moderate interaction":"Minor interaction"}</div>
+          <p>${esc(f.rule.what)}</p>
+          <p class="mgmt"><b>Why:</b> ${esc(f.rule.why)}</p>
+          <p class="mgmt"><b>What people usually do:</b> ${esc(f.rule.mgmt)}</p>
+          <div class="src">Source: curated from FDA prescribing information &amp; standard clinical references</div>
+        </div>
+      </div>`;
+    }
+  }
+  if (mentions.length){
+    html += `<p class="eyebrow" style="margin:18px 0 2px;">Also noted on FDA labels · ${mentions.length}</p>`;
+    for (const m of mentions){
+      html += `<div class="verdict v-note">
+        <div class="bar"></div>
+        <div class="vbody">
+          <div class="pair">${esc(m.from)} → mentions → ${esc(m.to)}</div>
+          <div class="sev"><span class="pill">label</span> Named in the FDA label</div>
+          <p>${esc(m.from)}'s FDA label discusses ${esc(m.to)} in its drug‑interactions section. This isn't severity‑rated — it means the label flags something worth asking about.</p>
+          <p class="mgmt" style="font-style:italic;">"…${esc(m.snippet)}…"</p>
+          <div class="src">Source: openFDA drug label · drug interactions section</div>
+        </div>
+      </div>`;
+    }
+  }
+  return html;
+}
+
+/* "what to ask your pharmacist" — grounded ONLY in what the scan found,
+   never advice about what to do. Highest severity first, capped at 4 so
+   it stays something a person would actually bring to a pharmacy counter. */
+function renderPharmacistQuestions(findings, mentions){
+  const rank = {major:0,moderate:1,minor:2};
+  const sorted = [...findings].sort((x,y)=>rank[x.rule.severity]-rank[y.rule.severity]);
+  const qs = [];
+
+  for (const f of sorted.slice(0,4)){
+    qs.push(`I take <b>${esc(f.A.display)}</b> and <b>${esc(f.B.display)}</b> together — my scan flagged a <b>${f.rule.severity}</b> interaction (${esc(f.rule.what.replace(/\.$/,"").toLowerCase())}). Is this something I should watch for or ask about?`);
+  }
+  if (qs.length < 4){
+    for (const m of mentions.slice(0, 4-qs.length)){
+      qs.push(`${esc(m.from)}'s FDA label specifically mentions ${esc(m.to)} in its interactions section — is that combination something I should be careful with?`);
+    }
+  }
+  if (!qs.length){
+    qs.push(`I take these medications together and nothing was flagged — is there anything about this combination worth double-checking given my specific health history?`);
+  }
+
+  return `<div class="askpharmacist">
+    <h3>What to ask your pharmacist</h3>
+    <ol>${qs.map(q=>`<li>${q}</li>`).join("")}</ol>
+    <p class="status" style="padding:10px 0 0;">Generated only from what this scan actually found — not medical advice, and not a substitute for a real conversation.</p>
+  </div>`;
 }
 
 /* one delegated listener covers every button the cabinet re-renders */
@@ -1366,7 +1514,7 @@ $("#cabinet-body").addEventListener("click", e => {
   if (act === "signin-github") signIn("github");
   else if (act === "signin-google") signIn("google");
   else if (act === "add")     onAddMed();
-  else if (act === "tocheck") checkCabinet();
+  else if (act === "scan")    runCabinetScan();
   else if (card && act === "edit")        openNoteEditor(card);
   else if (card && act === "note-save")   saveNote(card);
   else if (card && act === "note-cancel") renderCabinet();
