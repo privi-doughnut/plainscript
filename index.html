@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Plainscript — Medication Reference</title>
 <meta name="description" content="An educational tool that decodes medications, checks drug interactions, and points to general symptom guidance, using FDA and NIH data. Not medical advice." />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<meta name="theme-color" content="#16202E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -1665,8 +1669,24 @@ async function loadProfile(){
   }
 }
 
+const CABINET_CACHE_KEY = "plainscript.cabinet_cache";
+let cabinetIsOffline = false;
+
+/* tries the live fetch first; if that fails (offline, or a real error) it
+   falls back to the last successful fetch cached in localStorage, so My
+   Cabinet is still viewable — read-only — without a connection. Only
+   throws if there's truly nothing to fall back to. */
 async function loadCabinet(){
-  cabinet = (await db("medications?select=*&order=created_at.asc")) || [];
+  cabinetIsOffline = false;
+  try{
+    cabinet = (await db("medications?select=*&order=created_at.asc")) || [];
+    try{ localStorage.setItem(CABINET_CACHE_KEY, JSON.stringify(cabinet)); }catch(e){/* storage full/blocked — not fatal */}
+  }catch(e){
+    let cached = null;
+    try{ cached = JSON.parse(localStorage.getItem(CABINET_CACHE_KEY) || "null"); }catch(err){/* ignore corrupt cache */}
+    if (cached){ cabinet = cached; cabinetIsOffline = true; }
+    else throw e;
+  }
 }
 
 /* is this drug already saved? Match by RxCUI when we have it, else by
@@ -1966,7 +1986,10 @@ function renderCabinet(){
     return;
   }
 
-  let html = `<div class="field">
+  let html = cabinetIsOffline
+    ? `<div class="status" style="padding:0 0 14px;">📡 Offline — showing your cabinet as of your last visit. Adding or editing needs a connection.</div>`
+    : "";
+  html += `<div class="field">
     <label class="eyebrow" for="cab-input">Add a medication</label>
     <div class="inrow">
       <input type="text" id="cab-input" placeholder="e.g. metformin, Lipitor" autocomplete="off" />
@@ -2225,6 +2248,18 @@ $("#cabinet-body").addEventListener("keydown", e => {
   renderCabinet();
   if (justSignedIn) selectTab("cabinet"); // land the user on their cabinet after OAuth
 })();
+
+/* =================================================================
+   PWA (Phase 5) — installable, works offline for the app shell + the
+   curated interaction/symptom/class data already embedded in this
+   file. Feature-detected so it's a silent no-op on anything that
+   doesn't support service workers.
+   ================================================================= */
+if ("serviceWorker" in navigator){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(()=>{/* offline support just won't be available */});
+  });
+}
 </script>
 </body>
 </html>

@@ -1,0 +1,14 @@
+{
+  "name": "Plainscript — Medication Reference",
+  "short_name": "Plainscript",
+  "description": "Decode medications, check interactions, and get general symptom guidance — sourced from FDA and NIH data. Not medical advice.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F4F6F8",
+  "theme_color": "#16202E",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

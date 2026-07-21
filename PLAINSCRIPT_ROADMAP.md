@@ -66,7 +66,7 @@
 - ⬜ **"Why I built this"** — in *your* voice, first person, not AI copy.
 - ⬜ **FAQ** + full **sources/methodology page**.
 - ⬜ **"Report an error"** feedback loop (shows humility + gives you a correction pipeline — judges love this).
-- ⬜ Accessibility pass (screen reader, contrast, keyboard).
+- ✅ Accessibility pass — computed real WCAG contrast ratios for every core color pair in both themes (found and fixed several failures), added missing focus-visible states, fixed a pre-existing unstyled remove button, corrected ARIA roles on the similar/related modal's tabs.
 - ⬜ Light, privacy-respecting analytics.
 - ⬜ **CAC packaging** — demo video, written description, deploy check.
 
