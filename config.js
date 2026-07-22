@@ -10,7 +10,7 @@
 //   - CLAUDE_PROXY_URL  -> plain-English mode (Phase 1)
 //   - SUPABASE_*        -> accounts + saved cabinet (Phase 2)
 window.PLAINSCRIPT_CONFIG = {
-  CLAUDE_PROXY_URL:  "",  // e.g. https://plainscript-proxy.<you>.workers.dev
+  CLAUDE_PROXY_URL:  "https://plainscript-proxy.its-the-prithivi-show.workers.dev",  // Claude proxy (worker.js), deployed 2026-07-22
   SUPABASE_URL:      "https://rxwbyyhukmxsknmhhzsn.supabase.co",
   SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4d2J5eWh1a214c2tubWhoenNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0ODg5MDQsImV4cCI6MjEwMDA2NDkwNH0.g2XXOYsUaHLnMD1ObYGKYOU011v--z2RR83q1vsDkjA"
 };
