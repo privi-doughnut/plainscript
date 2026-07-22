@@ -436,6 +436,14 @@
     padding:9px 12px; border-radius:8px; font-size:13px; line-height:1.5; box-shadow:0 6px 24px rgba(0,0,0,.25); }
   .gloss-pop b{ display:block; margin-bottom:2px; text-transform:lowercase; }
 
+  /* side-by-side compare */
+  .cmp-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .cmp-col{ border:1px solid var(--line); border-radius:12px; padding:14px; background:var(--card); }
+  .cmp-name{ font-family:var(--serif); font-size:18px; font-weight:600; margin-bottom:10px; }
+  .cmp-field{ margin-bottom:10px; }
+  .cmp-field p{ margin:3px 0 0; font-size:14px; color:var(--ink-soft); line-height:1.5; }
+  @media (max-width:560px){ .cmp-grid{ grid-template-columns:1fr; } }
+
   /* safety & further-reading panels (Decode) */
   .ref-links{ display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; }
   .ref-link{ display:inline-flex; align-items:center; gap:4px; padding:7px 13px; border-radius:20px;
@@ -930,6 +938,24 @@ const I18N = {
     glossary_hint: "Underlined words have a plain-English definition — tap them.",
     explain_simpler_label: "Simpler",
     explain_simpler_aria: "Explain even simpler — like I'm 10",
+    compare_btn: "⇄ Compare with another drug",
+    compare_title_prefix: "Compare",
+    compare_with: "with…",
+    compare_placeholder: "Second medication name",
+    compare_go: "Compare",
+    compare_looking_up: "Looking up both medications…",
+    compare_interaction_eyebrow: "Between these two",
+    compare_no_interaction: "No documented interaction found between these two — reassuring, but not the same as safe. A pharmacist can check your full list.",
+    compare_same_class: "These two are in the same drug class — taking both may double up the same effect. Ask a pharmacist.",
+    compare_not_found: "Couldn't find that medication — check the spelling.",
+    col_boxed_yes: "⚠ Has a boxed warning",
+    col_boxed_no: "No boxed warning on the label",
+    scan_aria: "Scan a medicine barcode",
+    scan_title: "Scan a medicine barcode",
+    scan_hint: "Point the camera at the barcode on the box.",
+    scan_looking_up: "Looking up that barcode…",
+    scan_no_match: "Couldn't match that barcode to an FDA drug — try typing the name. Code:",
+    scan_no_camera: "Couldn't access the camera. Check permissions, or type the name instead.",
 
     /* Cabinet Scan (Phase 3) */
     scan_min_two: "Add at least two medications to scan.",
@@ -5219,6 +5245,115 @@ async function enhanceRows(box, d){
   }
 }
 
+/* ---- NDC barcode scan (feature-detected) --------------------------
+   Uses the native BarcodeDetector API + the device camera to read the
+   barcode on a medicine box, then looks the NDC up in openFDA's label
+   data and decodes the drug. Best-effort: drug barcodes encode the NDC
+   in several formats, so we try a few candidates; if none match we tell
+   the user the code and let them type the name. Silently absent where
+   BarcodeDetector or a camera isn't available (e.g. desktop Firefox). */
+function scanSupported(){
+  return ("BarcodeDetector" in window) && navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
+}
+function addScanButton(inputEl, onResolved){
+  if (!scanSupported()) return;
+  const btn = document.createElement("button");
+  btn.type = "button"; btn.className = "mic-btn"; btn.textContent = "📷";
+  btn.title = "Scan a medicine barcode";
+  btn.setAttribute("aria-label", "Scan a medicine barcode with the camera");
+  btn.addEventListener("click", ()=> openScanModal(inputEl, onResolved));
+  inputEl.insertAdjacentElement("afterend", btn);
+}
+
+async function openScanModal(inputEl, onResolved){
+  const trigger = document.activeElement;
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-label="${esc(t("scan_aria"))}" style="max-width:460px;">
+    <div class="modal-head"><h2>${esc(t("scan_title"))}</h2><button class="mini" data-act="close">${t("close_btn")}</button></div>
+    <div class="modal-body">
+      <video id="scan-video" playsinline muted style="width:100%; border-radius:12px; background:#000; aspect-ratio:4/3; object-fit:cover;"></video>
+      <p class="status" id="scan-status" style="padding-top:10px;">${esc(t("scan_hint"))}</p>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+  const video = overlay.querySelector("#scan-video");
+  const statusEl = overlay.querySelector("#scan-status");
+  let stream = null, raf = 0, done = false;
+  function close(){
+    done = true;
+    if (raf) cancelAnimationFrame(raf);
+    if (stream) stream.getTracks().forEach(t=>t.stop());
+    overlay.remove();
+    document.removeEventListener("keydown", onEsc);
+    if (trigger && trigger.focus) trigger.focus();
+  }
+  function onEsc(e){ if (e.key === "Escape") close(); }
+  document.addEventListener("keydown", onEsc);
+  overlay.addEventListener("click", e => { if (e.target === overlay) close(); const b=e.target.closest('[data-act="close"]'); if (b) close(); });
+
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+    video.srcObject = stream; await video.play();
+  }catch(e){ statusEl.textContent = t("scan_no_camera"); return; }
+
+  const detector = new window.BarcodeDetector({ formats: ["upc_a","upc_e","ean_13","ean_8","code_128","data_matrix"] });
+  async function tick(){
+    if (done) return;
+    try{
+      const codes = await detector.detect(video);
+      if (codes && codes.length){
+        const raw = (codes[0].rawValue||"").replace(/\D/g,"");
+        if (raw){
+          statusEl.innerHTML = `<span class="spin"></span>${esc(t("scan_looking_up"))}`;
+          const name = await ndcToDrugName(raw);
+          if (name){ inputEl.value = name; close(); onResolved && onResolved(); return; }
+          statusEl.textContent = t("scan_no_match") + " (" + raw + ")";
+          // keep scanning — user can reposition
+        }
+      }
+    }catch(e){ /* transient detect error — keep going */ }
+    raf = requestAnimationFrame(tick);
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+// build candidate NDC formats from a scanned UPC/EAN and query openFDA label data
+async function ndcToDrugName(digits){
+  const cands = new Set();
+  // UPC-A drug codes: middle 10 digits are the NDC (drop leading system digit + trailing check digit)
+  let core = digits;
+  if (digits.length === 12) core = digits.slice(1, 11);
+  else if (digits.length === 13) core = digits.slice(2, 12);
+  else if (digits.length === 11) core = digits;        // already NDC11-ish
+  else if (digits.length === 10) core = digits;
+  const c = core.replace(/\D/g,"");
+  if (c.length === 10){
+    cands.add(`${c.slice(0,4)}-${c.slice(4,8)}-${c.slice(8,10)}`);
+    cands.add(`${c.slice(0,5)}-${c.slice(5,8)}-${c.slice(8,10)}`);
+    cands.add(`${c.slice(0,5)}-${c.slice(5,9)}-${c.slice(9,10)}`);
+    cands.add(`${c.slice(0,4)}-${c.slice(4,8)}`);
+    cands.add(`${c.slice(0,5)}-${c.slice(5,8)}`);
+  }
+  if (c.length === 11){
+    cands.add(`${c.slice(0,5)}-${c.slice(5,9)}-${c.slice(9,11)}`);
+    cands.add(`${c.slice(0,5)}-${c.slice(5,8)}`);
+  }
+  for (const ndc of cands){
+    try{
+      const field = ndc.split("-").length === 3 ? "openfda.package_ndc" : "openfda.product_ndc";
+      const res = await fetch(`${FDA}?search=${field}:"${encodeURIComponent(ndc)}"&limit=1`);
+      if (!res.ok) continue;
+      const data = await res.json();
+      const rec = data.results && data.results[0];
+      const of = rec && rec.openfda;
+      const name = of && ((of.generic_name && of.generic_name[0]) || (of.brand_name && of.brand_name[0]));
+      if (name) return name;
+    }catch(e){ /* try next candidate */ }
+  }
+  return null;
+}
+
 /* "did you mean" — up to 5 similarly-spelled RxNorm candidates, shown as
    clickable chips instead of silently guessing just one and stopping. */
 function didYouMeanHTML(names){
@@ -5529,6 +5664,7 @@ TABS.forEach(t => $("#tab-"+t).addEventListener("click", ()=>selectTab(t)));
 $("#decode-btn").addEventListener("click", decode);
 $("#decode-input").addEventListener("keydown", e=>{ if(e.key==="Enter") decode(); });
 addVoiceButton($("#decode-input"), decode); // auto-decodes on speech — read-only, no side effect
+addScanButton($("#decode-input"), decode);  // camera barcode scan (feature-detected)
 
 $("#drug-list").append(drugRow(), drugRow());
 $("#add-drug").addEventListener("click",()=>$("#drug-list").append(drugRow()));
@@ -6228,6 +6364,112 @@ function addSimilarButton(box, d, displayName){
   btn.innerHTML = t("similar_related_btn");
   btn.addEventListener("click", ()=> openSimilarModal(d, displayName));
   head.appendChild(btn);
+
+  const cmp = document.createElement("button");
+  cmp.className = "mini";
+  cmp.style.marginTop = "12px";
+  cmp.style.marginLeft = "8px";
+  cmp.textContent = t("compare_btn");
+  cmp.addEventListener("click", ()=> openCompareModal(d, displayName));
+  head.appendChild(cmp);
+}
+
+/* Side-by-side compare — put the decoded drug next to a second one the
+   user names: key facts in two columns, PLUS the curated + FDA-label
+   interaction engine run on the pair (the genuinely useful part —
+   "can I take these two together?"). All openFDA-sourced; same cautious
+   empty state as the Check tab (never a green "safe"). */
+async function openCompareModal(dA, nameA){
+  const trigger = document.activeElement;
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-label="${esc(t("compare_btn"))}">
+    <div class="modal-head">
+      <h2>${esc(t("compare_title_prefix"))} ${esc(nameA)} ${esc(t("compare_with"))}</h2>
+      <button class="mini" data-act="close">${t("close_btn")}</button>
+    </div>
+    <div class="modal-body">
+      <div class="inrow" style="margin-bottom:12px;">
+        <input type="text" id="compare-input" placeholder="${esc(t("compare_placeholder"))}" autocomplete="off" />
+        <button class="go" data-act="compare-go">${esc(t("compare_go"))}</button>
+      </div>
+      <div id="compare-out" aria-live="polite"></div>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+
+  function onEsc(e){ if (e.key === "Escape") close(); }
+  function close(){ overlay.remove(); document.removeEventListener("keydown", onEsc); if (trigger && trigger.focus) trigger.focus(); }
+  document.addEventListener("keydown", onEsc);
+  overlay.addEventListener("click", e => {
+    if (e.target === overlay){ close(); return; }
+    const b = e.target.closest("[data-act]"); if (!b) return;
+    if (b.dataset.act === "close") close();
+    else if (b.dataset.act === "compare-go") runCompare(dA, nameA, overlay);
+  });
+  overlay.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "compare-input") runCompare(dA, nameA, overlay); });
+  overlay.querySelector("#compare-input").focus();
+}
+
+function compareColHTML(d, displayName){
+  const shortOf = (s)=> s ? esc(excerpt(String(s).replace(/\s+/g," ").trim())) : `<span style="color:var(--ink-faint);">—</span>`;
+  return `<div class="cmp-col">
+    <div class="cmp-name">${esc(displayName)}</div>
+    <div class="cmp-field"><span class="eyebrow">${esc(t("med_note_class"))}</span><p>${d.klass?esc(d.klass):`<span style="color:var(--ink-faint);">—</span>`}</p></div>
+    <div class="cmp-field"><span class="eyebrow">${esc(t("row_used_for"))}</span><p>${shortOf(d.indications)}</p></div>
+    <div class="cmp-field"><span class="eyebrow">${esc(t("row_how_works"))}</span><p>${shortOf(d.moa)}</p></div>
+    <div class="cmp-field"><span class="eyebrow">${esc(t("row_boxed"))}</span><p>${d.boxed?`<b style="color:var(--sev-major,#c0392b);">${esc(t("col_boxed_yes"))}</b>`:esc(t("col_boxed_no"))}</p></div>
+  </div>`;
+}
+
+async function runCompare(dA, nameA, overlay){
+  const out = overlay.querySelector("#compare-out");
+  const nameB = overlay.querySelector("#compare-input").value.trim();
+  if (!nameB) return;
+  out.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("compare_looking_up"))}</div>`;
+
+  let recB;
+  try{ const rr = await resolveLabel(nameB); recB = rr.rec; }
+  catch(e){ out.innerHTML = `<div class="err">${esc(e.message)}</div>`; return; }
+  if (!recB){ out.innerHTML = `<div class="err">${esc(t("compare_not_found"))}</div>`; return; }
+  const dB = parseLabel(recB);
+  const displayB = dB.brand && dB.generic && dB.brand.toLowerCase()!==dB.generic.toLowerCase() ? titlecase(dB.brand) : titlecase(dB.generic||dB.brand||nameB);
+
+  // run the real interaction engine on the pair
+  const A = await resolveForAnalysis(dA.generic || nameA);
+  const B = await resolveForAnalysis(dB.generic || nameB);
+  A.display = titlecase(nameA); B.display = displayB;
+  const { findings, mentions } = analyzeDrugPairs([A, B]);
+
+  let inter = "";
+  if (findings.length){
+    inter = findings.map(f=>{
+      const s=f.rule.severity, sevLabel = s==="major"?t("sev_major"):s==="moderate"?t("sev_moderate"):t("sev_minor");
+      return `<div class="verdict v-${s}"><div class="bar"></div><div class="vbody">
+        <div class="pair">${esc(f.A.display)} ✕ ${esc(f.B.display)}</div>
+        <div class="sev"><span class="pill">${s}</span> ${esc(sevLabel)}</div>
+        <p>${esc(pickLang(f.rule.what))}</p>
+        <p class="mgmt"><b>${esc(t("mgmt_label"))}</b> ${esc(pickLang(f.rule.mgmt))}</p>
+        <div class="src">${t("src_curated_interaction")}</div></div></div>`;
+    }).join("");
+  } else if (mentions.length){
+    inter = mentions.map(m=>`<div class="verdict v-note"><div class="bar"></div><div class="vbody">
+        <div class="pair">${esc(m.from)} → ${esc(m.to)}</div>
+        <div class="sev"><span class="pill">${esc(t("label_pill"))}</span> ${esc(t("named_in_label"))}</div>
+        <p class="mgmt" style="font-style:italic;">“…${esc(m.snippet)}…”</p>
+        <div class="src">${esc(t("src_fda_mention"))}</div></div></div>`).join("");
+  } else {
+    inter = `<div class="nofind"><p>${esc(t("compare_no_interaction"))}</p></div>`;
+  }
+  // same-class heads-up (double-up risk)
+  const sameClass = dA.klass && dB.klass && dA.klass.toLowerCase() === dB.klass.toLowerCase();
+
+  out.innerHTML = `
+    <div class="cmp-grid">${compareColHTML(dA, titlecase(nameA))}${compareColHTML(dB, displayB)}</div>
+    ${sameClass ? `<div class="relief-note" style="margin:14px 0;">${esc(t("compare_same_class"))}</div>` : ""}
+    <p class="eyebrow" style="margin:16px 0 6px;">${esc(t("compare_interaction_eyebrow"))}</p>
+    ${inter}`;
+  applyGlossary(out);
 }
 
 /* one openFDA query on substance_name serves both "other forms" and
