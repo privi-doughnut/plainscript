@@ -44,6 +44,15 @@ This file is the quick status view. `PLAINSCRIPT_ROADMAP.md` has the full phased
 
 **Everything else on the original roadmap is now built.** See the build log below.
 
+### Fresh ideas for future additions & improvements
+Five new directions worth considering once the current batch lands:
+
+1. **Refill & expiry reminders.** Track when each cabinet med was filled and gently flag when it's about to run out or pass its expiry — turns the cabinet from a static list into something that actively helps you stay on top of your meds. Pure Supabase + a date field per row; no new data sources.
+2. **"Traveling with meds" helper.** A printable card that shows each med's *generic* name (and, using the i18n work, its name/label in the destination country's language), plus a short plain-English summary of common carry-on rules for medication. Leans directly on the multilingual + generic-resolution work already done.
+3. **Opt-in adherence streak / gentle check-ins.** A strictly optional "did you take today's meds?" tracker with a streak counter, for people who want the nudge — no nagging, no dark patterns, fully privacy-respecting and off by default. Complements the dosing-schedule feature.
+4. **Cabinet Scan severity heatmap.** A visual N×N grid of the whole-cabinet scan — each cell colored by the worst interaction severity found for that pair — so a dense cabinet's risk pattern is scannable at a glance instead of read as a list. Uses only what the scan already computes; a natural home for the dataviz skill.
+5. **Pill / imprint identifier.** Identify a loose pill by its imprint code, shape, and color. High user value, but **needs research first**: NLM's free RxImage API was deprecated, so this is blocked until a current free imprint/image source is confirmed — flagging it rather than promising it.
+
 ---
 
 ## 3. Everything already built (build log)

@@ -4310,7 +4310,72 @@ const SYMPTOM_CATEGORIES = [
     symptom:{en:"Hangover"},
     category:{en:"Hydration & pain relievers"},
     note:{en:"Fluids and an OTC pain reliever ease hangover aches — skip acetaminophen after heavy drinking (harder on the liver)."},
-    selfcare:{en:"Water, rest, and food are the real fix; go easy on acetaminophen after drinking."} }
+    selfcare:{en:"Water, rest, and food are the real fix; go easy on acetaminophen after drinking."} },
+  { key:"migraine", group:"pain", catKey:"migraine", examples:["acetaminophen","aspirin","caffeine","ibuprofen"],
+    symptom:{en:"Migraine (mild or already diagnosed)"},
+    category:{en:"OTC migraine formulas"},
+    note:{en:"OTC migraine formulas combine a pain reliever with caffeine; best for mild or already-diagnosed migraines — a new, severe, or unusual headache needs a doctor."},
+    selfcare:{en:"A dark, quiet room, rest, hydration, and catching it early help a migraine most."} },
+  { key:"lactose_intolerance", group:"digestive", catKey:"lactase", examples:["lactase"],
+    symptom:{en:"Lactose intolerance"},
+    category:{en:"Lactase enzyme supplements"},
+    note:{en:"OTC lactase enzyme taken with dairy helps break down lactose so it causes less gas and cramping."},
+    selfcare:{en:"Smaller dairy portions, lactose-free options, and taking the enzyme right before dairy all help."} },
+  { key:"period_nausea", group:"period", catKey:"period_nausea", examples:["meclizine","dimenhydrinate"],
+    symptom:{en:"Period-related nausea"},
+    category:{en:"Anti-nausea (antiemetics)"},
+    note:{en:"The same OTC anti-nausea medicines used for motion sickness can settle mild period-related nausea."},
+    selfcare:{en:"Small sips of clear fluid, bland foods, ginger, and fresh air help mild nausea."} },
+  { key:"hoarse_voice", group:"cold", catKey:"hoarse", examples:[],
+    symptom:{en:"Hoarse voice / mild laryngitis"},
+    category:{en:"Rest & soothing — usually no medicine"},
+    note:{en:"A hoarse voice from a cold or overuse usually just needs rest — there's no pill that fixes it faster."},
+    selfcare:{en:"Rest your voice, sip warm fluids, run a humidifier, and avoid whispering (it strains the voice more)."} },
+  { key:"swimmers_ear", group:"efm", catKey:"swimmers_ear", examples:[],
+    symptom:{en:"Water trapped in the ear"},
+    category:{en:"Ear-drying drops"},
+    note:{en:"OTC ear-drying drops (isopropyl alcohol/glycerin) help evaporate trapped water — but ear pain, drainage, or hearing loss means see a doctor."},
+    selfcare:{en:"Tilt and gently tug the ear, use a towel, and dry ears after swimming; skip cotton swabs."} },
+  { key:"dry_mouth", group:"efm", catKey:"dry_mouth", examples:[],
+    symptom:{en:"Dry mouth"},
+    category:{en:"Saliva substitutes & moisturizing rinses"},
+    note:{en:"OTC moisturizing rinses and saliva substitutes ease a persistently dry mouth."},
+    selfcare:{en:"Sip water often, chew sugar-free gum, and cut back on caffeine and alcohol, which dry you out."} },
+  { key:"jock_itch", group:"intimate", catKey:"jock", examples:["clotrimazole","terbinafine","miconazole","tolnaftate"],
+    symptom:{en:"Jock itch"},
+    category:{en:"Topical antifungals"},
+    note:{en:"OTC topical antifungals treat jock itch, a common fungal rash in the groin area."},
+    selfcare:{en:"Keep the area clean and dry, wear loose breathable clothing, and change underwear daily."} },
+  { key:"lice", group:"skin", catKey:"lice", examples:["permethrin","pyrethrin"],
+    symptom:{en:"Head lice"},
+    category:{en:"Lice treatments (permethrin/pyrethrin)"},
+    note:{en:"OTC permethrin or pyrethrin treatments kill head lice; a second treatment about a week later catches newly hatched ones."},
+    selfcare:{en:"Comb out nits with a fine-tooth comb and wash bedding and hats in hot water to avoid re-infesting."} },
+  { key:"calluses", group:"skin", catKey:"callus", examples:["salicylic acid"],
+    symptom:{en:"Calluses or corns"},
+    category:{en:"Callus & corn removers (salicylic acid)"},
+    note:{en:"OTC salicylic acid pads gradually soften and remove calluses and corns."},
+    selfcare:{en:"Cushioning pads and better-fitting shoes take the pressure off; soak and gently file the area."} },
+  { key:"hives", group:"skin", catKey:"hives", examples:["cetirizine","loratadine","diphenhydramine"],
+    symptom:{en:"Hives (mild)"},
+    category:{en:"Oral antihistamines"},
+    note:{en:"OTC oral antihistamines calm the itch of mild hives — but hives with any swelling of the face/throat or trouble breathing is an emergency (call 911)."},
+    selfcare:{en:"A cool compress and avoiding the trigger help; skip hot showers, which can make hives worse."} },
+  { key:"pinworms", group:"other", catKey:"pinworm", examples:["pyrantel pamoate"],
+    symptom:{en:"Pinworms"},
+    category:{en:"Pinworm treatment (pyrantel)"},
+    note:{en:"OTC pyrantel treats pinworms; treating the whole household and repeating in two weeks helps stop reinfection."},
+    selfcare:{en:"Wash hands and under nails well, and hot-wash bedding and underwear to clear the eggs."} },
+  { key:"dehydration", group:"other", catKey:"dehydration", examples:["electrolyte"],
+    symptom:{en:"Mild dehydration (heat or exercise)"},
+    category:{en:"Oral rehydration & electrolytes"},
+    note:{en:"Oral rehydration solutions and electrolyte drinks replace fluids and salts lost to heat, exercise, or a stomach bug."},
+    selfcare:{en:"Sip fluids steadily, get out of the heat, and rest; severe dizziness or no urination needs urgent care."} },
+  { key:"snoring", group:"sleep", catKey:"snoring", examples:[],
+    symptom:{en:"Snoring (mild)"},
+    category:{en:"Self-care & nasal strips — usually no medicine"},
+    note:{en:"Most everyday snoring is eased by simple changes, not medicine; drug-free nasal strips can help some people breathe easier."},
+    selfcare:{en:"Try sleeping on your side, avoid alcohol before bed, and keep nasal passages clear; loud snoring with gasping needs a doctor."} }
 ];
 
 /* ---- DRUG-CLASS EXPLAINERS (Phase 4) ------------------------------
@@ -4686,6 +4751,11 @@ async function decode(){
     ${(foodHits.length || sensitivityHits.length) ? renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits) : ""}
     <p class="status" style="padding-top:4px;">${esc(t("decode_footer_note"))}</p>
   `;
+
+  // a misspelling can still resolve to a closest match AND surface other
+  // close spellings — those chips need wiring here too, not just in the
+  // no-match branch above (otherwise clicking them did nothing).
+  wireDidYouMean(box);
 
   // Phase 2: offer to save this med to the signed-in user's cabinet
   addCabinetSave(box, d, name);
