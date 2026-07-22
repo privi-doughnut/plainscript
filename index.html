@@ -4078,7 +4078,47 @@ const SYMPTOM_CATEGORIES = [
   { key:"skin_itch", catKey:"skin", examples:["hydrocortisone","diphenhydramine"],
     symptom:{en:"Minor skin itching or rash", es:"Picazón o sarpullido leve en la piel", zh:"轻微皮肤瘙痒或皮疹", vi:"Ngứa da hoặc phát ban nhẹ", ar:"حكة أو طفح جلدي خفيف", fr:"Légères démangeaisons ou éruption cutanée", ko:"경미한 피부 가려움 또는 발진", ru:"Лёгкий зуд кожи или сыпь", pt:"Leve coceira na pele ou erupção", de:"Leichter Hautjuckreiz oder Ausschlag", ja:"軽い皮膚のかゆみや発疹"},
     category:{en:"Topical antihistamines & hydrocortisone", es:"Antihistamínicos tópicos e hidrocortisona", zh:"局部抗组胺药和氢化可的松", vi:"Thuốc kháng histamine bôi ngoài da và hydrocortisone", ar:"مضادات الهيستامين الموضعية والهيدروكورتيزون", fr:"Antihistaminiques topiques &amp; hydrocortisone", ko:"국소 항히스타민제 &amp; 하이드로코르티손", ru:"Местные антигистаминные &amp; гидрокортизон", pt:"Anti-histamínicos tópicos &amp; hidrocortisona", de:"Örtliche Antihistaminika &amp; Hydrocortison", ja:"外用抗ヒスタミン薬 &amp; ヒドロコルチゾン"},
-    note:{en:"Reduce itching and inflammation on the skin.", es:"Reducen la picazón y la inflamación de la piel.", zh:"减轻皮肤瘙痒和炎症。", vi:"Giảm ngứa và viêm trên da.", ar:"تُقلّل الحكة والالتهاب على الجلد.", fr:"Réduisent les démangeaisons et l'inflammation sur la peau.", ko:"피부의 가려움과 염증을 줄입니다.", ru:"Уменьшают зуд и воспаление на коже.", pt:"Reduzem a coceira e a inflamação na pele.", de:"Verringern Juckreiz und Entzündung auf der Haut.", ja:"皮膚のかゆみと炎症を抑えます。"} }
+    note:{en:"Reduce itching and inflammation on the skin.", es:"Reducen la picazón y la inflamación de la piel.", zh:"减轻皮肤瘙痒和炎症。", vi:"Giảm ngứa và viêm trên da.", ar:"تُقلّل الحكة والالتهاب على الجلد.", fr:"Réduisent les démangeaisons et l'inflammation sur la peau.", ko:"피부의 가려움과 염증을 줄입니다.", ru:"Уменьшают зуд и воспаление на коже.", pt:"Reduzem a coceira e a inflamação na pele.", de:"Verringern Juckreiz und Entzündung auf der Haut.", ja:"皮膚のかゆみと炎症を抑えます。"} },
+  { key:"gas_bloating", catKey:"gas", examples:["simethicone"],
+    symptom:{en:"Gas or bloating", es:"Gases o hinchazón", zh:"胀气或腹胀", vi:"Đầy hơi hoặc chướng bụng", ar:"الغازات أو الانتفاخ", fr:"Gaz ou ballonnements", ko:"가스 또는 복부 팽만", ru:"Газы или вздутие", pt:"Gases ou inchaço", de:"Blähungen oder Völlegefühl", ja:"ガスやお腹の張り"},
+    category:{en:"Anti-gas medicines", es:"Antiflatulentos (antigases)", zh:"消胀气药", vi:"Thuốc chống đầy hơi", ar:"أدوية طرد الغازات", fr:"Médicaments anti-gaz", ko:"가스 완화제", ru:"Средства от газов", pt:"Antigases", de:"Mittel gegen Blähungen", ja:"ガス（お腹の張り）を抑える薬"},
+    note:{en:"Anti-gas medicines break up trapped gas bubbles to ease pressure and bloating.", es:"Los antiflatulentos deshacen las burbujas de gas atrapado para aliviar la presión y la hinchazón.", zh:"消胀气药能分解滞留的气泡，缓解胀气带来的压迫感和腹胀。", vi:"Thuốc chống đầy hơi làm vỡ các bọt khí bị mắc kẹt để giảm cảm giác căng tức và chướng bụng.", ar:"تعمل أدوية طرد الغازات على تفكيك فقاعات الغاز المحتبسة لتخفيف الضغط والانتفاخ.", fr:"Les médicaments anti-gaz brisent les bulles de gaz emprisonnées pour soulager la pression et les ballonnements.", ko:"가스 완화제는 갇힌 가스 방울을 분해해 압박감과 팽만감을 덜어 줍니다.", ru:"Средства от газов разбивают скопившиеся пузырьки газа, облегчая давление и вздутие.", pt:"Os antigases quebram as bolhas de gás presas para aliviar a pressão e o inchaço.", de:"Mittel gegen Blähungen zerteilen eingeschlossene Gasblasen, um Druck und Völlegefühl zu lindern.", ja:"ガスを抑える薬は、たまったガスの泡を分解して張りや圧迫感をやわらげます。"} },
+  { key:"menstrual_cramps", catKey:"pain", examples:["ibuprofen","naproxen","acetaminophen"],
+    symptom:{en:"Menstrual cramps", es:"Cólicos menstruales", zh:"经期痛经", vi:"Đau bụng kinh", ar:"تقلصات الدورة الشهرية", fr:"Crampes menstruelles", ko:"생리통", ru:"Менструальные спазмы", pt:"Cólicas menstruais", de:"Menstruationskrämpfe", ja:"生理痛"},
+    category:{en:"Pain relievers (analgesics)", es:"Analgésicos (para el dolor)", zh:"止痛药（镇痛药）", vi:"Thuốc giảm đau (analgesics)", ar:"مسكنات الألم (المسكّنات)", fr:"Analgésiques (antidouleurs)", ko:"진통제", ru:"Обезболивающие (анальгетики)", pt:"Analgésicos", de:"Schmerzmittel (Analgetika)", ja:"鎮痛薬"},
+    note:{en:"The same OTC pain relievers used for other aches; NSAIDs are often chosen because they also target the inflammation behind cramps.", es:"Los mismos analgésicos de venta libre que para otros dolores; a menudo se eligen los AINE porque también atacan la inflamación detrás de los cólicos.", zh:"与其他疼痛使用的是同类非处方止痛药；人们常选用非甾体抗炎药，因为它还能针对痛经背后的炎症。", vi:"Cùng loại thuốc giảm đau không kê đơn dùng cho các cơn đau khác; NSAID thường được chọn vì còn tác động đến tình trạng viêm gây ra đau bụng kinh.", ar:"نفس مسكنات الألم التي تُصرف دون وصفة والمستخدمة للآلام الأخرى؛ وغالبًا تُختار مضادات الالتهاب غير الستيرويدية لأنها تستهدف أيضًا الالتهاب المسبب للتقلصات.", fr:"Les mêmes antidouleurs en vente libre que pour d'autres douleurs ; on choisit souvent les AINS car ils ciblent aussi l'inflammation à l'origine des crampes.", ko:"다른 통증에 쓰는 것과 같은 시판 진통제입니다. NSAID는 생리통의 원인이 되는 염증에도 작용하기 때문에 자주 선택됩니다.", ru:"Те же безрецептурные обезболивающие, что и при других болях; НПВП часто выбирают, потому что они также действуют на воспаление, стоящее за спазмами.", pt:"Os mesmos analgésicos de venda livre usados para outras dores; os AINEs são frequentemente escolhidos porque também atuam na inflamação por trás das cólicas.", de:"Dieselben rezeptfreien Schmerzmittel wie bei anderen Beschwerden; NSAR werden oft gewählt, weil sie auch auf die Entzündung hinter den Krämpfen wirken.", ja:"他の痛みに使うのと同じ市販の鎮痛薬です。NSAIDは生理痛の背後にある炎症にも働くため、よく選ばれます。"} },
+  { key:"motion_sickness", catKey:"nausea", examples:["dimenhydrinate","meclizine"],
+    symptom:{en:"Motion sickness", es:"Mareo por movimiento", zh:"晕动症（晕车/晕船）", vi:"Say tàu xe", ar:"دوار الحركة", fr:"Mal des transports", ko:"멀미", ru:"Укачивание", pt:"Enjoo de movimento", de:"Reisekrankheit", ja:"乗り物酔い"},
+    category:{en:"Anti-nausea (antiemetics)", es:"Antináuseas (antieméticos)", zh:"止吐药（抗恶心药）", vi:"Thuốc chống buồn nôn (antiemetics)", ar:"مضادات الغثيان", fr:"Anti-nauséeux (antiémétiques)", ko:"진토제", ru:"Противорвотные (антиэметики)", pt:"Antináusea (antieméticos)", de:"Mittel gegen Übelkeit (Antiemetika)", ja:"制吐薬"},
+    note:{en:"Taken before travel, these antihistamine-type antiemetics help prevent the nausea of motion sickness.", es:"Tomados antes de viajar, estos antieméticos de tipo antihistamínico ayudan a prevenir las náuseas del mareo por movimiento.", zh:"在出行前服用，这些抗组胺类止吐药有助于预防晕动症引起的恶心。", vi:"Uống trước khi di chuyển, các thuốc chống buồn nôn dạng kháng histamine này giúp ngăn ngừa buồn nôn do say tàu xe.", ar:"عند تناولها قبل السفر، تساعد مضادات الغثيان هذه من نوع مضادات الهيستامين على منع غثيان دوار الحركة.", fr:"Pris avant le voyage, ces antiémétiques de type antihistaminique aident à prévenir la nausée du mal des transports.", ko:"이동 전에 복용하면, 이 항히스타민 계열의 진토제가 멀미로 인한 메스꺼움을 예방하는 데 도움이 됩니다.", ru:"Принятые перед поездкой, эти противорвотные антигистаминного типа помогают предотвратить тошноту при укачивании.", pt:"Tomados antes de viajar, esses antieméticos do tipo anti-histamínico ajudam a prevenir a náusea do enjoo de movimento.", de:"Vor der Reise eingenommen, helfen diese Antiemetika vom Antihistaminikum-Typ, der Übelkeit der Reisekrankheit vorzubeugen.", ja:"移動の前に飲むと、これらの抗ヒスタミン系の制吐薬が乗り物酔いの吐き気を防ぐのに役立ちます。"} },
+  { key:"athletes_foot", catKey:"antifungal", examples:["clotrimazole","terbinafine","miconazole","tolnaftate"],
+    symptom:{en:"Athlete's foot or ringworm", es:"Pie de atleta o tiña", zh:"足癣（脚气）或体癣", vi:"Nấm da chân hoặc nấm da", ar:"القدم الرياضي أو السعفة", fr:"Pied d'athlète ou teigne", ko:"무좀 또는 백선", ru:"Грибок стоп или стригущий лишай", pt:"Pé de atleta ou micose", de:"Fußpilz oder Ringelflechte", ja:"水虫（足白癬）やたむし"},
+    category:{en:"Topical antifungals", es:"Antifúngicos tópicos", zh:"外用抗真菌药", vi:"Thuốc kháng nấm bôi ngoài da", ar:"مضادات الفطريات الموضعية", fr:"Antifongiques topiques", ko:"국소 항진균제", ru:"Местные противогрибковые", pt:"Antifúngicos tópicos", de:"Örtliche Antimykotika", ja:"外用抗真菌薬"},
+    note:{en:"Topical antifungals treat common skin fungal infections; they're usually used for a couple of weeks, even after it looks better.", es:"Los antifúngicos tópicos tratan las infecciones fúngicas comunes de la piel; suelen usarse durante un par de semanas, incluso después de que mejore.", zh:"外用抗真菌药用于治疗常见的皮肤真菌感染；通常需连用两周左右，即使看起来好转也要继续用。", vi:"Thuốc kháng nấm bôi ngoài da điều trị các nhiễm nấm da thường gặp; thường dùng trong khoảng hai tuần, kể cả khi đã trông đỡ hơn.", ar:"تعالج مضادات الفطريات الموضعية عدوى الجلد الفطرية الشائعة؛ وتُستخدم عادةً لأسبوعين، حتى بعد أن يبدو التحسن.", fr:"Les antifongiques topiques traitent les infections fongiques cutanées courantes ; on les utilise généralement pendant environ deux semaines, même après amélioration.", ko:"국소 항진균제는 흔한 피부 곰팡이 감염을 치료합니다. 보통 나아 보여도 2주 정도 계속 사용합니다.", ru:"Местные противогрибковые лечат распространённые грибковые инфекции кожи; их обычно применяют около двух недель, даже после видимого улучшения.", pt:"Os antifúngicos tópicos tratam infecções fúngicas comuns da pele; geralmente são usados por cerca de duas semanas, mesmo depois de melhorar.", de:"Örtliche Antimykotika behandeln häufige Hautpilzinfektionen; sie werden meist etwa zwei Wochen lang angewendet, auch wenn es schon besser aussieht.", ja:"外用抗真菌薬は、よくある皮膚の真菌感染を治療します。良くなったように見えても、通常2週間ほど使い続けます。"} },
+  { key:"acne", catKey:"acne", examples:["benzoyl peroxide","salicylic acid","adapalene"],
+    symptom:{en:"Acne or pimples", es:"Acné o granos", zh:"痤疮或粉刺", vi:"Mụn trứng cá", ar:"حب الشباب أو البثور", fr:"Acné ou boutons", ko:"여드름", ru:"Акне или прыщи", pt:"Acne ou espinhas", de:"Akne oder Pickel", ja:"にきび・吹き出物"},
+    category:{en:"Topical acne treatments", es:"Tratamientos tópicos para el acné", zh:"外用祛痘药", vi:"Thuốc trị mụn bôi ngoài da", ar:"علاجات حب الشباب الموضعية", fr:"Traitements topiques de l'acné", ko:"국소 여드름 치료제", ru:"Местные средства от акне", pt:"Tratamentos tópicos para acne", de:"Örtliche Aknemittel", ja:"外用にきび治療薬"},
+    note:{en:"OTC acne products unclog pores and reduce the bacteria and oil behind breakouts.", es:"Los productos de venta libre para el acné destapan los poros y reducen las bacterias y el sebo detrás de los brotes.", zh:"非处方祛痘产品能疏通毛孔，减少引发痘痘的细菌和油脂。", vi:"Sản phẩm trị mụn không kê đơn giúp thông thoáng lỗ chân lông và giảm vi khuẩn cùng dầu nhờn gây ra mụn.", ar:"تعمل منتجات حب الشباب التي تُصرف دون وصفة على فتح المسام وتقليل البكتيريا والدهون المسببة للبثور.", fr:"Les produits anti-acné en vente libre débouchent les pores et réduisent les bactéries et le sébum à l'origine des poussées.", ko:"시판 여드름 제품은 모공을 뚫어 주고 여드름의 원인이 되는 세균과 피지를 줄입니다.", ru:"Безрецептурные средства от акне очищают поры и уменьшают количество бактерий и жира, стоящих за высыпаниями.", pt:"Os produtos de venda livre para acne desobstruem os poros e reduzem as bactérias e a oleosidade por trás das espinhas.", de:"Rezeptfreie Aknemittel befreien die Poren und verringern die Bakterien und den Talg hinter den Ausbrüchen.", ja:"市販のにきび用製品は毛穴のつまりを取り、にきびの原因となる細菌や皮脂を減らします。"} },
+  { key:"hemorrhoids", catKey:"hemorrhoid", examples:["phenylephrine","hydrocortisone","witch hazel"],
+    symptom:{en:"Hemorrhoids", es:"Hemorroides", zh:"痔疮", vi:"Bệnh trĩ", ar:"البواسير", fr:"Hémorroïdes", ko:"치질", ru:"Геморрой", pt:"Hemorroidas", de:"Hämorrhoiden", ja:"痔"},
+    category:{en:"Hemorrhoid treatments", es:"Tratamientos para hemorroides", zh:"痔疮治疗药", vi:"Thuốc trị trĩ", ar:"علاجات البواسير", fr:"Traitements des hémorroïdes", ko:"치질 치료제", ru:"Средства от геморроя", pt:"Tratamentos para hemorroidas", de:"Hämorrhoidenmittel", ja:"痔の治療薬"},
+    note:{en:"OTC creams and wipes soothe itching and swelling; they don't fix the underlying cause.", es:"Las cremas y toallitas de venta libre calman la picazón y la hinchazón; no corrigen la causa de fondo.", zh:"非处方药膏和湿巾能缓解瘙痒和肿胀，但无法解决根本原因。", vi:"Kem và khăn lau không kê đơn làm dịu ngứa và sưng; chúng không giải quyết nguyên nhân gốc.", ar:"تخفف الكريمات والمناديل التي تُصرف دون وصفة الحكة والتورم؛ لكنها لا تعالج السبب الأساسي.", fr:"Les crèmes et lingettes en vente libre apaisent les démangeaisons et le gonflement ; elles ne corrigent pas la cause sous-jacente.", ko:"시판 크림과 물티슈는 가려움과 부기를 가라앉히지만, 근본 원인을 해결하지는 않습니다.", ru:"Безрецептурные кремы и салфетки успокаивают зуд и отёк; они не устраняют основную причину.", pt:"Cremes e lenços de venda livre aliviam a coceira e o inchaço; não resolvem a causa de fundo.", de:"Rezeptfreie Cremes und Tücher lindern Juckreiz und Schwellung; die zugrunde liegende Ursache beheben sie nicht.", ja:"市販のクリームやシートはかゆみや腫れをやわらげますが、根本的な原因を治すものではありません。"} },
+  { key:"minor_cut", catKey:"topical_antibiotic", examples:["bacitracin","neomycin","polymyxin b"],
+    symptom:{en:"Minor cuts or scrapes", es:"Cortes o raspones menores", zh:"轻微割伤或擦伤", vi:"Vết cắt hoặc trầy xước nhẹ", ar:"جروح أو خدوش بسيطة", fr:"Petites coupures ou éraflures", ko:"경미한 베인 상처나 찰과상", ru:"Мелкие порезы или ссадины", pt:"Cortes ou arranhões leves", de:"Kleine Schnitte oder Schürfwunden", ja:"軽い切り傷やすり傷"},
+    category:{en:"Topical antibiotics", es:"Antibióticos tópicos", zh:"外用抗生素", vi:"Thuốc kháng sinh bôi ngoài da", ar:"المضادات الحيوية الموضعية", fr:"Antibiotiques topiques", ko:"국소 항생제", ru:"Местные антибиотики", pt:"Antibióticos tópicos", de:"Örtliche Antibiotika", ja:"外用抗生物質"},
+    note:{en:"Topical antibiotics help prevent infection in small wounds after cleaning them.", es:"Los antibióticos tópicos ayudan a prevenir infecciones en heridas pequeñas después de limpiarlas.", zh:"外用抗生素在清洁小伤口后有助于预防感染。", vi:"Thuốc kháng sinh bôi ngoài da giúp ngăn ngừa nhiễm trùng ở vết thương nhỏ sau khi làm sạch.", ar:"تساعد المضادات الحيوية الموضعية على منع العدوى في الجروح الصغيرة بعد تنظيفها.", fr:"Les antibiotiques topiques aident à prévenir l'infection des petites plaies après les avoir nettoyées.", ko:"국소 항생제는 작은 상처를 깨끗이 씻은 뒤 감염을 예방하는 데 도움이 됩니다.", ru:"Местные антибиотики помогают предотвратить инфекцию в небольших ранах после их очистки.", pt:"Os antibióticos tópicos ajudam a prevenir infecção em pequenos ferimentos após limpá-los.", de:"Örtliche Antibiotika helfen, eine Infektion kleiner Wunden nach dem Reinigen zu verhindern.", ja:"外用抗生物質は、小さな傷を清潔にしたあとの感染予防に役立ちます。"} },
+  { key:"cold_sore", catKey:"cold_sore", examples:["docosanol"],
+    symptom:{en:"Cold sores", es:"Herpes labial (fuegos)", zh:"唇疱疹（唇周疱疹）", vi:"Mụn rộp môi", ar:"قرح البرد", fr:"Boutons de fièvre", ko:"입술 물집(단순포진)", ru:"Герпес на губах", pt:"Herpes labial", de:"Lippenherpes", ja:"口唇ヘルペス"},
+    category:{en:"Cold sore treatments", es:"Tratamientos para el herpes labial", zh:"唇疱疹治疗药", vi:"Thuốc trị mụn rộp môi", ar:"علاجات قرح البرد", fr:"Traitements de l'herpès labial", ko:"입술 물집(단순포진) 치료제", ru:"Средства от герпеса на губах", pt:"Tratamentos para herpes labial", de:"Mittel gegen Lippenherpes", ja:"口唇ヘルペスの治療薬"},
+    note:{en:"OTC cold sore creams can shorten a flare if started at the first tingle.", es:"Las cremas de venta libre para el herpes labial pueden acortar el brote si se empiezan al primer hormigueo.", zh:"如果在最初有刺痒感时就开始使用，非处方唇疱疹药膏可以缩短发作时间。", vi:"Kem trị mụn rộp môi không kê đơn có thể rút ngắn đợt bùng phát nếu bắt đầu ngay khi có cảm giác ngứa râm ran đầu tiên.", ar:"يمكن لكريمات قرح البرد التي تُصرف دون وصفة أن تقصر مدة النوبة إذا بدأت عند أول إحساس بالوخز.", fr:"Les crèmes en vente libre contre les boutons de fièvre peuvent raccourcir une poussée si on les commence dès le premier picotement.", ko:"시판 입술 물집 크림은 처음 따끔거릴 때 바르기 시작하면 발현 기간을 줄일 수 있습니다.", ru:"Безрецептурные кремы от герпеса на губах могут сократить обострение, если начать при первом покалывании.", pt:"Os cremes de venda livre para herpes labial podem encurtar um surto se iniciados ao primeiro formigamento.", de:"Rezeptfreie Cremes gegen Lippenherpes können einen Ausbruch verkürzen, wenn man beim ersten Kribbeln beginnt.", ja:"市販の口唇ヘルペス用クリームは、最初のピリピリを感じたときに使い始めると症状の期間を短くできることがあります。"} },
+  { key:"dandruff", catKey:"dandruff", examples:["ketoconazole","selenium sulfide","pyrithione zinc"],
+    symptom:{en:"Dandruff or flaky scalp", es:"Caspa o cuero cabelludo escamoso", zh:"头皮屑或头皮脱屑", vi:"Gàu hoặc da đầu bong tróc", ar:"القشرة أو تقشر فروة الرأس", fr:"Pellicules ou cuir chevelu qui pèle", ko:"비듬 또는 두피 각질", ru:"Перхоть или шелушение кожи головы", pt:"Caspa ou couro cabeludo descamando", de:"Schuppen oder schuppige Kopfhaut", ja:"フケや頭皮のかさつき"},
+    category:{en:"Anti-dandruff shampoos", es:"Champús anticaspa", zh:"去屑洗发水", vi:"Dầu gội trị gàu", ar:"شامبوهات مضادة للقشرة", fr:"Shampooings antipelliculaires", ko:"비듬 방지 샴푸", ru:"Шампуни против перхоти", pt:"Xampus anticaspa", de:"Anti-Schuppen-Shampoos", ja:"フケ防止シャンプー"},
+    note:{en:"Medicated shampoos slow the skin flaking and yeast behind dandruff; leave them on a few minutes before rinsing.", es:"Los champús medicados frenan la descamación de la piel y la levadura detrás de la caspa; déjalos actuar unos minutos antes de enjuagar.", zh:"药用洗发水能减缓头皮脱屑并抑制引起头皮屑的真菌；冲洗前让其停留几分钟。", vi:"Dầu gội đặc trị làm chậm quá trình bong da và nấm men gây gàu; để yên vài phút trước khi xả sạch.", ar:"تُبطئ الشامبوهات الطبية تقشر الجلد والخميرة المسببة للقشرة؛ اتركها بضع دقائق قبل الشطف.", fr:"Les shampooings médicamenteux ralentissent la desquamation et la levure à l'origine des pellicules ; laissez agir quelques minutes avant de rincer.", ko:"약용 샴푸는 비듬의 원인이 되는 각질과 진균을 줄여 줍니다. 헹구기 전 몇 분간 그대로 두세요.", ru:"Лечебные шампуни замедляют шелушение кожи и рост грибка, стоящего за перхотью; оставьте на несколько минут перед смыванием.", pt:"Os xampus medicinais retardam a descamação da pele e o fungo por trás da caspa; deixe agir alguns minutos antes de enxaguar.", de:"Medizinische Shampoos verlangsamen die Hautschuppung und den Hefepilz hinter Schuppen; einige Minuten einwirken lassen, dann ausspülen.", ja:"薬用シャンプーは、フケの原因となる皮膚のはがれや真菌を抑えます。すすぐ前に数分置いてください。"} },
+  { key:"dry_eyes", catKey:"eye_lubricant", examples:["carboxymethylcellulose","polyethylene glycol","glycerin"],
+    symptom:{en:"Dry, irritated eyes", es:"Ojos secos e irritados", zh:"眼睛干涩、刺激不适", vi:"Mắt khô, kích ứng", ar:"جفاف وتهيّج العينين", fr:"Yeux secs et irrités", ko:"건조하고 자극된 눈", ru:"Сухость и раздражение глаз", pt:"Olhos secos e irritados", de:"Trockene, gereizte Augen", ja:"目の乾きや刺激"},
+    category:{en:"Lubricant eye drops (artificial tears)", es:"Gotas oftálmicas lubricantes (lágrimas artificiales)", zh:"润滑滴眼液（人工泪液）", vi:"Thuốc nhỏ mắt bôi trơn (nước mắt nhân tạo)", ar:"قطرات ترطيب العين (الدموع الاصطناعية)", fr:"Gouttes oculaires lubrifiantes (larmes artificielles)", ko:"인공눈물(윤활 점안액)", ru:"Увлажняющие глазные капли (искусственная слеза)", pt:"Colírios lubrificantes (lágrimas artificiais)", de:"Befeuchtende Augentropfen (künstliche Tränen)", ja:"潤滑目薬（人工涙液）"},
+    note:{en:"Artificial tears add moisture to soothe dryness; preservative-free versions suit frequent use.", es:"Las lágrimas artificiales aportan humedad para aliviar la sequedad; las versiones sin conservantes convienen para uso frecuente.", zh:"人工泪液能补充水分以缓解干涩；无防腐剂的产品适合频繁使用。", vi:"Nước mắt nhân tạo bổ sung độ ẩm để làm dịu khô mắt; loại không chất bảo quản phù hợp khi dùng thường xuyên.", ar:"تضيف الدموع الاصطناعية رطوبة لتخفيف الجفاف؛ والأنواع الخالية من المواد الحافظة مناسبة للاستخدام المتكرر.", fr:"Les larmes artificielles apportent de l'hydratation pour apaiser la sécheresse ; les versions sans conservateur conviennent à un usage fréquent.", ko:"인공눈물은 수분을 더해 건조함을 달래 줍니다. 무방부제 제품은 자주 사용하기에 적합합니다.", ru:"Искусственная слеза добавляет влагу, чтобы облегчить сухость; версии без консервантов подходят для частого применения.", pt:"As lágrimas artificiais adicionam umidade para aliviar o ressecamento; as versões sem conservantes são adequadas para uso frequente.", de:"Künstliche Tränen spenden Feuchtigkeit, um Trockenheit zu lindern; konservierungsmittelfreie Varianten eignen sich für häufige Anwendung.", ja:"人工涙液は水分を補って乾きをやわらげます。防腐剤フリーの製品は頻繁に使う場合に向いています。"} }
 ];
 
 /* ---- DRUG-CLASS EXPLAINERS (Phase 4) ------------------------------
@@ -5101,6 +5141,95 @@ async function signOut(){
   }
 }
 
+/* Sign-in popup — the header "Sign in" button (and the decode card's
+   "save — sign in" button) open this instead of jumping straight to the
+   Cabinet tab, so signing in doesn't yank you away from whatever you were
+   doing. It reuses the exact same Google + magic-link flow as the Cabinet
+   pane (signIn / sendMagicLink), just in a modal. Uses its OWN element ids
+   (modal-magic-*) so it never collides with the identical field that may
+   also be rendered in the Cabinet tab underneath. Same modal shell,
+   focus-trap and Escape handling as openSimilarModal. */
+function openSignInModal(){
+  if (!SB_ENABLED){ selectTab("cabinet"); return; } // "not configured" note lives in the cabinet pane
+  if (session){ selectTab("cabinet"); return; }      // already signed in — nothing to do but go there
+  const trigger = document.activeElement; // restore focus here when the modal closes
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-label="${esc(t("sign_in"))}" style="max-width:460px;">
+    <div class="modal-head">
+      <h2>${esc(t("cabinet_signedout_title"))}</h2>
+      <button class="mini" data-act="close">${t("close_btn")}</button>
+    </div>
+    <div class="modal-body">
+      <div class="signin" style="padding:0;">
+        <p>${esc(t("cabinet_signedout_body"))}</p>
+        <div class="providers">
+          <button class="provider" data-act="signin-google">${esc(t("continue_google"))}</button>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label class="eyebrow" for="modal-magic-email">${esc(t("magic_email_label"))}</label>
+          <div class="inrow">
+            <input type="email" id="modal-magic-email" placeholder="${esc(t("magic_email_placeholder"))}" autocomplete="email" />
+            <button class="go" data-act="magic-send">${esc(t("magic_send_btn"))}</button>
+          </div>
+        </div>
+        <div id="modal-magic-status" class="status" role="status"></div>
+        <p class="status" style="padding:12px 0 0;">${esc(t("cabinet_signin_footer"))}</p>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+
+  function onEsc(e){ if (e.key === "Escape") close(); }
+  function trapTab(e){
+    if (e.key !== "Tab") return;
+    const focusables = [...overlay.querySelectorAll('button, [href], input, [tabindex]:not([tabindex="-1"])')];
+    if (!focusables.length) return;
+    const first = focusables[0], last = focusables[focusables.length-1];
+    if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+  function close(){
+    overlay.remove();
+    document.removeEventListener("keydown", onEsc);
+    if (trigger && typeof trigger.focus === "function") trigger.focus();
+  }
+  async function sendModalMagic(btn){
+    const input = overlay.querySelector("#modal-magic-email");
+    const email = (input.value || "").trim();
+    const statusEl = overlay.querySelector("#modal-magic-status");
+    if (!/^\S+@\S+\.\S+$/.test(email)){ statusEl.textContent = t("magic_invalid_email"); input.focus(); return; }
+    btn.disabled = true;
+    statusEl.innerHTML = `<span class="spin"></span>${esc(t("magic_sending"))}`;
+    try{
+      await sendMagicLink(email);
+      magicSent = email; // also flips the Cabinet pane to its "check your email" state underneath
+      overlay.querySelector(".signin").innerHTML =
+        `<div class="status" style="padding:2px 0 12px;">${esc(t("magic_sent_note_prefix"))} <b>${esc(email)}</b> ${esc(t("magic_sent_note_suffix"))}</div>`;
+      renderCabinet();
+    }catch(e){ statusEl.textContent = e.message; btn.disabled = false; }
+  }
+
+  document.addEventListener("keydown", onEsc);
+  overlay.addEventListener("keydown", trapTab);
+  overlay.addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.target.id === "modal-magic-email"){
+      e.preventDefault();
+      sendModalMagic(overlay.querySelector('[data-act="magic-send"]'));
+    }
+  });
+  overlay.addEventListener("click", e => {
+    if (e.target === overlay){ close(); return; }
+    const btn = e.target.closest("[data-act]");
+    if (!btn) return;
+    const act = btn.dataset.act;
+    if (act === "close") close();
+    else if (act === "signin-google") signIn("google"); // navigates away; modal goes with the page
+    else if (act === "magic-send") sendModalMagic(btn);
+  });
+  overlay.querySelector('[data-act="close"]').focus();
+}
+
 /* --- database calls (PostgREST) ---------------------------------- */
 async function db(path, opts){
   opts = opts || {};
@@ -5353,7 +5482,7 @@ function renderAcct(){
     $("#signout-btn").addEventListener("click", signOut);
   } else {
     el.innerHTML = `<button class="mini" id="signin-btn">${esc(t("sign_in"))}</button>`;
-    $("#signin-btn").addEventListener("click", ()=>selectTab("cabinet"));
+    $("#signin-btn").addEventListener("click", openSignInModal);
   }
 }
 
@@ -5367,7 +5496,7 @@ function addCabinetSave(box, d, typed){
   btn.style.marginTop = "12px";
   if (!session){
     btn.textContent = t("cabinet_save_btn_signin");
-    btn.addEventListener("click", ()=>selectTab("cabinet"));
+    btn.addEventListener("click", openSignInModal);
   } else if (findInCabinet(d, typed)){
     btn.textContent = t("cabinet_in_cabinet");
     btn.disabled = true;
