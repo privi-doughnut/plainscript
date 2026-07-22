@@ -400,7 +400,23 @@
   .redflag p{margin:12px 0 0; font-size:13.5px; color:var(--ink-soft);}
   .redflag p b{color:var(--major-ink);}
 
-  .symptom-list{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
+  .symptom-list{margin-top:14px; display:flex; flex-direction:column; gap:8px;}
+  /* collapsible symptom groups */
+  .symptom-group{ border:1px solid var(--line); border-radius:12px; background:var(--card); overflow:hidden; }
+  .symptom-group > summary{
+    list-style:none; cursor:pointer; padding:12px 16px; display:flex; align-items:center; gap:10px;
+    font-family:var(--sans); font-weight:600; font-size:15px; color:var(--ink);
+  }
+  .symptom-group > summary::-webkit-details-marker{ display:none; }
+  .symptom-group > summary::after{ content:"▾"; margin-left:auto; color:var(--ink-faint); transition:transform .15s ease; }
+  .symptom-group[open] > summary::after{ transform:rotate(180deg); }
+  .symptom-group > summary:hover{ color:var(--accent-deep); }
+  .symptom-group > summary:focus-visible{ outline:2px solid var(--accent); outline-offset:-2px; }
+  .sg-count{ font-size:12px; font-weight:600; color:var(--ink-faint); background:var(--accent-wash); border-radius:20px; padding:1px 9px; }
+  .symptom-grid{ display:flex; flex-wrap:wrap; gap:8px; padding:0 16px 16px; }
+  /* self-care (non-drug) callout + relief disclaimer */
+  .selfcare-row{ background:var(--accent-wash); border-radius:10px; padding:12px 14px; }
+  .relief-note{ font-size:13.5px; color:var(--ink-soft); line-height:1.55; border-left:3px solid var(--accent); padding:4px 0 4px 14px; }
   .symptom-chip{
     position:relative; display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:20px;
     border:1px solid var(--line); background:var(--card); cursor:pointer;
@@ -558,6 +574,7 @@
       <legend class="eyebrow" style="padding:0;" data-i18n="symptoms_picker_label"></legend>
       <p class="panel-intro" style="margin-top:4px;" data-i18n="symptoms_picker_note"></p>
       <div id="symptom-list" class="symptom-list"></div>
+      <p class="relief-note" style="margin-top:16px;" data-i18n="symptoms_relief_disclaimer"></p>
       <button class="go" id="symptom-btn" style="margin-top:14px;" data-i18n="symptoms_btn"></button>
     </fieldset>
 
@@ -842,6 +859,8 @@ const I18N = {
     src_symptom_category: "Category mapping: hand-curated, textbook-level — not personalized, not a diagnosis",
     real_examples_eyebrow: "Real examples, sourced live from openFDA",
     symptoms_result_note: "This maps common symptoms to general OTC categories — it isn't a diagnosis, doesn't know your health history or other medications, and isn't personalized. A pharmacist can tell you which specific option actually fits you. Click any example above to decode it first.",
+    symptoms_relief_disclaimer: "These options help ease the discomfort of everyday symptoms — they don't cure the underlying cause. If a symptom is severe, unusual, keeps getting worse, or isn't better in a few days, check with a doctor or pharmacist.",
+    selfcare_eyebrow: "Simple things that can help — no medicine needed",
 
     /* Cabinet Scan (Phase 3) */
     scan_min_two: "Add at least two medications to scan.",
@@ -4026,99 +4045,272 @@ const INTERACTIONS = [
    user-visible field (symptom/category/note) is a {en, es} pair, read
    through pickLang(). "examples" stays English — those are ingredient
    names looked up live against openFDA, which is English-only data. */
+/* Symptom groups — collapsible sections in the picker so a long list stays
+   scannable. English-first here; a follow-up pass translates the labels and
+   the new symptoms/self-care into the other 10 languages. */
+const SYMPTOM_GROUPS = [
+  { key:"pain", label:{en:"Pain, aches & fever"} },
+  { key:"cold", label:{en:"Cold, cough, sinus & allergy"} },
+  { key:"digestive", label:{en:"Stomach & digestion"} },
+  { key:"period", label:{en:"Period & menstrual"} },
+  { key:"skin", label:{en:"Skin, scalp & nails"} },
+  { key:"efm", label:{en:"Eyes, ears & mouth"} },
+  { key:"sleep", label:{en:"Sleep, stress & energy"} },
+  { key:"intimate", label:{en:"Intimate & urinary"} },
+  { key:"other", label:{en:"Quitting smoking & other"} }
+];
+
 const SYMPTOM_CATEGORIES = [
-  { key:"headache", catKey:"pain", examples:["acetaminophen","ibuprofen","naproxen"],
+  { key:"headache", group:"pain", catKey:"pain", examples:["acetaminophen","ibuprofen","naproxen"],
     symptom:{en:"Headache", es:"Dolor de cabeza", zh:"头痛", vi:"Đau đầu", ar:"الصداع", fr:"Mal de tête", ko:"두통", ru:"Головная боль", pt:"Dor de cabeça", de:"Kopfschmerzen", ja:"頭痛"},
     category:{en:"Pain relievers (analgesics)", es:"Analgésicos (para el dolor)", zh:"止痛药（镇痛药）", vi:"Thuốc giảm đau (analgesics)", ar:"مسكنات الألم (المسكّنات)", fr:"Analgésiques (antidouleurs)", ko:"진통제", ru:"Обезболивающие (анальгетики)", pt:"Analgésicos", de:"Schmerzmittel (Analgetika)", ja:"鎮痛薬"},
-    note:{en:"Common OTC options for everyday aches and headaches.", es:"Opciones comunes de venta libre para dolores y dolores de cabeza cotidianos.", zh:"用于日常疼痛和头痛的常见非处方选择。", vi:"Các lựa chọn không kê đơn phổ biến cho các cơn đau và đau đầu thường ngày.", ar:"خيارات شائعة تُصرف دون وصفة طبية للآلام والصداع اليومي.", fr:"Options courantes en vente libre pour les douleurs et maux de tête du quotidien.", ko:"일상적인 통증과 두통에 흔한 일반의약품 선택지.", ru:"Распространённые безрецептурные варианты при повседневных болях и головных болях.", pt:"Opções comuns de venda livre para dores e dores de cabeça do dia a dia.", de:"Häufige rezeptfreie Optionen bei alltäglichen Schmerzen und Kopfschmerzen.", ja:"日常的な痛みや頭痛によく使われる市販の選択肢。"} },
-  { key:"fever", catKey:"fever", examples:["acetaminophen","ibuprofen"],
+    note:{en:"Common OTC options for everyday aches and headaches.", es:"Opciones comunes de venta libre para dolores y dolores de cabeza cotidianos.", zh:"用于日常疼痛和头痛的常见非处方选择。", vi:"Các lựa chọn không kê đơn phổ biến cho các cơn đau và đau đầu thường ngày.", ar:"خيارات شائعة تُصرف دون وصفة طبية للآلام والصداع اليومي.", fr:"Options courantes en vente libre pour les douleurs et maux de tête du quotidien.", ko:"일상적인 통증과 두통에 흔한 일반의약품 선택지.", ru:"Распространённые безрецептурные варианты при повседневных болях и головных болях.", pt:"Opções comuns de venda livre para dores e dores de cabeça do dia a dia.", de:"Häufige rezeptfreie Optionen bei alltäglichen Schmerzen und Kopfschmerzen.", ja:"日常的な痛みや頭痛によく使われる市販の選択肢。"},
+    selfcare:{en:"Rest, water, and easing off screens often help a tension headache."} },
+  { key:"fever", group:"pain", catKey:"fever", examples:["acetaminophen","ibuprofen"],
     symptom:{en:"Fever", es:"Fiebre", zh:"发烧", vi:"Sốt", ar:"الحمى", fr:"Fièvre", ko:"발열", ru:"Лихорадка", pt:"Febre", de:"Fieber", ja:"発熱"},
     category:{en:"Fever reducers (antipyretics)", es:"Antifebriles (antipiréticos)", zh:"退烧药（解热药）", vi:"Thuốc hạ sốt (antipyretics)", ar:"خافضات الحرارة", fr:"Antipyrétiques (réducteurs de fièvre)", ko:"해열제", ru:"Жаропонижающие (антипиретики)", pt:"Antitérmicos (antipiréticos)", de:"Fiebersenker (Antipyretika)", ja:"解熱薬"},
-    note:{en:"The same analgesics used for pain are also used to bring down a fever.", es:"Los mismos analgésicos que se usan para el dolor también se usan para bajar la fiebre.", zh:"用于止痛的同一类镇痛药也用于退烧。", vi:"Các loại thuốc giảm đau dùng để giảm đau cũng được dùng để hạ sốt.", ar:"نفس المسكنات المستخدمة للألم تُستخدم أيضًا لخفض الحمى.", fr:"Les mêmes analgésiques utilisés pour la douleur servent aussi à faire baisser la fièvre.", ko:"통증에 쓰는 같은 진통제가 발열을 내리는 데도 쓰입니다.", ru:"Те же анальгетики, что применяют при боли, используют и для снижения температуры.", pt:"Os mesmos analgésicos usados para dor também são usados para baixar a febre.", de:"Dieselben Schmerzmittel, die bei Schmerzen verwendet werden, dienen auch zum Fiebersenken.", ja:"痛みに使うのと同じ鎮痛薬が、熱を下げるのにも使われます。"} },
-  { key:"muscle_aches", catKey:"pain", examples:["ibuprofen","naproxen","acetaminophen"],
+    note:{en:"The same analgesics used for pain are also used to bring down a fever.", es:"Los mismos analgésicos que se usan para el dolor también se usan para bajar la fiebre.", zh:"用于止痛的同一类镇痛药也用于退烧。", vi:"Các loại thuốc giảm đau dùng để giảm đau cũng được dùng để hạ sốt.", ar:"نفس المسكنات المستخدمة للألم تُستخدم أيضًا لخفض الحمى.", fr:"Les mêmes analgésiques utilisés pour la douleur servent aussi à faire baisser la fièvre.", ko:"통증에 쓰는 같은 진통제가 발열을 내리는 데도 쓰입니다.", ru:"Те же анальгетики, что применяют при боли, используют и для снижения температуры.", pt:"Os mesmos analgésicos usados para dor também são usados para baixar a febre.", de:"Dieselben Schmerzmittel, die bei Schmerzen verwendet werden, dienen auch zum Fiebersenken.", ja:"痛みに使うのと同じ鎮痛薬が、熱を下げるのにも使われます。"},
+    selfcare:{en:"Rest, fluids, and light clothing help you ride out a fever; check with a doctor if it climbs high or lingers."} },
+  { key:"muscle_aches", group:"pain", catKey:"pain", examples:["ibuprofen","naproxen","acetaminophen"],
     symptom:{en:"Muscle or joint aches", es:"Dolores musculares o articulares", zh:"肌肉或关节疼痛", vi:"Đau cơ hoặc khớp", ar:"آلام العضلات أو المفاصل", fr:"Douleurs musculaires ou articulaires", ko:"근육 또는 관절 통증", ru:"Боль в мышцах или суставах", pt:"Dores musculares ou nas articulações", de:"Muskel- oder Gelenkschmerzen", ja:"筋肉や関節の痛み"},
     category:{en:"Pain relievers (analgesics)", es:"Analgésicos (para el dolor)", zh:"止痛药（镇痛药）", vi:"Thuốc giảm đau (analgesics)", ar:"مسكنات الألم (المسكّنات)", fr:"Analgésiques (antidouleurs)", ko:"진통제", ru:"Обезболивающие (анальгетики)", pt:"Analgésicos", de:"Schmerzmittel (Analgetika)", ja:"鎮痛薬"},
-    note:{en:"NSAIDs also target inflammation, not just pain.", es:"Los AINE también atacan la inflamación, no solo el dolor.", zh:"非甾体抗炎药还能针对炎症，而不仅仅是疼痛。", vi:"NSAID còn tác động đến viêm, không chỉ giảm đau.", ar:"تستهدف مضادات الالتهاب غير الستيرويدية الالتهاب أيضًا، وليس الألم فقط.", fr:"Les AINS ciblent aussi l'inflammation, pas seulement la douleur.", ko:"NSAID는 통증뿐 아니라 염증도 겨냥합니다.", ru:"НПВП воздействуют и на воспаление, а не только на боль.", pt:"Os AINEs também atuam na inflamação, não só na dor.", de:"NSAR wirken auch auf die Entzündung, nicht nur auf den Schmerz.", ja:"NSAIDは痛みだけでなく炎症にも働きます。"} },
-  { key:"congestion", catKey:"decongestant", examples:["phenylephrine","pseudoephedrine"],
+    note:{en:"NSAIDs also target inflammation, not just pain.", es:"Los AINE también atacan la inflamación, no solo el dolor.", zh:"非甾体抗炎药还能针对炎症，而不仅仅是疼痛。", vi:"NSAID còn tác động đến viêm, không chỉ giảm đau.", ar:"تستهدف مضادات الالتهاب غير الستيرويدية الالتهاب أيضًا، وليس الألم فقط.", fr:"Les AINS ciblent aussi l'inflammation, pas seulement la douleur.", ko:"NSAID는 통증뿐 아니라 염증도 겨냥합니다.", ru:"НПВП воздействуют и на воспаление, а не только на боль.", pt:"Os AINEs também atuam na inflamação, não só na dor.", de:"NSAR wirken auch auf die Entzündung, nicht nur auf den Schmerz.", ja:"NSAIDは痛みだけでなく炎症にも働きます。"},
+    selfcare:{en:"Rest, plus ice for a fresh injury or heat for stiffness, eases sore muscles and joints."} },
+  { key:"back_pain", group:"pain", catKey:"back", examples:["ibuprofen","naproxen","acetaminophen","menthol","lidocaine"],
+    symptom:{en:"Back pain (mild)"},
+    category:{en:"Pain relievers & topical rubs"},
+    note:{en:"OTC pain relievers and topical rubs ease everyday muscle-related back pain."},
+    selfcare:{en:"Heat or gentle movement usually beats long bed rest for mild back pain — and watch your lifting posture."} },
+  { key:"toothache", group:"pain", catKey:"dental", examples:["ibuprofen","acetaminophen","benzocaine"],
+    symptom:{en:"Toothache"},
+    category:{en:"Pain relievers & oral numbing gels"},
+    note:{en:"OTC pain relievers and numbing gels can ease tooth pain until you get seen."},
+    selfcare:{en:"Rinse with warm salt water and hold a cold compress to the cheek — and see a dentist, since a toothache usually needs a real fix."} },
+  { key:"arthritis", group:"pain", catKey:"joint", examples:["naproxen","ibuprofen","diclofenac","acetaminophen"],
+    symptom:{en:"Joint or arthritis aches (mild)"},
+    category:{en:"Pain relievers (incl. topical NSAID gels)"},
+    note:{en:"OTC pain relievers, including topical NSAID gels, ease mild joint and arthritis aches."},
+    selfcare:{en:"Gentle regular movement, heat for stiffness, and ice for a flare all help mild joint pain."} },
+  { key:"minor_sprain", group:"pain", catKey:"sprain", examples:["ibuprofen","naproxen","menthol"],
+    symptom:{en:"Minor sprain or strain"},
+    category:{en:"Anti-inflammatory pain relievers & rubs"},
+    note:{en:"OTC anti-inflammatory pain relievers ease the pain and swelling of a minor sprain."},
+    selfcare:{en:"Think R.I.C.E. — rest, ice, compression, elevation — for a minor sprain or strain."} },
+  { key:"congestion", group:"cold", catKey:"decongestant", examples:["phenylephrine","pseudoephedrine"],
     symptom:{en:"Runny or stuffy nose", es:"Nariz que moquea o congestionada", zh:"流鼻涕或鼻塞", vi:"Chảy nước mũi hoặc nghẹt mũi", ar:"سيلان الأنف أو انسداده", fr:"Nez qui coule ou bouché", ko:"콧물 또는 코막힘", ru:"Насморк или заложенность носа", pt:"Nariz escorrendo ou entupido", de:"Laufende oder verstopfte Nase", ja:"鼻水や鼻づまり"},
     category:{en:"Decongestants", es:"Descongestionantes", zh:"减充血剂", vi:"Thuốc thông mũi", ar:"مزيلات الاحتقان", fr:"Décongestionnants", ko:"충혈 완화제", ru:"Противоотёчные (деконгестанты)", pt:"Descongestionantes", de:"Abschwellmittel", ja:"充血除去薬"},
-    note:{en:"Work by shrinking swollen nasal passages.", es:"Funcionan reduciendo la hinchazón de las vías nasales.", zh:"通过收缩肿胀的鼻腔通道来发挥作用。", vi:"Hoạt động bằng cách làm co các đường mũi bị sưng.", ar:"تعمل عن طريق تقليص الممرات الأنفية المتورمة.", fr:"Agissent en réduisant le gonflement des voies nasales.", ko:"부은 비강 통로를 수축시켜 작용합니다.", ru:"Действуют, сужая отёкшие носовые ходы.", pt:"Agem reduzindo as vias nasais inchadas.", de:"Wirken, indem sie geschwollene Nasengänge verengen.", ja:"腫れた鼻の通り道を縮めて作用します。"} },
-  { key:"allergy", catKey:"antihistamine", examples:["cetirizine","loratadine","fexofenadine","diphenhydramine"],
+    note:{en:"Work by shrinking swollen nasal passages.", es:"Funcionan reduciendo la hinchazón de las vías nasales.", zh:"通过收缩肿胀的鼻腔通道来发挥作用。", vi:"Hoạt động bằng cách làm co các đường mũi bị sưng.", ar:"تعمل عن طريق تقليص الممرات الأنفية المتورمة.", fr:"Agissent en réduisant le gonflement des voies nasales.", ko:"부은 비강 통로를 수축시켜 작용합니다.", ru:"Действуют, сужая отёкшие носовые ходы.", pt:"Agem reduzindo as vias nasais inchadas.", de:"Wirken, indem sie geschwollene Nasengänge verengen.", ja:"腫れた鼻の通り道を縮めて作用します。"},
+    selfcare:{en:"Saline spray, a humidifier, and steam from a warm shower loosen a stuffy nose."} },
+  { key:"allergy", group:"cold", catKey:"antihistamine", examples:["cetirizine","loratadine","fexofenadine","diphenhydramine"],
     symptom:{en:"Sneezing or itchy eyes", es:"Estornudos u ojos que pican", zh:"打喷嚏或眼睛发痒", vi:"Hắt hơi hoặc ngứa mắt", ar:"العطس أو حكة العينين", fr:"Éternuements ou yeux qui démangent", ko:"재채기 또는 눈 가려움", ru:"Чихание или зуд в глазах", pt:"Espirros ou olhos coçando", de:"Niesen oder juckende Augen", ja:"くしゃみや目のかゆみ"},
     category:{en:"Antihistamines", es:"Antihistamínicos", zh:"抗组胺药", vi:"Thuốc kháng histamine", ar:"مضادات الهيستامين", fr:"Antihistaminiques", ko:"항히스타민제", ru:"Антигистаминные", pt:"Anti-histamínicos", de:"Antihistaminika", ja:"抗ヒスタミン薬"},
-    note:{en:"Block the histamine response behind classic allergy symptoms.", es:"Bloquean la respuesta de histamina detrás de los síntomas clásicos de alergia.", zh:"阻断典型过敏症状背后的组胺反应。", vi:"Ức chế phản ứng histamine đằng sau các triệu chứng dị ứng điển hình.", ar:"تُثبّط استجابة الهيستامين وراء أعراض الحساسية النموذجية.", fr:"Bloquent la réponse à l'histamine à l'origine des symptômes d'allergie classiques.", ko:"전형적인 알레르기 증상의 배후에 있는 히스타민 반응을 차단합니다.", ru:"Блокируют гистаминовую реакцию, стоящую за классическими симптомами аллергии.", pt:"Bloqueiam a resposta à histamina por trás dos sintomas clássicos de alergia.", de:"Blockieren die Histaminreaktion hinter klassischen Allergiesymptomen.", ja:"典型的なアレルギー症状の背後にあるヒスタミン反応を遮断します。"} },
-  { key:"cough", catKey:"cough", examples:["dextromethorphan","guaifenesin"],
+    note:{en:"Block the histamine response behind classic allergy symptoms.", es:"Bloquean la respuesta de histamina detrás de los síntomas clásicos de alergia.", zh:"阻断典型过敏症状背后的组胺反应。", vi:"Ức chế phản ứng histamine đằng sau các triệu chứng dị ứng điển hình.", ar:"تُثبّط استجابة الهيستامين وراء أعراض الحساسية النموذجية.", fr:"Bloquent la réponse à l'histamine à l'origine des symptômes d'allergie classiques.", ko:"전형적인 알레르기 증상의 배후에 있는 히스타민 반응을 차단합니다.", ru:"Блокируют гистаминовую реакцию, стоящую за классическими симптомами аллергии.", pt:"Bloqueiam a resposta à histamina por trás dos sintomas clássicos de alergia.", de:"Blockieren die Histaminreaktion hinter klassischen Allergiesymptomen.", ja:"典型的なアレルギー症状の背後にあるヒスタミン反応を遮断します。"},
+    selfcare:{en:"Rinsing with saline and avoiding your triggers cuts down sneezing and itchy eyes."} },
+  { key:"cough", group:"cold", catKey:"cough", examples:["dextromethorphan","guaifenesin"],
     symptom:{en:"Cough", es:"Tos", zh:"咳嗽", vi:"Ho", ar:"السعال", fr:"Toux", ko:"기침", ru:"Кашель", pt:"Tosse", de:"Husten", ja:"咳"},
     category:{en:"Cough suppressants & expectorants", es:"Antitusivos y expectorantes", zh:"止咳药和祛痰药", vi:"Thuốc giảm ho và thuốc long đờm", ar:"مثبطات السعال وطاردات البلغم", fr:"Antitussifs &amp; expectorants", ko:"진해제 &amp; 거담제", ru:"Противокашлевые &amp; отхаркивающие", pt:"Antitussígenos &amp; expectorantes", de:"Hustenstiller &amp; Schleimlöser", ja:"鎮咳薬 &amp; 去痰薬"},
-    note:{en:"One quiets the cough reflex; the other helps loosen mucus.", es:"Uno calma el reflejo de la tos; el otro ayuda a aflojar la mucosidad.", zh:"一种能抑制咳嗽反射，另一种有助于松动痰液。", vi:"Một loại làm dịu phản xạ ho; loại kia giúp làm loãng đờm.", ar:"أحدها يهدئ منعكس السعال؛ والآخر يساعد على إذابة المخاط.", fr:"L'un calme le réflexe de la toux ; l'autre aide à fluidifier le mucus.", ko:"하나는 기침 반사를 가라앉히고, 다른 하나는 가래를 묽게 하는 데 도움을 줍니다.", ru:"Одно успокаивает кашлевой рефлекс; другое помогает разжижать мокроту.", pt:"Um acalma o reflexo da tosse; o outro ajuda a soltar o muco.", de:"Der eine beruhigt den Hustenreiz; der andere hilft, den Schleim zu lösen.", ja:"一方は咳の反射を鎮め、もう一方は痰をゆるめるのを助けます。"} },
-  { key:"sore_throat", catKey:"throat", examples:["benzocaine","menthol"],
+    note:{en:"One quiets the cough reflex; the other helps loosen mucus.", es:"Uno calma el reflejo de la tos; el otro ayuda a aflojar la mucosidad.", zh:"一种能抑制咳嗽反射，另一种有助于松动痰液。", vi:"Một loại làm dịu phản xạ ho; loại kia giúp làm loãng đờm.", ar:"أحدها يهدئ منعكس السعال؛ والآخر يساعد على إذابة المخاط.", fr:"L'un calme le réflexe de la toux ; l'autre aide à fluidifier le mucus.", ko:"하나는 기침 반사를 가라앉히고, 다른 하나는 가래를 묽게 하는 데 도움을 줍니다.", ru:"Одно успокаивает кашлевой рефлекс; другое помогает разжижать мокроту.", pt:"Um acalma o reflexo da tosse; o outro ajuda a soltar o muco.", de:"Der eine beruhigt den Hustenreiz; der andere hilft, den Schleim zu lösen.", ja:"一方は咳の反射を鎮め、もう一方は痰をゆるめるのを助けます。"},
+    selfcare:{en:"Warm fluids, honey (not for babies under 1), and a humidifier soothe a cough."} },
+  { key:"sore_throat", group:"cold", catKey:"throat", examples:["benzocaine","menthol"],
     symptom:{en:"Sore throat", es:"Dolor de garganta", zh:"喉咙痛", vi:"Đau họng", ar:"التهاب الحلق", fr:"Mal de gorge", ko:"인후통", ru:"Боль в горле", pt:"Dor de garganta", de:"Halsschmerzen", ja:"のどの痛み"},
     category:{en:"Throat lozenges & topical anesthetics", es:"Pastillas para la garganta y anestésicos tópicos", zh:"喉片和局部麻醉剂", vi:"Viên ngậm họng và thuốc gây tê tại chỗ", ar:"أقراص استحلاب الحلق والمخدرات الموضعية", fr:"Pastilles pour la gorge &amp; anesthésiques locaux", ko:"인후 로젠지 &amp; 국소 마취제", ru:"Пастилки для горла &amp; местные анестетики", pt:"Pastilhas para garganta &amp; anestésicos tópicos", de:"Halspastillen &amp; örtliche Betäubungsmittel", ja:"のどトローチ &amp; 局所麻酔薬"},
-    note:{en:"Numb or soothe throat irritation.", es:"Adormecen o calman la irritación de la garganta.", zh:"使喉咙麻木或缓解喉咙不适。", vi:"Làm tê hoặc làm dịu tình trạng kích ứng họng.", ar:"تُخدّر أو تُهدّئ تهيج الحلق.", fr:"Anesthésient ou apaisent l'irritation de la gorge.", ko:"목의 자극을 마비시키거나 진정시킵니다.", ru:"Обезболивают или успокаивают раздражение горла.", pt:"Anestesiam ou aliviam a irritação da garganta.", de:"Betäuben oder lindern die Halsreizung.", ja:"のどの刺激を麻痺させたり和らげたりします。"} },
-  { key:"heartburn", catKey:"acid", examples:["famotidine","omeprazole","calcium carbonate"],
+    note:{en:"Numb or soothe throat irritation.", es:"Adormecen o calman la irritación de la garganta.", zh:"使喉咙麻木或缓解喉咙不适。", vi:"Làm tê hoặc làm dịu tình trạng kích ứng họng.", ar:"تُخدّر أو تُهدّئ تهيج الحلق.", fr:"Anesthésient ou apaisent l'irritation de la gorge.", ko:"목의 자극을 마비시키거나 진정시킵니다.", ru:"Обезболивают или успокаивают раздражение горла.", pt:"Anestesiam ou aliviam a irritação da garganta.", de:"Betäuben oder lindern die Halsreizung.", ja:"のどの刺激を麻痺させたり和らげたりします。"},
+    selfcare:{en:"Gargling warm salt water and sipping warm drinks soothe a sore throat."} },
+  { key:"sinus", group:"cold", catKey:"sinus", examples:["phenylephrine","pseudoephedrine"],
+    symptom:{en:"Sinus pressure"},
+    category:{en:"Decongestants & saline"},
+    note:{en:"Decongestants and saline rinses relieve the stuffed-up pressure of sinus congestion."},
+    selfcare:{en:"Steam, a warm compress over the sinuses, and staying hydrated help loosen sinus pressure."} },
+  { key:"chest_congestion", group:"cold", catKey:"expectorant", examples:["guaifenesin"],
+    symptom:{en:"Chest congestion / mucus"},
+    category:{en:"Expectorants"},
+    note:{en:"Expectorants thin and loosen mucus so a chesty cough clears more easily."},
+    selfcare:{en:"Drink plenty of fluids and use a humidifier to help loosen chest mucus."} },
+  { key:"nasal_allergy", group:"cold", catKey:"nasal_allergy", examples:["fluticasone","cetirizine","loratadine","cromolyn"],
+    symptom:{en:"Seasonal nasal allergies"},
+    category:{en:"Antihistamines & steroid nasal sprays"},
+    note:{en:"Non-drowsy antihistamines and steroid nasal sprays control ongoing seasonal nasal allergies."},
+    selfcare:{en:"Saline rinses and keeping windows shut on high-pollen days cut down allergy symptoms."} },
+  { key:"heartburn", group:"digestive", catKey:"acid", examples:["famotidine","omeprazole","calcium carbonate"],
     symptom:{en:"Heartburn or acid reflux", es:"Acidez o reflujo ácido", zh:"胃灼热或胃酸反流", vi:"Ợ nóng hoặc trào ngược axit", ar:"حرقة المعدة أو ارتجاع الحمض", fr:"Brûlures d'estomac ou reflux acide", ko:"속쓰림 또는 위산 역류", ru:"Изжога или кислотный рефлюкс", pt:"Azia ou refluxo ácido", de:"Sodbrennen oder saurer Reflux", ja:"胸やけや胃酸逆流"},
     category:{en:"Acid reducers", es:"Reductores de ácido", zh:"抑酸药", vi:"Thuốc giảm axit", ar:"مخفضات الحموضة", fr:"Réducteurs d'acidité", ko:"제산·위산 억제제", ru:"Средства, снижающие кислотность", pt:"Redutores de ácido", de:"Säurehemmer", ja:"胃酸を抑える薬"},
-    note:{en:"Either neutralize acid quickly or reduce how much the stomach makes.", es:"Neutralizan el ácido rápidamente o reducen cuánto produce el estómago.", zh:"要么迅速中和胃酸，要么减少胃酸的分泌量。", vi:"Trung hòa axit nhanh chóng hoặc giảm lượng axit mà dạ dày tiết ra.", ar:"إما تُعادل الحمض بسرعة أو تُقلل من كمية الحمض الذي تنتجه المعدة.", fr:"Soit neutralisent l'acide rapidement, soit réduisent la quantité que l'estomac produit.", ko:"위산을 빠르게 중화하거나 위가 만드는 양을 줄입니다.", ru:"Либо быстро нейтрализуют кислоту, либо снижают её выработку желудком.", pt:"Ou neutralizam o ácido rapidamente ou reduzem quanto o estômago produz.", de:"Neutralisieren die Säure schnell oder verringern, wie viel der Magen bildet.", ja:"酸を素早く中和するか、胃が作る量を減らします。"} },
-  { key:"nausea", catKey:"nausea", examples:["dimenhydrinate","meclizine"],
+    note:{en:"Either neutralize acid quickly or reduce how much the stomach makes.", es:"Neutralizan el ácido rápidamente o reducen cuánto produce el estómago.", zh:"要么迅速中和胃酸，要么减少胃酸的分泌量。", vi:"Trung hòa axit nhanh chóng hoặc giảm lượng axit mà dạ dày tiết ra.", ar:"إما تُعادل الحمض بسرعة أو تُقلل من كمية الحمض الذي تنتجه المعدة.", fr:"Soit neutralisent l'acide rapidement, soit réduisent la quantité que l'estomac produit.", ko:"위산을 빠르게 중화하거나 위가 만드는 양을 줄입니다.", ru:"Либо быстро нейтрализуют кислоту, либо снижают её выработку желудком.", pt:"Ou neutralizam o ácido rapidamente ou reduzem quanto o estômago produz.", de:"Neutralisieren die Säure schnell oder verringern, wie viel der Magen bildet.", ja:"酸を素早く中和するか、胃が作る量を減らします。"},
+    selfcare:{en:"Smaller meals, not lying down right after eating, and raising the head of your bed help reflux."} },
+  { key:"nausea", group:"digestive", catKey:"nausea", examples:["dimenhydrinate","meclizine"],
     symptom:{en:"Nausea", es:"Náuseas", zh:"恶心", vi:"Buồn nôn", ar:"الغثيان", fr:"Nausées", ko:"메스꺼움", ru:"Тошнота", pt:"Náusea", de:"Übelkeit", ja:"吐き気"},
     category:{en:"Anti-nausea (antiemetics)", es:"Antináuseas (antieméticos)", zh:"止吐药（抗恶心药）", vi:"Thuốc chống buồn nôn (antiemetics)", ar:"مضادات الغثيان", fr:"Anti-nauséeux (antiémétiques)", ko:"진토제", ru:"Противорвотные (антиэметики)", pt:"Antináusea (antieméticos)", de:"Mittel gegen Übelkeit (Antiemetika)", ja:"制吐薬"},
-    note:{en:"Commonly used for motion sickness and mild nausea.", es:"Se usan comúnmente para el mareo por movimiento y náuseas leves.", zh:"常用于晕动症和轻度恶心。", vi:"Thường được dùng cho say tàu xe và buồn nôn nhẹ.", ar:"تُستخدم بشكل شائع لدوار الحركة والغثيان الخفيف.", fr:"Couramment utilisés pour le mal des transports et les nausées légères.", ko:"멀미와 가벼운 메스꺼움에 흔히 쓰입니다.", ru:"Часто применяют при укачивании и лёгкой тошноте.", pt:"Comumente usados para enjoo de movimento e náusea leve.", de:"Häufig bei Reisekrankheit und leichter Übelkeit verwendet.", ja:"乗り物酔いや軽い吐き気によく使われます。"} },
-  { key:"diarrhea", catKey:"diarrhea", examples:["loperamide","bismuth subsalicylate"],
+    note:{en:"Commonly used for motion sickness and mild nausea.", es:"Se usan comúnmente para el mareo por movimiento y náuseas leves.", zh:"常用于晕动症和轻度恶心。", vi:"Thường được dùng cho say tàu xe và buồn nôn nhẹ.", ar:"تُستخدم بشكل شائع لدوار الحركة والغثيان الخفيف.", fr:"Couramment utilisés pour le mal des transports et les nausées légères.", ko:"멀미와 가벼운 메스꺼움에 흔히 쓰입니다.", ru:"Часто применяют при укачивании и лёгкой тошноте.", pt:"Comumente usados para enjoo de movimento e náusea leve.", de:"Häufig bei Reisekrankheit und leichter Übelkeit verwendet.", ja:"乗り物酔いや軽い吐き気によく使われます。"},
+    selfcare:{en:"Small sips of clear fluid, bland foods, ginger, and fresh air can settle mild nausea."} },
+  { key:"diarrhea", group:"digestive", catKey:"diarrhea", examples:["loperamide","bismuth subsalicylate"],
     symptom:{en:"Diarrhea", es:"Diarrea", zh:"腹泻", vi:"Tiêu chảy", ar:"الإسهال", fr:"Diarrhée", ko:"설사", ru:"Диарея", pt:"Diarreia", de:"Durchfall", ja:"下痢"},
     category:{en:"Anti-diarrheal", es:"Antidiarreicos", zh:"止泻药", vi:"Thuốc chống tiêu chảy", ar:"مضادات الإسهال", fr:"Antidiarrhéiques", ko:"지사제", ru:"Противодиарейные", pt:"Antidiarreicos", de:"Durchfallmittel", ja:"止瀉薬"},
-    note:{en:"Slow the gut down or coat and soothe the digestive tract.", es:"Ralentizan el intestino o recubren y calman el tracto digestivo.", zh:"减缓肠道蠕动，或包覆并舒缓消化道。", vi:"Làm chậm hoạt động của ruột, hoặc bao phủ và làm dịu đường tiêu hóa.", ar:"تُبطئ حركة الأمعاء أو تُغطي وتُهدّئ الجهاز الهضمي.", fr:"Ralentissent l'intestin ou tapissent et apaisent le tube digestif.", ko:"장 운동을 늦추거나 소화관을 감싸고 진정시킵니다.", ru:"Замедляют кишечник или обволакивают и успокаивают пищеварительный тракт.", pt:"Retardam o intestino ou revestem e acalmam o trato digestivo.", de:"Verlangsamen den Darm oder überziehen und beruhigen den Verdauungstrakt.", ja:"腸の動きを遅くするか、消化管を覆って和らげます。"} },
-  { key:"constipation", catKey:"laxative", examples:["polyethylene glycol","docusate","bisacodyl"],
+    note:{en:"Slow the gut down or coat and soothe the digestive tract.", es:"Ralentizan el intestino o recubren y calman el tracto digestivo.", zh:"减缓肠道蠕动，或包覆并舒缓消化道。", vi:"Làm chậm hoạt động của ruột, hoặc bao phủ và làm dịu đường tiêu hóa.", ar:"تُبطئ حركة الأمعاء أو تُغطي وتُهدّئ الجهاز الهضمي.", fr:"Ralentissent l'intestin ou tapissent et apaisent le tube digestif.", ko:"장 운동을 늦추거나 소화관을 감싸고 진정시킵니다.", ru:"Замедляют кишечник или обволакивают и успокаивают пищеварительный тракт.", pt:"Retardam o intestino ou revestem e acalmam o trato digestivo.", de:"Verlangsamen den Darm oder überziehen und beruhigen den Verdauungstrakt.", ja:"腸の動きを遅くするか、消化管を覆って和らげます。"},
+    selfcare:{en:"Sip water or an oral rehydration drink and ease back onto bland foods; see a doctor if it's severe, bloody, or lasts more than a couple of days."} },
+  { key:"constipation", group:"digestive", catKey:"laxative", examples:["polyethylene glycol","docusate","bisacodyl"],
     symptom:{en:"Constipation", es:"Estreñimiento", zh:"便秘", vi:"Táo bón", ar:"الإمساك", fr:"Constipation", ko:"변비", ru:"Запор", pt:"Constipação", de:"Verstopfung", ja:"便秘"},
     category:{en:"Laxatives", es:"Laxantes", zh:"泻药", vi:"Thuốc nhuận tràng", ar:"المُليّنات", fr:"Laxatifs", ko:"완하제", ru:"Слабительные", pt:"Laxantes", de:"Abführmittel", ja:"下剤"},
-    note:{en:"Different mechanisms — osmotic, stool softener, and stimulant.", es:"Diferentes mecanismos — osmótico, ablandador de heces, y estimulante.", zh:"作用机制各不相同——渗透性、软化大便类，以及刺激性。", vi:"Có nhiều cơ chế khác nhau — thẩm thấu, làm mềm phân, và kích thích.", ar:"آليات مختلفة — تناضحية، ومُليّنة للبراز، ومُحفّزة.", fr:"Mécanismes différents — osmotique, émollient fécal, et stimulant.", ko:"기전이 서로 다름 — 삼투성, 대변 연화제, 자극성.", ru:"Разные механизмы — осмотические, размягчители стула и стимулирующие.", pt:"Mecanismos diferentes — osmótico, amaciante das fezes e estimulante.", de:"Verschiedene Mechanismen — osmotisch, Stuhlweichmacher und stimulierend.", ja:"仕組みはさまざま — 浸透圧性、便軟化薬、刺激性。"} },
-  { key:"insomnia", catKey:"sleep", examples:["diphenhydramine","doxylamine"],
-    symptom:{en:"Trouble sleeping", es:"Dificultad para dormir", zh:"睡眠困难", vi:"Khó ngủ", ar:"صعوبة النوم", fr:"Difficulté à dormir", ko:"수면 곤란", ru:"Трудности со сном", pt:"Dificuldade para dormir", de:"Schlafstörungen", ja:"寝つきが悪い"},
-    category:{en:"Sleep aids", es:"Ayudas para dormir", zh:"助眠药", vi:"Thuốc hỗ trợ giấc ngủ", ar:"مساعدات النوم", fr:"Somnifères", ko:"수면 보조제", ru:"Снотворные средства", pt:"Auxiliares de sono", de:"Schlafmittel", ja:"睡眠補助薬"},
-    note:{en:"OTC sleep aids are antihistamines with a sedating side effect.", es:"Las ayudas para dormir de venta libre son antihistamínicos con un efecto secundario sedante.", zh:"非处方助眠药是具有镇静副作用的抗组胺药。", vi:"Thuốc hỗ trợ giấc ngủ không kê đơn là thuốc kháng histamine có tác dụng phụ gây buồn ngủ.", ar:"مساعدات النوم التي تُصرف دون وصفة طبية هي مضادات هيستامين ذات أثر جانبي مُهدّئ.", fr:"Les somnifères en vente libre sont des antihistaminiques avec un effet secondaire sédatif.", ko:"일반의약품 수면 보조제는 진정 부작용이 있는 항히스타민제입니다.", ru:"Безрецептурные снотворные — это антигистаминные с седативным побочным эффектом.", pt:"Auxiliares de sono de venda livre são anti-histamínicos com um efeito colateral sedativo.", de:"Rezeptfreie Schlafmittel sind Antihistaminika mit einer sedierenden Nebenwirkung.", ja:"市販の睡眠補助薬は、鎮静の副作用がある抗ヒスタミン薬です。"} },
-  { key:"skin_itch", catKey:"skin", examples:["hydrocortisone","diphenhydramine"],
-    symptom:{en:"Minor skin itching or rash", es:"Picazón o sarpullido leve en la piel", zh:"轻微皮肤瘙痒或皮疹", vi:"Ngứa da hoặc phát ban nhẹ", ar:"حكة أو طفح جلدي خفيف", fr:"Légères démangeaisons ou éruption cutanée", ko:"경미한 피부 가려움 또는 발진", ru:"Лёгкий зуд кожи или сыпь", pt:"Leve coceira na pele ou erupção", de:"Leichter Hautjuckreiz oder Ausschlag", ja:"軽い皮膚のかゆみや発疹"},
-    category:{en:"Topical antihistamines & hydrocortisone", es:"Antihistamínicos tópicos e hidrocortisona", zh:"局部抗组胺药和氢化可的松", vi:"Thuốc kháng histamine bôi ngoài da và hydrocortisone", ar:"مضادات الهيستامين الموضعية والهيدروكورتيزون", fr:"Antihistaminiques topiques &amp; hydrocortisone", ko:"국소 항히스타민제 &amp; 하이드로코르티손", ru:"Местные антигистаминные &amp; гидрокортизон", pt:"Anti-histamínicos tópicos &amp; hidrocortisona", de:"Örtliche Antihistaminika &amp; Hydrocortison", ja:"外用抗ヒスタミン薬 &amp; ヒドロコルチゾン"},
-    note:{en:"Reduce itching and inflammation on the skin.", es:"Reducen la picazón y la inflamación de la piel.", zh:"减轻皮肤瘙痒和炎症。", vi:"Giảm ngứa và viêm trên da.", ar:"تُقلّل الحكة والالتهاب على الجلد.", fr:"Réduisent les démangeaisons et l'inflammation sur la peau.", ko:"피부의 가려움과 염증을 줄입니다.", ru:"Уменьшают зуд и воспаление на коже.", pt:"Reduzem a coceira e a inflamação na pele.", de:"Verringern Juckreiz und Entzündung auf der Haut.", ja:"皮膚のかゆみと炎症を抑えます。"} },
-  { key:"gas_bloating", catKey:"gas", examples:["simethicone"],
+    note:{en:"Different mechanisms — osmotic, stool softener, and stimulant.", es:"Diferentes mecanismos — osmótico, ablandador de heces, y estimulante.", zh:"作用机制各不相同——渗透性、软化大便类，以及刺激性。", vi:"Có nhiều cơ chế khác nhau — thẩm thấu, làm mềm phân, và kích thích.", ar:"آليات مختلفة — تناضحية، ومُليّنة للبراز، ومُحفّزة.", fr:"Mécanismes différents — osmotique, émollient fécal, et stimulant.", ko:"기전이 서로 다름 — 삼투성, 대변 연화제, 자극성.", ru:"Разные механизмы — осмотические, размягчители стула и стимулирующие.", pt:"Mecanismos diferentes — osmótico, amaciante das fezes e estimulante.", de:"Verschiedene Mechanismen — osmotisch, Stuhlweichmacher und stimulierend.", ja:"仕組みはさまざま — 浸透圧性、便軟化薬、刺激性。"},
+    selfcare:{en:"More fiber, more water, and moving around regularly get things going."} },
+  { key:"gas_bloating", group:"digestive", catKey:"gas", examples:["simethicone"],
     symptom:{en:"Gas or bloating", es:"Gases o hinchazón", zh:"胀气或腹胀", vi:"Đầy hơi hoặc chướng bụng", ar:"الغازات أو الانتفاخ", fr:"Gaz ou ballonnements", ko:"가스 또는 복부 팽만", ru:"Газы или вздутие", pt:"Gases ou inchaço", de:"Blähungen oder Völlegefühl", ja:"ガスやお腹の張り"},
     category:{en:"Anti-gas medicines", es:"Antiflatulentos (antigases)", zh:"消胀气药", vi:"Thuốc chống đầy hơi", ar:"أدوية طرد الغازات", fr:"Médicaments anti-gaz", ko:"가스 완화제", ru:"Средства от газов", pt:"Antigases", de:"Mittel gegen Blähungen", ja:"ガス（お腹の張り）を抑える薬"},
-    note:{en:"Anti-gas medicines break up trapped gas bubbles to ease pressure and bloating.", es:"Los antiflatulentos deshacen las burbujas de gas atrapado para aliviar la presión y la hinchazón.", zh:"消胀气药能分解滞留的气泡，缓解胀气带来的压迫感和腹胀。", vi:"Thuốc chống đầy hơi làm vỡ các bọt khí bị mắc kẹt để giảm cảm giác căng tức và chướng bụng.", ar:"تعمل أدوية طرد الغازات على تفكيك فقاعات الغاز المحتبسة لتخفيف الضغط والانتفاخ.", fr:"Les médicaments anti-gaz brisent les bulles de gaz emprisonnées pour soulager la pression et les ballonnements.", ko:"가스 완화제는 갇힌 가스 방울을 분해해 압박감과 팽만감을 덜어 줍니다.", ru:"Средства от газов разбивают скопившиеся пузырьки газа, облегчая давление и вздутие.", pt:"Os antigases quebram as bolhas de gás presas para aliviar a pressão e o inchaço.", de:"Mittel gegen Blähungen zerteilen eingeschlossene Gasblasen, um Druck und Völlegefühl zu lindern.", ja:"ガスを抑える薬は、たまったガスの泡を分解して張りや圧迫感をやわらげます。"} },
-  { key:"menstrual_cramps", catKey:"pain", examples:["ibuprofen","naproxen","acetaminophen"],
-    symptom:{en:"Menstrual cramps", es:"Cólicos menstruales", zh:"经期痛经", vi:"Đau bụng kinh", ar:"تقلصات الدورة الشهرية", fr:"Crampes menstruelles", ko:"생리통", ru:"Менструальные спазмы", pt:"Cólicas menstruais", de:"Menstruationskrämpfe", ja:"生理痛"},
-    category:{en:"Pain relievers (analgesics)", es:"Analgésicos (para el dolor)", zh:"止痛药（镇痛药）", vi:"Thuốc giảm đau (analgesics)", ar:"مسكنات الألم (المسكّنات)", fr:"Analgésiques (antidouleurs)", ko:"진통제", ru:"Обезболивающие (анальгетики)", pt:"Analgésicos", de:"Schmerzmittel (Analgetika)", ja:"鎮痛薬"},
-    note:{en:"The same OTC pain relievers used for other aches; NSAIDs are often chosen because they also target the inflammation behind cramps.", es:"Los mismos analgésicos de venta libre que para otros dolores; a menudo se eligen los AINE porque también atacan la inflamación detrás de los cólicos.", zh:"与其他疼痛使用的是同类非处方止痛药；人们常选用非甾体抗炎药，因为它还能针对痛经背后的炎症。", vi:"Cùng loại thuốc giảm đau không kê đơn dùng cho các cơn đau khác; NSAID thường được chọn vì còn tác động đến tình trạng viêm gây ra đau bụng kinh.", ar:"نفس مسكنات الألم التي تُصرف دون وصفة والمستخدمة للآلام الأخرى؛ وغالبًا تُختار مضادات الالتهاب غير الستيرويدية لأنها تستهدف أيضًا الالتهاب المسبب للتقلصات.", fr:"Les mêmes antidouleurs en vente libre que pour d'autres douleurs ; on choisit souvent les AINS car ils ciblent aussi l'inflammation à l'origine des crampes.", ko:"다른 통증에 쓰는 것과 같은 시판 진통제입니다. NSAID는 생리통의 원인이 되는 염증에도 작용하기 때문에 자주 선택됩니다.", ru:"Те же безрецептурные обезболивающие, что и при других болях; НПВП часто выбирают, потому что они также действуют на воспаление, стоящее за спазмами.", pt:"Os mesmos analgésicos de venda livre usados para outras dores; os AINEs são frequentemente escolhidos porque também atuam na inflamação por trás das cólicas.", de:"Dieselben rezeptfreien Schmerzmittel wie bei anderen Beschwerden; NSAR werden oft gewählt, weil sie auch auf die Entzündung hinter den Krämpfen wirken.", ja:"他の痛みに使うのと同じ市販の鎮痛薬です。NSAIDは生理痛の背後にある炎症にも働くため、よく選ばれます。"} },
-  { key:"motion_sickness", catKey:"nausea", examples:["dimenhydrinate","meclizine"],
+    note:{en:"Anti-gas medicines break up trapped gas bubbles to ease pressure and bloating.", es:"Los antiflatulentos deshacen las burbujas de gas atrapado para aliviar la presión y la hinchazón.", zh:"消胀气药能分解滞留的气泡，缓解胀气带来的压迫感和腹胀。", vi:"Thuốc chống đầy hơi làm vỡ các bọt khí bị mắc kẹt để giảm cảm giác căng tức và chướng bụng.", ar:"تعمل أدوية طرد الغازات على تفكيك فقاعات الغاز المحتبسة لتخفيف الضغط والانتفاخ.", fr:"Les médicaments anti-gaz brisent les bulles de gaz emprisonnées pour soulager la pression et les ballonnements.", ko:"가스 완화제는 갇힌 가스 방울을 분해해 압박감과 팽만감을 덜어 줍니다.", ru:"Средства от газов разбивают скопившиеся пузырьки газа, облегчая давление и вздутие.", pt:"Os antigases quebram as bolhas de gás presas para aliviar a pressão e o inchaço.", de:"Mittel gegen Blähungen zerteilen eingeschlossene Gasblasen, um Druck und Völlegefühl zu lindern.", ja:"ガスを抑える薬は、たまったガスの泡を分解して張りや圧迫感をやわらげます。"},
+    selfcare:{en:"Eating slowly, going easy on gassy foods, and a short walk help trapped gas."} },
+  { key:"motion_sickness", group:"digestive", catKey:"nausea", examples:["dimenhydrinate","meclizine"],
     symptom:{en:"Motion sickness", es:"Mareo por movimiento", zh:"晕动症（晕车/晕船）", vi:"Say tàu xe", ar:"دوار الحركة", fr:"Mal des transports", ko:"멀미", ru:"Укачивание", pt:"Enjoo de movimento", de:"Reisekrankheit", ja:"乗り物酔い"},
     category:{en:"Anti-nausea (antiemetics)", es:"Antináuseas (antieméticos)", zh:"止吐药（抗恶心药）", vi:"Thuốc chống buồn nôn (antiemetics)", ar:"مضادات الغثيان", fr:"Anti-nauséeux (antiémétiques)", ko:"진토제", ru:"Противорвотные (антиэметики)", pt:"Antináusea (antieméticos)", de:"Mittel gegen Übelkeit (Antiemetika)", ja:"制吐薬"},
-    note:{en:"Taken before travel, these antihistamine-type antiemetics help prevent the nausea of motion sickness.", es:"Tomados antes de viajar, estos antieméticos de tipo antihistamínico ayudan a prevenir las náuseas del mareo por movimiento.", zh:"在出行前服用，这些抗组胺类止吐药有助于预防晕动症引起的恶心。", vi:"Uống trước khi di chuyển, các thuốc chống buồn nôn dạng kháng histamine này giúp ngăn ngừa buồn nôn do say tàu xe.", ar:"عند تناولها قبل السفر، تساعد مضادات الغثيان هذه من نوع مضادات الهيستامين على منع غثيان دوار الحركة.", fr:"Pris avant le voyage, ces antiémétiques de type antihistaminique aident à prévenir la nausée du mal des transports.", ko:"이동 전에 복용하면, 이 항히스타민 계열의 진토제가 멀미로 인한 메스꺼움을 예방하는 데 도움이 됩니다.", ru:"Принятые перед поездкой, эти противорвотные антигистаминного типа помогают предотвратить тошноту при укачивании.", pt:"Tomados antes de viajar, esses antieméticos do tipo anti-histamínico ajudam a prevenir a náusea do enjoo de movimento.", de:"Vor der Reise eingenommen, helfen diese Antiemetika vom Antihistaminikum-Typ, der Übelkeit der Reisekrankheit vorzubeugen.", ja:"移動の前に飲むと、これらの抗ヒスタミン系の制吐薬が乗り物酔いの吐き気を防ぐのに役立ちます。"} },
-  { key:"athletes_foot", catKey:"antifungal", examples:["clotrimazole","terbinafine","miconazole","tolnaftate"],
-    symptom:{en:"Athlete's foot or ringworm", es:"Pie de atleta o tiña", zh:"足癣（脚气）或体癣", vi:"Nấm da chân hoặc nấm da", ar:"القدم الرياضي أو السعفة", fr:"Pied d'athlète ou teigne", ko:"무좀 또는 백선", ru:"Грибок стоп или стригущий лишай", pt:"Pé de atleta ou micose", de:"Fußpilz oder Ringelflechte", ja:"水虫（足白癬）やたむし"},
-    category:{en:"Topical antifungals", es:"Antifúngicos tópicos", zh:"外用抗真菌药", vi:"Thuốc kháng nấm bôi ngoài da", ar:"مضادات الفطريات الموضعية", fr:"Antifongiques topiques", ko:"국소 항진균제", ru:"Местные противогрибковые", pt:"Antifúngicos tópicos", de:"Örtliche Antimykotika", ja:"外用抗真菌薬"},
-    note:{en:"Topical antifungals treat common skin fungal infections; they're usually used for a couple of weeks, even after it looks better.", es:"Los antifúngicos tópicos tratan las infecciones fúngicas comunes de la piel; suelen usarse durante un par de semanas, incluso después de que mejore.", zh:"外用抗真菌药用于治疗常见的皮肤真菌感染；通常需连用两周左右，即使看起来好转也要继续用。", vi:"Thuốc kháng nấm bôi ngoài da điều trị các nhiễm nấm da thường gặp; thường dùng trong khoảng hai tuần, kể cả khi đã trông đỡ hơn.", ar:"تعالج مضادات الفطريات الموضعية عدوى الجلد الفطرية الشائعة؛ وتُستخدم عادةً لأسبوعين، حتى بعد أن يبدو التحسن.", fr:"Les antifongiques topiques traitent les infections fongiques cutanées courantes ; on les utilise généralement pendant environ deux semaines, même après amélioration.", ko:"국소 항진균제는 흔한 피부 곰팡이 감염을 치료합니다. 보통 나아 보여도 2주 정도 계속 사용합니다.", ru:"Местные противогрибковые лечат распространённые грибковые инфекции кожи; их обычно применяют около двух недель, даже после видимого улучшения.", pt:"Os antifúngicos tópicos tratam infecções fúngicas comuns da pele; geralmente são usados por cerca de duas semanas, mesmo depois de melhorar.", de:"Örtliche Antimykotika behandeln häufige Hautpilzinfektionen; sie werden meist etwa zwei Wochen lang angewendet, auch wenn es schon besser aussieht.", ja:"外用抗真菌薬は、よくある皮膚の真菌感染を治療します。良くなったように見えても、通常2週間ほど使い続けます。"} },
-  { key:"acne", catKey:"acne", examples:["benzoyl peroxide","salicylic acid","adapalene"],
-    symptom:{en:"Acne or pimples", es:"Acné o granos", zh:"痤疮或粉刺", vi:"Mụn trứng cá", ar:"حب الشباب أو البثور", fr:"Acné ou boutons", ko:"여드름", ru:"Акне или прыщи", pt:"Acne ou espinhas", de:"Akne oder Pickel", ja:"にきび・吹き出物"},
-    category:{en:"Topical acne treatments", es:"Tratamientos tópicos para el acné", zh:"外用祛痘药", vi:"Thuốc trị mụn bôi ngoài da", ar:"علاجات حب الشباب الموضعية", fr:"Traitements topiques de l'acné", ko:"국소 여드름 치료제", ru:"Местные средства от акне", pt:"Tratamentos tópicos para acne", de:"Örtliche Aknemittel", ja:"外用にきび治療薬"},
-    note:{en:"OTC acne products unclog pores and reduce the bacteria and oil behind breakouts.", es:"Los productos de venta libre para el acné destapan los poros y reducen las bacterias y el sebo detrás de los brotes.", zh:"非处方祛痘产品能疏通毛孔，减少引发痘痘的细菌和油脂。", vi:"Sản phẩm trị mụn không kê đơn giúp thông thoáng lỗ chân lông và giảm vi khuẩn cùng dầu nhờn gây ra mụn.", ar:"تعمل منتجات حب الشباب التي تُصرف دون وصفة على فتح المسام وتقليل البكتيريا والدهون المسببة للبثور.", fr:"Les produits anti-acné en vente libre débouchent les pores et réduisent les bactéries et le sébum à l'origine des poussées.", ko:"시판 여드름 제품은 모공을 뚫어 주고 여드름의 원인이 되는 세균과 피지를 줄입니다.", ru:"Безрецептурные средства от акне очищают поры и уменьшают количество бактерий и жира, стоящих за высыпаниями.", pt:"Os produtos de venda livre para acne desobstruem os poros e reduzem as bactérias e a oleosidade por trás das espinhas.", de:"Rezeptfreie Aknemittel befreien die Poren und verringern die Bakterien und den Talg hinter den Ausbrüchen.", ja:"市販のにきび用製品は毛穴のつまりを取り、にきびの原因となる細菌や皮脂を減らします。"} },
-  { key:"hemorrhoids", catKey:"hemorrhoid", examples:["phenylephrine","hydrocortisone","witch hazel"],
+    note:{en:"Taken before travel, these antihistamine-type antiemetics help prevent the nausea of motion sickness.", es:"Tomados antes de viajar, estos antieméticos de tipo antihistamínico ayudan a prevenir las náuseas del mareo por movimiento.", zh:"在出行前服用，这些抗组胺类止吐药有助于预防晕动症引起的恶心。", vi:"Uống trước khi di chuyển, các thuốc chống buồn nôn dạng kháng histamine này giúp ngăn ngừa buồn nôn do say tàu xe.", ar:"عند تناولها قبل السفر، تساعد مضادات الغثيان هذه من نوع مضادات الهيستامين على منع غثيان دوار الحركة.", fr:"Pris avant le voyage, ces antiémétiques de type antihistaminique aident à prévenir la nausée du mal des transports.", ko:"이동 전에 복용하면, 이 항히스타민 계열의 진토제가 멀미로 인한 메스꺼움을 예방하는 데 도움이 됩니다.", ru:"Принятые перед поездкой, эти противорвотные антигистаминного типа помогают предотвратить тошноту при укачивании.", pt:"Tomados antes de viajar, esses antieméticos do tipo anti-histamínico ajudam a prevenir a náusea do enjoo de movimento.", de:"Vor der Reise eingenommen, helfen diese Antiemetika vom Antihistaminikum-Typ, der Übelkeit der Reisekrankheit vorzubeugen.", ja:"移動の前に飲むと、これらの抗ヒスタミン系の制吐薬が乗り物酔いの吐き気を防ぐのに役立ちます。"},
+    selfcare:{en:"Face forward, get fresh air, and look at the horizon to settle motion sickness."} },
+  { key:"hemorrhoids", group:"digestive", catKey:"hemorrhoid", examples:["phenylephrine","hydrocortisone","witch hazel"],
     symptom:{en:"Hemorrhoids", es:"Hemorroides", zh:"痔疮", vi:"Bệnh trĩ", ar:"البواسير", fr:"Hémorroïdes", ko:"치질", ru:"Геморрой", pt:"Hemorroidas", de:"Hämorrhoiden", ja:"痔"},
     category:{en:"Hemorrhoid treatments", es:"Tratamientos para hemorroides", zh:"痔疮治疗药", vi:"Thuốc trị trĩ", ar:"علاجات البواسير", fr:"Traitements des hémorroïdes", ko:"치질 치료제", ru:"Средства от геморроя", pt:"Tratamentos para hemorroidas", de:"Hämorrhoidenmittel", ja:"痔の治療薬"},
-    note:{en:"OTC creams and wipes soothe itching and swelling; they don't fix the underlying cause.", es:"Las cremas y toallitas de venta libre calman la picazón y la hinchazón; no corrigen la causa de fondo.", zh:"非处方药膏和湿巾能缓解瘙痒和肿胀，但无法解决根本原因。", vi:"Kem và khăn lau không kê đơn làm dịu ngứa và sưng; chúng không giải quyết nguyên nhân gốc.", ar:"تخفف الكريمات والمناديل التي تُصرف دون وصفة الحكة والتورم؛ لكنها لا تعالج السبب الأساسي.", fr:"Les crèmes et lingettes en vente libre apaisent les démangeaisons et le gonflement ; elles ne corrigent pas la cause sous-jacente.", ko:"시판 크림과 물티슈는 가려움과 부기를 가라앉히지만, 근본 원인을 해결하지는 않습니다.", ru:"Безрецептурные кремы и салфетки успокаивают зуд и отёк; они не устраняют основную причину.", pt:"Cremes e lenços de venda livre aliviam a coceira e o inchaço; não resolvem a causa de fundo.", de:"Rezeptfreie Cremes und Tücher lindern Juckreiz und Schwellung; die zugrunde liegende Ursache beheben sie nicht.", ja:"市販のクリームやシートはかゆみや腫れをやわらげますが、根本的な原因を治すものではありません。"} },
-  { key:"minor_cut", catKey:"topical_antibiotic", examples:["bacitracin","neomycin","polymyxin b"],
+    note:{en:"OTC creams and wipes soothe itching and swelling; they don't fix the underlying cause.", es:"Las cremas y toallitas de venta libre calman la picazón y la hinchazón; no corrigen la causa de fondo.", zh:"非处方药膏和湿巾能缓解瘙痒和肿胀，但无法解决根本原因。", vi:"Kem và khăn lau không kê đơn làm dịu ngứa và sưng; chúng không giải quyết nguyên nhân gốc.", ar:"تخفف الكريمات والمناديل التي تُصرف دون وصفة الحكة والتورم؛ لكنها لا تعالج السبب الأساسي.", fr:"Les crèmes et lingettes en vente libre apaisent les démangeaisons et le gonflement ; elles ne corrigent pas la cause sous-jacente.", ko:"시판 크림과 물티슈는 가려움과 부기를 가라앉히지만, 근본 원인을 해결하지는 않습니다.", ru:"Безрецептурные кремы и салфетки успокаивают зуд и отёк; они не устраняют основную причину.", pt:"Cremes e lenços de venda livre aliviam a coceira e o inchaço; não resolvem a causa de fundo.", de:"Rezeptfreie Cremes und Tücher lindern Juckreiz und Schwellung; die zugrunde liegende Ursache beheben sie nicht.", ja:"市販のクリームやシートはかゆみや腫れをやわらげますが、根本的な原因を治すものではありません。"},
+    selfcare:{en:"More fiber and water, warm sitz baths, and not straining help hemorrhoids settle."} },
+  { key:"indigestion", group:"digestive", catKey:"indigestion", examples:["calcium carbonate","famotidine"],
+    symptom:{en:"Indigestion / upset stomach"},
+    category:{en:"Antacids"},
+    note:{en:"Antacids quickly neutralize stomach acid to ease indigestion and an upset stomach."},
+    selfcare:{en:"Smaller meals, eating slowly, and avoiding your trigger foods settle an upset stomach."} },
+  { key:"menstrual_cramps", group:"period", catKey:"period_pain", examples:["ibuprofen","naproxen","acetaminophen"],
+    symptom:{en:"Menstrual cramps", es:"Cólicos menstruales", zh:"经期痛经", vi:"Đau bụng kinh", ar:"تقلصات الدورة الشهرية", fr:"Crampes menstruelles", ko:"생리통", ru:"Менструальные спазмы", pt:"Cólicas menstruais", de:"Menstruationskrämpfe", ja:"生理痛"},
+    category:{en:"Pain relievers (analgesics)", es:"Analgésicos (para el dolor)", zh:"止痛药（镇痛药）", vi:"Thuốc giảm đau (analgesics)", ar:"مسكنات الألم (المسكّنات)", fr:"Analgésiques (antidouleurs)", ko:"진통제", ru:"Обезболивающие (анальгетики)", pt:"Analgésicos", de:"Schmerzmittel (Analgetika)", ja:"鎮痛薬"},
+    note:{en:"The same OTC pain relievers used for other aches; NSAIDs are often chosen because they also target the inflammation behind cramps.", es:"Los mismos analgésicos de venta libre que para otros dolores; a menudo se eligen los AINE porque también atacan la inflamación detrás de los cólicos.", zh:"与其他疼痛使用的是同类非处方止痛药；人们常选用非甾体抗炎药，因为它还能针对痛经背后的炎症。", vi:"Cùng loại thuốc giảm đau không kê đơn dùng cho các cơn đau khác; NSAID thường được chọn vì còn tác động đến tình trạng viêm gây ra đau bụng kinh.", ar:"نفس مسكنات الألم التي تُصرف دون وصفة والمستخدمة للآلام الأخرى؛ وغالبًا تُختار مضادات الالتهاب غير الستيرويدية لأنها تستهدف أيضًا الالتهاب المسبب للتقلصات.", fr:"Les mêmes antidouleurs en vente libre que pour d'autres douleurs ; on choisit souvent les AINS car ils ciblent aussi l'inflammation à l'origine des crampes.", ko:"다른 통증에 쓰는 것과 같은 시판 진통제입니다. NSAID는 생리통의 원인이 되는 염증에도 작용하기 때문에 자주 선택됩니다.", ru:"Те же безрецептурные обезболивающие, что и при других болях; НПВП часто выбирают, потому что они также действуют на воспаление, стоящее за спазмами.", pt:"Os mesmos analgésicos de venda livre usados para outras dores; os AINEs são frequentemente escolhidos porque também atuam na inflamação por trás das cólicas.", de:"Dieselben rezeptfreien Schmerzmittel wie bei anderen Beschwerden; NSAR werden oft gewählt, weil sie auch auf die Entzündung hinter den Krämpfen wirken.", ja:"他の痛みに使うのと同じ市販の鎮痛薬です。NSAIDは生理痛の背後にある炎症にも働くため、よく選ばれます。"},
+    selfcare:{en:"A heating pad on your lower belly, gentle movement, and rest ease cramps."} },
+  { key:"period_bloating", group:"period", catKey:"period_bloat", examples:["pamabrom","acetaminophen","ibuprofen"],
+    symptom:{en:"Period bloating"},
+    category:{en:"Menstrual relief formulas"},
+    note:{en:"OTC menstrual formulas pair a gentle diuretic with a pain reliever for period bloating."},
+    selfcare:{en:"Cutting back on salty foods, staying hydrated, and light exercise ease period bloating."} },
+  { key:"period_headache", group:"period", catKey:"period_head", examples:["ibuprofen","acetaminophen","naproxen"],
+    symptom:{en:"Period headache"},
+    category:{en:"Pain relievers (analgesics)"},
+    note:{en:"The same OTC pain relievers used for other headaches work for period headaches."},
+    selfcare:{en:"Rest, hydration, and a cool cloth take the edge off a period headache."} },
+  { key:"pms_mood", group:"period", catKey:"pms", examples:["pamabrom","acetaminophen"],
+    symptom:{en:"PMS discomfort"},
+    category:{en:"Menstrual relief formulas"},
+    note:{en:"OTC PMS formulas target the mild aches and bloating of PMS — not a substitute for care if mood symptoms are severe."},
+    selfcare:{en:"Regular exercise, steady sleep, and easing off caffeine and salt help mild PMS symptoms."} },
+  { key:"breast_tenderness", group:"period", catKey:"breast", examples:["ibuprofen","acetaminophen"],
+    symptom:{en:"Breast tenderness (cyclical)"},
+    category:{en:"Pain relievers (analgesics)"},
+    note:{en:"OTC pain relievers ease the cyclical breast tenderness some people get before a period."},
+    selfcare:{en:"A supportive bra, a warm or cool compress, and less caffeine ease cyclical breast tenderness."} },
+  { key:"skin_itch", group:"skin", catKey:"skin", examples:["hydrocortisone","diphenhydramine"],
+    symptom:{en:"Minor skin itching or rash", es:"Picazón o sarpullido leve en la piel", zh:"轻微皮肤瘙痒或皮疹", vi:"Ngứa da hoặc phát ban nhẹ", ar:"حكة أو طفح جلدي خفيف", fr:"Légères démangeaisons ou éruption cutanée", ko:"경미한 피부 가려움 또는 발진", ru:"Лёгкий зуд кожи или сыпь", pt:"Leve coceira na pele ou erupção", de:"Leichter Hautjuckreiz oder Ausschlag", ja:"軽い皮膚のかゆみや発疹"},
+    category:{en:"Topical antihistamines & hydrocortisone", es:"Antihistamínicos tópicos e hidrocortisona", zh:"局部抗组胺药和氢化可的松", vi:"Thuốc kháng histamine bôi ngoài da và hydrocortisone", ar:"مضادات الهيستامين الموضعية والهيدروكورتيزون", fr:"Antihistaminiques topiques &amp; hydrocortisone", ko:"국소 항히스타민제 &amp; 하이드로코르티손", ru:"Местные антигистаминные &amp; гидрокортизон", pt:"Anti-histamínicos tópicos &amp; hidrocortisona", de:"Örtliche Antihistaminika &amp; Hydrocortison", ja:"外用抗ヒスタミン薬 &amp; ヒドロコルチゾン"},
+    note:{en:"Reduce itching and inflammation on the skin.", es:"Reducen la picazón y la inflamación de la piel.", zh:"减轻皮肤瘙痒和炎症。", vi:"Giảm ngứa và viêm trên da.", ar:"تُقلّل الحكة والالتهاب على الجلد.", fr:"Réduisent les démangeaisons et l'inflammation sur la peau.", ko:"피부의 가려움과 염증을 줄입니다.", ru:"Уменьшают зуд и воспаление на коже.", pt:"Reduzem a coceira e a inflamação na pele.", de:"Verringern Juckreiz und Entzündung auf der Haut.", ja:"皮膚のかゆみと炎症を抑えます。"},
+    selfcare:{en:"A cool compress, fragrance-free moisturizer, and not scratching calm an itchy rash."} },
+  { key:"athletes_foot", group:"skin", catKey:"antifungal", examples:["clotrimazole","terbinafine","miconazole","tolnaftate"],
+    symptom:{en:"Athlete's foot or ringworm", es:"Pie de atleta o tiña", zh:"足癣（脚气）或体癣", vi:"Nấm da chân hoặc nấm da", ar:"القدم الرياضي أو السعفة", fr:"Pied d'athlète ou teigne", ko:"무좀 또는 백선", ru:"Грибок стоп или стригущий лишай", pt:"Pé de atleta ou micose", de:"Fußpilz oder Ringelflechte", ja:"水虫（足白癬）やたむし"},
+    category:{en:"Topical antifungals", es:"Antifúngicos tópicos", zh:"外用抗真菌药", vi:"Thuốc kháng nấm bôi ngoài da", ar:"مضادات الفطريات الموضعية", fr:"Antifongiques topiques", ko:"국소 항진균제", ru:"Местные противогрибковые", pt:"Antifúngicos tópicos", de:"Örtliche Antimykotika", ja:"外用抗真菌薬"},
+    note:{en:"Topical antifungals treat common skin fungal infections; they're usually used for a couple of weeks, even after it looks better.", es:"Los antifúngicos tópicos tratan las infecciones fúngicas comunes de la piel; suelen usarse durante un par de semanas, incluso después de que mejore.", zh:"外用抗真菌药用于治疗常见的皮肤真菌感染；通常需连用两周左右，即使看起来好转也要继续用。", vi:"Thuốc kháng nấm bôi ngoài da điều trị các nhiễm nấm da thường gặp; thường dùng trong khoảng hai tuần, kể cả khi đã trông đỡ hơn.", ar:"تعالج مضادات الفطريات الموضعية عدوى الجلد الفطرية الشائعة؛ وتُستخدم عادةً لأسبوعين، حتى بعد أن يبدو التحسن.", fr:"Les antifongiques topiques traitent les infections fongiques cutanées courantes ; on les utilise généralement pendant environ deux semaines, même après amélioration.", ko:"국소 항진균제는 흔한 피부 곰팡이 감염을 치료합니다. 보통 나아 보여도 2주 정도 계속 사용합니다.", ru:"Местные противогрибковые лечат распространённые грибковые инфекции кожи; их обычно применяют около двух недель, даже после видимого улучшения.", pt:"Os antifúngicos tópicos tratam infecções fúngicas comuns da pele; geralmente são usados por cerca de duas semanas, mesmo depois de melhorar.", de:"Örtliche Antimykotika behandeln häufige Hautpilzinfektionen; sie werden meist etwa zwei Wochen lang angewendet, auch wenn es schon besser aussieht.", ja:"外用抗真菌薬は、よくある皮膚の真菌感染を治療します。良くなったように見えても、通常2週間ほど使い続けます。"},
+    selfcare:{en:"Keep feet clean and dry, change socks daily, and don't share towels."} },
+  { key:"acne", group:"skin", catKey:"acne", examples:["benzoyl peroxide","salicylic acid","adapalene"],
+    symptom:{en:"Acne or pimples", es:"Acné o granos", zh:"痤疮或粉刺", vi:"Mụn trứng cá", ar:"حب الشباب أو البثور", fr:"Acné ou boutons", ko:"여드름", ru:"Акне или прыщи", pt:"Acne ou espinhas", de:"Akne oder Pickel", ja:"にきび・吹き出物"},
+    category:{en:"Topical acne treatments", es:"Tratamientos tópicos para el acné", zh:"外用祛痘药", vi:"Thuốc trị mụn bôi ngoài da", ar:"علاجات حب الشباب الموضعية", fr:"Traitements topiques de l'acné", ko:"국소 여드름 치료제", ru:"Местные средства от акне", pt:"Tratamentos tópicos para acne", de:"Örtliche Aknemittel", ja:"外用にきび治療薬"},
+    note:{en:"OTC acne products unclog pores and reduce the bacteria and oil behind breakouts.", es:"Los productos de venta libre para el acné destapan los poros y reducen las bacterias y el sebo detrás de los brotes.", zh:"非处方祛痘产品能疏通毛孔，减少引发痘痘的细菌和油脂。", vi:"Sản phẩm trị mụn không kê đơn giúp thông thoáng lỗ chân lông và giảm vi khuẩn cùng dầu nhờn gây ra mụn.", ar:"تعمل منتجات حب الشباب التي تُصرف دون وصفة على فتح المسام وتقليل البكتيريا والدهون المسببة للبثور.", fr:"Les produits anti-acné en vente libre débouchent les pores et réduisent les bactéries et le sébum à l'origine des poussées.", ko:"시판 여드름 제품은 모공을 뚫어 주고 여드름의 원인이 되는 세균과 피지를 줄입니다.", ru:"Безрецептурные средства от акне очищают поры и уменьшают количество бактерий и жира, стоящих за высыпаниями.", pt:"Os produtos de venda livre para acne desobstruem os poros e reduzem as bactérias e a oleosidade por trás das espinhas.", de:"Rezeptfreie Aknemittel befreien die Poren und verringern die Bakterien und den Talg hinter den Ausbrüchen.", ja:"市販のにきび用製品は毛穴のつまりを取り、にきびの原因となる細菌や皮脂を減らします。"},
+    selfcare:{en:"Gentle cleansing, not picking, and non-comedogenic products help clear skin."} },
+  { key:"minor_cut", group:"skin", catKey:"topical_antibiotic", examples:["bacitracin","neomycin","polymyxin b"],
     symptom:{en:"Minor cuts or scrapes", es:"Cortes o raspones menores", zh:"轻微割伤或擦伤", vi:"Vết cắt hoặc trầy xước nhẹ", ar:"جروح أو خدوش بسيطة", fr:"Petites coupures ou éraflures", ko:"경미한 베인 상처나 찰과상", ru:"Мелкие порезы или ссадины", pt:"Cortes ou arranhões leves", de:"Kleine Schnitte oder Schürfwunden", ja:"軽い切り傷やすり傷"},
     category:{en:"Topical antibiotics", es:"Antibióticos tópicos", zh:"外用抗生素", vi:"Thuốc kháng sinh bôi ngoài da", ar:"المضادات الحيوية الموضعية", fr:"Antibiotiques topiques", ko:"국소 항생제", ru:"Местные антибиотики", pt:"Antibióticos tópicos", de:"Örtliche Antibiotika", ja:"外用抗生物質"},
-    note:{en:"Topical antibiotics help prevent infection in small wounds after cleaning them.", es:"Los antibióticos tópicos ayudan a prevenir infecciones en heridas pequeñas después de limpiarlas.", zh:"外用抗生素在清洁小伤口后有助于预防感染。", vi:"Thuốc kháng sinh bôi ngoài da giúp ngăn ngừa nhiễm trùng ở vết thương nhỏ sau khi làm sạch.", ar:"تساعد المضادات الحيوية الموضعية على منع العدوى في الجروح الصغيرة بعد تنظيفها.", fr:"Les antibiotiques topiques aident à prévenir l'infection des petites plaies après les avoir nettoyées.", ko:"국소 항생제는 작은 상처를 깨끗이 씻은 뒤 감염을 예방하는 데 도움이 됩니다.", ru:"Местные антибиотики помогают предотвратить инфекцию в небольших ранах после их очистки.", pt:"Os antibióticos tópicos ajudam a prevenir infecção em pequenos ferimentos após limpá-los.", de:"Örtliche Antibiotika helfen, eine Infektion kleiner Wunden nach dem Reinigen zu verhindern.", ja:"外用抗生物質は、小さな傷を清潔にしたあとの感染予防に役立ちます。"} },
-  { key:"cold_sore", catKey:"cold_sore", examples:["docosanol"],
+    note:{en:"Topical antibiotics help prevent infection in small wounds after cleaning them.", es:"Los antibióticos tópicos ayudan a prevenir infecciones en heridas pequeñas después de limpiarlas.", zh:"外用抗生素在清洁小伤口后有助于预防感染。", vi:"Thuốc kháng sinh bôi ngoài da giúp ngăn ngừa nhiễm trùng ở vết thương nhỏ sau khi làm sạch.", ar:"تساعد المضادات الحيوية الموضعية على منع العدوى في الجروح الصغيرة بعد تنظيفها.", fr:"Les antibiotiques topiques aident à prévenir l'infection des petites plaies après les avoir nettoyées.", ko:"국소 항생제는 작은 상처를 깨끗이 씻은 뒤 감염을 예방하는 데 도움이 됩니다.", ru:"Местные антибиотики помогают предотвратить инфекцию в небольших ранах после их очистки.", pt:"Os antibióticos tópicos ajudam a prevenir infecção em pequenos ferimentos após limpá-los.", de:"Örtliche Antibiotika helfen, eine Infektion kleiner Wunden nach dem Reinigen zu verhindern.", ja:"外用抗生物質は、小さな傷を清潔にしたあとの感染予防に役立ちます。"},
+    selfcare:{en:"Rinse with clean water, then keep it covered and clean while it heals."} },
+  { key:"cold_sore", group:"skin", catKey:"cold_sore", examples:["docosanol"],
     symptom:{en:"Cold sores", es:"Herpes labial (fuegos)", zh:"唇疱疹（唇周疱疹）", vi:"Mụn rộp môi", ar:"قرح البرد", fr:"Boutons de fièvre", ko:"입술 물집(단순포진)", ru:"Герпес на губах", pt:"Herpes labial", de:"Lippenherpes", ja:"口唇ヘルペス"},
     category:{en:"Cold sore treatments", es:"Tratamientos para el herpes labial", zh:"唇疱疹治疗药", vi:"Thuốc trị mụn rộp môi", ar:"علاجات قرح البرد", fr:"Traitements de l'herpès labial", ko:"입술 물집(단순포진) 치료제", ru:"Средства от герпеса на губах", pt:"Tratamentos para herpes labial", de:"Mittel gegen Lippenherpes", ja:"口唇ヘルペスの治療薬"},
-    note:{en:"OTC cold sore creams can shorten a flare if started at the first tingle.", es:"Las cremas de venta libre para el herpes labial pueden acortar el brote si se empiezan al primer hormigueo.", zh:"如果在最初有刺痒感时就开始使用，非处方唇疱疹药膏可以缩短发作时间。", vi:"Kem trị mụn rộp môi không kê đơn có thể rút ngắn đợt bùng phát nếu bắt đầu ngay khi có cảm giác ngứa râm ran đầu tiên.", ar:"يمكن لكريمات قرح البرد التي تُصرف دون وصفة أن تقصر مدة النوبة إذا بدأت عند أول إحساس بالوخز.", fr:"Les crèmes en vente libre contre les boutons de fièvre peuvent raccourcir une poussée si on les commence dès le premier picotement.", ko:"시판 입술 물집 크림은 처음 따끔거릴 때 바르기 시작하면 발현 기간을 줄일 수 있습니다.", ru:"Безрецептурные кремы от герпеса на губах могут сократить обострение, если начать при первом покалывании.", pt:"Os cremes de venda livre para herpes labial podem encurtar um surto se iniciados ao primeiro formigamento.", de:"Rezeptfreie Cremes gegen Lippenherpes können einen Ausbruch verkürzen, wenn man beim ersten Kribbeln beginnt.", ja:"市販の口唇ヘルペス用クリームは、最初のピリピリを感じたときに使い始めると症状の期間を短くできることがあります。"} },
-  { key:"dandruff", catKey:"dandruff", examples:["ketoconazole","selenium sulfide","pyrithione zinc"],
+    note:{en:"OTC cold sore creams can shorten a flare if started at the first tingle.", es:"Las cremas de venta libre para el herpes labial pueden acortar el brote si se empiezan al primer hormigueo.", zh:"如果在最初有刺痒感时就开始使用，非处方唇疱疹药膏可以缩短发作时间。", vi:"Kem trị mụn rộp môi không kê đơn có thể rút ngắn đợt bùng phát nếu bắt đầu ngay khi có cảm giác ngứa râm ran đầu tiên.", ar:"يمكن لكريمات قرح البرد التي تُصرف دون وصفة أن تقصر مدة النوبة إذا بدأت عند أول إحساس بالوخز.", fr:"Les crèmes en vente libre contre les boutons de fièvre peuvent raccourcir une poussée si on les commence dès le premier picotement.", ko:"시판 입술 물집 크림은 처음 따끔거릴 때 바르기 시작하면 발현 기간을 줄일 수 있습니다.", ru:"Безрецептурные кремы от герпеса на губах могут сократить обострение, если начать при первом покалывании.", pt:"Os cremes de venda livre para herpes labial podem encurtar um surto se iniciados ao primeiro formigamento.", de:"Rezeptfreie Cremes gegen Lippenherpes können einen Ausbruch verkürzen, wenn man beim ersten Kribbeln beginnt.", ja:"市販の口唇ヘルペス用クリームは、最初のピリピリを感じたときに使い始めると症状の期間を短くできることがあります。"},
+    selfcare:{en:"Don't pick at it; a cold compress and lip balm ease a cold sore."} },
+  { key:"dandruff", group:"skin", catKey:"dandruff", examples:["ketoconazole","selenium sulfide","pyrithione zinc"],
     symptom:{en:"Dandruff or flaky scalp", es:"Caspa o cuero cabelludo escamoso", zh:"头皮屑或头皮脱屑", vi:"Gàu hoặc da đầu bong tróc", ar:"القشرة أو تقشر فروة الرأس", fr:"Pellicules ou cuir chevelu qui pèle", ko:"비듬 또는 두피 각질", ru:"Перхоть или шелушение кожи головы", pt:"Caspa ou couro cabeludo descamando", de:"Schuppen oder schuppige Kopfhaut", ja:"フケや頭皮のかさつき"},
     category:{en:"Anti-dandruff shampoos", es:"Champús anticaspa", zh:"去屑洗发水", vi:"Dầu gội trị gàu", ar:"شامبوهات مضادة للقشرة", fr:"Shampooings antipelliculaires", ko:"비듬 방지 샴푸", ru:"Шампуни против перхоти", pt:"Xampus anticaspa", de:"Anti-Schuppen-Shampoos", ja:"フケ防止シャンプー"},
-    note:{en:"Medicated shampoos slow the skin flaking and yeast behind dandruff; leave them on a few minutes before rinsing.", es:"Los champús medicados frenan la descamación de la piel y la levadura detrás de la caspa; déjalos actuar unos minutos antes de enjuagar.", zh:"药用洗发水能减缓头皮脱屑并抑制引起头皮屑的真菌；冲洗前让其停留几分钟。", vi:"Dầu gội đặc trị làm chậm quá trình bong da và nấm men gây gàu; để yên vài phút trước khi xả sạch.", ar:"تُبطئ الشامبوهات الطبية تقشر الجلد والخميرة المسببة للقشرة؛ اتركها بضع دقائق قبل الشطف.", fr:"Les shampooings médicamenteux ralentissent la desquamation et la levure à l'origine des pellicules ; laissez agir quelques minutes avant de rincer.", ko:"약용 샴푸는 비듬의 원인이 되는 각질과 진균을 줄여 줍니다. 헹구기 전 몇 분간 그대로 두세요.", ru:"Лечебные шампуни замедляют шелушение кожи и рост грибка, стоящего за перхотью; оставьте на несколько минут перед смыванием.", pt:"Os xampus medicinais retardam a descamação da pele e o fungo por trás da caspa; deixe agir alguns minutos antes de enxaguar.", de:"Medizinische Shampoos verlangsamen die Hautschuppung und den Hefepilz hinter Schuppen; einige Minuten einwirken lassen, dann ausspülen.", ja:"薬用シャンプーは、フケの原因となる皮膚のはがれや真菌を抑えます。すすぐ前に数分置いてください。"} },
-  { key:"dry_eyes", catKey:"eye_lubricant", examples:["carboxymethylcellulose","polyethylene glycol","glycerin"],
+    note:{en:"Medicated shampoos slow the skin flaking and yeast behind dandruff; leave them on a few minutes before rinsing.", es:"Los champús medicados frenan la descamación de la piel y la levadura detrás de la caspa; déjalos actuar unos minutos antes de enjuagar.", zh:"药用洗发水能减缓头皮脱屑并抑制引起头皮屑的真菌；冲洗前让其停留几分钟。", vi:"Dầu gội đặc trị làm chậm quá trình bong da và nấm men gây gàu; để yên vài phút trước khi xả sạch.", ar:"تُبطئ الشامبوهات الطبية تقشر الجلد والخميرة المسببة للقشرة؛ اتركها بضع دقائق قبل الشطف.", fr:"Les shampooings médicamenteux ralentissent la desquamation et la levure à l'origine des pellicules ; laissez agir quelques minutes avant de rincer.", ko:"약용 샴푸는 비듬의 원인이 되는 각질과 진균을 줄여 줍니다. 헹구기 전 몇 분간 그대로 두세요.", ru:"Лечебные шампуни замедляют шелушение кожи и рост грибка, стоящего за перхотью; оставьте на несколько минут перед смыванием.", pt:"Os xampus medicinais retardam a descamação da pele e o fungo por trás da caspa; deixe agir alguns minutos antes de enxaguar.", de:"Medizinische Shampoos verlangsamen die Hautschuppung und den Hefepilz hinter Schuppen; einige Minuten einwirken lassen, dann ausspülen.", ja:"薬用シャンプーは、フケの原因となる皮膚のはがれや真菌を抑えます。すすぐ前に数分置いてください。"},
+    selfcare:{en:"Wash regularly and leave medicated shampoo on a few minutes before rinsing."} },
+  { key:"sunburn", group:"skin", catKey:"sunburn", examples:["aloe","hydrocortisone","lidocaine","ibuprofen"],
+    symptom:{en:"Mild sunburn"},
+    category:{en:"Cooling gels & pain relievers"},
+    note:{en:"Aloe or cooling gels plus an OTC pain reliever soothe a mild sunburn."},
+    selfcare:{en:"Cool compresses, aloe, and plenty of water help — and stay out of the sun while it heals."} },
+  { key:"bug_bites", group:"skin", catKey:"bites", examples:["hydrocortisone","diphenhydramine","calamine"],
+    symptom:{en:"Bug bites or stings"},
+    category:{en:"Anti-itch creams & antihistamines"},
+    note:{en:"Topical anti-itch creams and oral antihistamines calm the itch and swelling of bug bites."},
+    selfcare:{en:"A cold compress and not scratching help; scrape out a bee stinger rather than squeezing it."} },
+  { key:"eczema", group:"skin", catKey:"eczema", examples:["hydrocortisone"],
+    symptom:{en:"Mild eczema"},
+    category:{en:"Hydrocortisone & moisturizers"},
+    note:{en:"OTC hydrocortisone and rich moisturizers calm the itch and redness of mild eczema."},
+    selfcare:{en:"Moisturize often, use lukewarm (not hot) water, and try to spot your flare triggers."} },
+  { key:"warts", group:"skin", catKey:"warts", examples:["salicylic acid"],
+    symptom:{en:"Common skin warts"},
+    category:{en:"Wart removers (salicylic acid)"},
+    note:{en:"OTC salicylic acid gradually removes common skin warts over a few weeks."},
+    selfcare:{en:"Cover the wart and avoid picking it, which helps stop it spreading."} },
+  { key:"dry_skin", group:"skin", catKey:"emollient", examples:[],
+    symptom:{en:"Dry, flaky skin"},
+    category:{en:"Moisturizers & emollients"},
+    note:{en:"Rich fragrance-free moisturizers are the mainstay for dry, flaky skin — often no medicine needed."},
+    selfcare:{en:"Moisturize right after bathing, keep showers short and warm (not hot), and run a humidifier in dry air."} },
+  { key:"dry_eyes", group:"efm", catKey:"eye_lubricant", examples:["carboxymethylcellulose","polyethylene glycol","glycerin"],
     symptom:{en:"Dry, irritated eyes", es:"Ojos secos e irritados", zh:"眼睛干涩、刺激不适", vi:"Mắt khô, kích ứng", ar:"جفاف وتهيّج العينين", fr:"Yeux secs et irrités", ko:"건조하고 자극된 눈", ru:"Сухость и раздражение глаз", pt:"Olhos secos e irritados", de:"Trockene, gereizte Augen", ja:"目の乾きや刺激"},
     category:{en:"Lubricant eye drops (artificial tears)", es:"Gotas oftálmicas lubricantes (lágrimas artificiales)", zh:"润滑滴眼液（人工泪液）", vi:"Thuốc nhỏ mắt bôi trơn (nước mắt nhân tạo)", ar:"قطرات ترطيب العين (الدموع الاصطناعية)", fr:"Gouttes oculaires lubrifiantes (larmes artificielles)", ko:"인공눈물(윤활 점안액)", ru:"Увлажняющие глазные капли (искусственная слеза)", pt:"Colírios lubrificantes (lágrimas artificiais)", de:"Befeuchtende Augentropfen (künstliche Tränen)", ja:"潤滑目薬（人工涙液）"},
-    note:{en:"Artificial tears add moisture to soothe dryness; preservative-free versions suit frequent use.", es:"Las lágrimas artificiales aportan humedad para aliviar la sequedad; las versiones sin conservantes convienen para uso frecuente.", zh:"人工泪液能补充水分以缓解干涩；无防腐剂的产品适合频繁使用。", vi:"Nước mắt nhân tạo bổ sung độ ẩm để làm dịu khô mắt; loại không chất bảo quản phù hợp khi dùng thường xuyên.", ar:"تضيف الدموع الاصطناعية رطوبة لتخفيف الجفاف؛ والأنواع الخالية من المواد الحافظة مناسبة للاستخدام المتكرر.", fr:"Les larmes artificielles apportent de l'hydratation pour apaiser la sécheresse ; les versions sans conservateur conviennent à un usage fréquent.", ko:"인공눈물은 수분을 더해 건조함을 달래 줍니다. 무방부제 제품은 자주 사용하기에 적합합니다.", ru:"Искусственная слеза добавляет влагу, чтобы облегчить сухость; версии без консервантов подходят для частого применения.", pt:"As lágrimas artificiais adicionam umidade para aliviar o ressecamento; as versões sem conservantes são adequadas para uso frequente.", de:"Künstliche Tränen spenden Feuchtigkeit, um Trockenheit zu lindern; konservierungsmittelfreie Varianten eignen sich für häufige Anwendung.", ja:"人工涙液は水分を補って乾きをやわらげます。防腐剤フリーの製品は頻繁に使う場合に向いています。"} }
+    note:{en:"Artificial tears add moisture to soothe dryness; preservative-free versions suit frequent use.", es:"Las lágrimas artificiales aportan humedad para aliviar la sequedad; las versiones sin conservantes convienen para uso frecuente.", zh:"人工泪液能补充水分以缓解干涩；无防腐剂的产品适合频繁使用。", vi:"Nước mắt nhân tạo bổ sung độ ẩm để làm dịu khô mắt; loại không chất bảo quản phù hợp khi dùng thường xuyên.", ar:"تضيف الدموع الاصطناعية رطوبة لتخفيف الجفاف؛ والأنواع الخالية من المواد الحافظة مناسبة للاستخدام المتكرر.", fr:"Les larmes artificielles apportent de l'hydratation pour apaiser la sécheresse ; les versions sans conservateur conviennent à un usage fréquent.", ko:"인공눈물은 수분을 더해 건조함을 달래 줍니다. 무방부제 제품은 자주 사용하기에 적합합니다.", ru:"Искусственная слеза добавляет влагу, чтобы облегчить сухость; версии без консервантов подходят для частого применения.", pt:"As lágrimas artificiais adicionam umidade para aliviar o ressecamento; as versões sem conservantes são adequadas para uso frequente.", de:"Künstliche Tränen spenden Feuchtigkeit, um Trockenheit zu lindern; konservierungsmittelfreie Varianten eignen sich für häufige Anwendung.", ja:"人工涙液は水分を補って乾きをやわらげます。防腐剤フリーの製品は頻繁に使う場合に向いています。"},
+    selfcare:{en:"Take screen breaks, remember to blink, and a humidifier helps dry eyes."} },
+  { key:"itchy_eyes", group:"efm", catKey:"eye_allergy", examples:["ketotifen"],
+    symptom:{en:"Itchy, watery allergy eyes"},
+    category:{en:"Antihistamine eye drops"},
+    note:{en:"Antihistamine eye drops calm itchy, watery allergy eyes."},
+    selfcare:{en:"A cool compress and not rubbing your eyes help allergy eye itch."} },
+  { key:"earwax", group:"efm", catKey:"earwax", examples:["carbamide peroxide"],
+    symptom:{en:"Earwax buildup"},
+    category:{en:"Earwax removal drops"},
+    note:{en:"OTC drops soften and help clear built-up earwax."},
+    selfcare:{en:"Skip cotton swabs — they push wax deeper; softening drops let it work its way out."} },
+  { key:"canker_sore", group:"efm", catKey:"canker", examples:["benzocaine"],
+    symptom:{en:"Canker sores"},
+    category:{en:"Oral numbing gels & protectants"},
+    note:{en:"OTC numbing gels and protective pastes ease canker sore pain."},
+    selfcare:{en:"Rinse with salt water and steer clear of acidic or spicy foods while it heals."} },
+  { key:"bad_breath", group:"efm", catKey:"breath", examples:["cetylpyridinium"],
+    symptom:{en:"Bad breath"},
+    category:{en:"Antiseptic mouthwashes"},
+    note:{en:"Antiseptic mouthwashes cut the bacteria behind everyday bad breath."},
+    selfcare:{en:"Brushing, flossing, gently cleaning your tongue, and staying hydrated do most of the work."} },
+  { key:"insomnia", group:"sleep", catKey:"sleep", examples:["diphenhydramine","doxylamine"],
+    symptom:{en:"Trouble sleeping", es:"Dificultad para dormir", zh:"睡眠困难", vi:"Khó ngủ", ar:"صعوبة النوم", fr:"Difficulté à dormir", ko:"수면 곤란", ru:"Трудности со сном", pt:"Dificuldade para dormir", de:"Schlafstörungen", ja:"寝つきが悪い"},
+    category:{en:"Sleep aids", es:"Ayudas para dormir", zh:"助眠药", vi:"Thuốc hỗ trợ giấc ngủ", ar:"مساعدات النوم", fr:"Somnifères", ko:"수면 보조제", ru:"Снотворные средства", pt:"Auxiliares de sono", de:"Schlafmittel", ja:"睡眠補助薬"},
+    note:{en:"OTC sleep aids are antihistamines with a sedating side effect.", es:"Las ayudas para dormir de venta libre son antihistamínicos con un efecto secundario sedante.", zh:"非处方助眠药是具有镇静副作用的抗组胺药。", vi:"Thuốc hỗ trợ giấc ngủ không kê đơn là thuốc kháng histamine có tác dụng phụ gây buồn ngủ.", ar:"مساعدات النوم التي تُصرف دون وصفة طبية هي مضادات هيستامين ذات أثر جانبي مُهدّئ.", fr:"Les somnifères en vente libre sont des antihistaminiques avec un effet secondaire sédatif.", ko:"일반의약품 수면 보조제는 진정 부작용이 있는 항히스타민제입니다.", ru:"Безрецептурные снотворные — это антигистаминные с седативным побочным эффектом.", pt:"Auxiliares de sono de venda livre são anti-histamínicos com um efeito colateral sedativo.", de:"Rezeptfreie Schlafmittel sind Antihistaminika mit einer sedierenden Nebenwirkung.", ja:"市販の睡眠補助薬は、鎮静の副作用がある抗ヒスタミン薬です。"},
+    selfcare:{en:"A consistent bedtime, a cool dark room, and cutting screens before bed help sleep more than any pill."} },
+  { key:"jet_lag", group:"sleep", catKey:"melatonin", examples:["melatonin"],
+    symptom:{en:"Jet lag"},
+    category:{en:"Melatonin sleep aids"},
+    note:{en:"Melatonin can help nudge your body clock when adjusting to a new time zone."},
+    selfcare:{en:"Shift your sleep toward the new time zone, get daylight at the right times, and stay hydrated."} },
+  { key:"drowsiness", group:"sleep", catKey:"caffeine", examples:["caffeine"],
+    symptom:{en:"Daytime drowsiness"},
+    category:{en:"Caffeine alertness aids"},
+    note:{en:"OTC caffeine tablets can help you stay alert — but they don't replace real sleep."},
+    selfcare:{en:"A short nap, a walk, and water often beat reaching for more caffeine."} },
+  { key:"yeast_infection", group:"intimate", catKey:"yeast", examples:["miconazole","clotrimazole"],
+    symptom:{en:"Vaginal yeast infection"},
+    category:{en:"Vaginal antifungals"},
+    note:{en:"OTC vaginal antifungals treat a typical yeast infection."},
+    selfcare:{en:"Breathable cotton underwear and skipping douches and scented products help; see a clinician if it's your first time or keeps coming back."} },
+  { key:"uti_discomfort", group:"intimate", catKey:"uti", examples:["phenazopyridine"],
+    symptom:{en:"UTI burning (pain relief only)"},
+    category:{en:"Urinary pain relief — not a cure"},
+    note:{en:"OTC phenazopyridine eases UTI burning and urgency, but does NOT treat the infection — you still need to see a doctor."},
+    selfcare:{en:"Drink plenty of water — but a UTI needs a doctor and antibiotics to actually clear; the OTC product only numbs the burning."} },
+  { key:"smoking_cravings", group:"other", catKey:"nicotine", examples:["nicotine"],
+    symptom:{en:"Cravings while quitting smoking"},
+    category:{en:"Nicotine replacement (gum, patch, lozenge)"},
+    note:{en:"OTC nicotine gum, patches, and lozenges ease cravings while you quit."},
+    selfcare:{en:"Ride out cravings with water, a walk, or keeping your hands busy — a quitline can double your odds."} },
+  { key:"hangover", group:"other", catKey:"hangover", examples:["ibuprofen","electrolyte"],
+    symptom:{en:"Hangover"},
+    category:{en:"Hydration & pain relievers"},
+    note:{en:"Fluids and an OTC pain reliever ease hangover aches — skip acetaminophen after heavy drinking (harder on the liver)."},
+    selfcare:{en:"Water, rest, and food are the real fix; go easy on acetaminophen after drinking."} }
 ];
 
 /* ---- DRUG-CLASS EXPLAINERS (Phase 4) ------------------------------
@@ -4787,12 +4979,23 @@ function renderResults(box, drugs, findings, mentions){
    the sourcing rationale.
    ================================================================= */
 function renderSymptomList(){
-  $("#symptom-list").innerHTML = SYMPTOM_CATEGORIES.map(s => `
-    <label class="symptom-chip">
-      <input type="checkbox" value="${esc(s.key)}" />
-      <span>${esc(pickLang(s.symptom))}</span>
-    </label>
-  `).join("");
+  // grouped into collapsible <details> sections so a long list stays scannable.
+  // native <details> keeps its checkboxes in the DOM even when collapsed, so a
+  // symptom stays selected across open/close and the lookup still sees it.
+  $("#symptom-list").innerHTML = SYMPTOM_GROUPS.map(g => {
+    const items = SYMPTOM_CATEGORIES.filter(s => s.group === g.key);
+    if (!items.length) return "";
+    return `<details class="symptom-group">
+      <summary><span class="sg-label">${esc(pickLang(g.label))}</span><span class="sg-count">${items.length}</span></summary>
+      <div class="symptom-grid">
+        ${items.map(s => `
+          <label class="symptom-chip">
+            <input type="checkbox" value="${esc(s.key)}" />
+            <span>${esc(pickLang(s.symptom))}</span>
+          </label>`).join("")}
+      </div>
+    </details>`;
+  }).join("");
 }
 
 async function runSymptomLookup(){
@@ -4831,7 +5034,7 @@ async function runSymptomLookup(){
     sections.push({ ...m, items });
   }
 
-  box.innerHTML = sections.map(s => `
+  box.innerHTML = `<div class="relief-note">${esc(t("symptoms_relief_disclaimer"))}</div>` + sections.map(s => `
     <article class="card" style="margin-bottom:14px;">
       <div class="card-head">
         <span class="eyebrow">${esc(t("symptom_category_eyebrow"))} · ${esc(pickLang(s.symptom))}</span>
@@ -4842,6 +5045,10 @@ async function runSymptomLookup(){
           <p>${esc(pickLang(s.note))}</p>
           <div class="src">${esc(t("src_symptom_category"))}</div>
         </div>
+        ${s.selfcare && pickLang(s.selfcare) ? `<div class="row selfcare-row">
+          <span class="eyebrow">${esc(t("selfcare_eyebrow"))}</span>
+          <p>${esc(pickLang(s.selfcare))}</p>
+        </div>` : ""}
         ${s.items.length ? `<div class="row">
           <span class="eyebrow">${esc(t("real_examples_eyebrow"))}</span>
           <div class="cabinet-map" style="margin-top:8px;">
