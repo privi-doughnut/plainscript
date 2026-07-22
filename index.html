@@ -6685,7 +6685,7 @@ if (CLAUDE_PROXY_URL){
    adding {lang} fields to the 5 curated data arrays + one more
    LOCKED_SYSTEM entry in worker.js — nothing else needs to change.
    ================================================================= */
-const SUPPORTED_LANGS = ["en","es","zh","vi","ar","fr","ko","ru","pt","de","ja"];
+const SUPPORTED_LANGS = ["en","es","zh","vi","ar","fr","ko","ru","pt","de","ja","hi","ta"];
 const RTL_LANGS = ["ar"]; // right-to-left languages — flips document direction
 
 function applyLang(lang, opts){
@@ -7710,7 +7710,7 @@ function renderCabinet(){
 /* printable caregiver one-pager (Phase 5) — scopes print styling with a
    body class instead of touching @page globally, so printing from any
    other tab is completely unaffected. */
-const DATE_LOCALES = { en:"en-US", es:"es-ES", zh:"zh-CN", vi:"vi-VN", ar:"ar-SA", fr:"fr-FR", ko:"ko-KR", ru:"ru-RU", pt:"pt-BR", de:"de-DE", ja:"ja-JP" };
+const DATE_LOCALES = { en:"en-US", es:"es-ES", zh:"zh-CN", vi:"vi-VN", ar:"ar-SA", fr:"fr-FR", ko:"ko-KR", ru:"ru-RU", pt:"pt-BR", de:"de-DE", ja:"ja-JP", hi:"hi-IN", ta:"ta-IN" };
 
 function printCabinet(){
   selectTab("cabinet");
