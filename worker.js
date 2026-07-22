@@ -8,14 +8,18 @@
  *      anyone who finds the URL) can repurpose it to generate medical
  *      claims, diagnoses, or advice, in either language.
  *
- * Deploy:
- *   1. Create a Worker at dash.cloudflare.com, or `npx wrangler deploy`.
- *   2. Add a secret named ANTHROPIC_API_KEY:
- *        `npx wrangler secret put ANTHROPIC_API_KEY`
- *      (or Dashboard → Worker → Settings → Variables → add secret)
- *   3. (Optional) set ALLOWED_ORIGIN to your GitHub Pages URL to lock CORS
- *      down to just your site.
- *   4. Copy the deployed URL into config.js as CLAUDE_PROXY_URL.
+ * Deploy (this is a SEPARATE Worker from the static site — use the proxy
+ * config so it doesn't overwrite the "plainscript" site Worker):
+ *   1. npx wrangler login
+ *   2. npx wrangler deploy -c wrangler.worker.jsonc
+ *   3. npx wrangler secret put ANTHROPIC_API_KEY -c wrangler.worker.jsonc
+ *      (paste your Anthropic API key when prompted)
+ *   4. (Optional) set ALLOWED_ORIGIN to your site URL to lock CORS to just
+ *      your site: npx wrangler secret put ALLOWED_ORIGIN -c wrangler.worker.jsonc
+ *   5. Copy the deployed URL (printed by step 2) into config.js as
+ *      CLAUDE_PROXY_URL, then commit so the live site picks it up.
+ * The old dashboard "Edit code / Quick edit" button is gone for many Workers
+ * now — the wrangler CLI above is the reliable path.
  *
  * Contract:   POST { text, label, lang }   ->   { plain }
  *   `lang` is optional and defaults to "en". Add a new language by adding

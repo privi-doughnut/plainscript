@@ -1,0 +1,15 @@
+{
+  // Deploy config for the Claude-proxy Worker (worker.js) — SEPARATE from the
+  // static-site Worker (wrangler.jsonc, name "plainscript"). Different name so
+  // deploying the proxy never overwrites the site.
+  //
+  // Deploy it:            npx wrangler deploy -c wrangler.worker.jsonc
+  // Add the API key:      npx wrangler secret put ANTHROPIC_API_KEY -c wrangler.worker.jsonc
+  //
+  // After deploy, wrangler prints the URL (https://plainscript-proxy.<you>.workers.dev).
+  // Put that URL into config.js as CLAUDE_PROXY_URL to switch on plain-English mode.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "plainscript-proxy",
+  "main": "worker.js",
+  "compatibility_date": "2026-07-21"
+}
