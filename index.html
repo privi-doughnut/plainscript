@@ -414,6 +414,14 @@
   .symptom-group > summary:focus-visible{ outline:2px solid var(--accent); outline-offset:-2px; }
   .sg-count{ font-size:12px; font-weight:600; color:var(--ink-faint); background:var(--accent-wash); border-radius:20px; padding:1px 9px; }
   .symptom-grid{ display:flex; flex-wrap:wrap; gap:8px; padding:0 16px 16px; }
+  /* safety & further-reading panels (Decode) */
+  .ref-links{ display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; }
+  .ref-link{ display:inline-flex; align-items:center; gap:4px; padding:7px 13px; border-radius:20px;
+    border:1px solid var(--line); background:var(--card); color:var(--accent-deep); text-decoration:none; font-size:13.5px; font-weight:600; }
+  .ref-link:hover{ border-color:var(--accent); background:var(--accent-wash); }
+  .faers-list{ display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 8px; }
+  .faers-chip{ font-size:12.5px; padding:3px 10px; border-radius:20px; background:var(--accent-wash); color:var(--ink-soft); }
+
   /* self-care (non-drug) callout + relief disclaimer */
   .selfcare-row{ background:var(--accent-wash); border-radius:10px; padding:12px 14px; }
   .relief-note{ font-size:13.5px; color:var(--ink-soft); line-height:1.55; border-left:3px solid var(--accent); padding:4px 0 4px 14px; }
@@ -670,6 +678,9 @@ const SUPABASE_URL      = CFG.SUPABASE_URL      || ""; // Phase 2
 const SUPABASE_ANON_KEY = CFG.SUPABASE_ANON_KEY || ""; // Phase 2 (public, RLS-protected)
 
 const FDA = "https://api.fda.gov/drug/label.json";
+const FDA_ENFORCE  = "https://api.fda.gov/drug/enforcement.json"; // recalls
+const FDA_SHORTAGE = "https://api.fda.gov/drug/shortages.json";   // drug shortages
+const FDA_EVENT    = "https://api.fda.gov/drug/event.json";       // FAERS adverse-event reports
 const RXNORM = "https://rxnav.nlm.nih.gov/REST";
 
 /* =================================================================
@@ -861,6 +872,26 @@ const I18N = {
     symptoms_result_note: "This maps common symptoms to general OTC categories — it isn't a diagnosis, doesn't know your health history or other medications, and isn't personalized. A pharmacist can tell you which specific option actually fits you. Click any example above to decode it first.",
     symptoms_relief_disclaimer: "These options help ease the discomfort of everyday symptoms — they don't cure the underlying cause. If a symptom is severe, unusual, keeps getting worse, or isn't better in a few days, check with a doctor or pharmacist.",
     selfcare_eyebrow: "Simple things that can help — no medicine needed",
+
+    /* Safety & further-reading panels on Decode (openFDA recalls / shortages / FAERS) */
+    ref_eyebrow: "Safety &amp; further reading",
+    ref_title_prefix: "More on",
+    ref_checking: "Checking openFDA…",
+    ref_check_failed: "Couldn't check this just now — try again later.",
+    recall_eyebrow: "FDA recalls",
+    recall_none: "No active recalls found for this drug in openFDA — reassuring, but not a guarantee.",
+    recall_active_prefix: "Active/recent recall(s) found:",
+    src_recall: "Source: openFDA drug enforcement (recalls)",
+    shortage_eyebrow: "Reported shortages",
+    shortage_none: "No current shortages listed in openFDA for this drug.",
+    shortage_active_prefix: "Reported shortage status:",
+    src_shortage: "Source: openFDA drug shortages",
+    faers_eyebrow: "What people report to the FDA",
+    faers_intro: "The reactions most often reported to the FDA's FAERS database for this drug. These are voluntary reports — NOT proof the drug caused them, and not a measure of how likely they are for you.",
+    faers_none: "No adverse-event reports found in openFDA's FAERS data for this drug.",
+    src_faers: "Source: openFDA FAERS · adverse event reports",
+    further_reading_eyebrow: "Read more from NIH &amp; FDA",
+    src_further_reading: "Authoritative drug info from the U.S. National Library of Medicine &amp; FDA",
 
     /* Cabinet Scan (Phase 3) */
     scan_min_two: "Add at least two medications to scan.",
@@ -4749,7 +4780,7 @@ async function decode(){
       <div class="card-body">${fullRows.filter(Boolean).join("")}</div>
     </article>` : ""}
     ${(foodHits.length || sensitivityHits.length) ? renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits) : ""}
-    <p class="status" style="padding-top:4px;">${esc(t("decode_footer_note"))}</p>
+    <p class="status" id="decode-footer" style="padding-top:4px;">${esc(t("decode_footer_note"))}</p>
   `;
 
   // a misspelling can still resolve to a closest match AND surface other
@@ -4766,6 +4797,130 @@ async function decode(){
 
   // optional: upgrade prose to plain English if proxy configured
   enhanceRows(box, d);
+
+  // Safety & further-reading panels — live openFDA recalls, shortages, and
+  // FAERS reports, plus links out to NIH/FDA. Fetched after the card renders
+  // so a slow/broken source never blocks the main monograph.
+  renderReferencePanels(box, d, displayName);
+}
+
+/* ---- Safety & further-reading panels (openFDA-sourced) --------------
+   Everything here is factual, sourced data shown with its provenance —
+   the same rule as the rest of Decode. FAERS especially is framed as
+   voluntary reports, never as proof of cause or personal risk. Each
+   source loads independently and fails soft (a neutral "couldn't check"
+   or "none found" line), so one flaky endpoint never breaks the card. */
+function renderReferencePanels(box, d, displayName){
+  const gen = (d.generic||"").toLowerCase();
+  const brand = (d.brand||"").toLowerCase();
+  const search = gen || brand || "";
+  if (!search){ return; } // nothing reliable to query on
+  const nameForLink = d.generic || d.brand || displayName;
+
+  const card = document.createElement("article");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="card-head">
+      <span class="eyebrow">${t("ref_eyebrow")}</span>
+      <div class="name" style="font-size:19px;">${esc(t("ref_title_prefix"))} ${esc(displayName)}</div>
+    </div>
+    <div class="card-body">
+      <div class="row" id="rp-recall"><span class="eyebrow">${esc(t("recall_eyebrow"))}</span><p class="status" style="padding:4px 0;"><span class="spin"></span>${esc(t("ref_checking"))}</p></div>
+      <div class="row" id="rp-shortage"><span class="eyebrow">${esc(t("shortage_eyebrow"))}</span><p class="status" style="padding:4px 0;"><span class="spin"></span>${esc(t("ref_checking"))}</p></div>
+      <div class="row" id="rp-faers"><span class="eyebrow">${esc(t("faers_eyebrow"))}</span><p class="status" style="padding:4px 0;"><span class="spin"></span>${esc(t("ref_checking"))}</p></div>
+      <div class="row">
+        <span class="eyebrow">${t("further_reading_eyebrow")}</span>
+        <div class="ref-links">
+          <a class="ref-link" target="_blank" rel="noopener" href="https://medlineplus.gov/search/?query=${encodeURIComponent(nameForLink)}">MedlinePlus ↗</a>
+          <a class="ref-link" target="_blank" rel="noopener" href="https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=${encodeURIComponent(nameForLink)}">DailyMed ↗</a>
+        </div>
+        <div class="src">${t("src_further_reading")}</div>
+      </div>
+    </div>`;
+  const footer = box.querySelector("#decode-footer");
+  if (footer) box.insertBefore(card, footer); else box.appendChild(card);
+
+  loadRecalls(search);
+  loadShortages(search);
+  loadFaers(search);
+}
+
+// openFDA uses the same (generic OR brand) field pattern proven in fetchLabel
+function fdaNameQuery(field, name){
+  const q = encodeURIComponent(name);
+  return `${field}.generic_name:"${q}"+${field}.brand_name:"${q}"`;
+}
+function refFail(id){
+  const el = document.getElementById(id); if (!el) return;
+  el.querySelector(".status")?.remove();
+  el.insertAdjacentHTML("beforeend", `<p class="status" style="padding:4px 0;">${esc(t("ref_check_failed"))}</p>`);
+}
+function refFill(id, html){
+  const el = document.getElementById(id); if (!el) return;
+  el.querySelector(".status")?.remove();
+  el.insertAdjacentHTML("beforeend", html);
+}
+
+async function loadRecalls(search){
+  try{
+    const url = `${FDA_ENFORCE}?search=(${fdaNameQuery("openfda", search)})&limit=5`;
+    const res = await fetch(url);
+    if (res.status === 404){ refFill("rp-recall", `<p>${esc(t("recall_none"))}</p><div class="src">${esc(t("src_recall"))}</div>`); return; }
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const hits = (data.results||[]).filter(r => (r.status||"").toLowerCase() !== "terminated");
+    if (!hits.length){ refFill("rp-recall", `<p>${esc(t("recall_none"))}</p><div class="src">${esc(t("src_recall"))}</div>`); return; }
+    const items = hits.slice(0,3).map(r => `<div class="verdict v-moderate" style="margin-bottom:8px;"><div class="bar"></div><div class="vbody">
+        <div class="pair">${esc((r.classification||"Recall"))} · ${esc(r.status||"")}</div>
+        <p>${esc((r.reason_for_recall||"").slice(0,240))}</p>
+        ${r.recall_initiation_date ? `<p class="mgmt">${esc(fmtFdaDate(r.recall_initiation_date))}</p>` : ""}
+      </div></div>`).join("");
+    refFill("rp-recall", `<p>${esc(t("recall_active_prefix"))}</p>${items}<div class="src">${esc(t("src_recall"))}</div>`);
+  }catch(e){ refFail("rp-recall"); }
+}
+
+async function loadShortages(search){
+  try{
+    const url = `${FDA_SHORTAGE}?search=generic_name:"${encodeURIComponent(search)}"&limit=5`;
+    const res = await fetch(url);
+    if (res.status === 404){ refFill("rp-shortage", `<p>${esc(t("shortage_none"))}</p><div class="src">${esc(t("src_shortage"))}</div>`); return; }
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const cur = (data.results||[]).filter(r => (r.status||"").toLowerCase().includes("current"));
+    if (!cur.length){ refFill("rp-shortage", `<p>${esc(t("shortage_none"))}</p><div class="src">${esc(t("src_shortage"))}</div>`); return; }
+    const seen = new Set(), lines = [];
+    for (const r of cur){
+      const key = (r.status||"") + (r.presentation||r.proprietary_name||"");
+      if (seen.has(key)) continue; seen.add(key);
+      lines.push(`<div class="verdict v-moderate" style="margin-bottom:8px;"><div class="bar"></div><div class="vbody">
+        <div class="pair">${esc(r.status||"Current")}</div>
+        <p>${esc(r.presentation || r.proprietary_name || r.generic_name || "")}</p></div></div>`);
+      if (lines.length >= 3) break;
+    }
+    refFill("rp-shortage", `<p>${esc(t("shortage_active_prefix"))}</p>${lines.join("")}<div class="src">${esc(t("src_shortage"))}</div>`);
+  }catch(e){ refFail("rp-shortage"); }
+}
+
+async function loadFaers(search){
+  try{
+    const url = `${FDA_EVENT}?search=patient.drug.openfda.generic_name:"${encodeURIComponent(search)}"&count=patient.reaction.reactionmeddrapt.exact`;
+    const res = await fetch(url);
+    if (res.status === 404){ refFill("rp-faers", `<p>${esc(t("faers_none"))}</p><div class="src">${esc(t("src_faers"))}</div>`); return; }
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const rows = (data.results||[]).slice(0,8);
+    if (!rows.length){ refFill("rp-faers", `<p>${esc(t("faers_none"))}</p><div class="src">${esc(t("src_faers"))}</div>`); return; }
+    const chips = rows.map(r => `<span class="faers-chip">${esc(titlecase((r.term||"").toLowerCase()))}</span>`).join("");
+    refFill("rp-faers", `<p class="status" style="padding:2px 0 8px;">${esc(t("faers_intro"))}</p><div class="faers-list">${chips}</div><div class="src">${esc(t("src_faers"))}</div>`);
+  }catch(e){ refFail("rp-faers"); }
+}
+
+// openFDA dates are YYYYMMDD strings
+function fmtFdaDate(s){
+  if (!/^\d{8}$/.test(s)) return s;
+  const locale = DATE_LOCALES[uiLang] || "en-US";
+  const d = new Date(+s.slice(0,4), +s.slice(4,6)-1, +s.slice(6,8));
+  return d.toLocaleDateString(locale, {year:"numeric", month:"long", day:"numeric"});
 }
 
 function makeRow(label, text, src, warn){
