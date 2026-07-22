@@ -414,6 +414,28 @@
   .symptom-group > summary:focus-visible{ outline:2px solid var(--accent); outline-offset:-2px; }
   .sg-count{ font-size:12px; font-weight:600; color:var(--ink-faint); background:var(--accent-wash); border-radius:20px; padding:1px 9px; }
   .symptom-grid{ display:flex; flex-wrap:wrap; gap:8px; padding:0 16px 16px; }
+  /* easy-reading (dyslexia-friendly) mode — opt-in via header toggle */
+  body.easy-read{ --reading-scale:1.12; }
+  body.easy-read .card-body p, body.easy-read .row p, body.easy-read .panel-intro,
+  body.easy-read .selfcare-row p, body.easy-read .relief-note, body.easy-read .lede{
+    font-size:calc(1em * var(--reading-scale)); line-height:1.85; letter-spacing:0.01em; word-spacing:0.06em;
+    font-family:"Atkinson Hyperlegible","Verdana",var(--sans);
+  }
+  body.easy-read .card-body p, body.easy-read .row p{ max-width:66ch; }
+  /* read-aloud button on a decoded card */
+  .readaloud-btn{ display:inline-flex; align-items:center; gap:6px; margin-top:10px; padding:7px 14px; border-radius:20px;
+    border:1px solid var(--line); background:var(--card); color:var(--accent-deep); cursor:pointer; font-size:13.5px; font-weight:600; font-family:var(--sans); }
+  .readaloud-btn:hover{ border-color:var(--accent); background:var(--accent-wash); }
+  .readaloud-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  /* glossary terms + popover */
+  .gloss{ border:none; background:none; padding:0; font:inherit; color:inherit; cursor:help;
+    border-bottom:1.5px dotted var(--accent); }
+  .gloss:hover{ color:var(--accent-deep); }
+  .gloss:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .gloss-pop{ position:absolute; z-index:50; max-width:260px; background:var(--ink); color:var(--paper);
+    padding:9px 12px; border-radius:8px; font-size:13px; line-height:1.5; box-shadow:0 6px 24px rgba(0,0,0,.25); }
+  .gloss-pop b{ display:block; margin-bottom:2px; text-transform:lowercase; }
+
   /* safety & further-reading panels (Decode) */
   .ref-links{ display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; }
   .ref-link{ display:inline-flex; align-items:center; gap:4px; padding:7px 13px; border-radius:20px;
@@ -491,6 +513,13 @@
     <span class="tag">// medication reference</span>
     <button id="theme-toggle" class="themetoggle" aria-label="Switch to dark theme" title="Toggle light / dark">
       <span class="ticon" aria-hidden="true">☾</span><span class="tlabel" data-i18n="theme_dark">Dark</span>
+    </button>
+    <button id="reading-toggle" class="themetoggle" aria-pressed="false" data-i18n-aria-label="reading_mode_aria" title="Easy-reading mode">
+      <span class="ticon" aria-hidden="true">Aa</span><span class="tlabel" data-i18n="reading_mode_label">Easy read</span>
+    </button>
+    <!-- explain-simpler toggle — only shown when the plain-English Worker is configured -->
+    <button id="level-toggle" class="themetoggle" aria-pressed="false" data-i18n-aria-label="explain_simpler_aria" title="Explain even simpler" hidden>
+      <span class="ticon" aria-hidden="true">🧒</span><span class="tlabel" data-i18n="explain_simpler_label">Simpler</span>
     </button>
     <div class="lang-select-wrap">
       <span class="ticon" aria-hidden="true">🌐</span>
@@ -892,6 +921,15 @@ const I18N = {
     src_faers: "Source: openFDA FAERS · adverse event reports",
     further_reading_eyebrow: "Read more from NIH &amp; FDA",
     src_further_reading: "Authoritative drug info from the U.S. National Library of Medicine &amp; FDA",
+
+    /* accessibility: easy-reading mode + read-aloud + glossary */
+    reading_mode_label: "Easy read",
+    reading_mode_aria: "Toggle easy-reading mode (larger, more legible text)",
+    read_aloud: "🔊 Read aloud",
+    read_stop: "⏹ Stop",
+    glossary_hint: "Underlined words have a plain-English definition — tap them.",
+    explain_simpler_label: "Simpler",
+    explain_simpler_aria: "Explain even simpler — like I'm 10",
 
     /* Cabinet Scan (Phase 3) */
     scan_min_two: "Add at least two medications to scan.",
@@ -4682,11 +4720,12 @@ async function toPlainEnglish(text, label, lang){
   // The safety-locked prompt lives in the Worker (worker.js), NOT here — so
   // the proxy can only ever rephrase/translate FDA text and can't be
   // repurposed to generate medical claims. We just hand it the text, which
-  // section it is, and which language to render it in.
+  // section it is, which language to render it in, and the reading level
+  // ("simple" = the default 8th-grade rewrite, "simplest" = explain-like-I'm-10).
   try{
     const res = await fetch(CLAUDE_PROXY_URL, {
       method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ text, label, lang: lang || "en" })
+      body: JSON.stringify({ text, label, lang: lang || "en", level: readingLevel })
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -4700,6 +4739,7 @@ async function toPlainEnglish(text, label, lang){
 async function decode(){
   const name = $("#decode-input").value.trim();
   const box = $("#decode-results");
+  if (window.speechSynthesis) window.speechSynthesis.cancel(); // stop any prior read-aloud
   if (!name){ box.innerHTML = `<div class="err">${esc(t("decode_type_first"))}</div>`; return; }
   box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("decode_looking_up_prefix"))} “${esc(name)}” ${esc(t("decode_looking_up_suffix"))}</div>`;
 
@@ -4802,7 +4842,121 @@ async function decode(){
   // FAERS reports, plus links out to NIH/FDA. Fetched after the card renders
   // so a slow/broken source never blocks the main monograph.
   renderReferencePanels(box, d, displayName);
+
+  // accessibility: a read-aloud button (Web Speech, feature-detected) and
+  // plain-English glossary tooltips on the medical jargon in the label text.
+  addReadAloudButton(box);
+  applyGlossary(box);
 }
+
+/* Read-aloud (Web Speech synthesis, feature-detected — silently absent
+   where unsupported). Reads the visible monograph text; a second click
+   stops it, and starting a new Decode cancels any prior speech. */
+function addReadAloudButton(box){
+  if (!window.speechSynthesis) return;
+  const card = box.querySelector(".card");
+  if (!card) return;
+  const btn = document.createElement("button");
+  btn.type = "button"; btn.className = "readaloud-btn"; btn.textContent = t("read_aloud");
+  let speaking = false;
+  const reset = ()=>{ speaking = false; btn.textContent = t("read_aloud"); };
+  btn.addEventListener("click", ()=>{
+    if (speaking){ window.speechSynthesis.cancel(); reset(); return; }
+    const parts = [];
+    box.querySelectorAll(".card .name, .card .eyebrow, .card p[data-role='text']").forEach(el=>{
+      const s = (el.textContent||"").trim(); if (s) parts.push(s);
+    });
+    const text = parts.join(". ");
+    if (!text) return;
+    const u = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices() || [];
+    const v = voices.find(v => (v.lang||"").toLowerCase().startsWith(uiLang));
+    if (v) u.voice = v;
+    u.lang = (v && v.lang) || uiLang;
+    u.rate = 0.98; u.onend = reset; u.onerror = reset;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+    speaking = true; btn.textContent = t("read_stop");
+  });
+  const head = card.querySelector(".card-head") || card;
+  head.appendChild(btn);
+}
+
+/* Plain-English glossary — taps a scary medical word for a one-line
+   definition. Curated (Plainscript's own content), never invented per
+   drug. Wraps whole-word matches in the label prose; a click shows a
+   small popover. */
+const GLOSSARY = {
+  "hepatic":"relating to the liver",
+  "renal":"relating to the kidneys",
+  "cardiac":"relating to the heart",
+  "gastrointestinal":"relating to the stomach and intestines",
+  "cardiovascular":"relating to the heart and blood vessels",
+  "contraindicated":"should not be used in this situation",
+  "contraindication":"a reason this drug should not be used",
+  "adverse reaction":"an unwanted or harmful side effect",
+  "adverse reactions":"unwanted or harmful side effects",
+  "systemic":"affecting the whole body, not just one spot",
+  "topical":"applied to the skin (or a surface), acting locally",
+  "efficacy":"how well a treatment works",
+  "prophylaxis":"preventing a problem before it starts",
+  "edema":"swelling from fluid building up in the body",
+  "hypertension":"high blood pressure",
+  "hypotension":"low blood pressure",
+  "tachycardia":"a fast heart rate",
+  "bradycardia":"a slow heart rate",
+  "analgesic":"a pain reliever",
+  "antipyretic":"a fever reducer",
+  "anticoagulant":"a blood thinner",
+  "antiemetic":"a medicine that reduces nausea and vomiting",
+  "dyspepsia":"indigestion",
+  "urticaria":"hives — an itchy, raised skin rash",
+  "pruritus":"itching",
+  "erythema":"redness of the skin",
+  "syncope":"fainting",
+  "dyspnea":"shortness of breath",
+  "lethargy":"unusual drowsiness or lack of energy",
+  "malaise":"a general feeling of being unwell",
+  "titration":"adjusting a dose gradually up or down",
+  "hypoglycemia":"low blood sugar",
+  "hyperglycemia":"high blood sugar",
+  "hepatotoxicity":"liver damage caused by a substance",
+  "nephrotoxicity":"kidney damage caused by a substance",
+  "idiopathic":"with no known cause"
+};
+function applyGlossary(scope){
+  const terms = Object.keys(GLOSSARY).sort((a,b)=>b.length-a.length);
+  const re = new RegExp("\\b(" + terms.join("|") + ")\\b", "gi");
+  scope.querySelectorAll("p[data-role='text'], p[data-role='full']").forEach(p=>{
+    if (p.dataset.glossed) return;
+    const raw = p.textContent || "";
+    let out = "", last = 0, any = false, m;
+    re.lastIndex = 0;
+    while ((m = re.exec(raw))){
+      const key = m[0].toLowerCase();
+      if (!GLOSSARY[key]) continue;
+      any = true;
+      out += esc(raw.slice(last, m.index));
+      out += `<button type="button" class="gloss" data-term="${esc(key)}" title="${esc(GLOSSARY[key])}">${esc(m[0])}</button>`;
+      last = m.index + m[0].length;
+    }
+    if (any){ out += esc(raw.slice(last)); p.innerHTML = out; p.dataset.glossed = "1"; }
+  });
+}
+// one global handler: any click closes open popovers; a click on a term opens its own
+document.addEventListener("click", e => {
+  const g = e.target.closest(".gloss");
+  document.querySelectorAll(".gloss-pop").forEach(el => el.remove());
+  if (!g) return;
+  const def = GLOSSARY[g.dataset.term]; if (!def) return;
+  const pop = document.createElement("div");
+  pop.className = "gloss-pop";
+  pop.innerHTML = `<b>${esc(g.dataset.term)}</b>${esc(def)}`;
+  document.body.appendChild(pop);
+  const r = g.getBoundingClientRect();
+  pop.style.top  = (window.scrollY + r.bottom + 6) + "px";
+  pop.style.left = (window.scrollX + Math.max(8, Math.min(r.left, window.innerWidth - 272))) + "px";
+});
 
 /* ---- Safety & further-reading panels (openFDA-sourced) --------------
    Everything here is factual, sourced data shown with its provenance —
@@ -5345,6 +5499,45 @@ function applyTheme(dark, opts){
 }
 $("#theme-toggle").addEventListener("click", ()=>applyTheme(!isDark()));
 try{ if (localStorage.getItem(THEME_KEY) === "dark") applyTheme(true, {persist:false}); }catch(e){}
+
+/* easy-reading (dyslexia-friendly) mode — larger, more legible, looser
+   spacing. Pure CSS body class, persisted in localStorage like theme. */
+const READING_KEY = "plainscript.easyread";
+function applyReadingMode(on, opts){
+  opts = opts || {};
+  document.body.classList.toggle("easy-read", on);
+  const btn = $("#reading-toggle");
+  if (btn) btn.setAttribute("aria-pressed", on ? "true" : "false");
+  if (opts.persist !== false){ try{ on ? localStorage.setItem(READING_KEY,"1") : localStorage.removeItem(READING_KEY); }catch(e){} }
+}
+$("#reading-toggle").addEventListener("click", ()=>applyReadingMode(!document.body.classList.contains("easy-read")));
+try{ if (localStorage.getItem(READING_KEY)) applyReadingMode(true, {persist:false}); }catch(e){}
+
+/* "Explain even simpler" reading level — flips the plain-English rewrite
+   between the default 8th-grade level and an explain-like-I'm-10 level.
+   Only meaningful when the plain-English Worker is configured, so the
+   toggle stays hidden until then (no dead UI). Passed to the Worker as
+   `level`; the safety-locked prompt still lives server-side. */
+const LEVEL_KEY = "plainscript.level";
+let readingLevel = "standard";
+try{ if (localStorage.getItem(LEVEL_KEY) === "simplest") readingLevel = "simplest"; }catch(e){}
+function applyReadingLevel(level, opts){
+  opts = opts || {};
+  readingLevel = (level === "simplest") ? "simplest" : "standard";
+  const btn = $("#level-toggle");
+  if (btn) btn.setAttribute("aria-pressed", readingLevel === "simplest" ? "true" : "false");
+  if (opts.persist !== false){ try{ readingLevel==="simplest" ? localStorage.setItem(LEVEL_KEY,"simplest") : localStorage.removeItem(LEVEL_KEY); }catch(e){} }
+  // re-run an in-view decode so the rows re-fetch at the new level
+  if (opts.rerun !== false && $("#decode-input") && $("#decode-input").value.trim() && $("#decode-results").children.length){ decode(); }
+}
+if (CLAUDE_PROXY_URL){
+  const lt = $("#level-toggle");
+  if (lt){
+    lt.hidden = false;
+    lt.addEventListener("click", ()=>applyReadingLevel(readingLevel==="simplest" ? "standard" : "simplest"));
+    applyReadingLevel(readingLevel, {persist:false, rerun:false});
+  }
+}
 
 /* =================================================================
    LANGUAGE (Phase 5 — i18n) — same persistence pattern as theme:

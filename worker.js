@@ -143,6 +143,14 @@ export default {
     const text  = (body.text  || "").toString().slice(0, 6000);
     const label = (body.label || "section").toString().slice(0, 80);
     const lang  = LOCKED_SYSTEM[body.lang] ? body.lang : "en"; // unknown/missing lang -> English, never a client-controlled prompt
+    // Optional reading level. "simplest" = explain-like-I'm-10. This only ever
+    // appends a *style* instruction to the already-locked prompt — it can't add
+    // facts or loosen any of the safety rules above, and any other value is
+    // ignored (defaults to the standard 8th-grade rewrite).
+    const simplest = body.level === "simplest";
+    const system = LOCKED_SYSTEM[lang] + (simplest
+      ? "\n\nAdditionally: write it even more simply, as if explaining to a 10-year-old — very short sentences and only everyday words. This is a style change ONLY; all the numbered rules above still apply exactly (use only the provided text, add nothing, give no advice)."
+      : "");
     if (!text) return json({ plain: "" }, 200, cors);
 
     try {
@@ -156,7 +164,7 @@ export default {
         body: JSON.stringify({
           model: "claude-sonnet-5",
           max_tokens: 400,
-          system: LOCKED_SYSTEM[lang], // enforced here — client picks a language, never the prompt itself
+          system, // safety-locked base prompt (per language) + optional style-only reading-level note
           messages: [{ role: "user", content: `Section: ${label}\n\nText:\n${text}` }],
         }),
       });
