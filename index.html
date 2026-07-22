@@ -514,6 +514,23 @@
   .ib-track{ height:14px; background:var(--accent-wash); border-radius:7px; overflow:hidden; }
   .ib-fill{ height:100%; background:var(--accent); border-radius:0 7px 7px 0; }
   .ib-count{ font-family:var(--mono); font-size:13px; color:var(--ink); min-width:1.5em; text-align:right; }
+  /* multi-person filter bar + per-med meta (schedule / person) */
+  .person-bar{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px; }
+  .person-chip{ padding:6px 13px; border-radius:20px; border:1px solid var(--line); background:var(--card);
+    color:var(--ink-soft); font-size:13px; cursor:pointer; font-family:var(--sans); }
+  .person-chip:hover{ border-color:var(--accent); }
+  .person-chip.active{ border-color:var(--accent); background:var(--accent-wash); color:var(--accent-deep); font-weight:600; }
+  .person-chip.add{ color:var(--accent-deep); }
+  .medmeta{ margin-top:6px; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+  .sched-tags{ display:inline-flex; flex-wrap:wrap; gap:5px; }
+  .sched-tag{ font-size:12px; font-family:var(--mono); padding:2px 8px; border-radius:20px; background:var(--accent-wash); color:var(--ink-soft); }
+  .person-tag{ font-size:12.5px; color:var(--ink-soft); }
+  .meta-input{ font-size:14px; padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink); max-width:220px; }
+  .today-sched{ border:1px solid var(--line); border-radius:12px; padding:12px 16px; margin-bottom:14px; background:var(--card); }
+  .today-sched .ts-row{ display:flex; gap:12px; padding:4px 0; font-size:14px; }
+  .ts-time{ font-family:var(--mono); color:var(--accent-deep); min-width:52px; }
+  .ts-meds{ color:var(--ink-soft); }
+
   /* wallet / emergency card */
   .wallet-card{ margin-top:14px; border:1.5px solid var(--line); border-radius:12px; padding:16px; background:var(--card); }
   .wc-title{ font-family:var(--serif); font-size:18px; font-weight:600; margin-bottom:8px; }
@@ -918,6 +935,17 @@ const I18N = {
     wallet_print_btn: "🖨️ Print this card",
     wallet_saved_note: "Allergies & contact are saved on this device only.",
     wallet_card_title: "My medications",
+    sched_add: "＋ Add dosing times",
+    sched_edit: "🕑 Edit times",
+    sched_placeholder: "e.g. 08:00, 20:00",
+    sched_save: "Save times",
+    today_schedule: "Today's schedule",
+    person_everyone: "Everyone",
+    person_you: "You",
+    person_add: "＋ Add person",
+    person_add_ph: "Name (e.g. Mom)",
+    person_assign: "👤 Assign to a person",
+    person_of_prefix: "For",
     scan_btn: "🔎 Scan my whole cabinet",
     scan_note: "Checks every medication against every other one — not just pairs.",
     cabinet_footer_note: "Your cabinet is a personal reference list, not a medical record — keep your pharmacist's list as the source of truth.",
@@ -6325,13 +6353,16 @@ function findInCabinet(d, typed){
 }
 
 async function insertMed(typed, d){
+  // if a specific person is selected in the filter, tag the new med to them
+  const person = (activePerson === "ALL" || activePerson === "") ? null : activePerson;
   const rows = await db("medications", { method:"POST", body:{
     user_id:    session.user.id,       // RLS double-checks this equals auth.uid()
     name:       typed,
     generic:    d && d.generic ? titlecase(d.generic) : null,
     brand:      d && d.brand   ? titlecase(d.brand)   : null,
     rxcui:      (d && d.rxcui) || null,
-    drug_class: (d && d.klass) || null
+    drug_class: (d && d.klass) || null,
+    person:     person
   }});
   if (rows && rows[0]){ cabinet = cabinet || []; cabinet.push(rows[0]); }
   return rows && rows[0];
@@ -6647,6 +6678,53 @@ async function openSimilarModal(d, displayName){
 /* --- the cabinet panel ------------------------------------------- */
 function cabinetStatus(msg){ $("#cabinet-status").textContent = msg || ""; }
 
+/* Multi-person cabinets — an optional label ("Mom") on each med so one
+   caregiver can keep separate lists. "ALL" shows everything; "" is you
+   (untagged meds). People with no meds yet are remembered on-device so
+   you can add them before tagging. */
+const PEOPLE_KEY = "plainscript.people";
+let activePerson = "ALL";
+function storedPeople(){ try{ return JSON.parse(localStorage.getItem(PEOPLE_KEY)||"[]"); }catch(e){ return []; } }
+function savePeople(list){ try{ localStorage.setItem(PEOPLE_KEY, JSON.stringify([...new Set(list)])); }catch(e){} }
+function cabinetPeople(){
+  const fromMeds = (cabinet||[]).map(m => (m.person||"").trim()).filter(Boolean);
+  return [...new Set([...storedPeople(), ...fromMeds])].sort((a,b)=>a.localeCompare(b));
+}
+function personFilterBarHTML(){
+  const people = cabinetPeople();
+  if (!people.length) return ""; // no multi-person setup yet — keep the UI simple
+  const chip = (val,label)=>`<button class="person-chip${activePerson===val?" active":""}" data-act="person-pick" data-person="${esc(val)}">${esc(label)}</button>`;
+  return `<div class="person-bar">
+    ${chip("ALL", t("person_everyone"))}
+    ${chip("", t("person_you"))}
+    ${people.map(p=>chip(p,p)).join("")}
+    <button class="person-chip add" data-act="person-add">${t("person_add")}</button>
+  </div>`;
+}
+function medsForActivePerson(){
+  const meds = cabinet || [];
+  if (activePerson === "ALL") return meds;
+  if (activePerson === "") return meds.filter(m => !(m.person||"").trim());
+  return meds.filter(m => (m.person||"").trim() === activePerson);
+}
+
+/* Dosing schedule — optional comma-separated "HH:MM" times per med, and a
+   simple "Today" timeline that groups the visible meds by time. */
+function parseTimes(schedule){
+  return (schedule||"").split(",").map(s=>s.trim()).filter(s=>/^\d{1,2}:\d{2}$/.test(s))
+    .map(s=>{ const [h,m]=s.split(":"); return (h.padStart(2,"0"))+":"+m; }).sort();
+}
+function todayScheduleHTML(meds){
+  const slots = {};
+  meds.forEach(m => parseTimes(m.schedule).forEach(tm => { (slots[tm]=slots[tm]||[]).push(titlecase(m.generic||m.brand||m.name)); }));
+  const times = Object.keys(slots).sort();
+  if (!times.length) return "";
+  return `<div class="today-sched">
+    <span class="eyebrow">${esc(t("today_schedule"))}</span>
+    ${times.map(tm=>`<div class="ts-row"><span class="ts-time">${esc(tm)}</span><span class="ts-meds">${slots[tm].map(esc).join(", ")}</span></div>`).join("")}
+  </div>`;
+}
+
 function medRowHTML(m){
   const display = m.generic || m.brand || m.name;
   const strip = [];
@@ -6665,6 +6743,16 @@ function medRowHTML(m){
           ${m.notes
             ? `<p>“${esc(m.notes)}”</p><button class="expand" data-act="edit">${esc(t("med_note_edit_existing"))}</button>`
             : `<button class="expand" data-act="edit">${t("med_note_edit")}</button>`}
+        </div>
+        <div class="medmeta" data-role="sched">
+          ${parseTimes(m.schedule).length
+            ? `<span class="sched-tags">${parseTimes(m.schedule).map(x=>`<span class="sched-tag">🕑 ${esc(x)}</span>`).join("")}</span><button class="expand" data-act="sched-edit">${esc(t("sched_edit"))}</button>`
+            : `<button class="expand" data-act="sched-edit">${t("sched_add")}</button>`}
+        </div>
+        <div class="medmeta" data-role="person">
+          ${(m.person||"").trim()
+            ? `<span class="person-tag">👤 ${esc(t("person_of_prefix"))} ${esc(m.person)}</span><button class="expand" data-act="person-assign">${esc(t("med_note_edit_existing"))}</button>`
+            : `<button class="expand" data-act="person-assign">${t("person_assign")}</button>`}
         </div>
       </div>
       <button class="rm" data-act="remove" title="${esc(t("med_note_remove_label_prefix"))}" aria-label="${esc(t("med_note_remove_label_prefix"))} ${esc(titlecase(display))} ${esc(t("med_note_remove_from"))}">×</button>
@@ -6731,7 +6819,10 @@ function renderCabinet(){
       <p>${esc(t("cabinet_empty_body"))}</p>
     </div>`;
   } else {
-    html += `<div class="results">${cabinet.map(medRowHTML).join("")}</div>
+    const visible = medsForActivePerson();
+    html += personFilterBarHTML();
+    html += todayScheduleHTML(visible);
+    html += `<div class="results">${visible.map(medRowHTML).join("")}</div>
     <div class="cab-tools">
       <button class="ghost" data-act="print">${t("print_btn")}</button>
       <button class="ghost" data-act="wallet">${t("wallet_btn")}</button>
@@ -6739,7 +6830,7 @@ function renderCabinet(){
       <button class="ghost" data-act="share">${t("share_btn")}</button>
     </div>
     <div id="share-panel"></div>`;
-    if (cabinet.length >= 2){
+    if (visible.length >= 2){
       html += `<div class="cab-tools">
         <button class="go" data-act="scan">${t("scan_btn")}</button>
         <span class="status" style="padding:0;">${esc(t("scan_note"))}</span>
@@ -6931,6 +7022,72 @@ async function saveNote(card){
   }catch(e){ cabinetStatus(e.message); }
 }
 
+/* dosing-times editor (per med) — free "HH:MM, HH:MM" text, loosely
+   validated; parseTimes drops anything that isn't a time. */
+function openSchedEditor(card){
+  const m = cabinet.find(x => x.id === card.dataset.id); if (!m) return;
+  const holder = card.querySelector('[data-role="sched"]');
+  holder.innerHTML = `<input type="text" class="meta-input" placeholder="${esc(t("sched_placeholder"))}" value="${esc(m.schedule || "")}" />
+    <div class="notebtns">
+      <button class="mini" data-act="sched-save">${esc(t("sched_save"))}</button>
+      <button class="mini" data-act="meta-cancel">${esc(t("note_cancel_btn"))}</button>
+    </div>`;
+  holder.querySelector("input").focus();
+}
+async function saveSchedule(card){
+  const id = card.dataset.id;
+  const raw = card.querySelector("input").value.trim();
+  const clean = parseTimes(raw).join(", "); // normalize + drop junk
+  try{
+    await db("medications?id=eq." + encodeURIComponent(id),
+      { method:"PATCH", body:{ schedule: clean || null }, prefer:"return=minimal" });
+    const m = cabinet.find(x => x.id === id);
+    if (m) m.schedule = clean || null;
+    renderCabinet();
+  }catch(e){ cabinetStatus(e.message); }
+}
+
+/* assign a med to a person (multi-person cabinets) */
+function openPersonEditor(card){
+  const m = cabinet.find(x => x.id === card.dataset.id); if (!m) return;
+  const holder = card.querySelector('[data-role="person"]');
+  const opts = cabinetPeople().map(p=>`<option value="${esc(p)}"${(m.person||"")===p?" selected":""}>${esc(p)}</option>`).join("");
+  holder.innerHTML = `<span class="inrow">
+      <input type="text" class="meta-input" list="people-list" placeholder="${esc(t("person_add_ph"))}" value="${esc(m.person || "")}" />
+      <datalist id="people-list">${opts}</datalist>
+    </span>
+    <div class="notebtns">
+      <button class="mini" data-act="person-save">${esc(t("note_save_btn"))}</button>
+      <button class="mini" data-act="meta-cancel">${esc(t("note_cancel_btn"))}</button>
+    </div>`;
+  holder.querySelector("input").focus();
+}
+async function savePerson(card){
+  const id = card.dataset.id;
+  const val = card.querySelector("input").value.trim();
+  try{
+    await db("medications?id=eq." + encodeURIComponent(id),
+      { method:"PATCH", body:{ person: val || null }, prefer:"return=minimal" });
+    const m = cabinet.find(x => x.id === id);
+    if (m) m.person = val || null;
+    if (val) savePeople([...storedPeople(), val]);
+    renderCabinet();
+  }catch(e){ cabinetStatus(e.message); }
+}
+
+/* add a person to the filter bar before they have any meds tagged */
+function openPersonAdd(btn){
+  const bar = btn.closest(".person-bar"); if (!bar) return;
+  btn.outerHTML = `<span class="inrow" style="display:inline-flex; gap:6px;">
+    <input type="text" id="person-add-input" class="meta-input" placeholder="${esc(t("person_add_ph"))}" />
+    <button class="mini" data-act="person-add-save">${esc(t("note_save_btn"))}</button></span>`;
+  const inp = bar.querySelector("#person-add-input");
+  inp.focus();
+  const save = ()=>{ const v = inp.value.trim(); if (v){ savePeople([...storedPeople(), v]); activePerson = v; } renderCabinet(); };
+  bar.querySelector('[data-act="person-add-save"]').addEventListener("click", save);
+  inp.addEventListener("keydown", e=>{ if (e.key==="Enter") save(); });
+}
+
 async function removeMed(card){
   const id = card.dataset.id;
   try{
@@ -6951,17 +7108,20 @@ async function removeMed(card){
    ================================================================= */
 async function runCabinetScan(){
   const box = $("#scan-results");
-  if (!cabinet || cabinet.length < 2){ box.innerHTML = `<div class="err">${esc(t("scan_min_two"))}</div>`; return; }
-  const pairCount = cabinet.length*(cabinet.length-1)/2;
+  // scan only the currently-visible person's meds, so a caregiver scans
+  // one person's list at a time (with "Everyone" selected, that's all of them)
+  const meds = medsForActivePerson();
+  if (!meds || meds.length < 2){ box.innerHTML = `<div class="err">${esc(t("scan_min_two"))}</div>`; return; }
+  const pairCount = meds.length*(meds.length-1)/2;
   const pairWord = pairCount>1 ? t("scan_pairs_word_plural") : t("scan_pairs_word");
-  box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("scan_scanning_prefix"))} ${cabinet.length} ${esc(t("medications_word"))} — ${pairCount} ${esc(pairWord)}…</div>`;
+  box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("scan_scanning_prefix"))} ${meds.length} ${esc(t("medications_word"))} — ${pairCount} ${esc(pairWord)}…</div>`;
 
   const drugs = [];
-  for (const m of cabinet) drugs.push(await resolveForAnalysis(m.generic || m.brand || m.name));
+  for (const m of meds) drugs.push(await resolveForAnalysis(m.generic || m.brand || m.name));
   const { findings, mentions } = analyzeDrugPairs(drugs);
 
   box.innerHTML = renderScanSummary(findings, mentions)
-    + renderCabinetMap(cabinet)
+    + renderCabinetMap(meds)
     + renderScanMatrix(findings, mentions)
     + renderPharmacistQuestions(findings, mentions);
 }
@@ -7089,9 +7249,16 @@ $("#cabinet-body").addEventListener("click", e => {
   else if (act === "share-create") onCreateShare();
   else if (act === "share-copy")   onCopyShareLink();
   else if (act === "share-revoke") onRevokeShare();
+  else if (act === "person-pick")  { activePerson = btn.dataset.person; renderCabinet(); }
+  else if (act === "person-add")   openPersonAdd(btn);
   else if (card && act === "edit")        openNoteEditor(card);
   else if (card && act === "note-save")   saveNote(card);
   else if (card && act === "note-cancel") renderCabinet();
+  else if (card && act === "sched-edit")   openSchedEditor(card);
+  else if (card && act === "sched-save")   saveSchedule(card);
+  else if (card && act === "meta-cancel")  renderCabinet();
+  else if (card && act === "person-assign") openPersonEditor(card);
+  else if (card && act === "person-save")   savePerson(card);
   else if (card && act === "remove")      removeMed(card);
 });
 $("#cabinet-body").addEventListener("keydown", e => {

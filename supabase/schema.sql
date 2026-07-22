@@ -40,8 +40,14 @@ create table if not exists public.medications (
   rxcui      text,                 -- RxNorm id (handy for de-duping)
   drug_class text,
   notes      text,                 -- e.g. "morning, with food"
+  schedule   text,                 -- optional dosing times, comma-separated "HH:MM" (e.g. "08:00,20:00")
+  person     text,                 -- optional label for multi-person cabinets (e.g. "Mom"); null = you
   created_at timestamptz default now()
 );
+
+-- additive columns for existing installs (safe to re-run; no-op if present)
+alter table public.medications add column if not exists schedule text;
+alter table public.medications add column if not exists person   text;
 
 create index if not exists medications_user_idx on public.medications(user_id);
 
