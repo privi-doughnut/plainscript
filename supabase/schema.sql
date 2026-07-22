@@ -55,19 +55,29 @@ create index if not exists medications_user_idx on public.medications(user_id);
 alter table public.profiles    enable row level security;
 alter table public.medications enable row level security;
 
+-- Postgres has no CREATE POLICY IF NOT EXISTS, so drop-then-create keeps the
+-- whole file safely re-runnable (re-running used to error once the policies
+-- already existed).
+drop policy if exists "own profile: select" on public.profiles;
 create policy "own profile: select" on public.profiles
   for select using (auth.uid() = id);
+drop policy if exists "own profile: insert" on public.profiles;
 create policy "own profile: insert" on public.profiles
   for insert with check (auth.uid() = id);
+drop policy if exists "own profile: update" on public.profiles;
 create policy "own profile: update" on public.profiles
   for update using (auth.uid() = id);
 
+drop policy if exists "own meds: select" on public.medications;
 create policy "own meds: select" on public.medications
   for select using (auth.uid() = user_id);
+drop policy if exists "own meds: insert" on public.medications;
 create policy "own meds: insert" on public.medications
   for insert with check (auth.uid() = user_id);
+drop policy if exists "own meds: update" on public.medications;
 create policy "own meds: update" on public.medications
   for update using (auth.uid() = user_id);
+drop policy if exists "own meds: delete" on public.medications;
 create policy "own meds: delete" on public.medications
   for delete using (auth.uid() = user_id);
 
@@ -118,10 +128,13 @@ create index if not exists cabinet_shares_user_idx on public.cabinet_shares(user
 alter table public.cabinet_shares enable row level security;
 
 -- owner-only. No anon/public policy exists on this table on purpose.
+drop policy if exists "own shares: select" on public.cabinet_shares;
 create policy "own shares: select" on public.cabinet_shares
   for select using (auth.uid() = user_id);
+drop policy if exists "own shares: insert" on public.cabinet_shares;
 create policy "own shares: insert" on public.cabinet_shares
   for insert with check (auth.uid() = user_id);
+drop policy if exists "own shares: update" on public.cabinet_shares;
 create policy "own shares: update" on public.cabinet_shares
   for update using (auth.uid() = user_id);
 
