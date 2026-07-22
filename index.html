@@ -1002,6 +1002,7 @@ const I18N = {
     food_allergy_eyebrow: "Food, drink &amp; allergy notes",
     food_allergy_title_prefix: "Worth telling your pharmacist about",
     food_drink_interaction: "Food/drink interaction",
+    supplement_interaction: "Supplement / OTC interaction",
     food_allergy_combo_note: "These contain the same active ingredient — check you're not accidentally doubling up if you take more than one alongside this.",
     similar_related_btn: "🔎 Similar &amp; related meds",
     similar_related_title_suffix: "— similar &amp; related",
@@ -4570,6 +4571,53 @@ function foodInteractionsFor(tokens){
   return FOOD_INTERACTIONS.filter(f => sideHit(tokens, f.drugs));
 }
 
+/* ---- SUPPLEMENT & OTC INTERACTIONS --------------------------------
+   Same shape and rigor as FOOD_INTERACTIONS — Plainscript's own curated,
+   reviewed content (never FDA text), each verified against standard
+   references. Matches on the DECODED drug's tokens and names the common
+   supplement/OTC to be careful with. English-first; joins the pending
+   translation pass. `drugs` are English match tokens, like the sets above. */
+const SUPPLEMENT_INTERACTIONS = [
+  { drugs:SSRIS.concat(["venlafaxine","duloxetine","desvenlafaxine"]), severity:"major",
+    supplement:{en:"St. John's Wort (herbal supplement for mood)"},
+    what:{en:"Taking St. John's Wort with an antidepressant can push serotonin too high (serotonin syndrome) and can also make the antidepressant less effective."},
+    why:{en:"St. John's Wort raises serotonin on its own AND speeds up the liver enzymes that clear many drugs, so levels swing in both risky directions."},
+    mgmt:{en:"This combo is generally avoided. Tell your prescriber and pharmacist about any herbal supplements before starting an antidepressant."} },
+  { drugs:["warfarin"], severity:"major",
+    supplement:{en:"St. John's Wort (herbal supplement for mood)"},
+    what:{en:"St. John's Wort can make the blood thinner warfarin weaker, raising the risk of a clot."},
+    why:{en:"It speeds up the liver enzymes that clear warfarin, so more of it is broken down and its effect drops."},
+    mgmt:{en:"Warfarin and St. John's Wort are generally not combined; INR is watched closely if a supplement changes. Always report supplements."} },
+  { drugs:["ethinyl estradiol","levonorgestrel","norethindrone","drospirenone","norgestimate"], severity:"major",
+    supplement:{en:"St. John's Wort (herbal supplement for mood)"},
+    what:{en:"St. John's Wort can make hormonal birth control less reliable, with reports of breakthrough bleeding and unintended pregnancy."},
+    why:{en:"It speeds up the liver enzymes that clear the hormones, lowering their levels."},
+    mgmt:{en:"If you take hormonal contraception, avoid St. John's Wort or use a backup method — ask your pharmacist."} },
+  { drugs:["doxycycline","minocycline","tetracycline","ciprofloxacin","levofloxacin","moxifloxacin","norfloxacin"], severity:"moderate",
+    supplement:{en:"Calcium, iron, magnesium, or zinc supplements (and antacids)"},
+    what:{en:"These minerals can bind to certain antibiotics in the gut so much less antibiotic is absorbed — meaning it may not work."},
+    why:{en:"The mineral and the antibiotic stick together into a compound the body can't absorb well."},
+    mgmt:{en:"Usually fine if separated — take the antibiotic about 2 hours before or 4-6 hours after the supplement or antacid. Ask a pharmacist about timing."} },
+  { drugs:["levothyroxine","liothyronine"], severity:"moderate",
+    supplement:{en:"Calcium or iron supplements (and antacids)"},
+    what:{en:"Calcium and iron can reduce how much thyroid medicine your body absorbs, so your dose may work less well."},
+    why:{en:"They bind the thyroid hormone in the gut and block its absorption."},
+    mgmt:{en:"Take thyroid medicine on an empty stomach and separate it from calcium/iron by at least 4 hours."} },
+  { drugs:["warfarin"].concat(["clopidogrel","apixaban","rivaroxaban","dabigatran","aspirin"]), severity:"moderate",
+    supplement:{en:"Fish oil / high-dose omega-3, ginkgo biloba, or vitamin E"},
+    what:{en:"High doses of these supplements can add to the blood-thinning effect of anticoagulant or antiplatelet medicines, raising bleeding risk."},
+    why:{en:"Each one slightly reduces the blood's ability to clot; stacked on a blood thinner, the effect adds up."},
+    mgmt:{en:"Let your prescriber know about these supplements, especially before any procedure or if you bruise or bleed easily."} },
+  { drugs:ACE.concat(["losartan","valsartan","olmesartan"]).concat(KSPARE), severity:"moderate",
+    supplement:{en:"Potassium supplements or potassium-based salt substitutes"},
+    what:{en:"Adding extra potassium to these blood-pressure medicines can push potassium too high, which can affect heart rhythm."},
+    why:{en:"These medicines already make the body hold on to potassium; a supplement adds more on top."},
+    mgmt:{en:"Don't start a potassium supplement or salt substitute without checking first — potassium is usually monitored with blood tests."} },
+];
+function supplementInteractionsFor(tokens){
+  return SUPPLEMENT_INTERACTIONS.filter(s => sideHit(tokens, s.drugs));
+}
+
 /* ---- ALLERGY & CROSS-SENSITIVITY NOTES (Phase 4) -------------------
    Same curation standard again. These are well-established clinical
    cautions, not personalized allergy advice — framed as "worth telling
@@ -4774,6 +4822,7 @@ async function decode(){
   if (d.generic) tokens.add(d.generic.toLowerCase());
   const classExplainer = findClassExplainer(d.klass);
   const foodHits = foodInteractionsFor(tokens);
+  const supplementHits = supplementInteractionsFor(tokens);
   const sensitivityHits = crossSensitivityFor(tokens);
 
   // Overview — the same core fields Plainscript has always shown
@@ -4819,7 +4868,7 @@ async function decode(){
       </div>
       <div class="card-body">${fullRows.filter(Boolean).join("")}</div>
     </article>` : ""}
-    ${(foodHits.length || sensitivityHits.length) ? renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits) : ""}
+    ${(foodHits.length || supplementHits.length || sensitivityHits.length) ? renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits, supplementHits) : ""}
     <p class="status" id="decode-footer" style="padding-top:4px;">${esc(t("decode_footer_note"))}</p>
   `;
 
@@ -5094,7 +5143,8 @@ function makeRow(label, text, src, warn){
 /* the food/alcohol and allergy cross-sensitivity card on a Decode result —
    both curated sets (FOOD_INTERACTIONS, CROSS_SENSITIVITY), not FDA text,
    always labeled as Plainscript's own reviewed content. */
-function renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits){
+function renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits, supplementHits){
+  supplementHits = supplementHits || [];
   const rank = {major:0,moderate:1,minor:2};
   const foodRows = [...foodHits].sort((a,b)=>rank[a.severity]-rank[b.severity]).map(f => `
     <div class="verdict v-${f.severity}" style="margin-bottom:10px;">
@@ -5105,6 +5155,19 @@ function renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits){
         <p>${esc(pickLang(f.what))}</p>
         <p class="mgmt"><b>${esc(t("why_label"))}</b> ${esc(pickLang(f.why))}</p>
         <p class="mgmt"><b>${esc(t("mgmt_label"))}</b> ${esc(pickLang(f.mgmt))}</p>
+        <div class="src">${esc(t("src_curated_interaction"))}</div>
+      </div>
+    </div>`).join("");
+
+  const suppRows = [...supplementHits].sort((a,b)=>rank[a.severity]-rank[b.severity]).map(s => `
+    <div class="verdict v-${s.severity}" style="margin-bottom:10px;">
+      <div class="bar"></div>
+      <div class="vbody">
+        <div class="pair">${esc(displayName)} ✕ ${esc(pickLang(s.supplement))}</div>
+        <div class="sev"><span class="pill">${esc(s.severity)}</span> ${esc(t("supplement_interaction"))}</div>
+        <p>${esc(pickLang(s.what))}</p>
+        <p class="mgmt"><b>${esc(t("why_label"))}</b> ${esc(pickLang(s.why))}</p>
+        <p class="mgmt"><b>${esc(t("mgmt_label"))}</b> ${esc(pickLang(s.mgmt))}</p>
         <div class="src">${esc(t("src_curated_interaction"))}</div>
       </div>
     </div>`).join("");
@@ -5121,7 +5184,7 @@ function renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits){
       <span class="eyebrow">${t("food_allergy_eyebrow")}</span>
       <div class="name" style="font-size:19px;">${esc(t("food_allergy_title_prefix"))} ${esc(displayName)}</div>
     </div>
-    <div class="card-body">${foodRows}${sensRows}</div>
+    <div class="card-body">${foodRows}${suppRows}${sensRows}</div>
   </article>`;
 }
 
