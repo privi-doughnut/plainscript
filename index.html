@@ -496,7 +496,30 @@
       box-shadow:none !important; border:1px solid #999 !important; break-inside:avoid;
     }
     body.printing-cabinet a{ color:#000 !important; }
+    /* wallet card: hide everything but the isolated card holder */
+    body.printing-wallet > *{ display:none !important; }
+    body.printing-wallet #wallet-print-holder{ display:block !important; }
+    body.printing-wallet, body.printing-wallet [data-theme]{ background:#fff !important; color:#000 !important; }
+    body.printing-wallet .wallet-card{ border:1.5px solid #000 !important; max-width:420px; }
   }
+
+  /* cabinet insights — stat tiles + single-hue magnitude bars */
+  .stat-tiles{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .stat-tile{ border:1px solid var(--line); border-radius:12px; padding:14px; text-align:center; background:var(--card); }
+  .stat-num{ font-family:var(--serif); font-size:30px; font-weight:600; color:var(--accent-deep); line-height:1; }
+  .stat-lbl{ font-size:12px; color:var(--ink-soft); margin-top:6px; }
+  .insight-bars{ display:flex; flex-direction:column; gap:8px; }
+  .insight-bar{ display:grid; grid-template-columns:40% 1fr auto; align-items:center; gap:10px; }
+  .ib-label{ font-size:13px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ib-track{ height:14px; background:var(--accent-wash); border-radius:7px; overflow:hidden; }
+  .ib-fill{ height:100%; background:var(--accent); border-radius:0 7px 7px 0; }
+  .ib-count{ font-family:var(--mono); font-size:13px; color:var(--ink); min-width:1.5em; text-align:right; }
+  /* wallet / emergency card */
+  .wallet-card{ margin-top:14px; border:1.5px solid var(--line); border-radius:12px; padding:16px; background:var(--card); }
+  .wc-title{ font-family:var(--serif); font-size:18px; font-weight:600; margin-bottom:8px; }
+  .wc-meds{ margin:0 0 10px; padding-left:18px; font-size:14px; line-height:1.6; }
+  .wc-line{ font-size:13.5px; margin:3px 0; }
+  .wc-foot{ margin-top:10px; font-size:11px; font-style:italic; color:var(--ink-faint); }
 
   footer{border-top:1px solid var(--line); padding:22px 0 40px; color:var(--ink-faint); font-size:12.5px; font-family:var(--mono);}
   footer a{color:var(--accent-deep);}
@@ -876,7 +899,25 @@ const I18N = {
     cabinet_empty_body: "Add a medication above, or decode one in tab 01 and hit “Save to My Cabinet”.",
     cabinet_offline_note: "📡 Offline — showing your cabinet as of your last visit. Adding or editing needs a connection.",
     print_btn: "🖨️ Print / save as PDF",
+    wallet_btn: "🪪 Wallet card",
+    insights_btn: "📊 Cabinet insights",
     share_btn: "🔗 Share a read-only copy",
+    insights_title: "Your cabinet at a glance",
+    insights_total: "medications",
+    insights_matched: "matched to an FDA label",
+    insights_noted: "with a personal note",
+    insights_classes: "By drug class",
+    insights_unclassified: "No class on label",
+    insights_empty: "Add a couple of medications to see insights.",
+    wallet_title: "Wallet / emergency card",
+    wallet_intro: "A compact card to print, fold, and keep in a wallet — or screenshot for your phone. Handy in an emergency or at a new pharmacy.",
+    wallet_allergies_label: "Allergies",
+    wallet_allergies_ph: "e.g. penicillin, sulfa",
+    wallet_contact_label: "Emergency contact",
+    wallet_contact_ph: "name & phone number",
+    wallet_print_btn: "🖨️ Print this card",
+    wallet_saved_note: "Allergies & contact are saved on this device only.",
+    wallet_card_title: "My medications",
     scan_btn: "🔎 Scan my whole cabinet",
     scan_note: "Checks every medication against every other one — not just pairs.",
     cabinet_footer_note: "Your cabinet is a personal reference list, not a medical record — keep your pharmacist's list as the source of truth.",
@@ -6693,6 +6734,8 @@ function renderCabinet(){
     html += `<div class="results">${cabinet.map(medRowHTML).join("")}</div>
     <div class="cab-tools">
       <button class="ghost" data-act="print">${t("print_btn")}</button>
+      <button class="ghost" data-act="wallet">${t("wallet_btn")}</button>
+      <button class="ghost" data-act="insights">${t("insights_btn")}</button>
       <button class="ghost" data-act="share">${t("share_btn")}</button>
     </div>
     <div id="share-panel"></div>`;
@@ -6722,6 +6765,119 @@ function printCabinet(){
   window.print();
 }
 window.addEventListener("afterprint", () => document.body.classList.remove("printing-cabinet"));
+
+/* Cabinet insights — a stat-tile + one-hue magnitude view of the saved
+   cabinet, computed only from stored fields (no re-fetching). Single
+   measure (counts), so it's stat tiles + single-accent bars, no
+   categorical palette. */
+function openCabinetInsights(){
+  const meds = cabinet || [];
+  const trigger = document.activeElement;
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  let body;
+  if (!meds.length){
+    body = `<div class="nofind"><p>${esc(t("insights_empty"))}</p></div>`;
+  } else {
+    const total = meds.length;
+    const matched = meds.filter(m => m.generic || m.rxcui).length;
+    const noted = meds.filter(m => m.notes).length;
+    // class counts
+    const counts = {};
+    meds.forEach(m => { const k = m.drug_class || t("insights_unclassified"); counts[k] = (counts[k]||0)+1; });
+    const rows = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+    const max = Math.max(...rows.map(r=>r[1]));
+    const bars = rows.map(([cls,n])=>`
+      <div class="insight-bar">
+        <div class="ib-label" title="${esc(cls)}">${esc(cls)}</div>
+        <div class="ib-track"><div class="ib-fill" style="width:${Math.max(6, Math.round(n/max*100))}%;"></div></div>
+        <div class="ib-count">${n}</div>
+      </div>`).join("");
+    body = `
+      <div class="stat-tiles">
+        <div class="stat-tile"><div class="stat-num">${total}</div><div class="stat-lbl">${esc(t("insights_total"))}</div></div>
+        <div class="stat-tile"><div class="stat-num">${matched}</div><div class="stat-lbl">${esc(t("insights_matched"))}</div></div>
+        <div class="stat-tile"><div class="stat-num">${noted}</div><div class="stat-lbl">${esc(t("insights_noted"))}</div></div>
+      </div>
+      <p class="eyebrow" style="margin:18px 0 8px;">${esc(t("insights_classes"))}</p>
+      <div class="insight-bars">${bars}</div>`;
+  }
+  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-label="${esc(t("insights_title"))}" style="max-width:520px;">
+    <div class="modal-head"><h2>${esc(t("insights_title"))}</h2><button class="mini" data-act="close">${t("close_btn")}</button></div>
+    <div class="modal-body">${body}</div></div>`;
+  document.body.appendChild(overlay);
+  function onEsc(e){ if (e.key==="Escape") close(); }
+  function close(){ overlay.remove(); document.removeEventListener("keydown", onEsc); if (trigger&&trigger.focus) trigger.focus(); }
+  document.addEventListener("keydown", onEsc);
+  overlay.addEventListener("click", e => { if (e.target===overlay) close(); const b=e.target.closest('[data-act="close"]'); if (b) close(); });
+  overlay.querySelector('[data-act="close"]').focus();
+}
+
+/* Wallet / emergency card — a compact printable card: meds + allergies +
+   emergency contact. Allergies/contact are stored on-device only
+   (localStorage), never sent anywhere — they're personal and not part of
+   the medication data model. */
+const WALLET_ALLERGY_KEY = "plainscript.wallet.allergies";
+const WALLET_CONTACT_KEY = "plainscript.wallet.contact";
+function openWalletCard(){
+  const meds = cabinet || [];
+  const trigger = document.activeElement;
+  let allergies = "", contact = "";
+  try{ allergies = localStorage.getItem(WALLET_ALLERGY_KEY) || ""; contact = localStorage.getItem(WALLET_CONTACT_KEY) || ""; }catch(e){}
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  const medLines = meds.map(m => {
+    const nm = titlecase(m.generic || m.brand || m.name);
+    return `<li><b>${esc(nm)}</b>${m.notes ? ` — ${esc(m.notes)}` : ""}</li>`;
+  }).join("");
+  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-label="${esc(t("wallet_title"))}" style="max-width:460px;">
+    <div class="modal-head"><h2>${esc(t("wallet_title"))}</h2><button class="mini" data-act="close">${t("close_btn")}</button></div>
+    <div class="modal-body">
+      <p class="status" style="padding-top:0;">${esc(t("wallet_intro"))}</p>
+      <div class="field"><label class="eyebrow" for="wallet-allergies">${esc(t("wallet_allergies_label"))}</label>
+        <input type="text" id="wallet-allergies" value="${esc(allergies)}" placeholder="${esc(t("wallet_allergies_ph"))}" /></div>
+      <div class="field" style="margin-top:10px;"><label class="eyebrow" for="wallet-contact">${esc(t("wallet_contact_label"))}</label>
+        <input type="text" id="wallet-contact" value="${esc(contact)}" placeholder="${esc(t("wallet_contact_ph"))}" /></div>
+      <p class="status" style="font-size:12px;">${esc(t("wallet_saved_note"))}</p>
+      <div id="wallet-card" class="wallet-card">
+        <div class="wc-title">${esc(t("wallet_card_title"))}</div>
+        <ul class="wc-meds">${medLines || "<li>—</li>"}</ul>
+        <div class="wc-line"><b>${esc(t("wallet_allergies_label"))}:</b> <span id="wc-allergies">${esc(allergies||"—")}</span></div>
+        <div class="wc-line"><b>${esc(t("wallet_contact_label"))}:</b> <span id="wc-contact">${esc(contact||"—")}</span></div>
+        <div class="wc-foot">${esc(t("print_disclaimer"))}</div>
+      </div>
+      <button class="go" data-act="wallet-print" style="margin-top:12px;">${t("wallet_print_btn")}</button>
+    </div></div>`;
+  document.body.appendChild(overlay);
+  const aIn = overlay.querySelector("#wallet-allergies");
+  const cIn = overlay.querySelector("#wallet-contact");
+  function sync(){
+    try{ localStorage.setItem(WALLET_ALLERGY_KEY, aIn.value); localStorage.setItem(WALLET_CONTACT_KEY, cIn.value); }catch(e){}
+    overlay.querySelector("#wc-allergies").textContent = aIn.value || "—";
+    overlay.querySelector("#wc-contact").textContent = cIn.value || "—";
+  }
+  aIn.addEventListener("input", sync); cIn.addEventListener("input", sync);
+  function onEsc(e){ if (e.key==="Escape") close(); }
+  function close(){ overlay.remove(); document.removeEventListener("keydown", onEsc); if (trigger&&trigger.focus) trigger.focus(); }
+  document.addEventListener("keydown", onEsc);
+  overlay.addEventListener("click", e => {
+    if (e.target===overlay){ close(); return; }
+    const b = e.target.closest("[data-act]"); if (!b) return;
+    if (b.dataset.act==="close") close();
+    else if (b.dataset.act==="wallet-print") printWalletCard(overlay.querySelector("#wallet-card"));
+  });
+}
+function printWalletCard(cardEl){
+  // isolate just the card for printing via a body class, like printCabinet
+  const holder = document.createElement("div");
+  holder.id = "wallet-print-holder";
+  holder.innerHTML = cardEl.outerHTML;
+  document.body.appendChild(holder);
+  document.body.classList.add("printing-wallet");
+  const cleanup = ()=>{ document.body.classList.remove("printing-wallet"); holder.remove(); window.removeEventListener("afterprint", cleanup); };
+  window.addEventListener("afterprint", cleanup);
+  window.print();
+}
 
 async function onAddMed(){
   const input = $("#cab-input");
@@ -6927,6 +7083,8 @@ $("#cabinet-body").addEventListener("click", e => {
   else if (act === "add")     onAddMed();
   else if (act === "scan")    runCabinetScan();
   else if (act === "print")   printCabinet();
+  else if (act === "wallet")  openWalletCard();
+  else if (act === "insights") openCabinetInsights();
   else if (act === "share")        renderSharePanel();
   else if (act === "share-create") onCreateShare();
   else if (act === "share-copy")   onCopyShareLink();
