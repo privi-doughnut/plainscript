@@ -24,7 +24,7 @@ This file is the quick status view. `PLAINSCRIPT_ROADMAP.md` has the full phased
 
 **Content — the one thing only you can do:**
 - [ ] Write the "Why I built this" section in `README.md` — left as a clearly marked placeholder on purpose. This is genuinely the single remaining roadmap item that can't be done by anyone but you.
-- [ ] Review the "Report an error" link in the footer — it points to a pre-filled GitHub Issues form rather than a personal email, to avoid putting a real, spammable Gmail address in public page source. Swap it if you'd rather use something else.
+- [X] Review the "Report an error" link in the footer — it points to a pre-filled GitHub Issues form rather than a personal email, to avoid putting a real, spammable Gmail address in public page source. Swap it if you'd rather use something else. (its fine the way it is - privi)
 
 **Next up (roadmap items remaining after the localization push):**
 - [ ] **Tamil curated pass** — Tamil ships as a full 334-key UI dictionary, but its curated *medical* arrays (interactions, food/alcohol, symptoms, drug-class explainers) currently fall back to English via `pickLang`. Author the Tamil curated translations to bring it to full parity with Hindi. Big authoring job — best done with credits to spare. Same follow-up applies to any other language you want fully medical-localized.
