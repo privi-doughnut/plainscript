@@ -16,7 +16,7 @@ This file is the quick status view. `PLAINSCRIPT_ROADMAP.md` has the full phased
 **Supabase** (unlocks My Cabinet + Cabinet Scan + the share-a-cabinet feature):
 - [X] Run `supabase/schema.sql` in the Supabase SQL Editor — it's grown since you last saw it (now includes `cabinet_shares` + `get_shared_cabinet()` for link/QR sharing); the whole file is idempotent, safe to re-run start to finish.
 - [ ] Enable Google as an OAuth provider (Authentication → Providers → Google) with a client ID/secret from Google Cloud Console — confirmed currently off. (Email magic-link needs nothing — it's on by default.)
-- [ ] Allow-list redirect URLs (Authentication → URL Configuration) — add `http://localhost:8000` and `https://plainscript.its-the-prithivi-show.workers.dev`.
+- [X] Allow-list redirect URLs (Authentication → URL Configuration) — add `http://localhost:8000` and `https://plainscript.its-the-prithivi-show.workers.dev`.
 
 **Cloudflare:**
 - [ ] Confirm which Worker is which — you mentioned making a Cloudflare Worker; I need to know if that's `worker.js` (the Claude-proxy for Phase 1's plain-English mode, needs `ANTHROPIC_API_KEY`) or a separate thing from the static-site hosting Worker. Once confirmed, its URL goes into `config.js` as `CLAUDE_PROXY_URL`.
