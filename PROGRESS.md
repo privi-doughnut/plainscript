@@ -1,11 +1,11 @@
 # Plainscript — Progress & Status
 
-*Last updated: 2026-07-21 (after the Spanish localization pass)*
+*Last updated: 2026-07-24 (after scaling localization to 13 languages, incl. full Hindi + Tamil)*
 
 **Completion: ~76% of the full roadmap · Phases 0–5 are fully code-complete, including Spanish. Only Phase 6's analytics + CAC packaging remain, both low-priority/deferred — see below.**
 **97 days to the Congressional App Challenge deadline (Oct 26, 2026).**
 
-**New: Spanish is live** — a 🌐 toggle in the header switches the entire UI, the full curated medical content (interactions, food/alcohol notes, allergy notes, drug-class explainers, symptom categories), and (once the Phase 1 Worker is configured) live FDA label text too. Built as a proper i18n framework, not a one-off — the next language Privi wants is "add a dictionary column," not a rebuild. See the build log below for what's covered.
+**New: 13 languages live** — English, Spanish, Chinese, Vietnamese, Arabic (RTL), French, Korean, Russian, Portuguese, German, Japanese, Hindi, and Tamil. The 🌐 header selector switches the entire UI, the full curated medical content (interactions, food/alcohol notes, allergy notes, drug-class explainers, supplements, symptom categories), and (once the Phase 1 Worker is configured) live FDA label text too. Built as a proper i18n framework, not a one-off — a new language is "add a dictionary + a curated-field pass," not a rebuild. See the build log below for what's covered.
 
 This file is the quick status view. `PLAINSCRIPT_ROADMAP.md` has the full phased plan and reasoning; `CLAUDE.md` has the architecture and safety rules.
 
@@ -27,7 +27,7 @@ This file is the quick status view. `PLAINSCRIPT_ROADMAP.md` has the full phased
 - [X] Review the "Report an error" link in the footer — it points to a pre-filled GitHub Issues form rather than a personal email, to avoid putting a real, spammable Gmail address in public page source. Swap it if you'd rather use something else. (its fine the way it is - privi)
 
 **Next up (roadmap items remaining after the localization push):**
-- [ ] **Tamil curated pass** — Tamil ships as a full 334-key UI dictionary, but its curated *medical* arrays (interactions, food/alcohol, symptoms, drug-class explainers) currently fall back to English via `pickLang`. Author the Tamil curated translations to bring it to full parity with Hindi. Big authoring job — best done with credits to spare. Same follow-up applies to any other language you want fully medical-localized.
+- [X] **Tamil curated pass** — DONE (2026-07-24). Tamil now has full medical parity with Hindi: `ta` added to every curated field object (489 = 489 vs `hi`), so interactions, food/alcohol, allergy notes, drug-class explainers, supplements, and symptom categories all render in Tamil instead of falling back to English. The same append pattern is ready for any future language.
 - [ ] **Live-verify the DB features** — run `supabase/schema.sql` in the dashboard (idempotent) to unlock My Cabinet, share links, schedule + multi-person.
 - [ ] **"Why I built this"** — the `[PRIVI: voice this]` placeholder in `README.md`. You-only, in your voice.
 - [ ] **CAC packaging** (deadline Oct 26) — demo video (needs you) + written description.
@@ -63,6 +63,12 @@ Five new directions worth considering once the current batch lands:
 ---
 
 ## 3. Everything already built (build log)
+
+### 2026-07-24 — Localization scaled to 13 languages
+- Added **11 more languages** on top of English + Spanish: Chinese, Vietnamese, Arabic (RTL), French, Korean, Russian, Portuguese, German, Japanese, **Hindi**, and **Tamil** — each a full 334-key `I18N` dictionary, a `SUPPORTED_LANGS` + `DATE_LOCALES` entry, a language-selector `<option>`, and a `LOCKED_SYSTEM` rephrase prompt in `worker.js`.
+- **Full curated medical parity** for every language including Hindi and Tamil: `{lang}` fields on all curated arrays (INTERACTIONS, FOOD_INTERACTIONS, CROSS_SENSITIVITY, DRUG_CLASS_EXPLAINERS, SUPPLEMENT_INTERACTIONS, SYMPTOM_CATEGORIES, SYMPTOM_GROUPS) — real reviewed translations, English `pickLang` fallback only where a pass is still pending.
+- Each language verified programmatically: 334-key dictionary parity (no missing/extra keys) and curated-field coverage (`hi`/`ta` count == field count), plus `node --check` on the extracted script before every push.
+- Still worth a live browser pass — especially **Arabic RTL** and the Hindi/Tamil rendering (see the visual-QA checklist above).
 
 ### 2026-07-21 — Spanish localization ("take a full pass at spanish")
 - Built a real i18n framework: 230-key `I18N` dictionary (English + Spanish), `t()`/`pickLang()` lookup, `applyTranslations()` DOM-attribute pass, a 🌐 header toggle persisted via localStorage + a new `lang` profile column (same pattern as theme).
