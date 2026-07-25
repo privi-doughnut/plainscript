@@ -61,7 +61,7 @@ A batch of bigger features, sequenced by value × low-risk × no-new-dependency.
 - [ ] **Traveling-with-meds helper** — real but niche, and overlaps a lot with the new regimen story (which is already printable and multilingual). **Low priority.**
 - [ ] **Opt-in adherence streak / check-ins** — a habit/nudge feature; leans toward the kind of nagging the app deliberately avoids. **Low priority / arguably off-brand.**
 
-**Translation pass owed (follow-up)** — the 5 features above added ~44 new English UI keys wired through `t()`. They're functional in every language via the en fallback, but not yet translated into the other 12. One consolidated translation pass brings them to full parity (same as how Tamil curated was handled). Sizeable (~500 short strings) — best as its own focused push.
+**Translation pass — DONE (2026-07-25).** All ~58 new UI keys from this push (pictograms, regimen story, heatmap, refill/expiry reminders, scanner CTA, and Ask-the-label) are now translated into every one of the 13 languages — no English fallback remains for the new copy. Done in 3 committed batches (es/zh/vi/ar, fr/ko/ru/pt, de/ja/hi/ta), each verified for full key parity + `node --check`.
 
 **Resolved after discussion (2026-07-25)**
 - [X] **Point-and-decode (OCR)** — **decided against.** The barcode scanner already covers type-free input at higher reliability and zero dependency; OCR's only unique win (pharmacy vials) is the hardest OCR case and would cost a ~2 MB dependency that breaks the offline/CSP design. Instead, **made the existing scanner discoverable** — a labeled "Or scan the barcode on the box" CTA under the Decode field (was just a tiny icon).
