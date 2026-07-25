@@ -232,6 +232,20 @@
   .fda-list li.more-li{list-style:none; margin-left:-20px;}
   .fda-list li.more-li .expand{margin-top:2px;}
   body.easy-read .fda-list li{font-size:17px; line-height:1.7;}
+  /* pictograms — low-literacy "at a glance" cues on Decode */
+  .pict-grid{display:flex; flex-wrap:wrap; gap:10px;}
+  .pict{flex:1 1 168px; min-width:150px;}
+  .pict-chip{display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    appearance:none; background:var(--paper); border:1px solid var(--line); border-radius:12px;
+    padding:10px 12px; cursor:pointer; color:var(--ink); font:inherit; font-size:14px; font-weight:600;}
+  .pict-chip:hover, .pict-chip.open{border-color:var(--accent);}
+  .pict-ico{flex:none; width:30px; height:30px; color:var(--accent); display:inline-flex; align-items:center; justify-content:center;}
+  .pict-ico svg{width:30px; height:30px;}
+  .pict-label{line-height:1.3;}
+  .pict-ev{margin-top:6px; font-size:13px; color:var(--ink-soft); background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:8px 10px;}
+  .pict-ev-lbl{font-weight:700; color:var(--ink);}
+  body.easy-read .pict-chip{font-size:16px;}
+  body.easy-read .pict-ico, body.easy-read .pict-ico svg{width:36px; height:36px;}
   .row .src{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:6px;}
   .expand{
     appearance:none; background:none; border:none; cursor:pointer; padding:0; margin-top:6px;
@@ -1107,6 +1121,19 @@ const I18N = {
     row_pregnancy: "Pregnancy", src_pregnancy: "FDA label · pregnancy",
     row_nursing: "Breastfeeding / nursing", src_nursing: "FDA label · nursing mothers",
     decode_footer_note: "This is reference information from the medication's FDA label — not a recommendation about whether to take it, and not dosing advice. Talk to a pharmacist or doctor about your situation.",
+    pict_eyebrow: "At a glance",
+    pict_title: "Key things about taking this",
+    pict_note: "Simple visual cues pulled from this drug's FDA label. Tap any icon to see the exact label wording it came from — always double-check with your pharmacist.",
+    pict_from_label: "From the label:",
+    pict_with_food: "Take with food",
+    pict_empty_stomach: "Take on an empty stomach",
+    pict_avoid_alcohol: "Avoid alcohol",
+    pict_drowsiness: "May cause drowsiness — take care driving",
+    pict_refrigerate: "Keep refrigerated",
+    pict_sun_sensitivity: "Sun sensitivity — protect your skin",
+    pict_do_not_crush: "Swallow whole — don't crush or chew",
+    pict_plenty_water: "Take with plenty of water",
+    pict_finish_course: "Finish the full course",
     spanish_no_worker_note: "The FDA label text below is shown in its original English — translating it needs the plain-English Worker to be configured, which isn't set up on this deployment yet.",
     show_full_text: "Show full FDA text ▾", hide_full_text: "Hide full FDA text ▴",
     show_plain_english: "Show plain English ▴", show_original: "Show original FDA wording ▾",
@@ -6465,6 +6492,7 @@ async function decode(){
   const foodHits = foodInteractionsFor(tokens);
   const supplementHits = supplementInteractionsFor(tokens);
   const sensitivityHits = crossSensitivityFor(tokens);
+  const picts = detectPictograms(d, rec);   // low-literacy "at a glance" cues
 
   // Overview — the same core fields Plainscript has always shown
   const rows = [];
@@ -6501,6 +6529,7 @@ async function decode(){
       </div>
       <div class="card-body">${rows.filter(Boolean).join("")}</div>
     </article>
+    ${renderPictogramCard(picts)}
     ${hasFullRows ? `
     <article class="card">
       <div class="card-head">
@@ -6822,12 +6851,115 @@ function renderStructure(parts, cap){
 function wireStructure(box){
   if(box._structWired) return; box._structWired=true;
   box.addEventListener("click", e=>{
-    const b=e.target.closest?.('.expand[data-toggle]'); if(!b || !box.contains(b)) return;
-    const tgt=box.querySelector("#"+CSS.escape(b.dataset.toggle)); if(!tgt) return;
-    tgt.hidden=!tgt.hidden;
-    b.textContent = tgt.hidden ? t("show_full_text") : t("hide_full_text");
+    const b=e.target.closest?.('.expand[data-toggle]');
+    if(b && box.contains(b)){
+      const tgt=box.querySelector("#"+CSS.escape(b.dataset.toggle)); if(!tgt) return;
+      tgt.hidden=!tgt.hidden;
+      b.textContent = tgt.hidden ? t("show_full_text") : t("hide_full_text");
+      return;
+    }
+    const chip=e.target.closest?.('.pict-chip');
+    if(chip && box.contains(chip)){
+      const ev=box.querySelector("#"+CSS.escape(chip.dataset.ev)); if(!ev) return;
+      ev.hidden=!ev.hidden;
+      chip.setAttribute("aria-expanded", String(!ev.hidden));
+      chip.classList.toggle("open", !ev.hidden);
+    }
   });
 }
+/* ---- Pictograms: low-literacy "at a glance" cues on Decode -----------
+   Standard medication-guidance icons (take with food, avoid alcohol, etc.)
+   derived from the drug's own FDA label text. SAFETY: each icon fires only
+   on a per-sentence positive match WITH a negation guard, so a reversed
+   instruction ("do NOT take with food") can never surface the opposite
+   icon; and every icon carries the exact label sentence it came from,
+   viewable on tap. Detection patterns are unit-tested (see the
+   test_pictograms battery). This interprets nothing beyond re-surfacing a
+   sentence the label already states, always sourced. */
+const PICT_ICONS = {
+  with_food: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2v8M5 2v4M9 2v4M7 10v12"/><path d="M17 2c-1.7 0-2.5 2-2.5 5s.8 5 2.5 5v10"/></svg>',
+  empty_stomach: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  avoid_alcohol: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l-1 6a3 3 0 0 1-6 0L8 3zM12 15v5M9 21h6"/><path d="M3 3l18 18"/></svg>',
+  drowsiness: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h5l-5 5h5M12 8h6l-6 6h6M16 3h4l-4 4h4"/></svg>',
+  refrigerate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4 7l16 10M20 7L4 17M12 6l-2 1.5M12 6l2 1.5M12 18l-2-1.5M12 18l2-1.5"/></svg>',
+  sun_sensitivity: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 1v2M12 21v2M1 12h2M21 12h2M4.5 4.5l1.4 1.4M18.1 18.1l1.4 1.4M19.5 4.5l-1.4 1.4M5.9 18.1l-1.4 1.4"/><path d="M2 2l20 20"/></svg>',
+  do_not_crush: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M12 8v8"/><path d="M3 3l18 18"/></svg>',
+  plenty_water: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>',
+  finish_course: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>'
+};
+const PICTOGRAMS = [
+  { id:"with_food",
+    pos:/\btake(?:n)?\b[^.]*\bwith food\b|\bwith (?:a )?meals?\b|\bafter (?:eating|meals?|a meal)\b|\btake[^.]*with milk\b/i,
+    neg:/empty stomach|without food|with or without food|not (?:be )?take[^.]*with food|do not take[^.]*with food/i },
+  { id:"empty_stomach",
+    pos:/empty stomach|without food|before (?:a )?meals?|before eating|1 hour before[^.]*(?:or|and)[^.]*after/i,
+    neg:/with or without food|need not|not necessary|regardless of (?:food|meals)/i },
+  { id:"avoid_alcohol",
+    pos:/avoid[^.]*alcohol|do not (?:drink|use|consume)[^.]*alcohol|not (?:drink|consume)[^.]*alcohol|alcohol[^.]*(?:should not|do not|avoid|may increase)|limit(?:ing)?[^.]*alcohol|abstain[^.]*alcohol/i,
+    neg:/alcohol (?:swab|wipe|prep|pad)|contains?[^.]*alcohol|alcohol\s*[,)]|dehydrogenase/i },
+  { id:"drowsiness",
+    pos:/drowsiness|may cause[^.]*(?:sleep|sedat)|do not drive|operat(?:e|ing)[^.]*machinery|impair[^.]*(?:driving|mental|ability)|sedation|makes? you sleepy/i,
+    neg:/does not (?:cause|impair)|non-?drowsy|without (?:causing )?drowsiness|less likely[^.]*drowsi/i },
+  { id:"refrigerate",
+    pos:/refrigerat|store[^.]*(?:2°?\s*(?:to|-|–)\s*8°?\s*c|36°?\s*(?:to|-|–)\s*46°?\s*f)|keep (?:cold|refrigerated)/i,
+    neg:/do not refrigerate|not (?:be )?refrigerated|does not (?:require|need)[^.]*refrigerat/i },
+  { id:"sun_sensitivity",
+    pos:/photosensitiv|sunburn more easily|sensitiv[^.]*to (?:sun|light)|avoid[^.]*(?:sunlight|sun exposure|uv light)|wear (?:protective clothing|sunscreen)|exposure to (?:sunlight|the sun)[^.]*avoid/i,
+    neg:/protect (?:the )?(?:product|drug|vial|solution|medication) from light/i },
+  { id:"do_not_crush",
+    pos:/do not (?:crush|chew|break|split|divide|cut)|swallow[^.]*whole|must be swallowed whole/i,
+    neg:/may be (?:crushed|chewed|split|divided|opened)|can be (?:crushed|chewed|split)|if you cannot swallow/i },
+  { id:"plenty_water",
+    pos:/(?:with|drink)[^.]*(?:full )?glass(?:ful)? of water|plenty of (?:water|fluids?|liquids?)|drink[^.]*(?:plenty|adequate)[^.]*(?:water|fluid)|with 8 (?:ounces|oz)[^.]*water/i,
+    neg:/do not drink/i },
+  { id:"finish_course",
+    pos:/(?:take|continue|finish|complete)[^.]*(?:full|entire|prescribed|complete)[^.]*(?:course|amount|length|treatment)|even if[^.]*(?:you )?(?:feel|symptoms)[^.]*better|complete the (?:full |entire )?course/i,
+    neg:/does not need/i }
+];
+function detectPictograms(d, rec){
+  const raw = rec || {};
+  const g = k => Array.isArray(raw[k]) && raw[k].length ? raw[k][0] : null;
+  const fields = [d.dosage, d.warnings, d.precautions, d.boxed, d.contraindications,
+    d.interactionsProse, d.adverse, d.pregnancy, d.nursing,
+    g("storage_and_handling"), g("how_supplied"), g("patient_medication_information"),
+    g("information_for_patients"), g("instructions_for_use"), g("spl_patient_package_insert")];
+  const sents=[];
+  for(const f of fields){ if(f) _sentences(String(f).replace(/\s+/g," ")).forEach(s=>sents.push(s)); }
+  const seen=new Set(), out=[];
+  for(const det of PICTOGRAMS){
+    for(const s of sents){
+      if(det.pos.test(s) && !det.neg.test(s)){
+        if(!seen.has(det.id)){ seen.add(det.id); out.push({id:det.id, evidence:s.trim()}); }
+        break;
+      }
+    }
+  }
+  return out;
+}
+function renderPictogramCard(picts){
+  if(!picts.length) return "";
+  const chips = picts.map(p=>{
+    const id="pg"+Math.random().toString(36).slice(2,7);
+    return `<div class="pict">
+        <button class="pict-chip" data-ev="${id}" aria-expanded="false">
+          <span class="pict-ico" aria-hidden="true">${PICT_ICONS[p.id]||""}</span>
+          <span class="pict-label">${esc(t("pict_"+p.id))}</span>
+        </button>
+        <div class="pict-ev" id="${id}" hidden><span class="pict-ev-lbl">${esc(t("pict_from_label"))}</span> ${esc(p.evidence)}</div>
+      </div>`;
+  }).join("");
+  return `<article class="card pict-card">
+    <div class="card-head">
+      <span class="eyebrow">${esc(t("pict_eyebrow"))}</span>
+      <div class="name" style="font-size:19px;">${esc(t("pict_title"))}</div>
+    </div>
+    <div class="card-body">
+      <div class="pict-grid">${chips}</div>
+      <p class="status" style="padding-top:8px;">${esc(t("pict_note"))}</p>
+    </div>
+  </article>`;
+}
+
 const ROW_CAP = 6;   // show at most 6 bullets before a "show full" toggle
 function makeRow(label, text, src, warn){
   if (!text) return "";

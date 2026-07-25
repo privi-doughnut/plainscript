@@ -42,6 +42,31 @@ This file is the quick status view. `PLAINSCRIPT_ROADMAP.md` has the full phased
 
 ---
 
+## 1b. Feature build queue (2026-07 push)
+
+A batch of bigger features, sequenced by value × low-risk × no-new-dependency. Building one at a time, verify + commit each. "Don't oversaturate" is the guiding rule — each has to earn its place.
+
+**Foundational**
+- [X] **Decode readability pass** — FDA prose now lays out as bullets / short paragraphs instead of walls of text (`structureParts()`), applied to raw label text and the plain-English rephrase alike. (2026-07-25)
+
+**No new dependency — building these first**
+- [ ] **Pictogram / low-literacy "Understand Mode"** — standard public-domain-style icons (take with food, don't drive, avoid alcohol, keep refrigerated, etc.) derived from the label text, as a visual layer on Decode. Biggest equity win; pure inline SVG.
+- [ ] **Whole-regimen plain-English story** — turn the cabinet into one readable narrative page (what each med is for, when to take it, what to watch for), grouped sensibly. Uses the existing rephrase Worker.
+- [ ] **Interaction timing timeline** — a visual day-timeline from the dosing schedule that surfaces spacing conflicts (separate by 2 h, avoid alcohol 72 h, etc.). Uses data already curated.
+- [ ] **Refill & expiry reminders** — per-cabinet-med filled/expiry dates, gentle flag when running low or past expiry. Pure Supabase date fields.
+- [ ] **Traveling-with-meds helper** — a printable card with each med's generic name (+ its name in the destination language, reusing the i18n work) and plain-English carry-on notes.
+- [ ] **Cabinet Scan severity heatmap** — an N×N grid of the whole-cabinet scan, each cell colored by worst severity, so risk is scannable at a glance. Uses what the scan already computes.
+- [ ] **Opt-in adherence streak / gentle check-ins** — strictly optional "did you take today's meds?" tracker + streak. Off by default, no dark patterns.
+
+**Needs a call before building (flagging, not guessing)**
+- [ ] **Point-and-decode (OCR label scan)** — camera → read a pharmacy label → decode. Highest-impact, but needs an OCR engine (Tesseract.js is ~2 MB from a CDN, which fights the self-contained / CSP / offline design). Decision needed: bundle it, accept the CDN dependency, or wait for a lighter option.
+- [ ] **Grounded label Q&A** — "can I take this with food?" answered *only* by quoting the retrieved FDA label, never generated. Flashiest + riskiest; needs a carefully designed extract-or-say-nothing guardrail in the Worker before it's safe to ship.
+
+**Blocked**
+- [ ] **Pill / imprint identifier** — still blocked: NLM's free RxImage API was deprecated and no free imprint/image source is confirmed. Not building on a promise.
+
+---
+
 ## 2. Recommendations — what's left
 
 **Deliberately not built — explaining why rather than silently skipping:**
