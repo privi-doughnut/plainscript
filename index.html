@@ -595,6 +595,17 @@
   .reminder-banner{ margin-top:14px; padding:11px 14px; border-radius:var(--radius); background:var(--mod-bg); color:var(--mod-ink); border:1px solid var(--mod-bar); font-size:14px; }
   .scan-cta{ appearance:none; background:none; border:none; cursor:pointer; margin-top:10px; padding:0; color:var(--accent); font:inherit; font-size:14px; font-weight:600; }
   .scan-cta:hover{ text-decoration:underline; }
+  /* ask-the-label grounded Q&A */
+  .qa-card .inrow{ margin-top:8px; }
+  .qa-suggest{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .qa-eg{ appearance:none; cursor:pointer; font:inherit; font-size:12.5px; padding:5px 10px; border:1px solid var(--line); border-radius:20px; background:var(--paper); color:var(--ink-soft); }
+  .qa-eg:hover{ border-color:var(--accent); color:var(--accent); }
+  .qa-verified{ margin-top:14px; }
+  .qa-badge{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--accent); background:var(--accent-wash); border-radius:8px; padding:6px 11px; margin-bottom:12px; }
+  .qa-quote{ border-left:3px solid var(--accent); padding:2px 0 2px 12px; margin-bottom:12px; }
+  .qa-quote .eyebrow{ display:block; margin-bottom:3px; }
+  .qa-quote p{ margin:0; color:var(--ink); font-size:15px; line-height:1.55; }
+  .qa-none{ margin-top:14px; }
   .meta-input{ font-size:14px; padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink); max-width:220px; }
   .today-sched{ border:1px solid var(--line); border-radius:12px; padding:12px 16px; margin-bottom:14px; background:var(--card); }
   .today-sched .ts-row{ display:flex; gap:12px; padding:4px 0; font-size:14px; }
@@ -1204,6 +1215,20 @@ const I18N = {
     reminder_expired_word: "expired",
     reminder_soon_word: "expiring within 30 days",
     reminder_check: "check the dates below.",
+    qa_eyebrow: "Ask the label",
+    qa_title: "Ask a question about this drug",
+    qa_intro: "Type a question and I'll answer only by quoting this drug's FDA label, word for word. If the label doesn't cover it, I'll tell you — I never make anything up.",
+    qa_placeholder: "e.g. can I take this with alcohol?",
+    qa_ask: "Ask",
+    qa_thinking: "Looking through the FDA label…",
+    qa_badge: "Quoted word-for-word from the FDA label — not AI-written",
+    qa_none: "There was no information about that on this label. Sorry.",
+    qa_error: "Couldn't reach the label reader just now — try again in a moment.",
+    qa_disclaimer: "This only quotes the FDA label; it can't account for your dose, your health, or your other medicines. It's not medical advice — check anything important with a pharmacist.",
+    qa_en_note: "Answers are shown in the label's original English.",
+    qa_eg1: "What is this used for?",
+    qa_eg2: "What are the common side effects?",
+    qa_eg3: "Can I take this with alcohol?",
     spanish_no_worker_note: "The FDA label text below is shown in its original English — translating it needs the plain-English Worker to be configured, which isn't set up on this deployment yet.",
     show_full_text: "Show full FDA text ▾", hide_full_text: "Hide full FDA text ▴",
     show_plain_english: "Show plain English ▴", show_original: "Show original FDA wording ▾",
@@ -6609,6 +6634,7 @@ async function decode(){
       <div class="card-body">${fullRows.filter(Boolean).join("")}</div>
     </article>` : ""}
     ${(foodHits.length || supplementHits.length || sensitivityHits.length) ? renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits, supplementHits) : ""}
+    ${CLAUDE_PROXY_URL ? qaCardHTML() : ""}
     <p class="status" id="decode-footer" style="padding-top:4px;">${esc(t("decode_footer_note"))}</p>
   `;
 
@@ -6619,6 +6645,9 @@ async function decode(){
 
   // readability: wire the capped-list "show full / hide" toggles (delegated)
   wireStructure(box);
+
+  // ask-the-label grounded Q&A (only present when the proxy is configured)
+  wireQA(box, d);
 
   // Phase 2: offer to save this med to the signed-in user's cabinet
   addCabinetSave(box, d, name);
@@ -7028,6 +7057,145 @@ function renderPictogramCard(picts){
       <p class="status" style="padding-top:8px;">${esc(t("pict_note"))}</p>
     </div>
   </article>`;
+}
+
+/* ---- Ask the label: grounded Q&A ------------------------------------
+   The model (via the locked "qa" Worker mode) only POINTS AT sentences in
+   the drug's FDA label; it never authors the answer. Before anything is
+   shown, two independent client-side checks run on every returned quote:
+
+     Condition 1 — verbatim provenance: the quote must be a character-for-
+       character substring of the exact section text we sent (whitespace-
+       normalised, case-insensitive). We then display OUR local copy of that
+       span, not the model's returned string. This is the guarantee that
+       nothing on screen is AI-written.
+     Condition 2 — section-anchored relevance: it must be found in the very
+       section the model attributed it to, AND share a salient word with the
+       question (with a few lay synonyms). Guards verbatim-but-irrelevant or
+       mis-sourced sentences.
+
+   If either check fails for a quote it is dropped; if nothing survives, the
+   user gets the plain "no information on this label" message — never a
+   generated answer. */
+const QA_STOP = new Set("the a an of to is are can could would should i me my you your with for and or on in it this that do does did have has will be am if at as by from about into than then them they he she his her our we us not no".split(" "));
+const QA_SYN = {
+  coffee:["caffeine"], caffeine:["caffeine"], sleepy:["drowsi","sedat","sleep"], drowsy:["drowsi","sedat"],
+  tired:["drowsi","fatigue"], drive:["driving","machinery","operate"], driving:["machinery","operate"],
+  food:["food","meal","eat"], eat:["food","meal"], meal:["food"], milk:["milk","dairy"],
+  drink:["alcohol","fluid","liquid"], alcohol:["alcohol"], booze:["alcohol"],
+  pregnant:["pregnan"], pregnancy:["pregnan"], breastfeed:["nursing","lactat","breast"], breastfeeding:["nursing","lactat","breast"],
+  nursing:["nursing","lactat"], kids:["children","pediatric","child"], child:["children","pediatric"], children:["pediatric"],
+  kidney:["renal"], liver:["hepatic"], allergic:["hypersensitiv","allerg"], allergy:["hypersensitiv","allerg"],
+  overdose:["overdose"], miss:["missed","skip"], missed:["missed","skip"], stop:["discontinu","stop"], sun:["photosensitiv","sunlight"]
+};
+function qaNormWS(s){ return (s||"").replace(/\s+/g," ").trim(); }
+function qaQuestionTokens(q){
+  const base = (q||"").toLowerCase().split(/[^a-z]+/).filter(w => w.length>=3 && !QA_STOP.has(w));
+  const set = new Set(base);
+  base.forEach(w => (QA_SYN[w]||[]).forEach(s => set.add(s)));
+  return [...set];
+}
+function qaIsRelevant(text, sectionKey, qTokens){
+  if (!qTokens.length) return true;                 // question had no salient word — don't over-block
+  const hay = (text + " " + sectionKey).toLowerCase();
+  return qTokens.some(tk => hay.includes(tk));
+}
+/* the double-checker — returns only quotes that pass BOTH conditions */
+function qaVerifyQuotes(quotes, sections, question){
+  const secMap = {};
+  sections.forEach(s => { if (s.text){ const raw = qaNormWS(s.text); secMap[s.key] = { name:s.name, raw, lower:raw.toLowerCase() }; } });
+  const qTokens = qaQuestionTokens(question);
+  const out = [], seen = new Set();
+  for (const item of (quotes||[])){
+    if (!item || typeof item.quote !== "string") continue;
+    const q = qaNormWS(item.quote);
+    if (q.length < 4) continue;
+    const sec = secMap[item.section];
+    if (!sec) continue;                              // must name a section we actually sent
+    const idx = sec.lower.indexOf(q.toLowerCase());
+    if (idx < 0) continue;                           // Condition 1: verbatim in THAT section
+    const localText = sec.raw.substr(idx, q.length); // display OUR copy, never the model's string
+    if (!qaIsRelevant(localText, item.section, qTokens)) continue; // Condition 2
+    const key = item.section + "::" + localText.toLowerCase();
+    if (seen.has(key)) continue; seen.add(key);
+    out.push({ sectionName: sec.name, text: localText });
+    if (out.length >= 5) break;
+  }
+  return out;
+}
+async function qaAskLabel(question, sections){
+  const payload = { mode:"qa", question, sections: sections.filter(s=>s.text).map(s=>({ key:s.key, text:s.text })) };
+  const r = await fetch(CLAUDE_PROXY_URL, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload) });
+  const data = await r.json();
+  return Array.isArray(data.quotes) ? data.quotes : [];
+}
+async function qaRun(question, sections, answerEl){
+  answerEl.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("qa_thinking"))}</div>`;
+  let quotes;
+  try{ quotes = await qaAskLabel(question, sections); }
+  catch(e){ answerEl.innerHTML = `<div class="err">${esc(t("qa_error"))}</div>`; return; }
+  const verified = qaVerifyQuotes(quotes, sections, question);
+  if (!verified.length){
+    answerEl.innerHTML = `<div class="nofind qa-none"><p>${esc(t("qa_none"))}</p></div>`;
+    return;
+  }
+  const enNote = (uiLang !== "en") ? `<p class="status" style="font-size:12px; padding-top:0;">${esc(t("qa_en_note"))}</p>` : "";
+  answerEl.innerHTML = `<div class="qa-verified">
+      <div class="qa-badge">✓ ${esc(t("qa_badge"))}</div>
+      ${verified.map(v => `<div class="qa-quote"><span class="eyebrow">${esc(v.sectionName)}</span><p>“${esc(v.text)}”</p></div>`).join("")}
+      ${enNote}
+    </div>`;
+}
+function qaSectionsFor(d){
+  // cap each section so total payload/cost stays bounded; we verify against
+  // this exact (possibly-truncated) text, so a quote can only pass if it's in
+  // what we actually sent.
+  const cap = s => s ? s.replace(/\s+/g," ").trim().slice(0, 1800) : "";
+  return [
+    { key:"indications",       name:t("row_used_for"),        text:cap(d.indications) },
+    { key:"how_works",         name:t("row_how_works"),       text:cap(d.moa) },
+    { key:"side_effects",      name:t("row_side_effects"),    text:cap(d.adverse) },
+    { key:"boxed",             name:t("row_boxed"),           text:cap(d.boxed) },
+    { key:"contraindications", name:t("row_contraindications"),text:cap(d.contraindications) },
+    { key:"warnings",          name:t("row_warnings"),        text:cap(d.warnings) },
+    { key:"precautions",       name:t("row_precautions"),     text:cap(d.precautions) },
+    { key:"interactions",      name:t("row_interacts"),       text:cap(d.interactionsProse) },
+    { key:"dosage",            name:t("row_dosage"),          text:cap(d.dosage) },
+    { key:"pregnancy",         name:t("row_pregnancy"),       text:cap(d.pregnancy) },
+    { key:"nursing",           name:t("row_nursing"),         text:cap(d.nursing) }
+  ].filter(s => s.text);
+}
+function qaCardHTML(){
+  const egs = [t("qa_eg1"), t("qa_eg2"), t("qa_eg3")];
+  return `<article class="card qa-card">
+    <div class="card-head">
+      <span class="eyebrow">${esc(t("qa_eyebrow"))}</span>
+      <div class="name" style="font-size:19px;">${esc(t("qa_title"))}</div>
+    </div>
+    <div class="card-body">
+      <p class="status" style="padding-top:0;">${esc(t("qa_intro"))}</p>
+      <div class="inrow">
+        <input type="text" id="qa-input" placeholder="${esc(t("qa_placeholder"))}" autocomplete="off" />
+        <button class="go" data-act="qa-ask">${esc(t("qa_ask"))}</button>
+      </div>
+      <div class="qa-suggest">${egs.map(e=>`<button class="qa-eg" data-q="${esc(e)}">${esc(e)}</button>`).join("")}</div>
+      <div id="qa-answer" aria-live="polite"></div>
+      <p class="status" style="font-size:12px; padding-top:10px;">${esc(t("qa_disclaimer"))}</p>
+    </div>
+  </article>`;
+}
+function wireQA(box, d){
+  if (!CLAUDE_PROXY_URL) return;
+  const card = box.querySelector(".qa-card"); if (!card) return;
+  const input = card.querySelector("#qa-input");
+  const answerEl = card.querySelector("#qa-answer");
+  const sections = qaSectionsFor(d);
+  const ask = q => { q = (q||"").trim(); if (!q) return; input.value = q; qaRun(q, sections, answerEl); };
+  card.addEventListener("click", e => {
+    if (e.target.closest('[data-act="qa-ask"]')){ ask(input.value); return; }
+    const eg = e.target.closest(".qa-eg"); if (eg) ask(eg.dataset.q);
+  });
+  input.addEventListener("keydown", e => { if (e.key==="Enter") ask(input.value); });
 }
 
 const ROW_CAP = 6;   // show at most 6 bullets before a "show full" toggle

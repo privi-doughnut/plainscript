@@ -21,9 +21,18 @@
  * The old dashboard "Edit code / Quick edit" button is gone for many Workers
  * now — the wrangler CLI above is the reliable path.
  *
- * Contract:   POST { text, label, lang }   ->   { plain }
+ * Contract:   POST { text, label, lang }             ->   { plain }
+ *             POST { mode:"qa", question, sections }  ->   { quotes:[{section,quote}] }
  *   `lang` is optional and defaults to "en". Add a new language by adding
  *   one more entry to LOCKED_SYSTEM below — same rules, translated.
+ *
+ *   The "qa" mode is a STRICT EXTRACTOR: given a question and the drug's own
+ *   FDA label sections, it may only return sentences copied verbatim from
+ *   those sections (or an empty list). It never writes prose. The client then
+ *   independently re-verifies every returned quote is a character-for-character
+ *   substring of the label before showing it — so even this locked prompt is
+ *   not trusted to be the only guardrail. The model only ever *points at*
+ *   label sentences; it never authors the answer.
  */
 
 const LOCKED_SYSTEM = {
@@ -145,6 +154,22 @@ Gib nur den umgeschriebenen deutschen Text zurück, sonst nichts — ohne Kommen
 மீண்டும் எழுதிய தமிழ்ப் பாடத்தை மட்டுமே வழங்கவும், கருத்துகள் அல்லது கூடுதல் விளக்கங்கள் எதுவும் வேண்டாம்.`
 };
 
+/* Strict extract-only prompt for the "ask the label" feature. The model may
+   ONLY echo verbatim sentences from the supplied label sections, or return an
+   empty list. The client re-verifies every quote against the label anyway. */
+const QA_SYSTEM = `You are a strict information extractor for a medication reference tool. You are given a user's QUESTION about one medication and several SECTIONS of that medication's official FDA label. Your only job is to select the exact sentences from the provided label sections that help answer the question.
+
+Rules — follow exactly:
+1. Return ONLY sentences copied VERBATIM, character for character, from the provided label text. Never paraphrase, summarize, translate, correct, or add or remove words.
+2. Include a sentence only if it genuinely helps answer the user's question.
+3. If none of the provided sections address the question, return an empty list.
+4. Never add advice, reassurance, interpretation, opinions, or any words of your own.
+5. Never invent a drug name, number, condition, or claim.
+
+Output ONLY valid JSON, nothing before or after, in exactly this shape:
+{"quotes":[{"section":"<section key the sentence came from>","quote":"<the verbatim sentence>"}]}
+If nothing in the label answers the question, output exactly: {"quotes":[]}`;
+
 export default {
   async fetch(request, env) {
     const origin = env.ALLOWED_ORIGIN || "*";
@@ -160,6 +185,48 @@ export default {
     let body;
     try { body = await request.json(); }
     catch { return json({ error: "invalid JSON" }, 400, cors); }
+
+    // ---- "Ask the label" strict-extractor mode -----------------------------
+    if (body.mode === "qa") {
+      const question = (body.question || "").toString().slice(0, 300).trim();
+      let sections = Array.isArray(body.sections) ? body.sections.slice(0, 12) : [];
+      sections = sections
+        .map(s => ({ key: (s.key || "").toString().slice(0, 40), text: (s.text || "").toString().slice(0, 2000) }))
+        .filter(s => s.key && s.text);
+      if (!question || !sections.length) return json({ quotes: [] }, 200, cors);
+      const labelBlock = sections.map(s => `[section: ${s.key}]\n${s.text}`).join("\n\n");
+      try {
+        const r = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": env.ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+          },
+          body: JSON.stringify({
+            model: "claude-sonnet-5",
+            max_tokens: 700,
+            system: QA_SYSTEM, // locked strict-extractor prompt
+            messages: [{ role: "user", content: `Question: ${question}\n\nLabel sections:\n${labelBlock}` }],
+          }),
+        });
+        const data = await r.json();
+        const raw = (data.content || []).map(b => b.text || "").join("").trim();
+        let quotes = [];
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.quotes)) {
+            quotes = parsed.quotes.slice(0, 8).map(q => ({
+              section: (q.section || "").toString().slice(0, 40),
+              quote: (q.quote || "").toString().slice(0, 600),
+            }));
+          }
+        } catch (_) { quotes = []; } // unparseable -> treat as "nothing found"
+        return json({ quotes }, 200, cors);
+      } catch (e) {
+        return json({ error: "upstream error" }, 502, cors);
+      }
+    }
 
     // Cap and sanitize input — this proxy only ever sees label text.
     const text  = (body.text  || "").toString().slice(0, 6000);
