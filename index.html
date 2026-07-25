@@ -593,6 +593,8 @@
   .date-edit{ display:flex; flex-wrap:wrap; gap:12px; }
   .date-edit label{ display:flex; flex-direction:column; gap:3px; }
   .reminder-banner{ margin-top:14px; padding:11px 14px; border-radius:var(--radius); background:var(--mod-bg); color:var(--mod-ink); border:1px solid var(--mod-bar); font-size:14px; }
+  .scan-cta{ appearance:none; background:none; border:none; cursor:pointer; margin-top:10px; padding:0; color:var(--accent); font:inherit; font-size:14px; font-weight:600; }
+  .scan-cta:hover{ text-decoration:underline; }
   .meta-input{ font-size:14px; padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink); max-width:220px; }
   .today-sched{ border:1px solid var(--line); border-radius:12px; padding:12px 16px; margin-bottom:14px; background:var(--card); }
   .today-sched .ts-row{ display:flex; gap:12px; padding:4px 0; font-size:14px; }
@@ -1185,6 +1187,7 @@ const I18N = {
     hm_title: "Interaction map",
     hm_note: "Each square shows the strongest thing found between that pair. An empty square means nothing was found here — which is not the same as safe. Full details are listed below.",
     hm_none: "Nothing found",
+    scan_cta: "📷 Or scan the barcode on the box",
     dates_add: "＋ Add refill / expiry dates",
     dates_edit: "🗓 Refill / expiry",
     dates_filled: "Filled on",
@@ -7156,10 +7159,19 @@ function addScanButton(inputEl, onResolved){
   if (!scanSupported()) return;
   const btn = document.createElement("button");
   btn.type = "button"; btn.className = "mic-btn"; btn.textContent = "📷";
-  btn.title = "Scan a medicine barcode";
-  btn.setAttribute("aria-label", "Scan a medicine barcode with the camera");
+  btn.title = t("scan_title");
+  btn.setAttribute("aria-label", t("scan_aria"));
   btn.addEventListener("click", ()=> openScanModal(inputEl, onResolved));
   inputEl.insertAdjacentElement("afterend", btn);
+  // prominent labeled call-to-action below the field, so the type-free
+  // (camera) path is discoverable — not just a tiny icon in the input row
+  const field = inputEl.closest(".field");
+  if (field && !(field.nextElementSibling && field.nextElementSibling.classList.contains("scan-cta"))){
+    const cta = document.createElement("button");
+    cta.type = "button"; cta.className = "scan-cta"; cta.textContent = t("scan_cta");
+    cta.addEventListener("click", ()=> openScanModal(inputEl, onResolved));
+    field.insertAdjacentElement("afterend", cta);
+  }
 }
 
 async function openScanModal(inputEl, onResolved){
