@@ -356,6 +356,18 @@
   .mednote textarea:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-wash);}
   .notebtns{display:flex; gap:8px; margin-top:8px;}
   .cab-tools{display:flex; gap:9px; flex-wrap:wrap; align-items:center; margin-top:18px;}
+  /* regimen story */
+  .reg-card{margin-bottom:12px;}
+  .reg-field{margin-top:12px;}
+  .reg-field:first-child{margin-top:0;}
+  .reg-field .eyebrow{display:block; margin-bottom:4px;}
+  .reg-field p{margin:0; color:var(--ink); font-size:15px;}
+  @media print{
+    body.printing-regimen > *:not(.modal-overlay){display:none !important;}
+    body.printing-regimen .modal-overlay{position:static; background:none; display:block; padding:0; overflow:visible;}
+    body.printing-regimen .modal-box{box-shadow:none; max-width:none; max-height:none; border:none; overflow:visible;}
+    body.printing-regimen .modal-head .mini, body.printing-regimen .regimen-print{display:none !important;}
+  }
 
   /* ---------- Cabinet Scan (Phase 3) ---------- */
   .scan-summary{
@@ -1134,6 +1146,17 @@ const I18N = {
     pict_do_not_crush: "Swallow whole — don't crush or chew",
     pict_plenty_water: "Take with plenty of water",
     pict_finish_course: "Finish the full course",
+    regimen_btn: "📖 Explain my regimen",
+    regimen_title: "My regimen, explained",
+    regimen_intro: "A plain-English rundown of everything in your cabinet — what each medicine is for, when you take it, and your own notes. Good to read before an appointment or hand to a caregiver.",
+    regimen_loading: "Reading each medicine's FDA label…",
+    regimen_none: "Add some medicines to your cabinet first, then come back here.",
+    regimen_for: "What it's for",
+    regimen_when: "When you take it",
+    regimen_note: "Your note",
+    regimen_unmatched_note: "Couldn't match this one to an FDA label — double-check the spelling in your cabinet.",
+    regimen_print: "🖨️ Print / PDF",
+    regimen_footer: "This just re-reads each medicine's own FDA label in plain English — it's not medical advice, and it's not a substitute for your pharmacist's list. Always confirm anything important with a pharmacist.",
     spanish_no_worker_note: "The FDA label text below is shown in its original English — translating it needs the plain-English Worker to be configured, which isn't set up on this deployment yet.",
     show_full_text: "Show full FDA text ▾", hide_full_text: "Hide full FDA text ▴",
     show_plain_english: "Show plain English ▴", show_original: "Show original FDA wording ▾",
@@ -8585,6 +8608,7 @@ function renderCabinet(){
     html += todayScheduleHTML(visible);
     html += `<div class="results">${visible.map(medRowHTML).join("")}</div>
     <div class="cab-tools">
+      <button class="ghost" data-act="regimen">${t("regimen_btn")}</button>
       <button class="ghost" data-act="print">${t("print_btn")}</button>
       <button class="ghost" data-act="wallet">${t("wallet_btn")}</button>
       <button class="ghost" data-act="insights">${t("insights_btn")}</button>
@@ -8617,6 +8641,85 @@ function printCabinet(){
   window.print();
 }
 window.addEventListener("afterprint", () => document.body.classList.remove("printing-cabinet"));
+
+/* Regimen story — the whole cabinet as one plain-English page: what each
+   medicine is for (from its own FDA label, rephrased if the proxy is on),
+   when you take it, and your own note. Respects the active-person filter.
+   Purely re-reads retrieved FDA text — no advice, no severity, no
+   "should you take this". Printable for a caregiver or an appointment. */
+function regimenEntryHTML(en){
+  const times = parseTimes(en.m.schedule);
+  const parts = [];
+  if (en.forText)
+    parts.push(`<div class="reg-field"><span class="eyebrow">${esc(t("regimen_for"))}</span>${renderStructure(structureParts(en.forText), 4)}</div>`);
+  else
+    parts.push(`<div class="reg-field"><span class="eyebrow">${esc(t("regimen_for"))}</span><p class="status" style="padding:0;">${esc(t("regimen_unmatched_note"))}</p></div>`);
+  if (times.length)
+    parts.push(`<div class="reg-field"><span class="eyebrow">${esc(t("regimen_when"))}</span><p>${times.map(x=>`🕑 ${esc(x)}`).join("&nbsp;&nbsp;")}</p></div>`);
+  if ((en.m.notes||"").trim())
+    parts.push(`<div class="reg-field"><span class="eyebrow">${esc(t("regimen_note"))}</span><p>“${esc(en.m.notes)}”</p></div>`);
+  const sub = en.klass ? `<div class="datastrip"><span><b>${esc(t("med_note_class"))}</b> ${esc(en.klass)}</span></div>` : "";
+  return `<article class="card reg-card">
+    <div class="card-head"><div class="name">${esc(en.nm)}</div>${sub}</div>
+    <div class="card-body">${parts.join("")}</div>
+  </article>`;
+}
+async function openRegimenStory(){
+  const meds = medsForActivePerson();
+  const trigger = document.activeElement;
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-label="${esc(t("regimen_title"))}" style="max-width:640px;">
+    <div class="modal-head"><h2>${esc(t("regimen_title"))}</h2>
+      <div style="display:flex; gap:8px;">
+        <button class="mini regimen-print" data-act="regimen-print">${t("regimen_print")}</button>
+        <button class="mini" data-act="close">${t("close_btn")}</button>
+      </div></div>
+    <div class="modal-body">
+      <p class="status" style="padding-top:0;">${esc(t("regimen_intro"))}</p>
+      <div id="regimen-list"><div class="status"><span class="spin"></span>${esc(t("regimen_loading"))}</div></div>
+      <p class="status" style="padding-top:12px;">${esc(t("regimen_footer"))}</p>
+    </div></div>`;
+  document.body.appendChild(overlay);
+  function onEsc(e){ if (e.key==="Escape") close(); }
+  function close(){ overlay.remove(); document.removeEventListener("keydown", onEsc); if (trigger&&trigger.focus) trigger.focus(); }
+  document.addEventListener("keydown", onEsc);
+  overlay.addEventListener("click", e => {
+    if (e.target===overlay){ close(); return; }
+    const b = e.target.closest("[data-act]"); if (!b) return;
+    if (b.dataset.act==="close") close();
+    else if (b.dataset.act==="regimen-print") printRegimen();
+  });
+
+  const listEl = overlay.querySelector("#regimen-list");
+  if (!meds.length){ listEl.innerHTML = `<div class="nofind"><p>${esc(t("regimen_none"))}</p></div>`; return; }
+
+  // fetch each med's label in parallel (openFDA, keyless/CORS — same source as Decode)
+  const entries = await Promise.all(meds.map(async m => {
+    const nm = titlecase(m.generic || m.brand || m.name);
+    let indications = null, klass = m.drug_class || null;
+    try{
+      const rec = await fetchLabel(m.generic || m.brand || m.name);
+      if (rec){ const d = parseLabel(rec); indications = d.indications; if (!klass) klass = d.klass; }
+    }catch(e){/* leave unmatched */}
+    return { m, nm, indications, klass };
+  }));
+  // rephrase the "what it's for" to plain English if the proxy is configured,
+  // sequentially so we don't hammer the Worker; capped to a short excerpt
+  for (const en of entries){
+    if (!en.indications) continue;
+    const short = excerpt(en.indications, 320);
+    const plain = CLAUDE_PROXY_URL ? await toPlainEnglish(short, t("row_used_for"), uiLang) : null;
+    en.forText = plain || short;
+  }
+  listEl.innerHTML = entries.map(regimenEntryHTML).join("");
+  wireStructure(listEl); // capped-list toggles inside the story
+}
+function printRegimen(){
+  document.body.classList.add("printing-regimen");
+  window.print();
+}
+window.addEventListener("afterprint", () => document.body.classList.remove("printing-regimen"));
 
 /* Cabinet insights — a stat-tile + one-hue magnitude view of the saved
    cabinet, computed only from stored fields (no re-fetching). Single
@@ -9005,6 +9108,7 @@ $("#cabinet-body").addEventListener("click", e => {
   else if (act === "scan")    runCabinetScan();
   else if (act === "print")   printCabinet();
   else if (act === "wallet")  openWalletCard();
+  else if (act === "regimen") openRegimenStory();
   else if (act === "insights") openCabinetInsights();
   else if (act === "share")        renderSharePanel();
   else if (act === "share-create") onCreateShare();
