@@ -49,14 +49,18 @@ A batch of bigger features, sequenced by value × low-risk × no-new-dependency.
 **Foundational**
 - [X] **Decode readability pass** — FDA prose now lays out as bullets / short paragraphs instead of walls of text (`structureParts()`), applied to raw label text and the plain-English rephrase alike. (2026-07-25)
 
-**No new dependency — building these first**
-- [ ] **Pictogram / low-literacy "Understand Mode"** — standard public-domain-style icons (take with food, don't drive, avoid alcohol, keep refrigerated, etc.) derived from the label text, as a visual layer on Decode. Biggest equity win; pure inline SVG.
-- [ ] **Whole-regimen plain-English story** — turn the cabinet into one readable narrative page (what each med is for, when to take it, what to watch for), grouped sensibly. Uses the existing rephrase Worker.
-- [ ] **Interaction timing timeline** — a visual day-timeline from the dosing schedule that surfaces spacing conflicts (separate by 2 h, avoid alcohol 72 h, etc.). Uses data already curated.
-- [ ] **Refill & expiry reminders** — per-cabinet-med filled/expiry dates, gentle flag when running low or past expiry. Pure Supabase date fields.
-- [ ] **Traveling-with-meds helper** — a printable card with each med's generic name (+ its name in the destination language, reusing the i18n work) and plain-English carry-on notes.
-- [ ] **Cabinet Scan severity heatmap** — an N×N grid of the whole-cabinet scan, each cell colored by worst severity, so risk is scannable at a glance. Uses what the scan already computes.
-- [ ] **Opt-in adherence streak / gentle check-ins** — strictly optional "did you take today's meds?" tracker + streak. Off by default, no dark patterns.
+**No new dependency — SHIPPED this push (2026-07-25)**
+- [X] **Pictogram / low-literacy "Understand Mode"** — 9 medication-guidance icons derived from the label with negation-guarded, unit-tested detection; every icon carries the exact label sentence it came from. Biggest equity win.
+- [X] **Whole-regimen plain-English story** — "Explain my regimen" cabinet tool: each med's purpose (rephrased), schedule, and your note on one printable page for the active person.
+- [X] **Refill & expiry reminders** — per-med filled/expiry dates + colour-coded status tag + a "Heads up" banner for expired / expiring-within-30-days. localStorage-backed (no schema change, private, not shared).
+- [X] **Cabinet Scan severity heatmap** — N×N grid coloured by worst severity per pair, glyph + tooltip (never colour-alone), legend + list as the non-visual view.
+
+**Lower-value / my honest read — recommend leaving unless you disagree**
+- [ ] **Interaction timing timeline** — the dosing schedule already renders a "today" strip, and the genuinely-new part (spacing conflicts like "separate by 2 h") needs timing data that isn't structured in the curated set — I'd have to parse prose unreliably. Marginal over what exists; **recommend skipping** unless you want the schedule strip upgraded to a nicer visual.
+- [ ] **Traveling-with-meds helper** — real but niche, and overlaps a lot with the new regimen story (which is already printable and multilingual). **Low priority.**
+- [ ] **Opt-in adherence streak / check-ins** — a habit/nudge feature; leans toward the kind of nagging the app deliberately avoids. **Low priority / arguably off-brand.**
+
+**Translation pass owed (follow-up)** — the 5 features above added ~44 new English UI keys wired through `t()`. They're functional in every language via the en fallback, but not yet translated into the other 12. One consolidated translation pass brings them to full parity (same as how Tamil curated was handled). Sizeable (~500 short strings) — best as its own focused push.
 
 **Needs a call before building (flagging, not guessing)**
 - [ ] **Point-and-decode (OCR label scan)** — camera → read a pharmacy label → decode. Highest-impact, but needs an OCR engine (Tesseract.js is ~2 MB from a CDN, which fights the self-contained / CSP / offline design). Decision needed: bundle it, accept the CDN dependency, or wait for a lighter option.
