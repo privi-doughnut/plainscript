@@ -270,6 +270,24 @@
      that pill's own background — white doesn't work for every bar color
      (verified: moderate/minor bars only clear ~3:1 with white, which fails
      WCAG AA for text this small; dark ink clears 5:1+ on those two). */
+  /* cabinet interaction heatmap — reuses the reserved severity palette; every
+     cell also carries a glyph + tooltip so severity is never colour-alone */
+  .hm-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch; margin-top:2px; padding-bottom:2px;}
+  table.heatmap{border-collapse:separate; border-spacing:3px;}
+  .heatmap th{font-weight:600; color:var(--ink-soft); font-size:11px; font-family:var(--mono);}
+  .heatmap .hm-rowh{text-align:right; padding-right:8px; white-space:nowrap;}
+  .heatmap .hm-rowh .hm-num, .heatmap .hm-colh{color:var(--accent);}
+  .heatmap .hm-colh{text-align:center; min-width:26px; padding-bottom:3px;}
+  .heatmap .hm-corner{width:auto;}
+  .hm-cell{width:26px; height:26px; min-width:26px; border-radius:6px; text-align:center; vertical-align:middle; font-size:13px; line-height:26px; background:var(--paper);}
+  .hm-diag{background:transparent;}
+  .hm-none{background:var(--paper); border:1px solid var(--line);}
+  .hm-major{background:var(--major-bar); color:#fff;}
+  .hm-moderate{background:var(--mod-bar); color:var(--ink);}
+  .hm-minor{background:var(--minor-bar); color:var(--ink);}
+  .hm-note{background:var(--note-bg); color:var(--note-ink); border:1px solid var(--note-bar);}
+  .hm-legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:12px; color:var(--ink-soft); align-items:center;}
+  .hm-legend .hm-sw{display:inline-flex; width:20px; height:20px; border-radius:5px; align-items:center; justify-content:center; font-size:12px; margin-right:5px; vertical-align:middle; color:#fff;}
   .v-major{background:var(--major-bg);} .v-major .bar{background:var(--major-bar);} .v-major .pill{background:var(--major-bar); color:#fff;} .v-major .sev{color:var(--major-ink);}
   .v-moderate{background:var(--mod-bg);} .v-moderate .bar{background:var(--mod-bar);} .v-moderate .pill{background:var(--mod-bar); color:var(--ink);} .v-moderate .sev{color:var(--mod-ink);}
   .v-minor{background:var(--minor-bg);} .v-minor .bar{background:var(--minor-bar);} .v-minor .pill{background:var(--minor-bar); color:var(--ink);} .v-minor .sev{color:var(--minor-ink);}
@@ -1157,6 +1175,9 @@ const I18N = {
     regimen_unmatched_note: "Couldn't match this one to an FDA label — double-check the spelling in your cabinet.",
     regimen_print: "🖨️ Print / PDF",
     regimen_footer: "This just re-reads each medicine's own FDA label in plain English — it's not medical advice, and it's not a substitute for your pharmacist's list. Always confirm anything important with a pharmacist.",
+    hm_title: "Interaction map",
+    hm_note: "Each square shows the strongest thing found between that pair. An empty square means nothing was found here — which is not the same as safe. Full details are listed below.",
+    hm_none: "Nothing found",
     spanish_no_worker_note: "The FDA label text below is shown in its original English — translating it needs the plain-English Worker to be configured, which isn't set up on this deployment yet.",
     show_full_text: "Show full FDA text ▾", hide_full_text: "Hide full FDA text ▴",
     show_plain_english: "Show plain English ▴", show_original: "Show original FDA wording ▾",
@@ -8986,6 +9007,7 @@ async function runCabinetScan(){
 
   box.innerHTML = renderScanSummary(findings, mentions)
     + renderCabinetMap(meds)
+    + renderCabinetHeatmap(drugs, findings, mentions)
     + renderScanMatrix(findings, mentions)
     + renderPharmacistQuestions(findings, mentions);
 }
@@ -9023,6 +9045,61 @@ function renderCabinetMap(meds){
     <div class="cabinet-map">
       ${meds.map(m=>`<span class="map-chip"><b>${esc(titlecase(m.generic||m.name))}</b>${m.drug_class?` · ${esc(m.drug_class)}`:""}</span>`).join("")}
     </div>`;
+}
+
+/* Cabinet interaction heatmap — an N×N grid of the whole-cabinet scan, each
+   cell coloured by the worst thing found for that pair, so a dense cabinet's
+   risk pattern is scannable at a glance. Numbered columns keep the cells
+   compact; every filled cell carries a glyph + full-name tooltip/aria-label
+   so severity is never conveyed by colour alone, and a legend + the detailed
+   list below give the same information non-visually. Uses only what the scan
+   already computed — no new medical claims. */
+function renderCabinetHeatmap(drugs, findings, mentions){
+  const n = drugs.length;
+  if (n < 2) return "";
+  const rank = { major:3, moderate:2, minor:1, note:0.5 };
+  const cell = {};                     // "i,j" (i<j) -> {sev}
+  const setCell = (i,j,sev) => {
+    if (i<0 || j<0 || i===j) return;
+    const a=Math.min(i,j), b=Math.max(i,j), k=a+","+b;
+    if (!cell[k] || rank[sev] > rank[cell[k].sev]) cell[k] = { sev };
+  };
+  findings.forEach(f => setCell(drugs.indexOf(f.A), drugs.indexOf(f.B), f.rule.severity));
+  const byDisp = {}; drugs.forEach((d,ix) => { byDisp[(d.display||"").toLowerCase()] = ix; });
+  mentions.forEach(m => setCell(byDisp[(m.from||"").toLowerCase()] ?? -1, byDisp[(m.to||"").toLowerCase()] ?? -1, "note"));
+
+  const glyph = { major:"⚠", moderate:"▲", minor:"△", note:"·" };
+  const sevName = s => s==="note" ? t("named_in_label") : s==="major" ? t("sev_major") : s==="moderate" ? t("sev_moderate") : t("sev_minor");
+  const nameOf = d => titlecase(d.display || d.generic || "");
+
+  let head = `<tr><th class="hm-corner"></th>`;
+  for (let j=0;j<n;j++) head += `<th class="hm-colh" scope="col">${j+1}</th>`;
+  head += `</tr>`;
+  let rows = "";
+  for (let i=0;i<n;i++){
+    rows += `<tr><th class="hm-rowh" scope="row"><span class="hm-num">${i+1}</span> ${esc(nameOf(drugs[i]))}</th>`;
+    for (let j=0;j<n;j++){
+      if (i===j){ rows += `<td class="hm-cell hm-diag" aria-hidden="true"></td>`; continue; }
+      const a=Math.min(i,j), b=Math.max(i,j), c=cell[a+","+b];
+      const sev = c ? c.sev : null;
+      const lab = `${nameOf(drugs[i])} ✕ ${nameOf(drugs[j])}: ${sev ? sevName(sev) : t("hm_none")}`;
+      rows += sev
+        ? `<td class="hm-cell hm-${sev}" title="${esc(lab)}" aria-label="${esc(lab)}"><span aria-hidden="true">${glyph[sev]}</span></td>`
+        : `<td class="hm-cell hm-none" title="${esc(lab)}" aria-label="${esc(lab)}"></td>`;
+    }
+    rows += `</tr>`;
+  }
+  const legend = `<div class="hm-legend">
+      <span><span class="hm-sw hm-major">⚠</span>${esc(t("sev_major"))}</span>
+      <span><span class="hm-sw hm-moderate" style="color:var(--ink);">▲</span>${esc(t("sev_moderate"))}</span>
+      <span><span class="hm-sw hm-minor" style="color:var(--ink);">△</span>${esc(t("sev_minor"))}</span>
+      <span><span class="hm-sw hm-note" style="color:var(--note-ink);">·</span>${esc(t("named_in_label"))}</span>
+      <span><span class="hm-sw hm-none"></span>${esc(t("hm_none"))}</span>
+    </div>`;
+  return `<p class="eyebrow" style="margin:22px 0 6px;">${esc(t("hm_title"))}</p>
+    <div class="hm-scroll"><table class="heatmap">${head}${rows}</table></div>
+    ${legend}
+    <p class="status" style="padding-top:6px;">${esc(t("hm_note"))}</p>`;
 }
 
 /* same verdict-card markup renderResults uses for the pairwise Check tab —
