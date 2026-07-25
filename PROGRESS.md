@@ -19,6 +19,7 @@ This file is the quick status view. `PLAINSCRIPT_ROADMAP.md` has the full phased
 - [X] Allow-list redirect URLs (Authentication → URL Configuration) — add `http://localhost:8000` and `https://plainscript.its-the-prithivi-show.workers.dev`.
 
 **Cloudflare:**
+- [ ] **Redeploy the Worker to activate "Ask the label"** — `worker.js` gained a locked, extract-only `qa` mode. Run `npx wrangler deploy -c wrangler.worker.jsonc` (the `ANTHROPIC_API_KEY` secret is already set from last time). Until then, the Q&A box appears but calls the old Worker, which ignores `mode:"qa"` and returns nothing → users see the "no information" message.
 - [ ] Confirm which Worker is which — you mentioned making a Cloudflare Worker; I need to know if that's `worker.js` (the Claude-proxy for Phase 1's plain-English mode, needs `ANTHROPIC_API_KEY`) or a separate thing from the static-site hosting Worker. Once confirmed, its URL goes into `config.js` as `CLAUDE_PROXY_URL`.
 - [ ] Decide whether to close PR #1 (`cloudflare/workers-autoconfig` → `main`) — redundant now.
 
@@ -62,9 +63,9 @@ A batch of bigger features, sequenced by value × low-risk × no-new-dependency.
 
 **Translation pass owed (follow-up)** — the 5 features above added ~44 new English UI keys wired through `t()`. They're functional in every language via the en fallback, but not yet translated into the other 12. One consolidated translation pass brings them to full parity (same as how Tamil curated was handled). Sizeable (~500 short strings) — best as its own focused push.
 
-**Needs a call before building (flagging, not guessing)**
-- [ ] **Point-and-decode (OCR label scan)** — camera → read a pharmacy label → decode. Highest-impact, but needs an OCR engine (Tesseract.js is ~2 MB from a CDN, which fights the self-contained / CSP / offline design). Decision needed: bundle it, accept the CDN dependency, or wait for a lighter option.
-- [ ] **Grounded label Q&A** — "can I take this with food?" answered *only* by quoting the retrieved FDA label, never generated. Flashiest + riskiest; needs a carefully designed extract-or-say-nothing guardrail in the Worker before it's safe to ship.
+**Resolved after discussion (2026-07-25)**
+- [X] **Point-and-decode (OCR)** — **decided against.** The barcode scanner already covers type-free input at higher reliability and zero dependency; OCR's only unique win (pharmacy vials) is the hardest OCR case and would cost a ~2 MB dependency that breaks the offline/CSP design. Instead, **made the existing scanner discoverable** — a labeled "Or scan the barcode on the box" CTA under the Decode field (was just a tiny icon).
+- [X] **Grounded label Q&A ("Ask the label")** — SHIPPED. Answers a natural-language question using *only* verbatim FDA-label sentences; the model just points at candidates, never authors. Two-condition client-side double-checker before display: (1) verbatim provenance — must be a character-for-character substring of the exact section text sent, and we render our local copy; (2) section-anchored relevance — must live in the attributed section and overlap the question. Fail either → dropped; nothing survives → plain "no information on this label" message. Every answer carries a "quoted word-for-word, not AI-written" badge. Verifier unit-tested against fabrication / mis-attribution / irrelevant-verbatim traps. **⚠ Needs the Worker redeployed to go live (see Cloudflare below).**
 
 **Blocked**
 - [ ] **Pill / imprint identifier** — still blocked: NLM's free RxImage API was deprecated and no free imprint/image source is confirmed. Not building on a promise.
