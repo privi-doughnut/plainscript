@@ -224,6 +224,14 @@
   .row:last-child{border-bottom:none;}
   .row .eyebrow{display:block; margin-bottom:5px;}
   .row p{margin:0; color:var(--ink); font-size:15px;}
+  .rowtext p + p{margin-top:8px;}
+  /* readability: FDA prose broken into scannable bullets/short paragraphs */
+  .fda-list{margin:2px 0 0; padding-left:20px; display:flex; flex-direction:column; gap:6px; list-style:disc;}
+  .fda-list li{color:var(--ink); font-size:15px; line-height:1.5;}
+  .fda-list li::marker{color:var(--accent);}
+  .fda-list li.more-li{list-style:none; margin-left:-20px;}
+  .fda-list li.more-li .expand{margin-top:2px;}
+  body.easy-read .fda-list li{font-size:17px; line-height:1.7;}
   .row .src{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:6px;}
   .expand{
     appearance:none; background:none; border:none; cursor:pointer; padding:0; margin-top:6px;
@@ -6510,6 +6518,9 @@ async function decode(){
   // no-match branch above (otherwise clicking them did nothing).
   wireDidYouMean(box);
 
+  // readability: wire the capped-list "show full / hide" toggles (delegated)
+  wireStructure(box);
+
   // Phase 2: offer to save this med to the signed-in user's cabinet
   addCabinetSave(box, d, name);
 
@@ -6759,16 +6770,87 @@ function fmtFdaDate(s){
   return d.toLocaleDateString(locale, {year:"numeric", month:"long", day:"numeric"});
 }
 
+/* ---- Readability: lay out a blob of FDA label prose as scannable
+   structure — bullets for list-like text (semicolon-separated or 3+
+   sentences), short paragraphs otherwise. This ONLY re-lays-out the
+   retrieved text; it never changes, adds, or removes a single word, so
+   it stays well inside the "only ever show retrieved FDA text" rule.
+   Comma-lists are deliberately left alone (splitting them is unsafe —
+   commas appear mid-clause and inside numbers). */
+function _sentences(s){
+  const parts=[]; let last=0;
+  const re=/([.!?])\s+(?=[A-Z(0-9])/g; let m;
+  while((m=re.exec(s))){
+    const chunk=s.slice(last, m.index+1);
+    // don't split right after a common abbreviation or a single-letter initial
+    if(/(^|\s)(?:[A-Za-z]|e\.g|i\.e|vs|etc|approx|no|fig|inc|ltd|co|dr|mr|mrs|ms|st|u\.s|u\.s\.a|q\.d|b\.i\.d|t\.i\.d|q\.i\.d|p\.o|p\.r\.n|max|min)\.$/i.test(chunk)) continue;
+    parts.push(chunk.trim()); last=m.index+1;
+  }
+  const tail=s.slice(last).trim(); if(tail) parts.push(tail);
+  return parts.filter(Boolean);
+}
+function structureParts(text){
+  const full=(text||"").replace(/\s+/g," ").trim();
+  if(!full) return {kind:"empty", items:[], full:""};
+  const semi = full.split(/\s*;\s+/).map(x=>x.trim()).filter(Boolean);
+  if (semi.length>=3) return {kind:"list", items:semi, full};
+  const sent=_sentences(full);
+  if (sent.length>=3) return {kind:"list", items:sent, full};
+  if (sent.length===2) return {kind:"paras", items:sent, full};
+  return {kind:"para", items:[full], full};
+}
+/* render a structureParts() result to HTML; cap>0 collapses a long list
+   behind a "show full" toggle (wired via delegation in wireStructure). */
+function renderStructure(parts, cap){
+  if(!parts || parts.kind==="empty") return "";
+  if(parts.kind==="list"){
+    const items=parts.items;
+    if(cap && items.length > cap+1){
+      const head=items.slice(0,cap), rest=items.slice(cap);
+      const id="m"+Math.random().toString(36).slice(2,7);
+      return `<ul class="fda-list">`+head.map(x=>`<li>${esc(x)}</li>`).join("")
+        +`<li class="more-li"><button class="expand" data-toggle="${id}">${esc(t("show_full_text"))}</button></li></ul>`
+        +`<ul class="fda-list" id="${id}" hidden>`+rest.map(x=>`<li>${esc(x)}</li>`).join("")+`</ul>`;
+    }
+    return `<ul class="fda-list">`+items.map(x=>`<li>${esc(x)}</li>`).join("")+`</ul>`;
+  }
+  return parts.items.map(x=>`<p>${esc(x)}</p>`).join("");
+}
+/* delegated wiring for the capped-list "show full / hide" toggles. Safe to
+   call once per results box — it also catches lists injected later by the
+   plain-English pass, because it listens on the container. */
+function wireStructure(box){
+  if(box._structWired) return; box._structWired=true;
+  box.addEventListener("click", e=>{
+    const b=e.target.closest?.('.expand[data-toggle]'); if(!b || !box.contains(b)) return;
+    const tgt=box.querySelector("#"+CSS.escape(b.dataset.toggle)); if(!tgt) return;
+    tgt.hidden=!tgt.hidden;
+    b.textContent = tgt.hidden ? t("show_full_text") : t("hide_full_text");
+  });
+}
+const ROW_CAP = 6;   // show at most 6 bullets before a "show full" toggle
 function makeRow(label, text, src, warn){
   if (!text) return "";
-  const ex = excerpt(text);
   const full = text.replace(/\s+/g," ").trim();
-  const needExpand = full.length > ex.length;
-  const id = "r"+Math.random().toString(36).slice(2,8);
+  const parts = structureParts(full);
+  let body;
+  if (parts.kind === "list"){
+    body = `<div data-role="text" class="rowtext">${renderStructure(parts, ROW_CAP)}</div>`;
+  } else {
+    // prose: keep the excerpt + expand-to-full affordance, but structured
+    const ex = excerpt(full);
+    if (ex.length < full.length){
+      const id = "r"+Math.random().toString(36).slice(2,8);
+      body = `<div data-role="text" class="rowtext">${renderStructure(structureParts(ex), 0)}</div>`
+        + `<button class="expand" data-target="${id}">${esc(t("show_full_text"))}</button>`
+        + `<div id="${id}" data-role="full" hidden class="rowtext" style="margin-top:8px;color:var(--ink-soft);">${renderStructure(parts, 0)}</div>`;
+    } else {
+      body = `<div data-role="text" class="rowtext">${renderStructure(parts, 0)}</div>`;
+    }
+  }
   return `<div class="row" data-full="${esc(full)}" data-label="${esc(label)}">
     <span class="eyebrow">${esc(label)}</span>
-    <p data-role="text">${esc(ex)}</p>
-    ${needExpand?`<button class="expand" data-target="${id}">${esc(t("show_full_text"))}</button><p id="${id}" data-role="full" hidden style="margin-top:8px;color:var(--ink-soft);">${esc(full)}</p>`:""}
+    ${body}
     <div class="src">${esc(src)}</div>
   </div>`;
 }
@@ -6824,7 +6906,9 @@ function renderFoodAndAllergyCard(displayName, foodHits, sensitivityHits, supple
 /* wire up expanders + (if enabled) plain-English rephrasing */
 async function enhanceRows(box, d){
   const fullLabel = t("show_full_text"), hideLabel = t("hide_full_text");
-  box.querySelectorAll(".expand").forEach(btn=>{
+  // legacy prose expand-to-full (data-target). The capped-list toggles
+  // (data-toggle) are handled by wireStructure() via delegation, so skip them.
+  box.querySelectorAll(".expand[data-target]").forEach(btn=>{
     btn.addEventListener("click",()=>{
       const target = box.querySelector("#"+btn.dataset.target);
       const open = !target.hidden; target.hidden = open;
@@ -6833,22 +6917,29 @@ async function enhanceRows(box, d){
   });
   if (!CLAUDE_PROXY_URL) return;
   // rephrase (or, in Spanish mode, translate) each row's text in place,
-  // keeping the original FDA wording available behind a toggle
+  // keeping the original FDA wording available behind a toggle. Both the
+  // plain-English and the original are laid out with the same readability
+  // structure (bullets / short paragraphs).
   const plainLabel = t("show_plain_english"), origLabel = t("show_original"), rephrasedTag = t("rephrased_tag");
   for (const row of box.querySelectorAll(".row")){
     const label = row.dataset.label, full = row.dataset.full;
     const plain = await toPlainEnglish(full, label, uiLang);
     if (!plain) continue;
-    const p = row.querySelector('[data-role="text"]');
-    const orig = p.textContent;
-    p.textContent = plain;
+    const cont = row.querySelector('[data-role="text"]');
+    if (!cont) continue;
+    const origHTML  = renderStructure(structureParts(full),  ROW_CAP);
+    const plainHTML = renderStructure(structureParts(plain), ROW_CAP);
+    cont.innerHTML = plainHTML;
+    // any leftover prose expand-to-full for this row is now redundant
+    const legacy = row.querySelector('.expand[data-target]'); if (legacy) legacy.remove();
+    const legacyFull = row.querySelector('[data-role="full"]'); if (legacyFull) legacyFull.remove();
+    const tag = document.createElement("div"); tag.className="pe-toggle"; tag.textContent = rephrasedTag;
+    cont.insertAdjacentElement("beforebegin", tag);
     const tog = document.createElement("button");
     tog.className="expand"; tog.textContent = origLabel;
     let showing=false;
-    tog.addEventListener("click",()=>{ showing=!showing; p.textContent = showing?orig:plain; tog.textContent = showing?plainLabel:origLabel; });
-    p.insertAdjacentElement("afterend", tog);
-    const tag = document.createElement("div"); tag.className="pe-toggle"; tag.textContent = rephrasedTag;
-    p.insertAdjacentElement("afterend", tag);
+    tog.addEventListener("click",()=>{ showing=!showing; cont.innerHTML = showing?origHTML:plainHTML; tog.textContent = showing?plainLabel:origLabel; });
+    cont.insertAdjacentElement("afterend", tog);
   }
 }
 
