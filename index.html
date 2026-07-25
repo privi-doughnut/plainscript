@@ -586,6 +586,13 @@
   .sched-tags{ display:inline-flex; flex-wrap:wrap; gap:5px; }
   .sched-tag{ font-size:12px; font-family:var(--mono); padding:2px 8px; border-radius:20px; background:var(--accent-wash); color:var(--ink-soft); }
   .person-tag{ font-size:12.5px; color:var(--ink-soft); }
+  .date-tags{ display:inline-flex; flex-wrap:wrap; gap:5px; }
+  .exp-tag{ font-size:12px; font-family:var(--mono); padding:2px 8px; border-radius:20px; background:var(--accent-wash); color:var(--ink-soft); border:1px solid transparent; }
+  .exp-tag.exp-expired{ background:var(--major-bg); color:var(--major-ink); border-color:var(--major-bar); }
+  .exp-tag.exp-today, .exp-tag.exp-soon{ background:var(--mod-bg); color:var(--mod-ink); border-color:var(--mod-bar); }
+  .date-edit{ display:flex; flex-wrap:wrap; gap:12px; }
+  .date-edit label{ display:flex; flex-direction:column; gap:3px; }
+  .reminder-banner{ margin-top:14px; padding:11px 14px; border-radius:var(--radius); background:var(--mod-bg); color:var(--mod-ink); border:1px solid var(--mod-bar); font-size:14px; }
   .meta-input{ font-size:14px; padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink); max-width:220px; }
   .today-sched{ border:1px solid var(--line); border-radius:12px; padding:12px 16px; margin-bottom:14px; background:var(--card); }
   .today-sched .ts-row{ display:flex; gap:12px; padding:4px 0; font-size:14px; }
@@ -1178,6 +1185,22 @@ const I18N = {
     hm_title: "Interaction map",
     hm_note: "Each square shows the strongest thing found between that pair. An empty square means nothing was found here — which is not the same as safe. Full details are listed below.",
     hm_none: "Nothing found",
+    dates_add: "＋ Add refill / expiry dates",
+    dates_edit: "🗓 Refill / expiry",
+    dates_filled: "Filled on",
+    dates_expiry: "Expiry date",
+    dates_save: "Save",
+    dates_clear: "Clear",
+    filled_on: "Filled",
+    exp_expired: "Expired",
+    exp_today: "Expires today",
+    exp_in: "Expires in",
+    exp_day: "day",
+    exp_days: "days",
+    reminder_prefix: "Heads up:",
+    reminder_expired_word: "expired",
+    reminder_soon_word: "expiring within 30 days",
+    reminder_check: "check the dates below.",
     spanish_no_worker_note: "The FDA label text below is shown in its original English — translating it needs the plain-English Worker to be configured, which isn't set up on this deployment yet.",
     show_full_text: "Show full FDA text ▾", hide_full_text: "Hide full FDA text ▴",
     show_plain_english: "Show plain English ▴", show_original: "Show original FDA wording ▾",
@@ -8559,6 +8582,7 @@ function medRowHTML(m){
             ? `<span class="person-tag">👤 ${esc(t("person_of_prefix"))} ${esc(m.person)}</span><button class="expand" data-act="person-assign">${esc(t("med_note_edit_existing"))}</button>`
             : `<button class="expand" data-act="person-assign">${t("person_assign")}</button>`}
         </div>
+        <div class="medmeta" data-role="dates">${medDatesHTML(m)}</div>
       </div>
       <button class="rm" data-act="remove" title="${esc(t("med_note_remove_label_prefix"))}" aria-label="${esc(t("med_note_remove_label_prefix"))} ${esc(titlecase(display))} ${esc(t("med_note_remove_from"))}">×</button>
     </div>
@@ -8626,6 +8650,7 @@ function renderCabinet(){
   } else {
     const visible = medsForActivePerson();
     html += personFilterBarHTML();
+    html += reminderSummary(visible);
     html += todayScheduleHTML(visible);
     html += `<div class="results">${visible.map(medRowHTML).join("")}</div>
     <div class="cab-tools">
@@ -8909,6 +8934,85 @@ async function saveNote(card){
 
 /* dosing-times editor (per med) — free "HH:MM, HH:MM" text, loosely
    validated; parseTimes drops anything that isn't a time. */
+/* Refill & expiry reminders. Stored in localStorage keyed by med id (not the
+   DB) so the feature works today with no schema change and stays a private,
+   per-device reminder — it never rides along on a shared read-only cabinet.
+   Purely a personal date tracker; makes no medical claim. */
+const MED_DATES_KEY = "plainscript.med.dates";
+function loadMedDates(){ try{ return JSON.parse(localStorage.getItem(MED_DATES_KEY) || "{}") || {}; }catch(e){ return {}; } }
+function getMedDates(id){ return loadMedDates()[id] || {}; }
+function setMedDates(id, obj){
+  const all = loadMedDates();
+  if (!obj || (!obj.filled && !obj.expiry)) delete all[id]; else all[id] = obj;
+  try{ localStorage.setItem(MED_DATES_KEY, JSON.stringify(all)); }catch(e){}
+}
+function expiryStatus(expiry){
+  if (!expiry) return null;
+  const d = new Date(expiry + "T00:00:00"); if (isNaN(d)) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const days = Math.round((d - today) / 86400000);
+  if (days < 0)  return { kind:"expired", days };
+  if (days === 0) return { kind:"today", days };
+  if (days <= 30) return { kind:"soon", days };
+  return { kind:"ok", days };
+}
+function fmtDate(iso){
+  if (!iso) return "";
+  const d = new Date(iso + "T00:00:00"); if (isNaN(d)) return iso;
+  return d.toLocaleDateString(DATE_LOCALES[uiLang] || "en-US", { year:"numeric", month:"short", day:"numeric" });
+}
+function expiryText(es, expiry){
+  if (!es) return "";
+  if (es.kind === "expired") return t("exp_expired");
+  if (es.kind === "today")   return t("exp_today");
+  if (es.kind === "soon")    return `${t("exp_in")} ${es.days} ${es.days===1?t("exp_day"):t("exp_days")}`;
+  return fmtDate(expiry);
+}
+function medDatesHTML(m){
+  const dts = getMedDates(m.id), es = expiryStatus(dts.expiry);
+  if (!dts.filled && !dts.expiry)
+    return `<button class="expand" data-act="dates-edit">${t("dates_add")}</button>`;
+  const tags = [];
+  if (dts.filled) tags.push(`<span class="exp-tag">💊 ${esc(t("filled_on"))} ${esc(fmtDate(dts.filled))}</span>`);
+  if (dts.expiry) tags.push(`<span class="exp-tag exp-${es?es.kind:'ok'}">🗓 ${esc(expiryText(es, dts.expiry))}</span>`);
+  return `<span class="date-tags">${tags.join("")}</span><button class="expand" data-act="dates-edit">${esc(t("dates_edit"))}</button>`;
+}
+function reminderSummary(meds){
+  let expired=0, soon=0;
+  meds.forEach(m => { const es = expiryStatus(getMedDates(m.id).expiry); if (!es) return;
+    if (es.kind==="expired") expired++; else if (es.kind==="soon"||es.kind==="today") soon++; });
+  if (!expired && !soon) return "";
+  const parts=[];
+  if (expired) parts.push(`${expired} ${t("reminder_expired_word")}`);
+  if (soon)    parts.push(`${soon} ${t("reminder_soon_word")}`);
+  return `<div class="reminder-banner">⏰ <b>${esc(t("reminder_prefix"))}</b> ${esc(parts.join(" · "))} — ${esc(t("reminder_check"))}</div>`;
+}
+function openDatesEditor(card){
+  const m = cabinet.find(x => x.id === card.dataset.id); if (!m) return;
+  const dts = getMedDates(m.id);
+  const holder = card.querySelector('[data-role="dates"]');
+  holder.innerHTML = `<div class="date-edit">
+      <label class="eyebrow">${esc(t("dates_filled"))}<input type="date" class="meta-input date-in" data-k="filled" value="${esc(dts.filled||"")}" /></label>
+      <label class="eyebrow">${esc(t("dates_expiry"))}<input type="date" class="meta-input date-in" data-k="expiry" value="${esc(dts.expiry||"")}" /></label>
+    </div>
+    <div class="notebtns">
+      <button class="mini" data-act="dates-save">${esc(t("dates_save"))}</button>
+      <button class="mini" data-act="dates-clear">${esc(t("dates_clear"))}</button>
+      <button class="mini" data-act="meta-cancel">${esc(t("note_cancel_btn"))}</button>
+    </div>`;
+  holder.querySelector("input").focus();
+}
+function saveDates(card){
+  const m = cabinet.find(x => x.id === card.dataset.id); if (!m) return;
+  const holder = card.querySelector('[data-role="dates"]'); const obj = {};
+  holder.querySelectorAll(".date-in").forEach(inp => { if (inp.value) obj[inp.dataset.k] = inp.value; });
+  setMedDates(m.id, obj); renderCabinet();
+}
+function clearDates(card){
+  const m = cabinet.find(x => x.id === card.dataset.id); if (!m) return;
+  setMedDates(m.id, null); renderCabinet();
+}
+
 function openSchedEditor(card){
   const m = cabinet.find(x => x.id === card.dataset.id); if (!m) return;
   const holder = card.querySelector('[data-role="sched"]');
@@ -9201,6 +9305,9 @@ $("#cabinet-body").addEventListener("click", e => {
   else if (card && act === "meta-cancel")  renderCabinet();
   else if (card && act === "person-assign") openPersonEditor(card);
   else if (card && act === "person-save")   savePerson(card);
+  else if (card && act === "dates-edit")   openDatesEditor(card);
+  else if (card && act === "dates-save")   saveDates(card);
+  else if (card && act === "dates-clear")  clearDates(card);
   else if (card && act === "remove")      removeMed(card);
 });
 $("#cabinet-body").addEventListener("keydown", e => {
