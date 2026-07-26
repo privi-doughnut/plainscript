@@ -19,7 +19,7 @@ This file is the quick status view. `PLAINSCRIPT_ROADMAP.md` has the full phased
 - [X] Allow-list redirect URLs (Authentication → URL Configuration) — add `http://localhost:8000` and `https://plainscript.its-the-prithivi-show.workers.dev`.
 
 **Cloudflare:**
-- [ ] **Redeploy the Worker to activate "Ask the label"** — `worker.js` gained a locked, extract-only `qa` mode. Run `npx wrangler deploy -c wrangler.worker.jsonc` (the `ANTHROPIC_API_KEY` secret is already set from last time). Until then, the Q&A box appears but calls the old Worker, which ignores `mode:"qa"` and returns nothing → users see the "no information" message.
+- [X] **Redeploy the Worker to activate "Ask the label"** — DONE (2026-07-25). Deployed `plainscript-proxy` with the locked `qa` mode (Version 8cae01bc). Verified live end-to-end: empty `qa` probe returns `{"quotes":[]}`, a real question returns correctly-attributed verbatim label sentences, and the old rephrase mode still works. NOTE for next time: run wrangler from the repo dir (`~/plainscript-remote`), not `~` — the config path is repo-relative.
 - [ ] Confirm which Worker is which — you mentioned making a Cloudflare Worker; I need to know if that's `worker.js` (the Claude-proxy for Phase 1's plain-English mode, needs `ANTHROPIC_API_KEY`) or a separate thing from the static-site hosting Worker. Once confirmed, its URL goes into `config.js` as `CLAUDE_PROXY_URL`.
 - [ ] Decide whether to close PR #1 (`cloudflare/workers-autoconfig` → `main`) — redundant now.
 
