@@ -11,7 +11,7 @@
  * cached shell (e.g. after a big index.html change) — the activate step
  * deletes any cache that doesn't match the current name.
  */
-const CACHE_NAME = "plainscript-shell-v1";
+const CACHE_NAME = "plainscript-shell-v2";
 const SHELL_FILES = [
   "./",
   "./index.html",
