@@ -33,8 +33,12 @@ This file is the quick status view. `PLAINSCRIPT_ROADMAP.md` has the full phased
 - [ ] **"Why I built this"** — the `[PRIVI: voice this]` placeholder in `README.md`. You-only, in your voice.
 - [ ] **CAC packaging** (deadline Oct 26) — demo video (needs you) + written description.
 
-**Worth a visual/live check when you get a chance (no live browser this session):**
-- [ ] **Visual QA the localization**, especially **Arabic RTL** and the newer Hindi/Tamil rendering, in a real browser.
+**Live browser visual-QA pass — DONE (2026-08-02).** Drove Chrome against the live site. The app **loads and works** (the earlier "won't load" was a network outage, not a bug). Verified in-browser: Decode + readability bullets, pictogram "Understand Mode" (+ evidence reveal), the "Ask the label" Q&A end-to-end, and **Arabic RTL** (layout mirrors correctly, pictograms + rephrase render RTL). Four bugs found and fixed the same pass:
+  - `&amp;` rendered literally in `data-i18n` headings → decode entities in `applyTranslations`.
+  - Pictogram evidence showed the whole unpunctuated OTC blob → trimmed snippet around the match.
+  - **Ask-the-label wrongly returned "no information" for valid questions** (e.g. "what is this used for") → added question-intent→section relevance mapping; double-checker re-verified against fabrication/mis-attribution/irrelevant-verbatim traps.
+  - Scan CTA didn't re-localize on a live language switch → tagged `data-i18n`.
+- [ ] Still worth a look: **Hindi/Tamil** rendering, and the heatmap / regimen / refill features (need a signed-in cabinet with 2+ meds — couldn't exercise those without auth this pass).
 - [ ] Header wrapping on a narrow phone (4 tabs + theme toggle + account chip).
 - [ ] The severity-pill and `.eyebrow` color changes from the accessibility pass — computed the contrast math but haven't visually confirmed them.
 - [ ] The printable cabinet one-pager — CSS print styling is notoriously browser-inconsistent; worth a real print-preview check.
