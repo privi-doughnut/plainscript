@@ -59,13 +59,16 @@ A batch of bigger features, sequenced by value × low-risk × no-new-dependency.
 - [X] **Whole-regimen plain-English story** — "Explain my regimen" cabinet tool: each med's purpose (rephrased), schedule, and your note on one printable page for the active person.
 - [X] **Refill & expiry reminders** — per-med filled/expiry dates + colour-coded status tag + a "Heads up" banner for expired / expiring-within-30-days. localStorage-backed (no schema change, private, not shared).
 - [X] **Cabinet Scan severity heatmap** — N×N grid coloured by worst severity per pair, glyph + tooltip (never colour-alone), legend + list as the non-visual view.
+- [X] **"What is this?" explanation pills (2026-08-02)** — non-obvious symptom chips (jock itch, canker sore, post-nasal drip, hives, stye, pinworms, etc. — 26 terms) show a small "?" marker that reveals a plain-language definition on hover / focus / tap. Reusable `data-explain` mechanism (capture-phase click so it never toggles the checkbox; Esc/Enter/Space supported). Verified live in-browser.
 
 **Lower-value / my honest read — recommend leaving unless you disagree**
 - [ ] **Interaction timing timeline** — the dosing schedule already renders a "today" strip, and the genuinely-new part (spacing conflicts like "separate by 2 h") needs timing data that isn't structured in the curated set — I'd have to parse prose unreliably. Marginal over what exists; **recommend skipping** unless you want the schedule strip upgraded to a nicer visual.
 - [ ] **Traveling-with-meds helper** — real but niche, and overlaps a lot with the new regimen story (which is already printable and multilingual). **Low priority.**
 - [ ] **Opt-in adherence streak / check-ins** — a habit/nudge feature; leans toward the kind of nagging the app deliberately avoids. **Low priority / arguably off-brand.**
 
-**Translation pass — DONE (2026-07-25).** All ~58 new UI keys from this push (pictograms, regimen story, heatmap, refill/expiry reminders, scanner CTA, and Ask-the-label) are now translated into every one of the 13 languages — no English fallback remains for the new copy. Done in 3 committed batches (es/zh/vi/ar, fr/ko/ru/pt, de/ja/hi/ta), each verified for full key parity + `node --check`.
+**Translation pass — DONE (2026-07-25).** All ~58 new UI keys from that push (pictograms, regimen story, heatmap, refill/expiry reminders, scanner CTA, and Ask-the-label) are now translated into every one of the 13 languages — no English fallback remains for that copy. Done in 3 committed batches (es/zh/vi/ar, fr/ko/ru/pt, de/ja/hi/ta), each verified for full key parity + `node --check`.
+
+**Small translation debt (2026-08-02):** the 26 `SYMPTOM_EXPLAIN` definitions + `explain_aria` are English-only (pickLang falls back to en). Symptom *names* are already localized; only the hover definitions await a translate pass.
 
 **Resolved after discussion (2026-07-25)**
 - [X] **Point-and-decode (OCR)** — **decided against.** The barcode scanner already covers type-free input at higher reliability and zero dependency; OCR's only unique win (pharmacy vials) is the hardest OCR case and would cost a ~2 MB dependency that breaks the offline/CSP design. Instead, **made the existing scanner discoverable** — a labeled "Or scan the barcode on the box" CTA under the Decode field (was just a tiny icon).
