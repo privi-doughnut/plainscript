@@ -8069,7 +8069,9 @@ function addScanButton(inputEl, onResolved){
   const btn = document.createElement("button");
   btn.type = "button"; btn.className = "mic-btn"; btn.textContent = "📷";
   btn.title = t("scan_title");
+  // data-i18n-aria-label so a runtime language switch re-localizes it too
   btn.setAttribute("aria-label", t("scan_aria"));
+  btn.setAttribute("data-i18n-aria-label", "scan_aria");
   btn.addEventListener("click", ()=> openScanModal(inputEl, onResolved));
   inputEl.insertAdjacentElement("afterend", btn);
   // prominent labeled call-to-action below the field, so the type-free
@@ -8078,6 +8080,8 @@ function addScanButton(inputEl, onResolved){
   if (field && !(field.nextElementSibling && field.nextElementSibling.classList.contains("scan-cta"))){
     const cta = document.createElement("button");
     cta.type = "button"; cta.className = "scan-cta"; cta.textContent = t("scan_cta");
+    // data-i18n so applyTranslations() re-localizes it on a live language switch
+    cta.setAttribute("data-i18n", "scan_cta");
     cta.addEventListener("click", ()=> openScanModal(inputEl, onResolved));
     field.insertAdjacentElement("afterend", cta);
   }
