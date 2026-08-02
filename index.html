@@ -6205,12 +6205,23 @@ function pickLang(field){
   return field[uiLang] || field.en || "";
 }
 
+/* Decode the handful of HTML entities our i18n strings use, for plain-TEXT
+   contexts (textContent, placeholder, aria-label). Some strings carry "&amp;"
+   because they're also used inside innerHTML templates; when the same string
+   is dropped into textContent, the entity would show literally ("&AMP;"), so
+   decode it here. innerHTML assignments are left alone — entities are correct
+   there. */
+function decodeEntities(s){
+  return String(s)
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+}
 function applyTranslations(){
   document.documentElement.lang = uiLang;
-  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = decodeEntities(t(el.dataset.i18n)); });
   document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
-  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
-  document.querySelectorAll("[data-i18n-aria-label]").forEach(el => { el.setAttribute("aria-label", t(el.dataset.i18nAriaLabel)); });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = decodeEntities(t(el.dataset.i18nPlaceholder)); });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach(el => { el.setAttribute("aria-label", decodeEntities(t(el.dataset.i18nAriaLabel))); });
   const langLabel = document.getElementById("lang-label");
   if (langLabel) langLabel.textContent = uiLang.toUpperCase();
 }
@@ -7711,6 +7722,20 @@ const PICTOGRAMS = [
     pos:/(?:take|continue|finish|complete)[^.]*(?:full|entire|prescribed|complete)[^.]*(?:course|amount|length|treatment)|even if[^.]*(?:you )?(?:feel|symptoms)[^.]*better|complete the (?:full |entire )?course/i,
     neg:/does not need/i }
 ];
+/* Pull a short, readable window around the matched phrase — OTC "Drug Facts"
+   panels are often one long run-on with no sentence breaks, so showing the
+   whole "sentence" as evidence is unusable. Extend to word boundaries and
+   add ellipses when trimmed. */
+function pictSnippet(s, idx, len){
+  const pad = 70;
+  let a = Math.max(0, idx - pad), b = Math.min(s.length, idx + len + pad);
+  while(a > 0 && /\S/.test(s[a-1])) a--;
+  while(b < s.length && /\S/.test(s[b])) b++;
+  let snip = s.slice(a, b).trim();
+  if(a > 0) snip = "… " + snip;
+  if(b < s.length) snip = snip + " …";
+  return snip;
+}
 function detectPictograms(d, rec){
   const raw = rec || {};
   const g = k => Array.isArray(raw[k]) && raw[k].length ? raw[k][0] : null;
@@ -7723,8 +7748,9 @@ function detectPictograms(d, rec){
   const seen=new Set(), out=[];
   for(const det of PICTOGRAMS){
     for(const s of sents){
-      if(det.pos.test(s) && !det.neg.test(s)){
-        if(!seen.has(det.id)){ seen.add(det.id); out.push({id:det.id, evidence:s.trim()}); }
+      const m = s.match(det.pos);
+      if(m && !det.neg.test(s)){
+        if(!seen.has(det.id)){ seen.add(det.id); out.push({id:det.id, evidence:pictSnippet(s, m.index, m[0].length)}); }
         break;
       }
     }
@@ -7773,7 +7799,22 @@ function renderPictogramCard(picts){
    If either check fails for a quote it is dropped; if nothing survives, the
    user gets the plain "no information on this label" message — never a
    generated answer. */
-const QA_STOP = new Set("the a an of to is are can could would should i me my you your with for and or on in it this that do does did have has will be am if at as by from about into than then them they he she his her our we us not no".split(" "));
+const QA_STOP = new Set("the a an of to is are can could would should i me my you your with for and or on in it this that do does did have has will be am if at as by from about into than then them they he she his her our we us not no what which who whom whose when where why how".split(" "));
+/* Question-intent → which label sections legitimately answer it. Used as a
+   RELAXATION of the relevance gate: if the question expresses one of these
+   intents and the model's quote comes from a matching section, accept it even
+   without literal keyword overlap (labels phrase things differently than
+   people ask — "what's it used for" vs the label's "Uses… relieves…").
+   Condition 1 (verbatim) still fully guarantees the text is real label text. */
+const QA_INTENT = [
+  { re:/\b(use|uses|used|using|for|treat|purpose|indicat|good for|help|works?|what is|whats|what's)\b/i, secs:["indications","how_works"] },
+  { re:/\b(side.?effect|adverse|reaction|feel)\b/i, secs:["side_effects"] },
+  { re:/\b(pregnan|breast|nursing|lactat|baby|conceiv)\b/i, secs:["pregnancy","nursing"] },
+  { re:/\b(interact|together|combine|mix|another|other (drug|med|medicine))\b/i, secs:["interactions"] },
+  { re:/\b(dose|dosage|how much|how many|how often|frequency|take|when)\b/i, secs:["dosage"] },
+  { re:/\b(warn|danger|risk|serious|caution)\b/i, secs:["warnings","boxed"] },
+  { re:/\b(who should not|avoid|contraindicat|allerg|not take|shouldn)\b/i, secs:["contraindications","warnings"] },
+];
 const QA_SYN = {
   coffee:["caffeine"], caffeine:["caffeine"], sleepy:["drowsi","sedat","sleep"], drowsy:["drowsi","sedat"],
   tired:["drowsi","fatigue"], drive:["driving","machinery","operate"], driving:["machinery","operate"],
@@ -7791,10 +7832,14 @@ function qaQuestionTokens(q){
   base.forEach(w => (QA_SYN[w]||[]).forEach(s => set.add(s)));
   return [...set];
 }
-function qaIsRelevant(text, sectionKey, qTokens){
-  if (!qTokens.length) return true;                 // question had no salient word — don't over-block
+function qaIsRelevant(text, sectionKey, qTokens, question){
   const hay = (text + " " + sectionKey).toLowerCase();
-  return qTokens.some(tk => hay.includes(tk));
+  if (qTokens.some(tk => hay.includes(tk))) return true;      // direct keyword/synonym overlap
+  for (const it of QA_INTENT){                                // intent → section fallback
+    if (it.re.test(question) && it.secs.includes(sectionKey)) return true;
+  }
+  if (!qTokens.length) return true;                           // question had no salient word — don't over-block
+  return false;
 }
 /* the double-checker — returns only quotes that pass BOTH conditions */
 function qaVerifyQuotes(quotes, sections, question){
@@ -7811,7 +7856,7 @@ function qaVerifyQuotes(quotes, sections, question){
     const idx = sec.lower.indexOf(q.toLowerCase());
     if (idx < 0) continue;                           // Condition 1: verbatim in THAT section
     const localText = sec.raw.substr(idx, q.length); // display OUR copy, never the model's string
-    if (!qaIsRelevant(localText, item.section, qTokens)) continue; // Condition 2
+    if (!qaIsRelevant(localText, item.section, qTokens, question)) continue; // Condition 2
     const key = item.section + "::" + localText.toLowerCase();
     if (seen.has(key)) continue; seen.add(key);
     out.push({ sectionName: sec.name, text: localText });
