@@ -493,9 +493,14 @@
     border-bottom:1.5px dotted var(--accent); }
   .gloss:hover{ color:var(--accent-deep); }
   .gloss:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
-  .gloss-pop{ position:absolute; z-index:50; max-width:260px; background:var(--ink); color:var(--paper);
+  .gloss-pop, .explain-pop{ position:absolute; z-index:50; max-width:260px; background:var(--ink); color:var(--paper);
     padding:9px 12px; border-radius:8px; font-size:13px; line-height:1.5; box-shadow:0 6px 24px rgba(0,0,0,.25); }
-  .gloss-pop b{ display:block; margin-bottom:2px; text-transform:lowercase; }
+  .gloss-pop b, .explain-pop b{ display:block; margin-bottom:2px; text-transform:none; }
+  /* small "what is this?" info marker (hover / focus / tap → explanation pill) */
+  .explain-dot{ display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px;
+    margin-left:5px; border-radius:50%; border:1.3px solid var(--accent); color:var(--accent);
+    font-size:11px; font-weight:700; line-height:1; cursor:help; flex:none; font-family:var(--sans); }
+  .explain-dot:hover, .explain-dot:focus-visible{ background:var(--accent); color:var(--paper); outline:none; }
 
   /* side-by-side compare */
   .cmp-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
@@ -1199,6 +1204,7 @@ const I18N = {
     hm_note: "Each square shows the strongest thing found between that pair. An empty square means nothing was found here — which is not the same as safe. Full details are listed below.",
     hm_none: "Nothing found",
     scan_cta: "📷 Or scan the barcode on the box",
+    explain_aria: "What is this? Show a plain-language explanation",
     dates_add: "＋ Add refill / expiry dates",
     dates_edit: "🗓 Refill / expiry",
     dates_filled: "Filled on",
@@ -7486,6 +7492,52 @@ document.addEventListener("click", e => {
   pop.style.left = (window.scrollX + Math.max(8, Math.min(r.left, window.innerWidth - 272))) + "px";
 });
 
+/* ---- "What is this?" explanation pill --------------------------------
+   Any element with a data-explain attribute shows a small pill with that
+   text on hover, keyboard focus, or tap. Reusable for anything that isn't
+   immediately obvious (currently the symptom chips). Purely a definition;
+   never advice. */
+let _explainPop = null, _explainHideTimer = null;
+function showExplainPill(el){
+  hideExplainPill();
+  const text = el.getAttribute("data-explain"); if (!text) return;
+  const pop = document.createElement("div");
+  pop.className = "explain-pop";
+  pop.textContent = text;
+  document.body.appendChild(pop);
+  _explainPop = pop;
+  const r = el.getBoundingClientRect();
+  pop.style.top  = (window.scrollY + r.bottom + 6) + "px";
+  pop.style.left = (window.scrollX + Math.max(8, Math.min(r.left, window.innerWidth - 272))) + "px";
+}
+function hideExplainPill(){ if (_explainPop){ _explainPop.remove(); _explainPop = null; } }
+document.addEventListener("mouseover", e => {
+  const el = e.target.closest && e.target.closest("[data-explain]");
+  if (el){ clearTimeout(_explainHideTimer); showExplainPill(el); }
+});
+document.addEventListener("mouseout", e => {
+  const el = e.target.closest && e.target.closest("[data-explain]");
+  if (el){ _explainHideTimer = setTimeout(hideExplainPill, 120); }
+});
+document.addEventListener("focusin", e => {
+  const el = e.target.closest && e.target.closest("[data-explain]");
+  if (el) showExplainPill(el);
+});
+document.addEventListener("focusout", e => {
+  const el = e.target.closest && e.target.closest("[data-explain]");
+  if (el) hideExplainPill();
+});
+document.addEventListener("click", e => {
+  const el = e.target.closest && e.target.closest("[data-explain]");
+  if (el){ e.preventDefault(); e.stopPropagation(); (_explainPop ? hideExplainPill() : showExplainPill(el)); return; }
+  hideExplainPill(); // click elsewhere closes it
+}, true); // capture phase so tapping the marker never toggles the symptom checkbox
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") hideExplainPill();
+  const el = e.target.closest && e.target.closest("[data-explain]");
+  if (el && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); (_explainPop ? hideExplainPill() : showExplainPill(el)); }
+});
+
 /* ---- Safety & further-reading panels (openFDA-sourced) --------------
    Everything here is factual, sourced data shown with its provenance —
    the same rule as the rest of Decode. FAERS especially is framed as
@@ -8377,6 +8429,38 @@ function renderResults(box, drugs, findings, mentions){
    SYMPTOM_CATEGORIES comment above and the methodology accordion for
    the sourcing rationale.
    ================================================================= */
+/* Plain-language explanations for symptom terms that aren't obvious to
+   everyone ("jock itch", "canker sore", "post-nasal drip"…). Shown as a small
+   hover/tap "?" pill on the symptom chip — purely a term definition, not
+   advice. English for now; pickLang() falls back to en until translated. */
+const SYMPTOM_EXPLAIN = {
+  athletes_foot:{en:"A common fungal infection between the toes — itchy, flaky, sometimes cracked skin."},
+  jock_itch:{en:"A fungal rash in the groin area — itchy, red, often ring-shaped."},
+  canker_sore:{en:"A small painful ulcer inside the mouth. Not contagious (unlike a cold sore)."},
+  cold_sore:{en:"A small blister on or near the lips, caused by a virus. It's contagious."},
+  postnasal_drip:{en:"Mucus dripping down the back of your throat — often causing a cough or constant throat-clearing."},
+  pms_mood:{en:"PMS = premenstrual syndrome: mood and body symptoms in the days before a period."},
+  breast_tenderness:{en:"Sore or sensitive breasts, often in the days before a period."},
+  pinworms:{en:"Tiny intestinal worms that cause itching around the bottom — common in children."},
+  hives:{en:"Raised, itchy welts on the skin, usually from an allergic reaction."},
+  stye:{en:"A small, painful red bump on the edge of the eyelid."},
+  chafing:{en:"Sore, irritated skin from repeated rubbing — often the inner thighs or groin."},
+  swimmers_ear:{en:"Irritation of the outer ear canal, often from water trapped after swimming."},
+  lice:{en:"Tiny insects that live in the hair and scalp and cause itching."},
+  pubic_lice:{en:"Tiny insects in coarse body hair that cause itching. Also called 'crabs'."},
+  calluses:{en:"Thick, hardened patches of skin from repeated pressure or rubbing."},
+  eczema:{en:"A condition that leaves skin dry, itchy, red, and inflamed."},
+  hemorrhoids:{en:"Swollen veins around the anus that can itch, hurt, or bleed."},
+  nerve_pain:{en:"Burning, tingling, or shooting pain coming from irritated nerves."},
+  growing_pains:{en:"Harmless aching in a child's legs, often in the evening or at night."},
+  lactose_intolerance:{en:"Trouble digesting the sugar in dairy — causing gas, bloating, or cramps."},
+  uti_discomfort:{en:"UTI = urinary tract infection: burning, urgency, or pain when you pee."},
+  yeast_infection:{en:"A common fungal infection causing itching, irritation, and discharge."},
+  hoarse_voice:{en:"A rough or croaky voice — 'laryngitis' means the voice box is inflamed."},
+  migraine:{en:"A severe, often one-sided headache, sometimes with nausea or light sensitivity."},
+  menstrual_migraine:{en:"A migraine (severe headache) that shows up around your period."},
+  dehydration:{en:"When your body loses more fluid than it takes in — thirst, dark urine, dizziness."}
+};
 function renderSymptomList(){
   // grouped into collapsible <details> sections so a long list stays scannable.
   // native <details> keeps its checkboxes in the DOM even when collapsed, so a
@@ -8387,11 +8471,14 @@ function renderSymptomList(){
     return `<details class="symptom-group">
       <summary><span class="sg-label">${esc(pickLang(g.label))}</span><span class="sg-count">${items.length}</span></summary>
       <div class="symptom-grid">
-        ${items.map(s => `
-          <label class="symptom-chip">
+        ${items.map(s => {
+          const ex = SYMPTOM_EXPLAIN[s.key];
+          const dot = ex ? ` <span class="explain-dot" role="button" tabindex="0" aria-label="${esc(t("explain_aria"))}" data-explain="${esc(pickLang(ex))}">?</span>` : "";
+          return `<label class="symptom-chip">
             <input type="checkbox" value="${esc(s.key)}" />
-            <span>${esc(pickLang(s.symptom))}</span>
-          </label>`).join("")}
+            <span>${esc(pickLang(s.symptom))}</span>${dot}
+          </label>`;
+        }).join("")}
       </div>
     </details>`;
   }).join("");
