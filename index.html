@@ -178,16 +178,20 @@
     appearance:none; cursor:pointer; font-family:var(--sans); font-weight:600; font-size:15px;
     padding:13px 20px; border-radius:var(--radius); border:1px solid var(--accent-deep);
     background:var(--accent); color:#fff;
+    transition:transform .12s cubic-bezier(.2,.65,.3,1), background-color .15s ease, border-color .15s ease;
   }
   button.go:hover{background:var(--accent-deep);}
   button.go:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+  button.go:active{transform:scale(.97);}   /* mechanical press feedback */
   button.ghost{
     appearance:none; cursor:pointer; font-family:var(--sans); font-weight:600; font-size:14px;
     padding:11px 14px; border-radius:var(--radius); border:1px dashed var(--line);
     background:transparent; color:var(--accent-deep);
+    transition:transform .12s cubic-bezier(.2,.65,.3,1), background-color .15s ease, border-color .15s ease;
   }
   button.ghost:hover{border-color:var(--accent); background:var(--accent-wash);}
   button.ghost:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  button.ghost:active{transform:scale(.97);}
 
   .druglist{display:flex; flex-direction:column; gap:9px; margin:0 0 12px;}
   .drugrow{display:flex; gap:9px; align-items:center;}
@@ -339,10 +343,21 @@
     appearance:none; cursor:pointer; font-family:var(--mono); font-size:12px; letter-spacing:.03em;
     padding:8px 13px; border:1px solid var(--line); border-radius:20px;
     background:var(--card); color:var(--ink-soft);
+    transition:transform .12s cubic-bezier(.2,.65,.3,1), background-color .15s ease, border-color .15s ease, color .15s ease;
   }
   .mini:hover{border-color:var(--accent); color:var(--accent-deep);}
   .mini:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .mini:active:not(:disabled){transform:scale(.96);}
   .mini:disabled{opacity:.6; cursor:default;}
+  /* --- craft-layer polish (anti-slop): tabular numerals on data, balanced
+     headings, press feedback on chip-style controls. Additive, no logic. --- */
+  .datastrip, .heatmap, .hm-cell, .ts-time, .sched-tag, .exp-tag, .stat-num,
+  .ib-count, .sg-count, .wc-line, .print-strip, .map-chip{ font-variant-numeric:tabular-nums; }
+  .card-head .name, .redflag h2, .modal-head h2, .symptom-group summary .sg-label{ text-wrap:balance; }
+  .symptom-chip, .qa-eg, .map-chip, .pict-chip{
+    transition:transform .12s cubic-bezier(.2,.65,.3,1), background-color .15s ease, border-color .15s ease, color .15s ease;
+  }
+  .qa-eg:active, .map-chip:active, .pict-chip:active{ transform:scale(.97); }
   .mini:disabled:hover{border-color:var(--line); color:var(--ink-soft);}
 
   .signin{

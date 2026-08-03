@@ -15,8 +15,8 @@ This file is the quick status view. `PLAINSCRIPT_ROADMAP.md` has the full phased
 
 **Supabase** (unlocks My Cabinet + Cabinet Scan + the share-a-cabinet feature):
 - [X] Run `supabase/schema.sql` in the Supabase SQL Editor — it's grown since you last saw it (now includes `cabinet_shares` + `get_shared_cabinet()` for link/QR sharing); the whole file is idempotent, safe to re-run start to finish.
-- [ ] Enable Google as an OAuth provider (Authentication → Providers → Google) with a client ID/secret from Google Cloud Console — confirmed currently off. (Email magic-link needs nothing — it's on by default.)
-- [X] Allow-list redirect URLs (Authentication → URL Configuration) — add `http://localhost:8000` and `https://plainscript.its-the-prithivi-show.workers.dev`.
+- [ ] **Enable Google sign-in (still TODO — 2026-08-03).** Authentication → Providers → Google: toggle on + paste a Client ID/Secret from Google Cloud Console (OAuth 2.0 "Web application"). In that Google OAuth client, set the Authorized redirect URI to `https://rxwbyyhukmxsknmhhzsn.supabase.co/auth/v1/callback`. Until then, the "Continue with Google" button fails; the email magic-link works and is the fallback. (Code side is fine — nothing to change there.)
+- [X] Allow-list redirect URLs + Site URL (Authentication → URL Configuration). **Fixed 2026-08-03:** the magic link was redirecting to a broken `localhost` because the **Site URL** was still the dev localhost; set to `https://plainscript.its-the-prithivi-show.workers.dev` and allow-list `…workers.dev/**` (wildcard). Sign-in via magic link confirmed working.
 
 **Cloudflare:**
 - [X] **Redeploy the Worker to activate "Ask the label"** — DONE (2026-07-25). Deployed `plainscript-proxy` with the locked `qa` mode (Version 8cae01bc). Verified live end-to-end: empty `qa` probe returns `{"quotes":[]}`, a real question returns correctly-attributed verbatim label sentences, and the old rephrase mode still works. NOTE for next time: run wrangler from the repo dir (`~/plainscript-remote`), not `~` — the config path is repo-relative.
