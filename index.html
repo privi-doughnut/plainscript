@@ -7261,15 +7261,21 @@ async function toPlainEnglish(text, label, lang){
   // repurposed to generate medical claims. We just hand it the text, which
   // section it is, which language to render it in, and the reading level
   // ("simple" = the default 8th-grade rewrite, "simplest" = explain-like-I'm-10).
-  try{
-    const res = await fetch(CLAUDE_PROXY_URL, {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ text, label, lang: lang || "en", level: readingLevel })
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return (data.plain || "").trim() || null;
-  }catch(e){ return null; }
+  const body = JSON.stringify({ text, label, lang: lang || "en", level: readingLevel });
+  // one retry with a short backoff — a transient worker/API hiccup shouldn't
+  // silently drop the reader back to raw FDA jargon. On a genuine ok response
+  // we return whatever it says (no retry); we only retry a network error or
+  // non-2xx status.
+  for (let attempt = 0; attempt < 2; attempt++){
+    try{
+      const res = await fetch(CLAUDE_PROXY_URL, {
+        method:"POST", headers:{"Content-Type":"application/json"}, body
+      });
+      if (res.ok){ const data = await res.json(); return (data.plain || "").trim() || null; }
+    }catch(e){ /* fall through to retry */ }
+    if (attempt === 0) await new Promise(r => setTimeout(r, 600));
+  }
+  return null;
 }
 
 /* =================================================================
