@@ -316,6 +316,14 @@
   .status .spin{display:inline-block; width:11px; height:11px; border:2px solid var(--line); border-top-color:var(--accent); border-radius:50%; animation:sp .7s linear infinite; vertical-align:-1px; margin-right:8px;}
   @keyframes sp{to{transform:rotate(360deg);}}
   @media (prefers-reduced-motion:reduce){ .spin{animation:none;} }
+  /* deterministic skeleton (anti-slop rule #8): structural placeholder that
+     matches the incoming layout; a subtle opacity "breathe", never a moving
+     shimmer, and it animates opacity only (hardware-accelerated). */
+  .skel{ background:var(--line); border-radius:6px; opacity:.6; }
+  .skel-pulse{ animation:skelBreathe 1.5s ease-in-out infinite; }
+  @keyframes skelBreathe{ 0%,100%{opacity:.4;} 50%{opacity:.75;} }
+  @media (prefers-reduced-motion:reduce){ .skel-pulse{animation:none;} }
+  .skel-card{ border:1px solid var(--line); border-radius:var(--radius); padding:22px 24px 24px; }
   .err{background:var(--major-bg); border:1px solid var(--major-bar); color:var(--major-ink); padding:13px 16px; border-radius:var(--radius); font-size:14px;}
 
   /* ---------- methodology accordion (credibility / sourcing) ---------- */
@@ -7291,12 +7299,23 @@ async function toPlainEnglish(text, label, lang){
 /* =================================================================
    DECODE
    ================================================================= */
+/* Structural skeleton matching the decode monograph footprint (eyebrow →
+   drug name → data strip → a few label rows), so the layout is anchored
+   while openFDA responds instead of a lone spinning wheel. */
+function decodeSkeleton(){
+  const bar = (w,h,mt) => `<div class="skel skel-pulse" style="width:${w};height:${h}px;${mt?`margin-top:${mt}px;`:""}"></div>`;
+  const row = `<div style="margin-top:22px;">${bar("110px",9)}${bar("94%",12,11)}${bar("80%",12,8)}</div>`;
+  return `<article class="skel-card" aria-hidden="true">
+      ${bar("84px",9)}${bar("230px",22,12)}${bar("66%",11,14)}
+      ${row}${row}${row}
+    </article>`;
+}
 async function decode(){
   const name = $("#decode-input").value.trim();
   const box = $("#decode-results");
   if (window.speechSynthesis) window.speechSynthesis.cancel(); // stop any prior read-aloud
   if (!name){ box.innerHTML = `<div class="err">${esc(t("decode_type_first"))}</div>`; return; }
-  box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("decode_looking_up_prefix"))} “${esc(name)}” ${esc(t("decode_looking_up_suffix"))}</div>`;
+  box.innerHTML = `<p class="status" style="padding:0 0 6px;">${esc(t("decode_looking_up_prefix"))} “${esc(name)}” ${esc(t("decode_looking_up_suffix"))}</p>${decodeSkeleton()}`;
 
   let rec, noteName = null, altNames = [];
   try{ const rr = await resolveLabel(name); rec = rr.rec; noteName = rr.suggested; altNames = rr.alternates || []; }
