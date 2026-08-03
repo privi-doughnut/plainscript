@@ -1,11 +1,22 @@
-# Only index.html + config.js need to be served publicly by the static
-# assets deploy (Cloudflare Workers/Pages). Everything else here is either
-# dev docs or the separate Claude-proxy Worker's source, not the site itself.
+# Only the public site needs to ship: index.html, config.js, sw.js,
+# manifest.webmanifest, and the PWA icons. Everything below is dev docs,
+# the separate proxy Worker's source, tooling, or repo internals — NEVER
+# serve these from the public static site.
+#
+# ⚠️ .git MUST stay listed here — without it the whole repo history is
+# publicly downloadable at /.git/*.
 CLAUDE.md
 PLAINSCRIPT_ROADMAP.md
+PROGRESS.md
 README.md
 worker.js
 wrangler.jsonc
+wrangler.worker.jsonc
 supabase/
 .gitignore
 .assetsignore
+.git/
+.wrangler/
+node_modules/
+.claude/
+.mcp.json
