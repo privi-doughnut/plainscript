@@ -1,155 +1,51 @@
 # Plainscript — Progress & Status
 
-*Last updated: 2026-07-24 (after scaling localization to 13 languages, incl. full Hindi + Tamil)*
+*Last updated: 2026-08-04*
 
-**Completion: ~76% of the full roadmap · Phases 0–5 are fully code-complete, including Spanish. Only Phase 6's analytics + CAC packaging remain, both low-priority/deferred — see below.**
-**97 days to the Congressional App Challenge deadline (Oct 26, 2026).**
+**The app is essentially feature-complete and polished.** We're past building core features — what remains is (1) Congressional App Challenge submission packaging, (2) a few content/dashboard items only Privi can do, and (3) optional polish + a planned security sweep. **CAC deadline: Oct 26, 2026.**
 
-**New: 13 languages live** — English, Spanish, Chinese, Vietnamese, Arabic (RTL), French, Korean, Russian, Portuguese, German, Japanese, Hindi, and Tamil. The 🌐 header selector switches the entire UI, the full curated medical content (interactions, food/alcohol notes, allergy notes, drug-class explainers, supplements, symptom categories), and (once the Phase 1 Worker is configured) live FDA label text too. Built as a proper i18n framework, not a one-off — a new language is "add a dictionary + a curated-field pass," not a rebuild. See the build log below for what's covered.
-
-This file is the quick status view. `PLAINSCRIPT_ROADMAP.md` has the full phased plan and reasoning; `CLAUDE.md` has the architecture and safety rules.
+Companion docs: `CLAUDE.md` = architecture + safety rules · `PLAINSCRIPT_ROADMAP.md` = original phased plan · git history = full change log. Live site: https://plainscript.its-the-prithivi-show.workers.dev/
 
 ---
 
-## 1. Things you need to do
+## 1. Only Privi can do these
+- [ ] **"Why I built this"** — fill the `[PRIVI: voice this]` placeholder in `README.md`, in your own voice.
+- [ ] **CAC demo video** — required for the submission.
+- [ ] **Enable Google sign-in** — Supabase → Authentication → Providers → Google: toggle on + Client ID/Secret from Google Cloud Console (OAuth "Web application"); set that client's Authorized redirect URI to `https://rxwbyyhukmxsknmhhzsn.supabase.co/auth/v1/callback`. (Magic-link already works, so this is optional-ish.)
+- [ ] **Check Cloudflare Workers Builds** — the git auto-deploy stalled on 2026-08-03/04. Fallback that works reliably: `npx wrangler deploy -c wrangler.jsonc` run from `~/plainscript-remote` (NOT `~` — the config path is repo-relative). Worth confirming the pipeline is healthy.
 
-**Supabase** (unlocks My Cabinet + Cabinet Scan + the share-a-cabinet feature):
-- [X] Run `supabase/schema.sql` in the Supabase SQL Editor — it's grown since you last saw it (now includes `cabinet_shares` + `get_shared_cabinet()` for link/QR sharing); the whole file is idempotent, safe to re-run start to finish.
-- [ ] **Enable Google sign-in (still TODO — 2026-08-03).** Authentication → Providers → Google: toggle on + paste a Client ID/Secret from Google Cloud Console (OAuth 2.0 "Web application"). In that Google OAuth client, set the Authorized redirect URI to `https://rxwbyyhukmxsknmhhzsn.supabase.co/auth/v1/callback`. Until then, the "Continue with Google" button fails; the email magic-link works and is the fallback. (Code side is fine — nothing to change there.)
-- [X] Allow-list redirect URLs + Site URL (Authentication → URL Configuration). **Fixed 2026-08-03:** the magic link was redirecting to a broken `localhost` because the **Site URL** was still the dev localhost; set to `https://plainscript.its-the-prithivi-show.workers.dev` and allow-list `…workers.dev/**` (wildcard). Sign-in via magic link confirmed working.
+## 2. Next up when we resume (the "post-limit" list)
+- [ ] **Security sweep** — *Privi asked for this; I can do most of it.* Scope:
+  - **RLS audit** — confirm every Supabase table's row-level security truly isolates users (cabinet privacy depends on it).
+  - **Share-link function** — `get_shared_cabinet()` exposes only the intended narrow columns, token is unguessable, and revoke actually kills access.
+  - **XSS audit** — user notes + openFDA text flow into `innerHTML`; verify `esc()` is applied everywhere (the biggest client-side risk).
+  - **Worker** — confirm the rephrase/qa modes can't be repurposed to generate content, the API key never leaks, and CORS is scoped (`ALLOWED_ORIGIN`).
+  - **Repo/deploy hygiene** — `.git` exposure is fixed (§4); re-confirm no secrets in `config.js` or git history and that `.assetsignore` stays complete.
+- [ ] **CAC written description** — I can draft the technical writeup; you adapt it to the official form fields.
+- [ ] **Symptom-explanation translations** — the 26 `SYMPTOM_EXPLAIN` "?" definitions + `explain_aria` are English-only (symptom *names* are already localized). One translate pass → full 13-language parity.
+- [ ] **Remaining visual QA / minor polish** — Hindi/Tamil rendering; live spot-check of the new skeletons + dialog animations; narrow-phone header wrapping; printable one-pager print-preview; share-a-cabinet end-to-end in an incognito window; reference-panel (recalls/shortages/FAERS) sub-loaders still use small spinners.
 
-**Cloudflare:**
-- [X] **Redeploy the Worker to activate "Ask the label"** — DONE (2026-07-25). Deployed `plainscript-proxy` with the locked `qa` mode (Version 8cae01bc). Verified live end-to-end: empty `qa` probe returns `{"quotes":[]}`, a real question returns correctly-attributed verbatim label sentences, and the old rephrase mode still works. NOTE for next time: run wrangler from the repo dir (`~/plainscript-remote`), not `~` — the config path is repo-relative.
-- [ ] Confirm which Worker is which — you mentioned making a Cloudflare Worker; I need to know if that's `worker.js` (the Claude-proxy for Phase 1's plain-English mode, needs `ANTHROPIC_API_KEY`) or a separate thing from the static-site hosting Worker. Once confirmed, its URL goes into `config.js` as `CLAUDE_PROXY_URL`.
-- [ ] Decide whether to close PR #1 (`cloudflare/workers-autoconfig` → `main`) — redundant now.
+## 3. Deferred / decided-against (don't rebuild without a reason)
+- **Interaction timing timeline** — marginal over the existing schedule strip; the novel part (spacing conflicts) needs timing data that isn't structured. Recommend skipping.
+- **Traveling-with-meds helper** — overlaps the (already printable + multilingual) regimen story. Low priority.
+- **Adherence streak / check-ins** — nudge/habit feature; leans toward the nagging the app deliberately avoids. Low priority.
+- **OCR point-and-decode** — decided against: the barcode scanner already covers type-free input; OCR needs a ~2 MB dependency that breaks the offline/CSP design. Made the scanner more discoverable instead.
+- **Pill / imprint identifier** — blocked: no free imprint/image API since NLM's RxImage was deprecated.
+- **Analytics** — low priority; plenty of CAC/ISEF entries ship without any.
+- **React component libraries (shadcn / 21st.dev / skiper-ui)** — architectural mismatch: Plainscript is vanilla, single-file, no build step. Use only as *visual inspiration*; the polish is hand-built to match.
 
-**Content — the one thing only you can do:**
-- [ ] Write the "Why I built this" section in `README.md` — left as a clearly marked placeholder on purpose. This is genuinely the single remaining roadmap item that can't be done by anyone but you.
-- [X] Review the "Report an error" link in the footer — it points to a pre-filled GitHub Issues form rather than a personal email, to avoid putting a real, spammable Gmail address in public page source. Swap it if you'd rather use something else. (its fine the way it is - privi)
-
-**Next up (roadmap items remaining after the localization push):**
-- [X] **Tamil curated pass** — DONE (2026-07-24). Tamil now has full medical parity with Hindi: `ta` added to every curated field object (489 = 489 vs `hi`), so interactions, food/alcohol, allergy notes, drug-class explainers, supplements, and symptom categories all render in Tamil instead of falling back to English. The same append pattern is ready for any future language.
-- [ ] **Live-verify the DB features** — run `supabase/schema.sql` in the dashboard (idempotent) to unlock My Cabinet, share links, schedule + multi-person.
-- [ ] **"Why I built this"** — the `[PRIVI: voice this]` placeholder in `README.md`. You-only, in your voice.
-- [ ] **CAC packaging** (deadline Oct 26) — demo video (needs you) + written description.
-
-**Live browser visual-QA pass — DONE (2026-08-02).** Drove Chrome against the live site. The app **loads and works** (the earlier "won't load" was a network outage, not a bug). Verified in-browser: Decode + readability bullets, pictogram "Understand Mode" (+ evidence reveal), the "Ask the label" Q&A end-to-end, and **Arabic RTL** (layout mirrors correctly, pictograms + rephrase render RTL). Four bugs found and fixed the same pass:
-  - `&amp;` rendered literally in `data-i18n` headings → decode entities in `applyTranslations`.
-  - Pictogram evidence showed the whole unpunctuated OTC blob → trimmed snippet around the match.
-  - **Ask-the-label wrongly returned "no information" for valid questions** (e.g. "what is this used for") → added question-intent→section relevance mapping; double-checker re-verified against fabrication/mis-attribution/irrelevant-verbatim traps.
-  - Scan CTA didn't re-localize on a live language switch → tagged `data-i18n`.
-- [ ] Still worth a look: **Hindi/Tamil** rendering, and the heatmap / regimen / refill features (need a signed-in cabinet with 2+ meds — couldn't exercise those without auth this pass).
-- [ ] Header wrapping on a narrow phone (4 tabs + theme toggle + account chip).
-- [ ] The severity-pill and `.eyebrow` color changes from the accessibility pass — computed the contrast math but haven't visually confirmed them.
-- [ ] The printable cabinet one-pager — CSS print styling is notoriously browser-inconsistent; worth a real print-preview check.
-- [ ] The share-a-cabinet feature end to end, once the schema is re-run: create a link, open it in an incognito window, confirm it shows the right (and only the right) data, then revoke it and confirm the link stops working.
-- [ ] Click through the app in Spanish (🌐 toggle in the header) — I validated the dictionary programmatically (every key resolves in both languages, no missing translations) but haven't seen it render in a live browser this session.
+## 4. Security note (resolved 2026-08-03)
+`.git` was briefly served publicly during a manual full-tree deploy (`.assetsignore` hadn't listed it). Fixed: `.git/`, `PROGRESS.md`, dev docs, and tooling are now excluded; verified `/.git/*` → 404 while public files still serve. No secrets were ever in git history — the Anthropic API key lives only as a Cloudflare Worker secret; `config.js` holds only the public Supabase anon key (RLS-protected). A fuller sweep is queued in §2.
 
 ---
 
-## 1b. Feature build queue (2026-07 push)
+## 5. What's built (summary)
+- **Decode** — type a drug → plain-English monograph from its real FDA label (indications, mechanism, side effects, warnings, full label details), with readability bullets, barcode scanner, voice input, and a "Similar & related" lookup.
+- **Check interactions** — 2+ meds → severity-rated, sourced, plain-English warnings (curated set + FDA-label cross-reference). Never shows a green "safe."
+- **My Cabinet** (Supabase auth: Google + passwordless email) — save meds, personal notes, dosing schedule, multi-person, printable one-pager, wallet card, insights, **share a read-only cabinet** (link/QR), **whole-cabinet Scan** with an **N×N interaction heatmap**, **regimen story**, and **refill/expiry reminders**.
+- **Symptoms** — emergency red-flag checklist + curated symptom→OTC-category lookup (no diagnosis) + **"?" hover explanations** for non-obvious terms.
+- **Plain-English mode** (safety-locked Cloudflare Worker proxy) — rephrases retrieved FDA text; **"Ask the label"** answers questions using only verbatim label sentences (two-condition double-checker + "not AI-written" badge).
+- **13 languages** — full UI + curated medical content (en, es, zh, vi, ar [RTL], fr, ko, ru, pt, de, ja, hi, ta).
+- **Pictogram "Understand Mode"**, **PWA** (installable, offline app-shell), **dark theme**, an accessibility pass (WCAG contrast, focus states, reduced-motion), and an anti-slop **design polish** pass (active-press feedback, tabular numerals, balanced headings, spring dialog entrances, deterministic skeletons).
 
-A batch of bigger features, sequenced by value × low-risk × no-new-dependency. Building one at a time, verify + commit each. "Don't oversaturate" is the guiding rule — each has to earn its place.
-
-**Foundational**
-- [X] **Decode readability pass** — FDA prose now lays out as bullets / short paragraphs instead of walls of text (`structureParts()`), applied to raw label text and the plain-English rephrase alike. (2026-07-25)
-
-**No new dependency — SHIPPED this push (2026-07-25)**
-- [X] **Pictogram / low-literacy "Understand Mode"** — 9 medication-guidance icons derived from the label with negation-guarded, unit-tested detection; every icon carries the exact label sentence it came from. Biggest equity win.
-- [X] **Whole-regimen plain-English story** — "Explain my regimen" cabinet tool: each med's purpose (rephrased), schedule, and your note on one printable page for the active person.
-- [X] **Refill & expiry reminders** — per-med filled/expiry dates + colour-coded status tag + a "Heads up" banner for expired / expiring-within-30-days. localStorage-backed (no schema change, private, not shared).
-- [X] **Cabinet Scan severity heatmap** — N×N grid coloured by worst severity per pair, glyph + tooltip (never colour-alone), legend + list as the non-visual view.
-- [X] **"What is this?" explanation pills (2026-08-02)** — non-obvious symptom chips (jock itch, canker sore, post-nasal drip, hives, stye, pinworms, etc. — 26 terms) show a small "?" marker that reveals a plain-language definition on hover / focus / tap. Reusable `data-explain` mechanism (capture-phase click so it never toggles the checkbox; Esc/Enter/Space supported). Verified live in-browser.
-
-**Lower-value / my honest read — recommend leaving unless you disagree**
-- [ ] **Interaction timing timeline** — the dosing schedule already renders a "today" strip, and the genuinely-new part (spacing conflicts like "separate by 2 h") needs timing data that isn't structured in the curated set — I'd have to parse prose unreliably. Marginal over what exists; **recommend skipping** unless you want the schedule strip upgraded to a nicer visual.
-- [ ] **Traveling-with-meds helper** — real but niche, and overlaps a lot with the new regimen story (which is already printable and multilingual). **Low priority.**
-- [ ] **Opt-in adherence streak / check-ins** — a habit/nudge feature; leans toward the kind of nagging the app deliberately avoids. **Low priority / arguably off-brand.**
-
-**Translation pass — DONE (2026-07-25).** All ~58 new UI keys from that push (pictograms, regimen story, heatmap, refill/expiry reminders, scanner CTA, and Ask-the-label) are now translated into every one of the 13 languages — no English fallback remains for that copy. Done in 3 committed batches (es/zh/vi/ar, fr/ko/ru/pt, de/ja/hi/ta), each verified for full key parity + `node --check`.
-
-**Small translation debt (2026-08-02):** the 26 `SYMPTOM_EXPLAIN` definitions + `explain_aria` are English-only (pickLang falls back to en). Symptom *names* are already localized; only the hover definitions await a translate pass.
-
-**Resolved after discussion (2026-07-25)**
-- [X] **Point-and-decode (OCR)** — **decided against.** The barcode scanner already covers type-free input at higher reliability and zero dependency; OCR's only unique win (pharmacy vials) is the hardest OCR case and would cost a ~2 MB dependency that breaks the offline/CSP design. Instead, **made the existing scanner discoverable** — a labeled "Or scan the barcode on the box" CTA under the Decode field (was just a tiny icon).
-- [X] **Grounded label Q&A ("Ask the label")** — SHIPPED. Answers a natural-language question using *only* verbatim FDA-label sentences; the model just points at candidates, never authors. Two-condition client-side double-checker before display: (1) verbatim provenance — must be a character-for-character substring of the exact section text sent, and we render our local copy; (2) section-anchored relevance — must live in the attributed section and overlap the question. Fail either → dropped; nothing survives → plain "no information on this label" message. Every answer carries a "quoted word-for-word, not AI-written" badge. Verifier unit-tested against fabrication / mis-attribution / irrelevant-verbatim traps. **⚠ Needs the Worker redeployed to go live (see Cloudflare below).**
-
-**Blocked**
-- [ ] **Pill / imprint identifier** — still blocked: NLM's free RxImage API was deprecated and no free imprint/image source is confirmed. Not building on a promise.
-
----
-
-## 2. Recommendations — what's left
-
-**Deliberately not built — explaining why rather than silently skipping:**
-- **Light, privacy-respecting analytics.** Genuinely low priority — plenty of CAC/ISEF submissions ship with none at all. A simple Supabase page-view counter is the cheapest option if you want it later.
-- **CAC packaging** (demo video, written description, deploy checklist) — the video needs you regardless. I can draft a technical written description once you want one, but I don't know the exact official CAC submission form fields, so I didn't want to guess and hand you something that doesn't match what they actually ask for.
-- **A third language** — you mentioned wanting a couple more, each as its own pass. The framework is ready (add a language object to `I18N`, add `{lang}` fields to the 5 curated data arrays, add one more `LOCKED_SYSTEM` entry in `worker.js`) — just say which language and I'll do the same careful pass Spanish got.
-
-**Everything else on the original roadmap is now built.** See the build log below.
-
-### Fresh ideas for future additions & improvements
-Five new directions worth considering once the current batch lands:
-
-1. **Refill & expiry reminders.** Track when each cabinet med was filled and gently flag when it's about to run out or pass its expiry — turns the cabinet from a static list into something that actively helps you stay on top of your meds. Pure Supabase + a date field per row; no new data sources.
-2. **"Traveling with meds" helper.** A printable card that shows each med's *generic* name (and, using the i18n work, its name/label in the destination country's language), plus a short plain-English summary of common carry-on rules for medication. Leans directly on the multilingual + generic-resolution work already done.
-3. **Opt-in adherence streak / gentle check-ins.** A strictly optional "did you take today's meds?" tracker with a streak counter, for people who want the nudge — no nagging, no dark patterns, fully privacy-respecting and off by default. Complements the dosing-schedule feature.
-4. **Cabinet Scan severity heatmap.** A visual N×N grid of the whole-cabinet scan — each cell colored by the worst interaction severity found for that pair — so a dense cabinet's risk pattern is scannable at a glance instead of read as a list. Uses only what the scan already computes; a natural home for the dataviz skill.
-5. **Pill / imprint identifier.** Identify a loose pill by its imprint code, shape, and color. High user value, but **needs research first**: NLM's free RxImage API was deprecated, so this is blocked until a current free imprint/image source is confirmed — flagging it rather than promising it.
-
----
-
-## 3. Everything already built (build log)
-
-### 2026-07-24 — Localization scaled to 13 languages
-- Added **11 more languages** on top of English + Spanish: Chinese, Vietnamese, Arabic (RTL), French, Korean, Russian, Portuguese, German, Japanese, **Hindi**, and **Tamil** — each a full 334-key `I18N` dictionary, a `SUPPORTED_LANGS` + `DATE_LOCALES` entry, a language-selector `<option>`, and a `LOCKED_SYSTEM` rephrase prompt in `worker.js`.
-- **Full curated medical parity** for every language including Hindi and Tamil: `{lang}` fields on all curated arrays (INTERACTIONS, FOOD_INTERACTIONS, CROSS_SENSITIVITY, DRUG_CLASS_EXPLAINERS, SUPPLEMENT_INTERACTIONS, SYMPTOM_CATEGORIES, SYMPTOM_GROUPS) — real reviewed translations, English `pickLang` fallback only where a pass is still pending.
-- Each language verified programmatically: 334-key dictionary parity (no missing/extra keys) and curated-field coverage (`hi`/`ta` count == field count), plus `node --check` on the extracted script before every push.
-- Still worth a live browser pass — especially **Arabic RTL** and the Hindi/Tamil rendering (see the visual-QA checklist above).
-
-### 2026-07-21 — Spanish localization ("take a full pass at spanish")
-- Built a real i18n framework: 230-key `I18N` dictionary (English + Spanish), `t()`/`pickLang()` lookup, `applyTranslations()` DOM-attribute pass, a 🌐 header toggle persisted via localStorage + a new `lang` profile column (same pattern as theme).
-- Translated every static UI string, every JS-rendered dynamic string, and all 5 curated medical data arrays (INTERACTIONS, FOOD_INTERACTIONS, CROSS_SENSITIVITY, DRUG_CLASS_EXPLAINERS, SYMPTOM_CATEGORIES) — real reviewed translations, not machine-translated on the fly.
-- `worker.js` now supports a `lang` parameter for translating live FDA text (still constrained to "use only the provided text," in either language); without the Worker configured, Spanish mode shows FDA text in English with a visible explanatory note rather than looking broken.
-- Found and fixed two latent bugs while doing this: two functions (`enhanceRows`, `loadProfile`) each had a local variable literally named `t` that would have silently shadowed the global translation function the moment either tried to call it.
-- Framework built so the next language (Privi wants a couple more, each its own pass) is "add a dictionary column," not a rebuild.
-
-### 2026-07-21 — a full build session ("let's finish this app")
-Starting from ~43% complete (Phases 0–3 done, Phase 4 partial), this session:
-
-**Phase 4 (Depth & teaching) — completed:**
-- Drug-class explainers (16 common classes: NSAIDs, SSRIs, statins, ACE inhibitors, benzodiazepines, opioids, PPIs, macrolides, etc.)
-- Food & alcohol interactions (warfarin+vitamin K, MAOIs+tyramine, statins+grapefruit, alcohol+opioids/benzos/metronidazole/acetaminophen)
-- Allergy/cross-sensitivity notes (penicillin/cephalosporin, sulfa, NSAID/aspirin sensitivity)
-- Pregnancy/nursing-mothers label fields
-- A general "why do interactions happen" mechanism explainer, connecting every interaction's individual "Why" line back to the handful of recurring mechanisms (CYP450 competition, additive effects, electrolyte shifts, absorption interference)
-- Side-effect labeling clarity (mild-vs-serious framing, without inventing a new severity classifier)
-- **Declined:** a full ranked-differential-diagnosis symptom checker (conflicts with the app's own "no diagnosis" rule) — built the Symptoms tab (red-flag checklist + OTC-category lookup) instead, earlier the same session.
-
-**Accessibility pass:**
-- Computed actual WCAG contrast ratios for every core color pair in both themes and fixed real failures: `--ink-faint` (2.88:1 in light theme, failing), severity-pill text (0 of 4 severities passed in dark theme with white text)
-- Fixed a real pre-existing bug: the My Cabinet remove button had zero CSS applied (wrong selector scope)
-- Added missing focus-visible states (`.ghost`, `.expand`, `.rm` all had `appearance:none`, which also strips the native focus ring)
-- Fixed ARIA roles on the similar/related modal's tabs
-
-**Phase 5 (Breadth & reach) — complete except Spanish:**
-- PWA: manifest, hand-generated icons (no Pillow available — wrote a minimal PNG encoder, verified via zlib round-trip + independent CRC check + a visual render), a service worker (network-first for the app shell only, never touches API calls), and an offline-cached fallback for My Cabinet
-- Voice input: a mic button (Web Speech API, feature-detected) on Decode, Check, and My Cabinet's inputs
-- Printable caregiver one-pager: a "Print / save as PDF" button in My Cabinet, scoped so it can't affect any other tab
-- **Share a read-only cabinet via link/QR** — the one feature that needed careful backend design before building. New `cabinet_shares` table + a `get_shared_cabinet()` SECURITY DEFINER function: anon gets zero direct table access at all, the share token is an unguessable random uuid, and the function returns a deliberately narrow, non-identifying column set (no id/user_id/rxcui). Full security rationale is documented in `supabase/schema.sql` §5. QR rendering uses one external free service (goqr.me) as a deliberate, bounded exception to "no dependencies" — the feature still fully works via the copyable link if that service is ever down.
-- Not built: Spanish mode (see recommendations above)
-
-**Phase 6 (Trust & launch polish) — complete except analytics/CAC packaging:**
-- FAQ (6 new questions in the existing methodology accordion)
-- "Report an error" — a footer link to a pre-filled GitHub Issues form
-- "Why I built this" — explicitly-marked placeholder in README.md for Privi to fill in himself
-- Not built: analytics, CAC packaging (demo video needs you; written description not drafted without knowing the actual submission form)
-
-### Earlier the same day
-- Discovered the real project lived on GitHub (`privi-doughnut/plainscript`), consolidated, and fast-forward merged everything into `main`.
-- Built Phase 2 (Supabase auth + My Cabinet) verification, Phase 3 (Cabinet Scan), and the initial Symptoms tab.
-- Swapped GitHub OAuth for Google + passwordless email after you flagged it didn't fit the audience.
-- Merged in Cloudflare Workers static-assets config so the site deploys cleanly.
-
-### Phase 0 — Foundation (shipped before this session)
-- Decode, hybrid interaction checker, persistent safety frame, dark theme, mobile-first & accessible.
+**Safety invariants (never violate):** every fact comes from openFDA / RxNorm / the curated set; the LLM only rephrases retrieved text, never generates medical claims; no green "safe"; every claim shows its source; disclaimers stay persistent. No diagnosis, no dosing advice, no "should I take this."
