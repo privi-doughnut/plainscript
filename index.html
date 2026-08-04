@@ -7310,6 +7310,12 @@ function decodeSkeleton(){
       ${row}${row}${row}
     </article>`;
 }
+function skelResults(n){
+  n = n || 2;
+  const bar=(w,ht,mt)=>`<div class="skel skel-pulse" style="width:${w};height:${ht}px;${mt?`margin-top:${mt}px;`:''}"></div>`;
+  const card=`<article class="skel-card" aria-hidden="true" style="margin-bottom:12px;">${bar('90px',9)}${bar('55%',17,12)}${bar('93%',12,12)}${bar('80%',12,8)}</article>`;
+  return Array.from({length:n}, ()=>card).join('');
+}
 async function decode(){
   const name = $("#decode-input").value.trim();
   const box = $("#decode-results");
@@ -8386,7 +8392,7 @@ async function checkInteractions(){
   const inputs = [...$("#drug-list").querySelectorAll("input")].map(i=>i.value.trim()).filter(Boolean);
   const box = $("#check-results");
   if (inputs.length < 2){ box.innerHTML = `<div class="err">${esc(t("check_min_two"))}</div>`; return; }
-  box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("check_checking_prefix"))} ${inputs.length} ${esc(t("check_checking_suffix"))}</div>`;
+  box.innerHTML = `<p class="status" style="padding:0 0 6px;">${esc(t("check_checking_prefix"))} ${inputs.length} ${esc(t("check_checking_suffix"))}</p>${skelResults(2)}`;
 
   const drugs = [];
   for (const name of inputs) drugs.push(await resolveForAnalysis(name));
@@ -8550,7 +8556,7 @@ async function runSymptomLookup(){
     matched.push(entry);
   }
 
-  box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("symptoms_looking_up"))}</div>`;
+  box.innerHTML = `<p class="status" style="padding:0 0 6px;">${esc(t("symptoms_looking_up"))}</p>${skelResults(2)}`;
 
   const sections = [];
   for (const m of matched){
@@ -9388,7 +9394,7 @@ async function runCompare(dA, nameA, overlay){
   const out = overlay.querySelector("#compare-out");
   const nameB = overlay.querySelector("#compare-input").value.trim();
   if (!nameB) return;
-  out.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("compare_looking_up"))}</div>`;
+  out.innerHTML = `<p class="status" style="padding:0 0 6px;">${esc(t("compare_looking_up"))}</p>${skelResults(2)}`;
 
   let recB;
   try{ const rr = await resolveLabel(nameB); recB = rr.rec; }
@@ -9511,7 +9517,7 @@ async function openSimilarModal(d, displayName){
       <button class="mtab" role="tab" data-tab="forms" aria-selected="false">${t("tab_other_forms")}</button>
       <button class="mtab" role="tab" data-tab="combos" aria-selected="false">${t("tab_combo_products")}</button>
     </div>
-    <div class="modal-body" aria-live="polite"><div class="status"><span class="spin"></span>${esc(t("similar_looking_up"))}</div></div>
+    <div class="modal-body" aria-live="polite"><p class="status" style="padding:0 0 6px;">${esc(t("similar_looking_up"))}</p>${skelResults(2)}</div>
   </div>`;
   document.body.appendChild(overlay);
 
@@ -10165,7 +10171,7 @@ async function runCabinetScan(){
   if (!meds || meds.length < 2){ box.innerHTML = `<div class="err">${esc(t("scan_min_two"))}</div>`; return; }
   const pairCount = meds.length*(meds.length-1)/2;
   const pairWord = pairCount>1 ? t("scan_pairs_word_plural") : t("scan_pairs_word");
-  box.innerHTML = `<div class="status"><span class="spin"></span>${esc(t("scan_scanning_prefix"))} ${meds.length} ${esc(t("medications_word"))} — ${pairCount} ${esc(pairWord)}…</div>`;
+  box.innerHTML = `<p class="status" style="padding:0 0 6px;">${esc(t("scan_scanning_prefix"))} ${meds.length} ${esc(t("medications_word"))} — ${pairCount} ${esc(pairWord)}…</p>${skelResults(2)}`;
 
   const drugs = [];
   for (const m of meds) drugs.push(await resolveForAnalysis(m.generic || m.brand || m.name));
