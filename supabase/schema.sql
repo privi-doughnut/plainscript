@@ -82,8 +82,11 @@ create policy "own meds: delete" on public.medications
   for delete using (auth.uid() = user_id);
 
 -- 4. Auto-create a profile row on signup ----------------------------------
+-- SECURITY DEFINER + an explicit, locked search_path so it can't be tricked
+-- into resolving `profiles` to an attacker-planted object earlier in the path.
 create or replace function public.handle_new_user()
-returns trigger language plpgsql security definer as $$
+returns trigger language plpgsql security definer
+set search_path = public, pg_temp as $$
 begin
   insert into public.profiles (id) values (new.id)
   on conflict (id) do nothing;

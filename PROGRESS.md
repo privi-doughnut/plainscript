@@ -15,12 +15,7 @@ Companion docs: `CLAUDE.md` = architecture + safety rules · `PLAINSCRIPT_ROADMA
 - [ ] **Check Cloudflare Workers Builds** — the git auto-deploy stalled on 2026-08-03/04. Fallback that works reliably: `npx wrangler deploy -c wrangler.jsonc` run from `~/plainscript-remote` (NOT `~` — the config path is repo-relative). Worth confirming the pipeline is healthy.
 
 ## 2. Next up when we resume (the "post-limit" list)
-- [ ] **Security sweep** — *Privi asked for this; I can do most of it.* Scope:
-  - **RLS audit** — confirm every Supabase table's row-level security truly isolates users (cabinet privacy depends on it).
-  - **Share-link function** — `get_shared_cabinet()` exposes only the intended narrow columns, token is unguessable, and revoke actually kills access.
-  - **XSS audit** — user notes + openFDA text flow into `innerHTML`; verify `esc()` is applied everywhere (the biggest client-side risk).
-  - **Worker** — confirm the rephrase/qa modes can't be repurposed to generate content, the API key never leaks, and CORS is scoped (`ALLOWED_ORIGIN`).
-  - **Repo/deploy hygiene** — `.git` exposure is fixed (§4); re-confirm no secrets in `config.js` or git history and that `.assetsignore` stays complete.
+- [X] **Security sweep — DONE (2026-08-07).** RLS, share-link function, XSS, secrets, and `.git` all verified/clean; one low finding fixed (`handle_new_user` search_path). One open item for you: the proxy Worker is open/unauthenticated (API-budget abuse risk) → set an Anthropic spend cap + `ALLOWED_ORIGIN`. Full write-up in §4.
 - [ ] **CAC written description** — I can draft the technical writeup; you adapt it to the official form fields.
 - [ ] **Symptom-explanation translations** — the 26 `SYMPTOM_EXPLAIN` "?" definitions + `explain_aria` are English-only (symptom *names* are already localized). One translate pass → full 13-language parity.
 - [ ] **Remaining visual QA / minor polish** — Hindi/Tamil rendering; live spot-check of the new skeletons + dialog animations; narrow-phone header wrapping; printable one-pager print-preview; share-a-cabinet end-to-end in an incognito window; reference-panel (recalls/shortages/FAERS) sub-loaders still use small spinners.
@@ -34,8 +29,21 @@ Companion docs: `CLAUDE.md` = architecture + safety rules · `PLAINSCRIPT_ROADMA
 - **Analytics** — low priority; plenty of CAC/ISEF entries ship without any.
 - **React component libraries (shadcn / 21st.dev / skiper-ui)** — architectural mismatch: Plainscript is vanilla, single-file, no build step. Use only as *visual inspiration*; the polish is hand-built to match.
 
-## 4. Security note (resolved 2026-08-03)
-`.git` was briefly served publicly during a manual full-tree deploy (`.assetsignore` hadn't listed it). Fixed: `.git/`, `PROGRESS.md`, dev docs, and tooling are now excluded; verified `/.git/*` → 404 while public files still serve. No secrets were ever in git history — the Anthropic API key lives only as a Cloudflare Worker secret; `config.js` holds only the public Supabase anon key (RLS-protected). A fuller sweep is queued in §2.
+## 4. Security sweep (done 2026-08-07)
+
+**Solid / verified clean:**
+- **RLS** on `profiles`, `medications`, `cabinet_shares` — every policy scoped to `auth.uid()`; a user can only ever read/write their own rows.
+- **Share links** — `get_shared_cabinet()` is `SECURITY DEFINER` with a locked `search_path`, returns only `generic/brand/drug_class/notes` (never id/user_id/rxcui), checks `revoked_at`, keyed by a 122-bit random token; anon has zero direct table access.
+- **XSS** — 322 `esc()` calls across 70 `innerHTML` sites; spot-check of user-controlled sinks (notes, person, allergies) all escaped.
+- **Secrets** — `config.js` holds only the public Supabase anon key; the Anthropic key exists only as a Worker secret; no secrets in git history.
+- **`.git` exposure** (2026-08-03) — was briefly served during a manual full-tree deploy; fixed in `.assetsignore` (`/.git/*` → 404, public files still serve).
+
+**Fixed this sweep:**
+- `handle_new_user()` now sets an explicit `search_path` (defense-in-depth). ⚠️ **Requires re-running `supabase/schema.sql`** to take effect (idempotent, low priority).
+
+**Open finding — [Medium] the Claude proxy Worker is open + unauthenticated:**
+- CORS defaults to `*` and there's no auth/rate-limit, so anyone with the (public) proxy URL can send rephrase/qa requests and **burn the Anthropic API budget**. Per-call cost is capped (input ≤6000 chars, max_tokens 400/700) and it can only rephrase/extract — no data-breach — but volume abuse is possible.
+- **Recommended mitigations (cheap → thorough):** (1) set an **Anthropic account spend cap** (caps the financial blast radius no matter what — do this first); (2) `npx wrangler secret put ALLOWED_ORIGIN -c wrangler.worker.jsonc` = your site origin (stops cross-site browser abuse); (3) add Cloudflare rate-limiting on the worker route if abuse ever appears.
 
 ---
 
