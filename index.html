@@ -1340,6 +1340,7 @@ const I18N = {
   },
 
   es: {
+    explain_aria: "¿Qué es esto? Mostrar una explicación en lenguaje sencillo",
     pict_eyebrow: "De un vistazo",
     pict_title: "Puntos clave para tomarlo",
     pict_note: "Señales visuales sencillas extraídas de la etiqueta de la FDA de este medicamento. Toca cualquier icono para ver el texto exacto de la etiqueta del que proviene — confírmalo siempre con tu farmacéutico.",
@@ -1752,6 +1753,7 @@ const I18N = {
   },
 
   zh: {
+    explain_aria: "这是什么？显示通俗易懂的解释",
     pict_eyebrow: "一览",
     pict_title: "服用要点",
     pict_note: "从该药物FDA标签中提取的简单视觉提示。点按任一图标可查看其来源的确切标签文字——请务必与药剂师核实。",
@@ -2131,6 +2133,7 @@ const I18N = {
   },
 
   vi: {
+    explain_aria: "Đây là gì? Hiện giải thích bằng ngôn ngữ đơn giản",
     pict_eyebrow: "Nhìn nhanh",
     pict_title: "Những điều quan trọng khi dùng thuốc này",
     pict_note: "Các gợi ý hình ảnh đơn giản lấy từ nhãn FDA của thuốc này. Chạm vào bất kỳ biểu tượng nào để xem đúng câu chữ trên nhãn mà nó xuất phát — luôn kiểm tra lại với dược sĩ.",
@@ -2509,6 +2512,7 @@ const I18N = {
     personal_note_aria: "Ghi chú cá nhân"
   },
   ar: {
+    explain_aria: "ما هذا؟ عرض شرح بلغة بسيطة",
     pict_eyebrow: "لمحة سريعة",
     pict_title: "أمور مهمة عند تناول هذا الدواء",
     pict_note: "إشارات مرئية بسيطة مأخوذة من ملصق FDA لهذا الدواء. انقر على أي رمز لرؤية نص الملصق الدقيق الذي جاء منه — تحقّق دائمًا مع الصيدلي.",
@@ -2928,6 +2932,7 @@ const I18N = {
     shared_view_open_app: "افتح تطبيق Plainscript الكامل ←"
   },
   fr: {
+    explain_aria: "Qu'est-ce que c'est ? Afficher une explication en langage simple",
     pict_eyebrow: "En un coup d'œil",
     pict_title: "Points clés pour la prise",
     pict_note: "Repères visuels simples tirés de l'étiquette FDA de ce médicament. Touchez une icône pour voir le texte exact de l'étiquette dont elle provient — vérifiez toujours auprès de votre pharmacien.",
@@ -3347,6 +3352,7 @@ const I18N = {
     shared_view_open_app: "Ouvrir l'application Plainscript complète →"
   },
   ko: {
+    explain_aria: "이게 뭔가요? 쉬운 말 설명 보기",
     pict_eyebrow: "한눈에 보기",
     pict_title: "복용 시 핵심 사항",
     pict_note: "이 약의 FDA 라벨에서 뽑아낸 간단한 시각 안내입니다. 아이콘을 누르면 그 근거가 된 정확한 라벨 문구를 볼 수 있습니다 — 항상 약사와 다시 확인하세요.",
@@ -8490,32 +8496,32 @@ function renderResults(box, drugs, findings, mentions){
    hover/tap "?" pill on the symptom chip — purely a term definition, not
    advice. English for now; pickLang() falls back to en until translated. */
 const SYMPTOM_EXPLAIN = {
-  athletes_foot:{en:"A common fungal infection between the toes — itchy, flaky, sometimes cracked skin."},
-  jock_itch:{en:"A fungal rash in the groin area — itchy, red, often ring-shaped."},
-  canker_sore:{en:"A small painful ulcer inside the mouth. Not contagious (unlike a cold sore)."},
-  cold_sore:{en:"A small blister on or near the lips, caused by a virus. It's contagious."},
-  postnasal_drip:{en:"Mucus dripping down the back of your throat — often causing a cough or constant throat-clearing."},
-  pms_mood:{en:"PMS = premenstrual syndrome: mood and body symptoms in the days before a period."},
-  breast_tenderness:{en:"Sore or sensitive breasts, often in the days before a period."},
-  pinworms:{en:"Tiny intestinal worms that cause itching around the bottom — common in children."},
-  hives:{en:"Raised, itchy welts on the skin, usually from an allergic reaction."},
-  stye:{en:"A small, painful red bump on the edge of the eyelid."},
-  chafing:{en:"Sore, irritated skin from repeated rubbing — often the inner thighs or groin."},
-  swimmers_ear:{en:"Irritation of the outer ear canal, often from water trapped after swimming."},
-  lice:{en:"Tiny insects that live in the hair and scalp and cause itching."},
-  pubic_lice:{en:"Tiny insects in coarse body hair that cause itching. Also called 'crabs'."},
-  calluses:{en:"Thick, hardened patches of skin from repeated pressure or rubbing."},
-  eczema:{en:"A condition that leaves skin dry, itchy, red, and inflamed."},
-  hemorrhoids:{en:"Swollen veins around the anus that can itch, hurt, or bleed."},
-  nerve_pain:{en:"Burning, tingling, or shooting pain coming from irritated nerves."},
-  growing_pains:{en:"Harmless aching in a child's legs, often in the evening or at night."},
-  lactose_intolerance:{en:"Trouble digesting the sugar in dairy — causing gas, bloating, or cramps."},
-  uti_discomfort:{en:"UTI = urinary tract infection: burning, urgency, or pain when you pee."},
-  yeast_infection:{en:"A common fungal infection causing itching, irritation, and discharge."},
-  hoarse_voice:{en:"A rough or croaky voice — 'laryngitis' means the voice box is inflamed."},
-  migraine:{en:"A severe, often one-sided headache, sometimes with nausea or light sensitivity."},
-  menstrual_migraine:{en:"A migraine (severe headache) that shows up around your period."},
-  dehydration:{en:"When your body loses more fluid than it takes in — thirst, dark urine, dizziness."}
+  athletes_foot:{en:"A common fungal infection between the toes — itchy, flaky, sometimes cracked skin.", es:"Una infección por hongos común entre los dedos del pie: picazón, descamación y a veces piel agrietada.", zh:"脚趾之间常见的真菌感染——发痒、脱皮，有时皮肤皲裂。", vi:"Nhiễm nấm thường gặp ở kẽ ngón chân — ngứa, bong tróc, đôi khi nứt da.", ar:"عدوى فطرية شائعة بين أصابع القدم — حكة وتقشّر وأحيانًا تشقّق الجلد.", fr:"Une infection fongique courante entre les orteils — démangeaisons, desquamation, parfois peau crevassée.", ko:"발가락 사이에 흔한 곰팡이 감염 — 가렵고 각질이 일고 때로 피부가 갈라집니다."},
+  jock_itch:{en:"A fungal rash in the groin area — itchy, red, often ring-shaped.", es:"Un sarpullido por hongos en la ingle: con picazón, rojo y a menudo en forma de anillo.", zh:"腹股沟部位的真菌性皮疹——发痒、发红，常呈环形。", vi:"Phát ban do nấm ở vùng bẹn — ngứa, đỏ, thường có hình vòng.", ar:"طفح فطري في منطقة الأربية — مثير للحكة، أحمر، وغالبًا على شكل حلقة.", fr:"Une éruption fongique à l'aine — qui démange, rouge, souvent en forme d'anneau.", ko:"사타구니 부위의 곰팡이 발진 — 가렵고 붉으며 흔히 고리 모양입니다."},
+  canker_sore:{en:"A small painful ulcer inside the mouth. Not contagious (unlike a cold sore).", es:"Una pequeña úlcera dolorosa dentro de la boca. No es contagiosa (a diferencia del herpes labial).", zh:"口腔内的小而疼痛的溃疡。不具传染性（与唇疱疹不同）。", vi:"Vết loét nhỏ đau trong miệng. Không lây (khác với mụn rộp môi).", ar:"قرحة صغيرة مؤلمة داخل الفم. غير معدية (بخلاف قرحة البرد).", fr:"Un petit ulcère douloureux à l'intérieur de la bouche. Non contagieux (contrairement au bouton de fièvre).", ko:"입안에 생기는 작고 아픈 궤양. (입술 물집과 달리) 전염되지 않습니다."},
+  cold_sore:{en:"A small blister on or near the lips, caused by a virus. It's contagious.", es:"Una pequeña ampolla en los labios o cerca, causada por un virus. Es contagiosa.", zh:"嘴唇上或附近的小水泡，由病毒引起，具有传染性。", vi:"Mụn nước nhỏ trên hoặc gần môi, do vi-rút gây ra. Có lây.", ar:"بثرة صغيرة على الشفتين أو بالقرب منهما، يسببها فيروس. وهي معدية.", fr:"Une petite cloque sur ou près des lèvres, causée par un virus. C'est contagieux.", ko:"입술 위나 근처에 생기는 작은 물집으로, 바이러스가 원인입니다. 전염됩니다."},
+  postnasal_drip:{en:"Mucus dripping down the back of your throat — often causing a cough or constant throat-clearing.", es:"Moco que gotea por la parte de atrás de la garganta, a menudo causando tos o carraspeo constante.", zh:"黏液沿咽喉后部下流——常引起咳嗽或不停清嗓子。", vi:"Dịch nhầy chảy xuống phía sau cổ họng — thường gây ho hoặc hắng giọng liên tục.", ar:"مخاط يتقطّر إلى مؤخرة الحلق — غالبًا ما يسبب سعالًا أو تنحنحًا مستمرًا.", fr:"Du mucus qui coule à l'arrière de la gorge — provoquant souvent une toux ou un raclement de gorge constant.", ko:"콧물이 목 뒤로 흘러내리는 것 — 흔히 기침이나 계속 목을 가다듬게 만듭니다."},
+  pms_mood:{en:"PMS = premenstrual syndrome: mood and body symptoms in the days before a period.", es:"SPM = síndrome premenstrual: síntomas de ánimo y cuerpo en los días antes del periodo.", zh:"PMS＝经前综合征：月经前几天出现的情绪和身体症状。", vi:"PMS = hội chứng tiền kinh nguyệt: các triệu chứng tâm trạng và cơ thể trong những ngày trước kỳ kinh.", ar:"PMS = المتلازمة السابقة للحيض: أعراض مزاجية وجسدية في الأيام التي تسبق الدورة.", fr:"SPM = syndrome prémenstruel : symptômes d'humeur et physiques dans les jours avant les règles.", ko:"PMS = 월경 전 증후군: 생리 며칠 전에 나타나는 기분·신체 증상."},
+  breast_tenderness:{en:"Sore or sensitive breasts, often in the days before a period.", es:"Senos doloridos o sensibles, a menudo en los días previos al periodo.", zh:"乳房酸痛或敏感，常在月经前几天出现。", vi:"Ngực đau hoặc nhạy cảm, thường trong những ngày trước kỳ kinh.", ar:"ألم أو حساسية في الثديين، غالبًا في الأيام التي تسبق الدورة.", fr:"Seins douloureux ou sensibles, souvent dans les jours précédant les règles.", ko:"가슴이 아프거나 예민한 상태로, 흔히 생리 며칠 전에 나타납니다."},
+  pinworms:{en:"Tiny intestinal worms that cause itching around the bottom — common in children.", es:"Pequeños gusanos intestinales que causan picazón alrededor del ano; comunes en niños.", zh:"引起肛门周围瘙痒的微小肠道寄生虫——儿童常见。", vi:"Giun đường ruột nhỏ gây ngứa quanh hậu môn — thường gặp ở trẻ em.", ar:"ديدان معوية صغيرة تسبب حكة حول الشرج — شائعة عند الأطفال.", fr:"De minuscules vers intestinaux qui provoquent des démangeaisons autour de l'anus — fréquents chez l'enfant.", ko:"항문 주위 가려움을 일으키는 작은 장내 기생충 — 어린이에게 흔합니다."},
+  hives:{en:"Raised, itchy welts on the skin, usually from an allergic reaction.", es:"Ronchas elevadas y con picazón en la piel, normalmente por una reacción alérgica.", zh:"皮肤上凸起、发痒的风团，通常由过敏反应引起。", vi:"Các nốt sẩn nổi, ngứa trên da, thường do phản ứng dị ứng.", ar:"بثور بارزة ومثيرة للحكة على الجلد، عادةً بسبب رد فعل تحسسي.", fr:"Des plaques surélevées qui démangent sur la peau, généralement dues à une réaction allergique.", ko:"피부에 솟아오른 가려운 발진으로, 대개 알레르기 반응 때문입니다."},
+  stye:{en:"A small, painful red bump on the edge of the eyelid.", es:"Un pequeño bulto rojo y doloroso en el borde del párpado.", zh:"眼睑边缘一个又小又痛的红色肿块。", vi:"Một nốt đỏ nhỏ, đau ở mép mí mắt.", ar:"نتوء أحمر صغير ومؤلم على حافة الجفن.", fr:"Une petite bosse rouge et douloureuse au bord de la paupière.", ko:"눈꺼풀 가장자리에 생기는 작고 아픈 붉은 혹."},
+  chafing:{en:"Sore, irritated skin from repeated rubbing — often the inner thighs or groin.", es:"Piel irritada y dolorida por el roce repetido, a menudo en la entrepierna o las ingles.", zh:"反复摩擦造成的皮肤酸痛、刺激——常见于大腿内侧或腹股沟。", vi:"Da đau, kích ứng do cọ xát lặp đi lặp lại — thường ở đùi trong hoặc bẹn.", ar:"جلد متألم ومتهيّج بسبب الاحتكاك المتكرر — غالبًا في باطن الفخذين أو الأربية.", fr:"Peau irritée et douloureuse due à un frottement répété — souvent l'intérieur des cuisses ou l'aine.", ko:"반복적인 마찰로 인한 쓰라리고 자극된 피부 — 흔히 허벅지 안쪽이나 사타구니."},
+  swimmers_ear:{en:"Irritation of the outer ear canal, often from water trapped after swimming.", es:"Irritación del canal del oído externo, a menudo por agua atrapada tras nadar.", zh:"外耳道的炎症，常因游泳后耳内积水引起。", vi:"Viêm ống tai ngoài, thường do nước đọng lại sau khi bơi.", ar:"التهاب قناة الأذن الخارجية، غالبًا بسبب ماء محتبس بعد السباحة.", fr:"Irritation du conduit auditif externe, souvent due à de l'eau restée après la baignade.", ko:"바깥귀길의 염증으로, 흔히 수영 후 물이 갇혀 생깁니다."},
+  lice:{en:"Tiny insects that live in the hair and scalp and cause itching.", es:"Pequeños insectos que viven en el cabello y el cuero cabelludo y causan picazón.", zh:"生活在头发和头皮上、引起瘙痒的微小昆虫。", vi:"Côn trùng nhỏ sống trên tóc và da đầu và gây ngứa.", ar:"حشرات صغيرة تعيش في الشعر وفروة الرأس وتسبب حكة.", fr:"De minuscules insectes qui vivent dans les cheveux et le cuir chevelu et provoquent des démangeaisons.", ko:"머리카락과 두피에 살며 가려움을 일으키는 작은 곤충."},
+  pubic_lice:{en:"Tiny insects in coarse body hair that cause itching. Also called 'crabs'.", es:"Pequeños insectos en el vello grueso del cuerpo que causan picazón. También llamados «ladillas».", zh:"寄生在粗体毛上、引起瘙痒的微小昆虫，也叫「阴虱」。", vi:"Côn trùng nhỏ sống ở lông thô trên cơ thể, gây ngứa. Còn gọi là 'rận mu'.", ar:"حشرات صغيرة تعيش في شعر الجسم الخشن وتسبب حكة. تُسمى أيضًا 'قمل العانة'.", fr:"De minuscules insectes dans les poils épais du corps qui provoquent des démangeaisons. Aussi appelés « morpions ».", ko:"굵은 체모에 사는, 가려움을 일으키는 작은 곤충. '사면발니'라고도 합니다."},
+  calluses:{en:"Thick, hardened patches of skin from repeated pressure or rubbing.", es:"Parches de piel gruesa y endurecida por presión o roce repetido.", zh:"因反复受压或摩擦而形成的厚硬皮肤斑块。", vi:"Các mảng da dày, chai cứng do áp lực hoặc cọ xát lặp đi lặp lại.", ar:"بقع جلدية سميكة ومتصلّبة بسبب الضغط أو الاحتكاك المتكرر.", fr:"Des plaques de peau épaisse et durcie dues à une pression ou un frottement répété.", ko:"반복적인 압력이나 마찰로 두껍고 딱딱해진 피부 부위."},
+  eczema:{en:"A condition that leaves skin dry, itchy, red, and inflamed.", es:"Una afección que deja la piel seca, con picazón, roja e inflamada.", zh:"一种使皮肤干燥、发痒、发红和发炎的状况。", vi:"Một tình trạng làm da khô, ngứa, đỏ và viêm.", ar:"حالة تجعل الجلد جافًا ومثيرًا للحكة وأحمر وملتهبًا.", fr:"Une affection qui rend la peau sèche, qui démange, rouge et enflammée.", ko:"피부를 건조하고 가렵고 붉고 염증 있게 만드는 질환."},
+  hemorrhoids:{en:"Swollen veins around the anus that can itch, hurt, or bleed.", es:"Venas hinchadas alrededor del ano que pueden picar, doler o sangrar.", zh:"肛门周围肿胀的静脉，可能发痒、疼痛或出血。", vi:"Các tĩnh mạch sưng quanh hậu môn, có thể ngứa, đau hoặc chảy máu.", ar:"أوردة منتفخة حول الشرج قد تسبب الحكة أو الألم أو النزيف.", fr:"Des veines gonflées autour de l'anus qui peuvent démanger, faire mal ou saigner.", ko:"항문 주위의 부은 정맥으로, 가렵거나 아프거나 피가 날 수 있습니다."},
+  nerve_pain:{en:"Burning, tingling, or shooting pain coming from irritated nerves.", es:"Dolor ardiente, con hormigueo o punzante que viene de nervios irritados.", zh:"来自受刺激神经的灼烧、刺痛或放射性疼痛。", vi:"Đau rát, châm chích hoặc như điện giật xuất phát từ dây thần kinh bị kích thích.", ar:"ألم حارق أو وخز أو ألم كهربائي ناتج عن أعصاب متهيّجة.", fr:"Douleur brûlante, de picotement ou fulgurante provenant de nerfs irrités.", ko:"자극받은 신경에서 오는 타는 듯하거나 저리거나 찌르는 통증."},
+  growing_pains:{en:"Harmless aching in a child's legs, often in the evening or at night.", es:"Dolores inofensivos en las piernas de un niño, a menudo por la tarde o la noche.", zh:"儿童腿部无害的酸痛，常在傍晚或夜间出现。", vi:"Cơn đau vô hại ở chân trẻ em, thường vào buổi tối hoặc ban đêm.", ar:"آلام غير ضارة في ساقي الطفل، غالبًا في المساء أو الليل.", fr:"Des douleurs sans gravité dans les jambes d'un enfant, souvent le soir ou la nuit.", ko:"주로 저녁이나 밤에 나타나는, 아이 다리의 해롭지 않은 통증."},
+  lactose_intolerance:{en:"Trouble digesting the sugar in dairy — causing gas, bloating, or cramps.", es:"Dificultad para digerir el azúcar de los lácteos, causando gases, hinchazón o cólicos.", zh:"难以消化乳制品中的糖，导致胀气、腹胀或痉挛。", vi:"Khó tiêu hóa đường trong sữa — gây đầy hơi, chướng bụng hoặc đau quặn.", ar:"صعوبة في هضم سكر الحليب — تسبب الغازات أو الانتفاخ أو التقلصات.", fr:"Difficulté à digérer le sucre des produits laitiers — provoquant gaz, ballonnements ou crampes.", ko:"유제품의 당을 소화하기 어려워 가스, 복부 팽만, 경련이 생기는 것."},
+  uti_discomfort:{en:"UTI = urinary tract infection: burning, urgency, or pain when you pee.", es:"ITU = infección urinaria: ardor, urgencia o dolor al orinar.", zh:"UTI＝尿路感染：排尿时灼痛、尿急或疼痛。", vi:"UTI = nhiễm trùng đường tiết niệu: rát, buồn tiểu gấp hoặc đau khi đi tiểu.", ar:"UTI = عدوى المسالك البولية: حرقة أو إلحاح أو ألم عند التبول.", fr:"IU = infection urinaire : brûlure, envie pressante ou douleur en urinant.", ko:"UTI = 요로 감염: 소변 볼 때 화끈거림, 급박뇨 또는 통증."},
+  yeast_infection:{en:"A common fungal infection causing itching, irritation, and discharge.", es:"Una infección por hongos común que causa picazón, irritación y flujo.", zh:"一种常见的真菌感染，引起瘙痒、刺激和分泌物。", vi:"Một nhiễm nấm thường gặp gây ngứa, kích ứng và tiết dịch.", ar:"عدوى فطرية شائعة تسبب الحكة والتهيّج والإفرازات.", fr:"Une infection fongique courante provoquant démangeaisons, irritation et pertes.", ko:"가려움, 자극, 분비물을 일으키는 흔한 곰팡이 감염."},
+  hoarse_voice:{en:"A rough or croaky voice — 'laryngitis' means the voice box is inflamed.", es:"Una voz ronca o áspera; «laringitis» significa que la laringe está inflamada.", zh:"声音嘶哑或沙哑；「喉炎」是指声带发炎。", vi:"Giọng khàn hoặc khản — 'viêm thanh quản' nghĩa là hộp thanh quản bị viêm.", ar:"صوت أجش أو خشن — 'التهاب الحنجرة' يعني التهاب صندوق الصوت.", fr:"Une voix rauque ou éraillée — « laryngite » signifie que le larynx est enflammé.", ko:"쉬거나 갈라진 목소리 — '후두염'은 성대에 염증이 생겼다는 뜻입니다."},
+  migraine:{en:"A severe, often one-sided headache, sometimes with nausea or light sensitivity.", es:"Un dolor de cabeza intenso, a menudo de un solo lado, a veces con náuseas o sensibilidad a la luz.", zh:"一种剧烈、常为单侧的头痛，有时伴有恶心或对光敏感。", vi:"Cơn đau đầu dữ dội, thường một bên, đôi khi kèm buồn nôn hoặc nhạy cảm với ánh sáng.", ar:"صداع شديد، غالبًا في جانب واحد، أحيانًا مع غثيان أو حساسية للضوء.", fr:"Un mal de tête intense, souvent d'un seul côté, parfois avec nausées ou sensibilité à la lumière.", ko:"심하고 흔히 한쪽에 오는 두통으로, 때로 메스꺼움이나 빛 예민함을 동반합니다."},
+  menstrual_migraine:{en:"A migraine (severe headache) that shows up around your period.", es:"Una migraña (dolor de cabeza intenso) que aparece cerca del periodo.", zh:"在月经前后出现的偏头痛（剧烈头痛）。", vi:"Cơn đau nửa đầu (đau đầu dữ dội) xuất hiện quanh kỳ kinh.", ar:"صداع نصفي (صداع شديد) يظهر قرب موعد الدورة.", fr:"Une migraine (mal de tête intense) qui survient autour des règles.", ko:"생리 즈음에 나타나는 편두통(심한 두통)."},
+  dehydration:{en:"When your body loses more fluid than it takes in — thirst, dark urine, dizziness.", es:"Cuando tu cuerpo pierde más líquido del que recibe: sed, orina oscura, mareo.", zh:"当身体失去的水分多于摄入时——口渴、尿色深、头晕。", vi:"Khi cơ thể mất nhiều nước hơn lượng nạp vào — khát, nước tiểu sẫm màu, chóng mặt.", ar:"عندما يفقد جسمك سوائل أكثر مما يأخذ — عطش، بول داكن، دوخة.", fr:"Quand ton corps perd plus de liquide qu'il n'en reçoit — soif, urine foncée, vertiges.", ko:"몸이 섭취하는 것보다 더 많은 수분을 잃을 때 — 갈증, 짙은 소변, 어지럼."}
 };
 function renderSymptomList(){
   // grouped into collapsible <details> sections so a long list stays scannable.
