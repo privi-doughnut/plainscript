@@ -16,9 +16,10 @@ Companion docs: `CLAUDE.md` = architecture + safety rules · `PLAINSCRIPT_ROADMA
 
 ## 2. Next up when we resume (the "post-limit" list)
 - [X] **Security sweep — DONE (2026-08-07).** RLS, share-link function, XSS, secrets, and `.git` all verified/clean; one low finding fixed (`handle_new_user` search_path). One open item for you: the proxy Worker is open/unauthenticated (API-budget abuse risk) → set an Anthropic spend cap + `ALLOWED_ORIGIN`. Full write-up in §4.
-- [ ] **CAC written description** — I can draft the technical writeup; you adapt it to the official form fields.
-- [ ] **Symptom-explanation translations** — the 26 `SYMPTOM_EXPLAIN` "?" definitions + `explain_aria` are English-only (symptom *names* are already localized). One translate pass → full 13-language parity.
-- [ ] **Remaining visual QA / minor polish** — Hindi/Tamil rendering; live spot-check of the new skeletons + dialog animations; narrow-phone header wrapping; printable one-pager print-preview; share-a-cabinet end-to-end in an incognito window; reference-panel (recalls/shortages/FAERS) sub-loaders still use small spinners.
+- [X] **CAC written description — DONE (2026-08-07).** Draft at `CAC_SUBMISSION.md` (excluded from the public site); factual parts written, personal-voice bits marked `[PRIVI: …]`.
+- [X] **Symptom-explanation translations — DONE (2026-08-08).** The 26 `SYMPTOM_EXPLAIN` definitions + `explain_aria` now in all 13 languages (2 committed batches, parity verified). No English fallback remains.
+- [X] **Reference-panel skeletons — DONE.** Recalls/shortages/FAERS sub-loaders now use mini-skeletons; the spinner→skeleton sweep is complete app-wide.
+- [ ] **Remaining live visual QA (optional)** — Hindi/Tamil rendering; spot-check of skeletons + dialog animations; narrow-phone header wrapping; printable one-pager print-preview; share-a-cabinet end-to-end in incognito. (Main features already verified in-browser this session.)
 
 ## 3. Deferred / decided-against (don't rebuild without a reason)
 - **Interaction timing timeline** — marginal over the existing schedule strip; the novel part (spacing conflicts) needs timing data that isn't structured. Recommend skipping.
