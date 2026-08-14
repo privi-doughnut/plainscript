@@ -662,7 +662,47 @@
 
   @media (max-width:560px){
     .brand h1{font-size:25px;}
-    .tab{padding:10px 9px; font-size:14px;}
+
+    /* The tab labels are short sentences ("Decode a medication"), so four of
+       them physically cannot fit a 320-360px phone — they used to run off the
+       right edge and drag the whole page into horizontal scroll. Let the strip
+       itself scroll instead, and reclaim width by dropping the decorative
+       01-04 counters.
+       Deliberately no edge-fade affordance: a CSS mask is physical-direction
+       only, so in RTL (Arabic) it lands on the wrong edge and dims the active
+       tab, and it fades even in languages whose labels are short enough that
+       there's nothing to scroll. The tab visibly cut off at the edge already
+       does that job. */
+    .tabs{overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;}
+    .tabs::-webkit-scrollbar{display:none;}
+    .tab{padding:10px 9px; font-size:14px; flex:0 0 auto; white-space:nowrap;}
+    .tab .num{display:none;}
+
+    /* iOS Safari auto-zooms the page whenever you focus a control whose
+       font-size is under 16px — and never zooms back out. Every text input
+       is already 16px; these three weren't. */
+    .mednote textarea, .meta-input, .lang-select-wrap select{font-size:16px;}
+
+    /* 3 stat tiles across a 320px screen leaves ~87px each — too tight for
+       the number + its label. */
+    .stat-tiles{grid-template-columns:repeat(2,1fr);}
+  }
+
+  /* ---------- non-Latin script corrections ----------
+     The mono "instrument" texture is a Latin-only effect. Two problems in the
+     other scripts we ship:
+       1. Spline Sans Mono has no Arabic/Devanagari/Tamil/CJK coverage, so those
+          labels silently fall back to some arbitrary system font anyway.
+       2. letter-spacing is actively destructive there — in Arabic it severs the
+          cursive joins between letters, and in Devanagari/Tamil it splits
+          conjuncts apart. text-transform:uppercase is simply meaningless.
+     So for those languages only, drop the tracking and use the UI sans. Latin
+     languages are untouched and keep the signature look. */
+  html:is([lang="ar"],[lang="hi"],[lang="ta"],[lang="zh"],[lang="ja"],[lang="ko"])
+  :is(.eyebrow, .brand .tag, .themetoggle, .acct, .mini, .expand, .row .src,
+      .verdict .pair, .sev .pill, .lang-select-wrap select, footer){
+    font-family:var(--sans);
+    letter-spacing:normal;
   }
 </style>
 </head>
@@ -10398,11 +10438,18 @@ $("#cabinet-body").addEventListener("keydown", e => {
 
 /* --- boot -------------------------------------------------------- */
 (async function initAccounts(){
-  // restore a saved language preference before anything else renders
-  try{
-    const storedLang = localStorage.getItem(LANG_KEY);
-    if (storedLang && SUPPORTED_LANGS.includes(storedLang)) applyLang(storedLang, {persist:false});
-  }catch(e){/* ignore — defaults to English */}
+  // Restore a saved language preference before anything else renders.
+  // NOTE: applyLang() is the ONLY caller of applyTranslations(), and every
+  // static [data-i18n] label ships empty in the HTML (tabs, the Decode/Check
+  // buttons, the safety-bar disclaimer, the FAQ). So this call must be
+  // UNCONDITIONAL — gating it on a stored preference meant a first-time
+  // visitor, who has nothing in localStorage yet, got a page with blank
+  // labels and, worse, a blank safety disclaimer. Anyone testing with a
+  // previously-visited browser never saw it.
+  let storedLang = null;
+  try{ storedLang = localStorage.getItem(LANG_KEY); }
+  catch(e){/* private mode / storage blocked — fall through to English */}
+  applyLang(SUPPORTED_LANGS.includes(storedLang) ? storedLang : "en", {persist:false});
 
   // a ?share=<token> link takes over the whole page — no session, no
   // sign-in, nothing else in this function is relevant to that visitor
