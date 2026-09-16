@@ -1,6 +1,16 @@
 # Plainscript — Progress & Status
 
-*Last updated: 2026-08-04*
+*Last updated: 2026-08-18*
+
+> ⚠️ **The live site is one commit behind, and that commit is the important one.**
+> `main` locally is ahead of `origin/main` by `56b1959` ("Fix blank-label first visit
+> + real mobile layout bugs") — verified 2026-08-18 that the deployed site byte-for-byte
+> matches `origin/main`, so **the first-visit blank-label bug is still live**: anyone
+> opening plainscript for the first time (fresh browser, nothing in localStorage —
+> i.e. every CAC judge) sees no tab labels, no button text, no FAQ, and a blank safety
+> disclaimer. Fix is written and committed locally; it just needs `git push` + a deploy.
+> There is also one uncommitted one-line fix in `index.html` (hide the language selector
+> in the printable cabinet one-pager). **Push + deploy is the top priority next session.**
 
 **The app is essentially feature-complete and polished.** We're past building core features — what remains is (1) Congressional App Challenge submission packaging, (2) a few content/dashboard items only Privi can do, and (3) optional polish + a planned security sweep. **CAC deadline: Oct 26, 2026.**
 
@@ -19,6 +29,13 @@ Companion docs: `CLAUDE.md` = architecture + safety rules · `PLAINSCRIPT_ROADMA
 - [X] **CAC written description — DONE (2026-08-07).** Draft at `CAC_SUBMISSION.md` (excluded from the public site); factual parts written, personal-voice bits marked `[PRIVI: …]`.
 - [X] **Symptom-explanation translations — DONE (2026-08-08).** The 26 `SYMPTOM_EXPLAIN` definitions + `explain_aria` now in all 13 languages (2 committed batches, parity verified). No English fallback remains.
 - [X] **Reference-panel skeletons — DONE.** Recalls/shortages/FAERS sub-loaders now use mini-skeletons; the spinner→skeleton sweep is complete app-wide.
+- [X] **First-visit blank-label bug — FIXED in code (2026-08-14), NOT YET LIVE.** `applyTranslations()`
+  is only reachable via `applyLang()`, and boot used to call it only when a language was already
+  saved. Boot now calls it unconditionally, defaulting to English (`index.html:10441-10453`).
+  Shipped alongside real mobile fixes: tab strip overflow at 320-360px, three sub-16px controls
+  that made iOS Safari auto-zoom on focus, cabinet stat tiles 3→2 columns on narrow phones, and
+  no more mono/letter-spacing on non-Latin labels. **Needs push + deploy — see the callout up top.**
+- [X] **Smoothness pass (2026-08-12).** Dropped modal backdrop-blur; hover-pill listeners are O(1) via `matches()`.
 - [ ] **Remaining live visual QA (optional)** — Hindi/Tamil rendering; spot-check of skeletons + dialog animations; narrow-phone header wrapping; printable one-pager print-preview; share-a-cabinet end-to-end in incognito. (Main features already verified in-browser this session.)
 
 ## 3. Deferred / decided-against (don't rebuild without a reason)
