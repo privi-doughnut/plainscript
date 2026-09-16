@@ -1,16 +1,12 @@
 # Plainscript — Progress & Status
 
-*Last updated: 2026-08-18*
+*Last updated: 2026-09-16*
 
-> ⚠️ **The live site is one commit behind, and that commit is the important one.**
-> `main` locally is ahead of `origin/main` by `56b1959` ("Fix blank-label first visit
-> + real mobile layout bugs") — verified 2026-08-18 that the deployed site byte-for-byte
-> matches `origin/main`, so **the first-visit blank-label bug is still live**: anyone
-> opening plainscript for the first time (fresh browser, nothing in localStorage —
-> i.e. every CAC judge) sees no tab labels, no button text, no FAQ, and a blank safety
-> disclaimer. Fix is written and committed locally; it just needs `git push` + a deploy.
-> There is also one uncommitted one-line fix in `index.html` (hide the language selector
-> in the printable cabinet one-pager). **Push + deploy is the top priority next session.**
+> ⚠️ **`origin/main` is one commit ahead of the deployed site.** Commit `e6fc0f4`
+> ("Fix P0 safety/privacy bugs") is pushed but not yet deployed — run
+> `npx wrangler deploy -c wrangler.jsonc` from `~/plainscript-remote` to ship it.
+> (The earlier first-visit blank-label bug from `56b1959` IS deployed and
+> verified live as of 2026-09-16 — byte-for-byte matched against `origin/main`.)
 
 **The app is essentially feature-complete and polished.** We're past building core features — what remains is (1) Congressional App Challenge submission packaging, (2) a few content/dashboard items only Privi can do, and (3) optional polish + a planned security sweep. **CAC deadline: Oct 26, 2026.**
 
@@ -20,9 +16,13 @@ Companion docs: `CLAUDE.md` = architecture + safety rules · `PLAINSCRIPT_ROADMA
 
 ## 1. Only Privi can do these
 - [ ] **"Why I built this"** — fill the `[PRIVI: voice this]` placeholder in `README.md`, in your own voice.
-- [ ] **CAC demo video** — required for the submission.
+- [ ] **`[PRIVI: personal spark]` + `[PRIVI: 2-3 real challenges]`** in `CAC_SUBMISSION.md` — every comparable past CAC winner researched (PillPall, CareCompanion, Your Medicine) had a concrete personal story; this is the biggest lever left on the Concept score.
+- [ ] **CAC demo video** — required for the submission per the 2026 rules.
+- [ ] **Deploy commit `e6fc0f4`** — `npx wrangler deploy -c wrangler.jsonc` from `~/plainscript-remote` (direct wrangler execution is blocked for Claude by the auto-mode classifier; run with the `!` prefix).
 - [ ] **Enable Google sign-in** — Supabase → Authentication → Providers → Google: toggle on + Client ID/Secret from Google Cloud Console (OAuth "Web application"); set that client's Authorized redirect URI to `https://rxwbyyhukmxsknmhhzsn.supabase.co/auth/v1/callback`. (Magic-link already works, so this is optional-ish.)
 - [ ] **Check Cloudflare Workers Builds** — the git auto-deploy stalled on 2026-08-03/04. Fallback that works reliably: `npx wrangler deploy -c wrangler.jsonc` run from `~/plainscript-remote` (NOT `~` — the config path is repo-relative). Worth confirming the pipeline is healthy.
+- [ ] **Legal/compliance decisions** (full findings in §6 below) — highest priority: publish a real Privacy Policy + Terms and link them from the footer (Washington's My Health My Data Act has no small-app exemption and requires this). Get actual attorney review before wide public launch — not just for CAC.
+- [ ] **Mobile scope decided 2026-09-16: PWA app-shell polish now, native app-store wrap only as a post-submission stretch goal** (not started before Oct 26). See §7 for what "polish" means concretely.
 
 ## 2. Next up when we resume (the "post-limit" list)
 - [X] **Security sweep — DONE (2026-08-07).** RLS, share-link function, XSS, secrets, and `.git` all verified/clean; one low finding fixed (`handle_new_user` search_path). One open item for you: the proxy Worker is open/unauthenticated (API-budget abuse risk) → set an Anthropic spend cap + `ALLOWED_ORIGIN`. Full write-up in §4.
@@ -75,3 +75,46 @@ Companion docs: `CLAUDE.md` = architecture + safety rules · `PLAINSCRIPT_ROADMA
 - **Pictogram "Understand Mode"**, **PWA** (installable, offline app-shell), **dark theme**, an accessibility pass (WCAG contrast, focus states, reduced-motion), and an anti-slop **design polish** pass (active-press feedback, tabular numerals, balanced headings, spring dialog entrances, deterministic skeletons).
 
 **Safety invariants (never violate):** every fact comes from openFDA / RxNorm / the curated set; the LLM only rephrases retrieved text, never generates medical claims; no green "safe"; every claim shows its source; disclaimers stay persistent. No diagnosis, no dosing advice, no "should I take this."
+
+---
+
+## 6. Bug & graceful-failure audit (2026-09-16)
+
+Full read-through of `index.html`, `worker.js`, `config.js`, `supabase/schema.sql`. P0s below are fixed (commit `e6fc0f4`, needs deploy — see §1); P1/P2 are queued, not yet done.
+
+**Fixed:**
+- [X] **Silent FDA-lookup failure looked identical to "nothing found."** `resolveForAnalysis()` now flags a genuine fetch failure (`labelUnverified`) separately from a normal no-match, and both the Check tab and Cabinet Scan show an explicit "couldn't fully check X" warning instead of silently proceeding to the ordinary empty state.
+- [X] **Share-link QR leaked the live access token to a third party.** `api.qrserver.com` used to receive the full share URL (token included) every time the Share panel opened. Now rendered entirely client-side via a vendored, dependency-free `qrcode-generator` (MIT; round-trip encode/decode verified in Node before inlining — see the `<script>` block right after `config.js`).
+
+**Queued — not yet fixed:**
+- [ ] **P1** — Duplicate/self-matching drug entries aren't deduped in the Check tab; a drug can "interact" with itself if its own label mentions its own generic name (`labelMentions`, `analyzeDrugPairs`).
+- [ ] **P1** — Drug resolution in Check/Scan is sequential (`await` in a loop) with no per-drug progress or count cap; a long list reads as hung on a slow connection.
+- [ ] **P1** — The Plain-English Worker retry never actually engages because `worker.js` returns HTTP 200 even when the upstream Claude call fails (`data.content` missing → `{plain:""}` at 200). Harmless today (falls back to raw FDA text correctly) but the retry-on-hiccup design silently doesn't fire.
+- [ ] **P2** — No client-side max-length check on drug-name/note inputs before hitting openFDA/Supabase; an extreme-length input surfaces a raw "FDA service error (414)" instead of a friendly message.
+- [ ] **P2** — Missing i18n keys fall back to the raw key string (e.g. `decode_type_first`) rather than blank — acceptable, worth a lint pass before submission.
+- [ ] **P2** — `sw.js` caches a network response without `event.waitUntil`; on fast page-unload the write can silently drop (offline fallback is best-effort here, not the initial app-shell cache).
+- Not independently re-verified, already flagged as pending visual QA in §2: Arabic RTL under real content, missing-translation-key visual behavior across all 13 languages, multi-person cabinet with zero people, a share link opened after the sharer's account is deleted.
+
+## 7. Legal/compliance preflight (2026-09-16) — NOT LEGAL ADVICE
+
+Risk-spotting pass only (no legal skill/plugin exists on this machine). Get an actual attorney before wide public launch — many do free/low-cost review for student projects, or ask if CAC/your school has pro-bono legal resources.
+
+| Item | Status | Risk | Recommendation |
+|---|---|---|---|
+| Privacy Policy + Terms of Service | **Absent** — no page, no footer link | Med | Write and link from the footer next to "Report an error," in all 13 languages eventually. |
+| Washington My Health My Data Act (+ similar state consumer-health-data laws) | **Absent protection** | **Med-High, highest priority** | No small-app exemption — "what medications a user takes" is consumer health data. Requires a prominently-linked privacy policy + opt-in consent at signup. Nevada/Connecticut have similar statutes; one well-written policy covers the superset. |
+| COPPA | Low real exposure | Low | Not directed at under-13s; no action needed. |
+| ADA/WCAG 2.1 AA | Partially addressed, undocumented | Med | Contrast/focus/reduced-motion/ARIA already done per `CLAUDE.md`; run an automated axe/Lighthouse audit and keep the output on file. |
+| FDA Software-as-a-Medical-Device / CDS boundary | Likely fine | Low-Med | Current non-goals (no diagnosis, no dosing, never "safe," always sourced, always routes emergencies out) keep it in the low-risk zone. Don't add anything that recommends a course of action. |
+| App store requirements (if native/PWA-wrapped later) | Not ready | Med-High, only if pursued | Apple/Google both require a live privacy-policy URL and **in-app self-service account deletion** for account-creating apps — Plainscript has neither yet; deletion needs a service-role-key server function (can't be done from the anon client key). Deferred per the 2026-09-16 mobile-scope decision (PWA-only for CAC). |
+
+## 8. Feature/moving-parts gap-check (2026-09-16)
+
+Checked what's actually wired vs. what `PLAINSCRIPT_ROADMAP.md` claims. Good news: `config.js` already has live Supabase + Worker keys, so accounts, My Cabinet, and Plain-English mode are genuinely live in production — the roadmap doc's ⬜ marks on those are just stale. Glossary tooltips also already exist.
+
+- [ ] **Real gap: dosing reminders are passive-only.** There's an "expiring soon" banner shown only if you happen to open the app — no actual `Notification` API / scheduled local push for "take your 8am dose." No `Notification.`/`pushManager` usage anywhere in the codebase. This is the one functional (non-aesthetic) hole, and it's exactly what a direct CAC competitor (CareCompanion) leans on hardest. Worth adding via feature-detect-and-degrade, same pattern as voice input.
+- Everything else on the roadmap is either shipped or a deliberate, already-justified non-goal (symptom checker, pill imprint ID, analytics) — see roadmap §"Deferred / decided-against."
+
+## 9. Mobile/web design direction (decided 2026-09-16)
+
+**Decision: polish the PWA app-shell now (bottom tab nav on mobile widths, native-feeling view transitions, splash screen, safe-area/notch handling), still single-file vanilla JS, no new build tooling. Native app-store wrapping (Capacitor/PWABuilder) is a post-submission stretch goal only** — going straight for native builds now risked the Oct 26 deadline via Xcode/Play Console review lead time. Not started yet.
