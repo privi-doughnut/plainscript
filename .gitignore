@@ -4,6 +4,8 @@
 .DS_Store
 node_modules/
 .wrangler/
+# local-only responsive test harness (loads index.html in phone-sized iframes)
+_viewport_harness.html
 *.log
 .env
 .env.*

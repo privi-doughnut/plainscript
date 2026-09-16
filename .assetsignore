@@ -21,3 +21,4 @@ supabase/
 node_modules/
 .claude/
 .mcp.json
+_viewport_harness.html

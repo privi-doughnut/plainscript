@@ -2,13 +2,21 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- viewport-fit=cover is what makes env(safe-area-inset-*) resolve to real values,
+     which the fixed bottom navigation needs to clear the iPhone home indicator. -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Plainscript — Medication Reference</title>
 <meta name="description" content="An educational tool that decodes medications, checks drug interactions, and points to general symptom guidance, using FDA and NIH data. Not medical advice." />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <link rel="apple-touch-icon" href="icon-192.png" />
 <meta name="theme-color" content="#16202E" />
+<!-- iOS still reads these rather than the manifest's display mode: without them an
+     installed Plainscript opens inside Safari chrome instead of standalone. -->
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Plainscript" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -159,6 +167,19 @@
   .tab[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent);}
   .tab .num{font-family:var(--mono); font-size:11px; color:var(--accent); }
   .tab:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px;}
+  /* tab icons belong to the phone bottom bar only — see the max-width:560px block */
+  .tab .tico{display:none;}
+  /* the bar is position:fixed at phone widths, which would otherwise reprint on
+     every page of the cabinet one-pager */
+  @media print{ .tabs{display:none !important;} }
+
+  /* Switching tool should feel like a view changing, not a page redrawing.
+     Panels are direct children of <main> and every modal is appended to
+     <body>, so animating a transform here can't knock a fixed-position
+     dialog out of place. */
+  .panel:not([hidden]){animation:panel-in .2s ease-out;}
+  @keyframes panel-in{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  @media (prefers-reduced-motion:reduce){ .panel:not([hidden]){animation:none;} }
 
   main{padding:26px 0 60px;}
   .panel[hidden]{display:none;}
@@ -664,20 +685,52 @@
   @media (max-width:560px){
     .brand h1{font-size:25px;}
 
-    /* The tab labels are short sentences ("Decode a medication"), so four of
-       them physically cannot fit a 320-360px phone — they used to run off the
-       right edge and drag the whole page into horizontal scroll. Let the strip
-       itself scroll instead, and reclaim width by dropping the decorative
-       01-04 counters.
-       Deliberately no edge-fade affordance: a CSS mask is physical-direction
-       only, so in RTL (Arabic) it lands on the wrong edge and dims the active
-       tab, and it fades even in languages whose labels are short enough that
-       there's nothing to scroll. The tab visibly cut off at the edge already
-       does that job. */
-    .tabs{overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;}
-    .tabs::-webkit-scrollbar{display:none;}
-    .tab{padding:10px 9px; font-size:14px; flex:0 0 auto; white-space:nowrap;}
+    /* ---------- app-shell bottom navigation ----------
+       The tab labels are short sentences ("Decode a medication"), so four of
+       them physically cannot fit a 320-360px phone. This used to be solved by
+       letting the strip scroll horizontally, which worked but never stopped
+       feeling like a web page: the tabs scrolled out of reach and you had to
+       go back up to the header to change tool.
+       At phone widths the same tablist becomes a fixed bottom bar instead —
+       the pattern every native app uses, thumb-reachable and always visible.
+       It is deliberately the SAME element and the same four buttons: identical
+       IDs, identical role="tab"/aria-selected wiring, so every bit of existing
+       tab logic, keyboard handling and translation keeps working untouched.
+       Only the presentation moves. Labels shrink to one word's worth of space
+       under an icon, so nothing needs to scroll and RTL needs no special case
+       (a flex row mirrors on its own). */
+    .tabs{
+      position:fixed; left:0; right:0; bottom:0; z-index:60;
+      margin:0; gap:0; overflow:visible;
+      border-bottom:none; border-top:1px solid var(--line);
+      background:var(--card);
+      /* keeps the bar clear of the iPhone home indicator */
+      padding-bottom:env(safe-area-inset-bottom,0px);
+      box-shadow:0 -2px 14px rgba(10,14,20,.07);
+    }
+    .tab{
+      flex:1 1 0; min-width:0; flex-direction:column; justify-content:center; gap:3px;
+      padding:8px 3px 6px; margin-bottom:0; min-height:56px;
+      font-size:11px; line-height:1.15; text-align:center; white-space:normal;
+      border-bottom:none; border-top:2px solid transparent; margin-top:-1px;
+      /* long labels in some languages would otherwise wrap to three lines */
+      overflow:hidden;
+    }
+    .tab > span[data-i18n]{
+      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+      overflow:hidden; max-width:100%;
+      /* Labels are full phrases ("Decode a medication") and wrap to two lines in
+         some languages but one in others. Reserving two lines for all four keeps
+         the icons on a shared baseline instead of jittering row to row. */
+      min-height:2.3em;
+    }
     .tab .num{display:none;}
+    .tab .tico{display:block; width:22px; height:22px; flex:0 0 auto;}
+    .tab[aria-selected="true"]{color:var(--accent); border-bottom-color:transparent; border-top-color:var(--accent);}
+
+    /* content has to clear the fixed bar, or the last card sits under it */
+    main{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px));}
+    footer .wrap{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px));}
 
     /* iOS Safari auto-zooms the page whenever you focus a control whose
        font-size is under 16px — and never zooms back out. Every text input
@@ -752,18 +805,22 @@
   </div>
   <p class="lede" data-i18n="tagline"></p>
 
+  <!-- The .tico icons are for the phone-width bottom bar only (hidden on desktop,
+       where the 01-04 counters carry the instrument look instead). They're
+       aria-hidden because each button already has a real text label beside them.
+       Stroke-only, currentColor, so they inherit theme + active-accent for free. -->
   <div class="tabs" role="tablist" aria-label="Tools" data-i18n-aria-label="tools_aria">
     <button class="tab" id="tab-decode" role="tab" aria-selected="true" aria-controls="panel-decode">
-      <span class="num">01</span><span data-i18n="tab_decode"></span>
+      <span class="num">01</span><svg class="tico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="2.5" y="8" width="19" height="8" rx="4"/><path d="M12 8v8"/></svg><span data-i18n="tab_decode"></span>
     </button>
     <button class="tab" id="tab-check" role="tab" aria-selected="false" aria-controls="panel-check">
-      <span class="num">02</span><span data-i18n="tab_check"></span>
+      <span class="num">02</span><svg class="tico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg><span data-i18n="tab_check"></span>
     </button>
     <button class="tab" id="tab-cabinet" role="tab" aria-selected="false" aria-controls="panel-cabinet">
-      <span class="num">03</span><span data-i18n="tab_cabinet"></span>
+      <span class="num">03</span><svg class="tico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 12h17M10 7.6h4M10 16.4h4"/></svg><span data-i18n="tab_cabinet"></span>
     </button>
     <button class="tab" id="tab-symptoms" role="tab" aria-selected="false" aria-controls="panel-symptoms">
-      <span class="num">04</span><span data-i18n="tab_symptoms"></span>
+      <span class="num">04</span><svg class="tico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12h4L9 6l4 12 2.5-6h6"/></svg><span data-i18n="tab_symptoms"></span>
     </button>
   </div>
 </div></header>
