@@ -9536,7 +9536,12 @@ function sideHit(tokens, side){
 
 /* ---- openFDA fetch ------------------------------------------------ */
 async function fetchLabel(name){
-  const q = encodeURIComponent(name.trim().toLowerCase());
+  const clean = name.trim();
+  // openFDA 414s on an absurdly long query string. No real drug name comes close
+  // to this, so treat over-long input as "no match" — which routes into the normal
+  // friendly not-found path — rather than surfacing a raw HTTP error to the user.
+  if (!clean || clean.length > 120) return null;
+  const q = encodeURIComponent(clean.toLowerCase());
   const url = `${FDA}?search=(openfda.brand_name:"${q}"+openfda.generic_name:"${q}"+openfda.substance_name:"${q}")&limit=1`;
   const res = await fetch(url);
   if (res.status === 404) return null;          // openFDA returns 404 when nothing matches
@@ -10698,14 +10703,26 @@ function addVoiceButton(inputEl, autoSubmit){
   inputEl.insertAdjacentElement("afterend", btn);
 }
 
+/* The pairwise Check tab runs one openFDA lookup per medicine and an N×N pair
+   analysis, so cap the rows — a longer list belongs in My Cabinet → Scan. */
+const MAX_CHECK_ROWS = 15;
+function syncAddDrugBtn(){
+  const btn = $("#add-drug"), list = $("#drug-list");
+  if (!btn || !list) return;
+  const full = list.children.length >= MAX_CHECK_ROWS;
+  btn.disabled = full;
+  btn.title = full ? `You can check up to ${MAX_CHECK_ROWS} medicines at once — for a longer list, save them in My Cabinet and use Scan.` : "";
+}
+
 function drugRow(val=""){
   const div = document.createElement("div");
   div.className="drugrow";
-  div.innerHTML = `<input type="text" placeholder="${esc(t('drug_row_placeholder'))}" autocomplete="off" value="${esc(val)}" />
+  div.innerHTML = `<input type="text" maxlength="120" placeholder="${esc(t('drug_row_placeholder'))}" autocomplete="off" value="${esc(val)}" />
     <button class="rm" title="${esc(t('med_note_remove_label_prefix'))}" aria-label="${esc(t('remove_medication_aria'))}">×</button>`;
   div.querySelector(".rm").addEventListener("click",()=>{
     if ($("#drug-list").children.length>2) div.remove();
     else div.querySelector("input").value="";
+    syncAddDrugBtn();
   });
   addVoiceButton(div.querySelector("input")); // just fills the field — checking needs 2+ filled first
   return div;
@@ -10730,12 +10747,43 @@ async function resolveForAnalysis(name){
 
 /* run every unique pair of resolved drugs through the curated set, then the
    FDA-label mention layer. Shared by the Check tab and Cabinet Scan. */
+/* Two entries that resolve to the same medicine — the same name typed twice, or
+   a brand plus its own generic — must never be analysed as a pair. An FDA label
+   routinely names its own ingredient ("concurrent use of NSAIDs…"), which would
+   otherwise surface as a nonsensical "aspirin → mentions → aspirin" finding. */
+function sameDrug(A, B){
+  const ra = A.label && A.label.rxcui, rb = B.label && B.label.rxcui;
+  if (ra && rb && String(ra) === String(rb)) return true;
+  const ga = A.label && A.label.generic && A.label.generic.toLowerCase();
+  const gb = B.label && B.label.generic && B.label.generic.toLowerCase();
+  if (ga && gb && ga === gb) return true;
+  return A.name.trim().toLowerCase() === B.name.trim().toLowerCase();
+}
+
+/* Resolve several medicines at once instead of one-at-a-time, but cap how many
+   openFDA requests are in flight: a large cabinet firing every lookup in
+   parallel risks being throttled by a public, keyless API. Order is preserved. */
+async function resolveAll(names, limit = 5){
+  const out = new Array(names.length);
+  let next = 0;
+  const runner = async () => {
+    while (true){
+      const i = next++;
+      if (i >= names.length) return;
+      out[i] = await resolveForAnalysis(names[i]);
+    }
+  };
+  await Promise.all(new Array(Math.min(limit, names.length)).fill(0).map(runner));
+  return out;
+}
+
 function analyzeDrugPairs(drugs){
   const findings = [];   // curated severity hits
   const mentions = [];   // FDA-label cross-references
   for (let i=0;i<drugs.length;i++){
     for (let j=i+1;j<drugs.length;j++){
       const A=drugs[i], B=drugs[j];
+      if (sameDrug(A,B)) continue;
 
       let matched=false;
       for (const rule of INTERACTIONS){
@@ -10753,13 +10801,16 @@ function analyzeDrugPairs(drugs){
 }
 
 async function checkInteractions(){
-  const inputs = [...$("#drug-list").querySelectorAll("input")].map(i=>i.value.trim()).filter(Boolean);
+  const typed = [...$("#drug-list").querySelectorAll("input")].map(i=>i.value.trim()).filter(Boolean);
+  // drop exact repeats before spending a lookup on them; brand-vs-own-generic
+  // repeats are caught later by sameDrug() once both have resolved
+  const seen = new Set();
+  const inputs = typed.filter(n => { const k = n.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
   const box = $("#check-results");
   if (inputs.length < 2){ box.innerHTML = `<div class="err">${esc(t("check_min_two"))}</div>`; return; }
-  box.innerHTML = `<p class="status" style="padding:0 0 6px;">${esc(t("check_checking_prefix"))} ${inputs.length} ${esc(t("check_checking_suffix"))}</p>${skelResults(2)}`;
+  box.innerHTML = `<p class="status" style="padding:0 0 6px;">${esc(t("check_checking_prefix"))} ${inputs.length} ${esc(t("check_checking_suffix"))}</p>${skelResults(Math.min(inputs.length,4))}`;
 
-  const drugs = [];
-  for (const name of inputs) drugs.push(await resolveForAnalysis(name));
+  const drugs = await resolveAll(inputs);
 
   const { findings, mentions } = analyzeDrugPairs(drugs);
   renderResults(box, drugs, findings, mentions);
@@ -10996,7 +11047,11 @@ addVoiceButton($("#decode-input"), decode); // auto-decodes on speech — read-o
 addScanButton($("#decode-input"), decode);  // camera barcode scan (feature-detected)
 
 $("#drug-list").append(drugRow(), drugRow());
-$("#add-drug").addEventListener("click",()=>$("#drug-list").append(drugRow()));
+$("#add-drug").addEventListener("click",()=>{
+  if ($("#drug-list").children.length >= MAX_CHECK_ROWS) { syncAddDrugBtn(); return; }
+  $("#drug-list").append(drugRow());
+  syncAddDrugBtn();
+});
 $("#check-btn").addEventListener("click", checkInteractions);
 $("#drug-list").addEventListener("keydown", e=>{ if(e.key==="Enter") checkInteractions(); });
 
@@ -11229,7 +11284,7 @@ async function ensureFreshSession(){
   if (!session) throw new Error("You're signed out — sign in to use your cabinet.");
   if (Math.floor(Date.now()/1000) > session.expires_at - 60){
     try{ await refreshSession(); }
-    catch(e){ localSignOut(); throw new Error("Your session expired — please sign in again."); }
+    catch(e){ localSignOut(); throw new Error(t("cabinet_session_expired")); }
   }
 }
 
@@ -11400,7 +11455,7 @@ async function db(path, opts){
   let res = await call();
   if (res.status === 401){ // stale token → one refresh + retry
     try{ await refreshSession(); }
-    catch(e){ localSignOut(); throw new Error("Your session expired — please sign in again."); }
+    catch(e){ localSignOut(); throw new Error(t("cabinet_session_expired")); }
     res = await call();
   }
   if (!res.ok) throw new Error("Couldn't reach your cabinet (error "+res.status+") — try again.");
@@ -12557,8 +12612,7 @@ async function runCabinetScan(){
   const pairWord = pairCount>1 ? t("scan_pairs_word_plural") : t("scan_pairs_word");
   box.innerHTML = `<p class="status" style="padding:0 0 6px;">${esc(t("scan_scanning_prefix"))} ${meds.length} ${esc(t("medications_word"))} — ${pairCount} ${esc(pairWord)}…</p>${skelResults(2)}`;
 
-  const drugs = [];
-  for (const m of meds) drugs.push(await resolveForAnalysis(m.generic || m.brand || m.name));
+  const drugs = await resolveAll(meds.map(m => m.generic || m.brand || m.name));
   const { findings, mentions } = analyzeDrugPairs(drugs);
 
   box.innerHTML = renderUnverifiedWarning(drugs)

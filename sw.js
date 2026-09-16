@@ -46,7 +46,11 @@ self.addEventListener("fetch", (event) => {
     fetch(event.request)
       .then((res) => {
         const copy = res.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        // waitUntil keeps the service worker alive until the cache write lands —
+        // without it a fast page-unload can silently drop the offline copy.
+        event.waitUntil(
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy))
+        );
         return res;
       })
       .catch(() =>

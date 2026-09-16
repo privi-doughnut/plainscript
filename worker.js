@@ -258,7 +258,14 @@ export default {
         }),
       });
       const data = await r.json();
-      const plain = (data.content || []).map(b => b.text || "").join("").trim();
+      // An upstream failure (rate limit, overload, bad request) comes back as an
+      // error shape with no `content`. Returning that as HTTP 200 + an empty
+      // string meant the client's retry-on-hiccup could never fire, because it
+      // only retries on a non-ok response. Surface it as a real error status.
+      if (!r.ok || !Array.isArray(data.content)) {
+        return json({ error: "upstream error" }, 502, cors);
+      }
+      const plain = data.content.map(b => b.text || "").join("").trim();
       return json({ plain }, 200, cors);
     } catch (e) {
       return json({ error: "upstream error" }, 502, cors);
