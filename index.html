@@ -604,6 +604,7 @@
     body.printing-cabinet .lang-select-wrap,
     body.printing-cabinet .lede, body.printing-cabinet .method, body.printing-cabinet footer,
     body.printing-cabinet .cab-tools, body.printing-cabinet .field,
+    body.printing-cabinet .cab-dash,
     body.printing-cabinet .mc-rm, body.printing-cabinet #scan-results,
     body.printing-cabinet #panel-decode, body.printing-cabinet #panel-check,
     body.printing-cabinet #panel-symptoms
@@ -625,6 +626,21 @@
   }
 
   /* cabinet insights — stat tiles + single-hue magnitude bars */
+  /* ---------- cabinet dashboard band ----------
+     Turns My Cabinet from a list with a toolbar into something that answers
+     "is there anything I should look at?" the moment it loads. Every number in
+     it is derived from data already in memory — no new fetch, no new claim.
+     Deliberately neutral ink and never a success/green treatment: the app's
+     core invariant is that nothing-found is not the same as safe, and a
+     reassuring colour here would quietly contradict the words beside it. */
+  .cab-dash{
+    border:1px solid var(--line); border-radius:var(--radius); background:var(--card);
+    box-shadow:var(--shadow); padding:16px 18px; margin:18px 0 0;
+  }
+  .cab-dash-action{
+    display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+    margin-top:14px; padding-top:14px; border-top:1px solid var(--line);
+  }
   .stat-tiles{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
   .stat-tile{ border:1px solid var(--line); border-radius:12px; padding:14px; text-align:center; background:var(--card); }
   .stat-num{ font-family:var(--serif); font-size:30px; font-weight:600; color:var(--accent-deep); line-height:1; }
@@ -12265,6 +12281,9 @@ function renderCabinet(){
   } else {
     const visible = medsForActivePerson();
     html += personFilterBarHTML();
+    // status first, then the list — a dashboard should answer a question on
+    // arrival rather than wait for you to read every row and work it out
+    html += dashboardSummaryHTML(visible);
     html += reminderSummary(visible);
     html += todayScheduleHTML(visible);
     html += `<div class="results">${visible.map(medRowHTML).join("")}</div>
@@ -12275,18 +12294,37 @@ function renderCabinet(){
       <button class="ghost" data-act="insights">${t("insights_btn")}</button>
       <button class="ghost" data-act="share">${t("share_btn")}</button>
     </div>
-    <div id="share-panel"></div>`;
-    if (visible.length >= 2){
-      html += `<div class="cab-tools">
-        <button class="go" data-act="scan">${t("scan_btn")}</button>
-        <span class="status" style="padding:0;">${esc(t("scan_note"))}</span>
-      </div>
-      <div id="scan-results" aria-live="polite"></div>`;
-    }
+    <div id="share-panel"></div>
+    <div id="scan-results" aria-live="polite"></div>`;
     html += `<p class="status" style="padding-top:14px;">${esc(t("cabinet_footer_note"))}</p>`;
   }
   box.innerHTML = html;
   addVoiceButton($("#cab-input")); // fills the field — user still reviews before saving
+}
+
+/* The band at the top of My Cabinet. Promotes the three counts that were
+   previously buried inside the Insights modal, and makes "scan my whole
+   cabinet" the one unmistakable primary action instead of a sixth ghost
+   button below the list. Uses only already-translated keys, so it works in
+   all 13 languages without new strings.
+   The scan CTA still appears only at 2+ medications, because scanning a
+   single medicine for interactions is meaningless. */
+function dashboardSummaryHTML(meds){
+  const total   = meds.length;
+  const matched = meds.filter(m => m.generic || m.rxcui).length;
+  const noted   = meds.filter(m => m.notes).length;
+  return `<div class="cab-dash">
+    <span class="eyebrow">${esc(t("your_cabinet_eyebrow"))}</span>
+    <div class="stat-tiles" style="margin-top:10px;">
+      <div class="stat-tile"><div class="stat-num">${total}</div><div class="stat-lbl">${esc(t("insights_total"))}</div></div>
+      <div class="stat-tile"><div class="stat-num">${matched}</div><div class="stat-lbl">${esc(t("insights_matched"))}</div></div>
+      <div class="stat-tile"><div class="stat-num">${noted}</div><div class="stat-lbl">${esc(t("insights_noted"))}</div></div>
+    </div>
+    ${meds.length >= 2 ? `<div class="cab-dash-action">
+      <button class="go" data-act="scan">${t("scan_btn")}</button>
+      <span class="status" style="padding:0;">${esc(t("scan_note"))}</span>
+    </div>` : ""}
+  </div>`;
 }
 
 /* printable caregiver one-pager (Phase 5) — scopes print styling with a
