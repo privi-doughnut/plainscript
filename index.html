@@ -948,6 +948,9 @@
 <footer><div class="wrap">
   <span data-i18n-html="footer_text"></span> ·
   <a id="report-error-link" href="https://github.com/privi-doughnut/plainscript/issues/new?title=Bug%20report&amp;body=%2A%2AWhat%20page%20or%20medication%20were%20you%20looking%20at%3F%2A%2A%0A%0A%0A%2A%2AWhat%20did%20you%20expect%2C%20and%20what%20actually%20happened%3F%2A%2A%0A%0A%0A%2A%2ABrowser%2Fdevice%20%28optional%29%3A%2A%2A%0A" target="_blank" rel="noopener" data-i18n="report_error_link"></a>
+   ·
+  <a href="privacy.html" data-i18n="footer_privacy"></a> ·
+  <a href="terms.html" data-i18n="footer_terms"></a>
 </div></footer>
 
 <!-- Keys & URLs. Safe to commit: the Supabase anon key is public by design
@@ -3411,6 +3414,9 @@ const I18N = {
 
     footer_text: `Plainscript · educational project · data from openFDA &amp; NIH RxNorm · not affiliated with the FDA or NIH · This product uses publicly available data from the U.S. National Library of Medicine and the U.S. Food and Drug Administration but is not endorsed by them.`,
     report_error_link: "Report an error",
+    footer_privacy: "Privacy Policy",
+    footer_terms: "Terms",
+    auth_consent_note: "By creating an account, you agree to:",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "Signed in as",
@@ -3970,6 +3976,9 @@ const I18N = {
 
     footer_text: `Plainscript · proyecto educativo · datos de openFDA y NIH RxNorm · no afiliado con la FDA ni el NIH · Este producto usa datos disponibles públicamente de la Biblioteca Nacional de Medicina de EE. UU. y de la Administración de Alimentos y Medicamentos de EE. UU., pero no está respaldado por ellas.`,
     report_error_link: "Reportar un error",
+    footer_privacy: "Política de privacidad",
+    footer_terms: "Términos",
+    auth_consent_note: "Al crear una cuenta, aceptas:",
 
     signed_in_as: "Sesión iniciada como",
     sign_out: "Cerrar sesión",
@@ -4375,6 +4384,9 @@ const I18N = {
 
     footer_text: `Plainscript · 教育项目 · 数据来自openFDA和NIH RxNorm · 与FDA或NIH无关联 · 本产品使用美国国立医学图书馆和美国食品药品监督管理局公开提供的数据，但未获得它们的认可或背书。`,
     report_error_link: "报告错误",
+    footer_privacy: "隐私政策",
+    footer_terms: "使用条款",
+    auth_consent_note: "创建账户即表示您同意：",
 
     signed_in_as: "已登录身份：", sign_out: "退出登录", sign_in: "登录",
     cabinet_signedout_title: "把你真实的用药清单集中放在一个地方。",
@@ -4755,6 +4767,9 @@ const I18N = {
 
     footer_text: `Plainscript · dự án giáo dục · dữ liệu từ openFDA &amp; NIH RxNorm · không liên kết với FDA hay NIH · Sản phẩm này sử dụng dữ liệu công khai từ Thư viện Y khoa Quốc gia Hoa Kỳ và Cục Quản lý Thực phẩm và Dược phẩm Hoa Kỳ nhưng không được các cơ quan này chứng thực.`,
     report_error_link: "Báo lỗi",
+    footer_privacy: "Chính sách quyền riêng tư",
+    footer_terms: "Điều khoản",
+    auth_consent_note: "Khi tạo tài khoản, bạn đồng ý với:",
 
     signed_in_as: "Đã đăng nhập với tư cách:", sign_out: "Đăng xuất", sign_in: "Đăng nhập",
     cabinet_signedout_title: "Tập hợp danh sách thuốc thực sự của bạn vào một nơi.",
@@ -5142,6 +5157,9 @@ const I18N = {
 
     footer_text: `Plainscript · مشروع تثقيفي · البيانات من openFDA و RxNorm التابع لـ NIH · غير تابع لإدارة الغذاء والدواء (FDA) أو المعهد الوطني للصحة (NIH) · يستخدم هذا المنتج بيانات متاحة للعامة من المكتبة الوطنية الأمريكية للطب وإدارة الغذاء والدواء الأمريكية لكنه غير معتمد من قبلهما.`,
     report_error_link: "الإبلاغ عن خطأ",
+    footer_privacy: "سياسة الخصوصية",
+    footer_terms: "الشروط",
+    auth_consent_note: "بإنشاء حساب، فإنك توافق على:",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "مسجّل الدخول باسم",
@@ -5562,6 +5580,9 @@ const I18N = {
 
     footer_text: `Plainscript · projet éducatif · données de openFDA &amp; RxNorm du NIH · non affilié à la FDA ou au NIH · Ce produit utilise des données publiquement disponibles de la Bibliothèque nationale de médecine des États-Unis et de la Food and Drug Administration des États-Unis mais n'est pas approuvé par elles.`,
     report_error_link: "Signaler une erreur",
+    footer_privacy: "Politique de confidentialité",
+    footer_terms: "Conditions",
+    auth_consent_note: "En créant un compte, vous acceptez :",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "Connecté en tant que",
@@ -5982,6 +6003,9 @@ const I18N = {
 
     footer_text: `Plainscript · 교육 프로젝트 · 데이터 출처 openFDA &amp; NIH RxNorm · FDA 또는 NIH와 무관 · 이 제품은 미국 국립의학도서관과 미국 식품의약국의 공개 데이터를 사용하지만 그들의 보증을 받은 것은 아닙니다.`,
     report_error_link: "오류 신고",
+    footer_privacy: "개인정보 처리방침",
+    footer_terms: "이용약관",
+    auth_consent_note: "계정을 만들면 다음에 동의하게 됩니다:",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "로그인 계정:",
@@ -6402,6 +6426,9 @@ const I18N = {
 
     footer_text: `Plainscript · образовательный проект · данные из openFDA &amp; NIH RxNorm · не аффилирован с FDA или NIH · Этот продукт использует общедоступные данные Национальной медицинской библиотеки США и Управления по санитарному надзору США, но не одобрен ими.`,
     report_error_link: "Сообщить об ошибке",
+    footer_privacy: "Политика конфиденциальности",
+    footer_terms: "Условия",
+    auth_consent_note: "Создавая аккаунт, вы соглашаетесь с:",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "Вход выполнен как",
@@ -6822,6 +6849,9 @@ const I18N = {
 
     footer_text: `Plainscript · projeto educativo · dados do openFDA &amp; NIH RxNorm · não afiliado à FDA ou ao NIH · Este produto usa dados publicamente disponíveis da Biblioteca Nacional de Medicina dos EUA e da Food and Drug Administration dos EUA, mas não é endossado por eles.`,
     report_error_link: "Relatar um erro",
+    footer_privacy: "Política de Privacidade",
+    footer_terms: "Termos",
+    auth_consent_note: "Ao criar uma conta, você concorda com:",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "Conectado como",
@@ -7242,6 +7272,9 @@ const I18N = {
 
     footer_text: `Plainscript · Bildungsprojekt · Daten von openFDA &amp; NIH RxNorm · nicht mit der FDA oder den NIH verbunden · Dieses Produkt verwendet öffentlich verfügbare Daten der US-amerikanischen National Library of Medicine und der US-amerikanischen Food and Drug Administration, wird aber nicht von ihnen befürwortet.`,
     report_error_link: "Fehler melden",
+    footer_privacy: "Datenschutzerklärung",
+    footer_terms: "Nutzungsbedingungen",
+    auth_consent_note: "Mit der Erstellung eines Kontos stimmen Sie zu:",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "Angemeldet als",
@@ -7662,6 +7695,9 @@ const I18N = {
 
     footer_text: `Plainscript · 教育プロジェクト · データ出所 openFDA &amp; NIH RxNorm · FDAやNIHとは無関係 · 本製品は米国国立医学図書館および米国食品医薬品局の公開データを使用していますが、両機関の承認を受けたものではありません。`,
     report_error_link: "間違いを報告",
+    footer_privacy: "プライバシーポリシー",
+    footer_terms: "利用規約",
+    auth_consent_note: "アカウントを作成すると、以下に同意したことになります：",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "サインイン中：",
@@ -7970,6 +8006,9 @@ const I18N = {
     faq_error_content: "<p>कृपया हमें बताएँ — नीचे फ़ुटर में \"त्रुटि की रिपोर्ट करें\" देखें। यहाँ हर चयनित तथ्य (परस्पर क्रियाएँ, दवा-वर्ग व्याख्याएँ, भोजन/शराब नोट्स) मानक संदर्भों से जाँचा जाता है, पर ग़लतियाँ फिर भी संभव हैं, और जिस उपकरण को सुधारा न जा सके वह भरोसेमंद नहीं है। सुधारों की समीक्षा होती है और उन्हें ठीक किया जाता है, अनदेखा नहीं।</p>",
     footer_text: "Plainscript · शैक्षिक परियोजना · डेटा openFDA &amp; NIH RxNorm से · FDA या NIH से संबद्ध नहीं · यह उत्पाद अमेरिकी राष्ट्रीय चिकित्सा पुस्तकालय और अमेरिकी खाद्य एवं औषधि प्रशासन के सार्वजनिक रूप से उपलब्ध डेटा का उपयोग करता है, पर उनके द्वारा समर्थित नहीं है।",
     report_error_link: "त्रुटि की रिपोर्ट करें",
+    footer_privacy: "गोपनीयता नीति",
+    footer_terms: "शर्तें",
+    auth_consent_note: "खाता बनाकर, आप इनसे सहमत होते हैं:",
     signed_in_as: "इस रूप में साइन इन:",
     sign_out: "साइन आउट",
     sign_in: "साइन इन",
@@ -8365,6 +8404,9 @@ const I18N = {
     faq_error_content: "<p>தயவுசெய்து எங்களிடம் சொல்லுங்கள் — கீழே அடிக்குறிப்பில் \"பிழையைப் புகாரளி\" ஐப் பார்க்கவும். இங்குள்ள ஒவ்வொரு தேர்ந்தெடுக்கப்பட்ட தகவலும் (இடைவினைகள், மருந்து-வகை விளக்கங்கள், உணவு/மது குறிப்புகள்) நிலையான குறிப்புகளுடன் மதிப்பாய்வு செய்யப்படுகிறது, ஆனால் தவறுகள் இன்னும் சாத்தியம், மேலும் திருத்த முடியாத கருவி நம்பகமானதல்ல. திருத்தங்கள் மதிப்பாய்வு செய்யப்பட்டு சரிசெய்யப்படுகின்றன, புறக்கணிக்கப்படுவதில்லை.</p>",
     footer_text: "Plainscript · கல்வித் திட்டம் · தரவு openFDA &amp; NIH RxNorm இலிருந்து · FDA அல்லது NIH உடன் இணைக்கப்படவில்லை · இந்தத் தயாரிப்பு அமெரிக்க தேசிய மருத்துவ நூலகம் மற்றும் அமெரிக்க உணவு மற்றும் மருந்து நிர்வாகத்தின் பொதுவில் கிடைக்கும் தரவைப் பயன்படுத்துகிறது, ஆனால் அவற்றால் அங்கீகரிக்கப்படவில்லை.",
     report_error_link: "பிழையைப் புகாரளி",
+    footer_privacy: "தனியுரிமைக் கொள்கை",
+    footer_terms: "விதிமுறைகள்",
+    auth_consent_note: "கணக்கை உருவாக்குவதன் மூலம், இவற்றை ஏற்கிறீர்கள்:",
     signed_in_as: "இவராக உள்நுழைந்துள்ளீர்:",
     sign_out: "வெளியேறு",
     sign_in: "உள்நுழை",
@@ -11439,6 +11481,15 @@ function openSignInModal(){
           </div>
         </div>
         <div id="modal-magic-status" class="status" role="status"></div>
+        <!-- Consent moment. Washington's My Health My Data Act (and the other state
+             consumer-health-data laws) expect opt-in before health-adjacent data is
+             collected, and saving what medicines you take is exactly that. Kept as a
+             short lead-in plus the two links so the sentence stays easy to translate
+             accurately in all 13 languages. -->
+        <p class="status" style="padding:12px 0 0;">${esc(t("auth_consent_note"))}
+          <a href="terms.html" target="_blank" rel="noopener">${esc(t("footer_terms"))}</a> ·
+          <a href="privacy.html" target="_blank" rel="noopener">${esc(t("footer_privacy"))}</a>
+        </p>
         <p class="status" style="padding:12px 0 0;">${esc(t("cabinet_signin_footer"))}</p>
       </div>
     </div>

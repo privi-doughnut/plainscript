@@ -2,11 +2,22 @@
 
 *Last updated: 2026-09-16*
 
-> ⚠️ **`origin/main` is one commit ahead of the deployed site.** Commit `e6fc0f4`
-> ("Fix P0 safety/privacy bugs") is pushed but not yet deployed — run
-> `npx wrangler deploy -c wrangler.jsonc` from `~/plainscript-remote` to ship it.
-> (The earlier first-visit blank-label bug from `56b1959` IS deployed and
-> verified live as of 2026-09-16 — byte-for-byte matched against `origin/main`.)
+> 🚨 **THE DEADLINE IS NOON, NOT MIDNIGHT.** The 2026 rulebook says submissions close
+> **12:00 PM EDT on Monday 26 October 2026**. Every earlier note in this repo said
+> just "Oct 26" — that is half a day of runway that does not exist.
+>
+> 🚨 **AI usage must be disclosed in the submission.** The 2026 rules permit AI help but
+> require it be "fully disclosed," that it "not constitute the entirety of the technical
+> development," and that the student "demonstrate significant individual contributions and
+> technical understanding." This repo contains `CLAUDE.md` and commits co-authored by
+> Claude, and judges are entitled to demand the source. Disclosed plainly and confidently
+> this is a non-issue and arguably reads as maturity; left undisclosed and discovered, it
+> is existential. See §10.
+>
+> ✅ **Deploys are healthy again.** Cloudflare's git auto-deploy picked up the pushed
+> commits on its own — verified 2026-09-16 that the live site matches `origin/main`
+> byte-for-byte, including the client-side QR fix. `wrangler deploy` is no longer needed
+> as a fallback (and is blocked for Claude by the auto-mode classifier anyway).
 
 **The app is essentially feature-complete and polished.** We're past building core features — what remains is (1) Congressional App Challenge submission packaging, (2) a few content/dashboard items only Privi can do, and (3) optional polish + a planned security sweep. **CAC deadline: Oct 26, 2026.**
 
@@ -114,6 +125,34 @@ Checked what's actually wired vs. what `PLAINSCRIPT_ROADMAP.md` claims. Good new
 
 - [ ] **Real gap: dosing reminders are passive-only.** There's an "expiring soon" banner shown only if you happen to open the app — no actual `Notification` API / scheduled local push for "take your 8am dose." No `Notification.`/`pushManager` usage anywhere in the codebase. This is the one functional (non-aesthetic) hole, and it's exactly what a direct CAC competitor (CareCompanion) leans on hardest. Worth adding via feature-detect-and-degrade, same pattern as voice input.
 - Everything else on the roadmap is either shipped or a deliberate, already-justified non-goal (symptom checker, pill imprint ID, analytics) — see roadmap §"Deferred / decided-against."
+
+## 10. CAC competitive research (2026-09-16) — sample of 24 winning projects
+
+Sampled 18 district winners from 2025, 2 from 2024, and the 2025 national/regional tier, deliberately including unglamorous districts to find the median rather than the headline.
+
+**What wins:** health/medical/accessibility is the dominant category (~46% of the sample). Framing is a *personal anecdote* essentially universally — not one winner led with statistics. Solo entries are normal (~15 of 24). District-tier technical sophistication is modest (Kanban boards, equipment-rental apps, a middle-school immune-system game); hardware + ML is what escalates you to the national tier. Judging is done by the Member of Congress and their office — **congressional staffers, usually not engineers**.
+
+**What winners systematically lack** — across 24 projects, essentially none mention data provenance, accessibility, internationalization, privacy/data handling, or safety limits. Health winners uniformly claim maximum capability; one 2024 winner claims "rapid and reliable early-stage diagnoses" for 14 chest diseases with no stated sourcing. **The bar on rigor is low; the bar on storytelling is high.**
+
+**Where Plainscript genuinely leads:** live publicly-usable URL + open source (judges may demand exactly this verification); authoritative sourcing with visible per-claim provenance; 13 languages; WCAG/pictogram/read-aloud/offline; and the safety non-goals — which read as markedly more mature than the field *if framed as deliberate design rather than missing features*.
+
+**Where Plainscript is behind or at risk:**
+- [ ] **AI disclosure** — see the banner at the top. Needs a deliberate, honest written disclosure, plus Privi genuinely able to defend arbitrary parts of the code. Highest-risk item in the whole submission.
+- [ ] **No demo video.** The rules call it *"the most critical component"* of the submission, verbatim.
+- [ ] **Personal story still an empty placeholder** while ~100% of winners have one.
+- [ ] Four tabs is a lot of surface to explain in under 3 minutes — real risk of a diffuse feature-tour video that lands no single idea.
+- [ ] **Direct precedent exists:** "Your Medicine" (GA-01, 2024) is a close concept that already won. Differentiation has to be explicit, not assumed.
+
+**Recommended demo video structure (target 2:30, hard cap 3:00):** 0:00-0:15 name/app/purpose in one sentence · 0:15-0:45 personal story then the Jan-2024 NLM API shutdown · 0:45-1:00 who it's for, stated explicitly · 1:00-2:00 live demo *on the public URL, said out loud* (decode a real drug → warfarin+aspirin → Cabinet Scan heatmap, deliberately showing the "nothing found isn't the same as safe" state and saying why) · 2:00-2:20 tools/languages + the AI disclosure · 2:20-2:40 reach and restraint. Cheapest edge available: demo the real deployed URL and invite verification — almost nothing in the published record suggests competitors do.
+
+**Also:** the six written submission questions are published in the rulebook — pre-draft them instead of writing under deadline pressure.
+
+## 11. Engineering debt worth knowing about (2026-09-16)
+
+Measured, not estimated:
+- [ ] **Zero automated tests** across ~12,000 lines of JS and 157 functions — which is why the duplicate-drug and silent-failure bugs survived months. A suite for the interaction engine (`analyzeDrugPairs`, `sameDrug`, `sideHit`, `labelMentions`) is in progress; it's also the most defensible thing to show a judge: *"the parts that could hurt someone have tests."*
+- [ ] **Ad-hoc design values:** 27 distinct spacing values, 20 font sizes (including six half-pixel steps like 13.5/14.5/15.5 that are too close to perceive), and 11 border radii despite a `--radius` token existing and being used 17×. Mechanical fix: add spacing/type/radius tokens beside the existing colour tokens and sweep to the nearest. Nothing looks dramatically different in any one spot; the whole thing starts feeling deliberate.
+- Already strong and worth not breaking: colour rationing (severity colours mean severity and nothing else), 17 `:focus-visible` rules, computed-and-corrected WCAG contrast, 44×44px primary tap targets. `.mini` buttons compute to ~32px — legal under WCAG AA but under Apple's comfortable-thumb threshold; worth bumping the ones used on phones.
 
 ## 9. Mobile/web design direction (decided 2026-09-16)
 
