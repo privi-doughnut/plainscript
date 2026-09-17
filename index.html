@@ -678,6 +678,17 @@
   }
 
   /* cabinet insights — stat tiles + single-hue magnitude bars */
+  /* Guest-mode notice. Uses the neutral note tokens rather than a severity
+     colour — losing a list to a cleared cache is a real risk worth stating
+     plainly, but it is not a medical warning and must not borrow that
+     visual language. */
+  .guest-banner{
+    border:1px solid var(--note-bar); border-left-width:3px; background:var(--note-bg);
+    color:var(--note-ink); border-radius:var(--radius); padding:13px 16px; margin:0 0 16px;
+  }
+  .guest-banner b{font-size:14.5px;}
+  .guest-banner p{margin:5px 0 10px; font-size:14px; line-height:1.5;}
+
   /* ---------- cabinet dashboard band ----------
      Turns My Cabinet from a list with a toolbar into something that answers
      "is there anything I should look at?" the moment it loads. Every number in
@@ -842,6 +853,7 @@
     if (matchMedia("(display-mode: standalone)").matches) return;  // installed app: start_url IS the tool
     if (localStorage.getItem("plainscript.entered")) return;       // they've been in before
     if (localStorage.getItem("plainscript.session")) return;       // signed in
+    if (localStorage.getItem("plainscript.guest") === "1") return; // a guest with a local cabinet has plainly already chosen
     document.body.classList.add("landing-mode");
   }catch(e){ /* storage blocked — fall through to the tool */ }
 })();
@@ -880,6 +892,7 @@
     <div class="lp-cta">
       <button class="go" data-act="enter-app">Open the tool</button>
       <button class="ghost" data-act="enter-signup">Create a free account</button>
+      <button class="ghost" data-act="use-guest">Use as guest</button>
     </div>
     <p class="lp-strip">openFDA · RxNorm · 13 languages · works offline · no ads · no tracking</p>
     <p class="lp-note">No account needed. Decoding a medication and checking interactions are free and always will be.</p>
@@ -3572,6 +3585,11 @@ const I18N = {
     footer_privacy: "Privacy Policy",
     footer_terms: "Terms",
     auth_consent_note: "By creating an account, you agree to:",
+    guest_use_btn: "Use as guest",
+    guest_banner_title: "You're using Plainscript as a guest.",
+    guest_warning: "This list is saved only in this browser. Clearing your browsing data, or using another device, will lose it. Nothing is sent to a server.",
+    guest_signup_btn: "Create an account to keep it",
+    guest_save_failed: "Couldn't save to this browser — storage may be full or blocked.",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "Signed in as",
@@ -4134,6 +4152,11 @@ const I18N = {
     footer_privacy: "Política de privacidad",
     footer_terms: "Términos",
     auth_consent_note: "Al crear una cuenta, aceptas:",
+    guest_use_btn: "Usar como invitado",
+    guest_banner_title: "Estás usando Plainscript como invitado.",
+    guest_warning: "Esta lista se guarda solo en este navegador. Si borras los datos de navegación o usas otro dispositivo, se perderá. No se envía nada a un servidor.",
+    guest_signup_btn: "Crea una cuenta para conservarla",
+    guest_save_failed: "No se pudo guardar en este navegador: el almacenamiento puede estar lleno o bloqueado.",
 
     signed_in_as: "Sesión iniciada como",
     sign_out: "Cerrar sesión",
@@ -4542,6 +4565,11 @@ const I18N = {
     footer_privacy: "隐私政策",
     footer_terms: "使用条款",
     auth_consent_note: "创建账户即表示您同意：",
+    guest_use_btn: "以访客身份使用",
+    guest_banner_title: "您正在以访客身份使用 Plainscript。",
+    guest_warning: "此列表仅保存在本浏览器中。清除浏览数据或更换设备都会导致丢失。不会向服务器发送任何内容。",
+    guest_signup_btn: "创建账户以保留它",
+    guest_save_failed: "无法保存到此浏览器——存储空间可能已满或被阻止。",
 
     signed_in_as: "已登录身份：", sign_out: "退出登录", sign_in: "登录",
     cabinet_signedout_title: "把你真实的用药清单集中放在一个地方。",
@@ -4925,6 +4953,11 @@ const I18N = {
     footer_privacy: "Chính sách quyền riêng tư",
     footer_terms: "Điều khoản",
     auth_consent_note: "Khi tạo tài khoản, bạn đồng ý với:",
+    guest_use_btn: "Dùng với tư cách khách",
+    guest_banner_title: "Bạn đang dùng Plainscript với tư cách khách.",
+    guest_warning: "Danh sách này chỉ được lưu trong trình duyệt này. Xóa dữ liệu duyệt web hoặc dùng thiết bị khác sẽ mất nó. Không có gì được gửi lên máy chủ.",
+    guest_signup_btn: "Tạo tài khoản để giữ lại",
+    guest_save_failed: "Không thể lưu vào trình duyệt này — bộ nhớ có thể đã đầy hoặc bị chặn.",
 
     signed_in_as: "Đã đăng nhập với tư cách:", sign_out: "Đăng xuất", sign_in: "Đăng nhập",
     cabinet_signedout_title: "Tập hợp danh sách thuốc thực sự của bạn vào một nơi.",
@@ -5315,6 +5348,11 @@ const I18N = {
     footer_privacy: "سياسة الخصوصية",
     footer_terms: "الشروط",
     auth_consent_note: "بإنشاء حساب، فإنك توافق على:",
+    guest_use_btn: "الاستخدام كضيف",
+    guest_banner_title: "أنت تستخدم Plainscript كضيف.",
+    guest_warning: "تُحفظ هذه القائمة في هذا المتصفح فقط. مسح بيانات التصفح أو استخدام جهاز آخر سيؤدي إلى فقدانها. لا يُرسل أي شيء إلى خادم.",
+    guest_signup_btn: "أنشئ حسابًا للاحتفاظ بها",
+    guest_save_failed: "تعذّر الحفظ في هذا المتصفح — قد تكون مساحة التخزين ممتلئة أو محظورة.",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "مسجّل الدخول باسم",
@@ -5738,6 +5776,11 @@ const I18N = {
     footer_privacy: "Politique de confidentialité",
     footer_terms: "Conditions",
     auth_consent_note: "En créant un compte, vous acceptez :",
+    guest_use_btn: "Utiliser en tant qu'invité",
+    guest_banner_title: "Vous utilisez Plainscript en tant qu'invité.",
+    guest_warning: "Cette liste est enregistrée uniquement dans ce navigateur. Effacer vos données de navigation ou utiliser un autre appareil la fera disparaître. Rien n'est envoyé à un serveur.",
+    guest_signup_btn: "Créer un compte pour la conserver",
+    guest_save_failed: "Impossible d'enregistrer dans ce navigateur — le stockage est peut-être plein ou bloqué.",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "Connecté en tant que",
@@ -6161,6 +6204,11 @@ const I18N = {
     footer_privacy: "개인정보 처리방침",
     footer_terms: "이용약관",
     auth_consent_note: "계정을 만들면 다음에 동의하게 됩니다:",
+    guest_use_btn: "게스트로 사용",
+    guest_banner_title: "게스트로 Plainscript를 사용 중입니다.",
+    guest_warning: "이 목록은 이 브라우저에만 저장됩니다. 인터넷 사용 기록을 지우거나 다른 기기를 사용하면 사라집니다. 서버로 전송되는 것은 없습니다.",
+    guest_signup_btn: "계정을 만들어 보관하기",
+    guest_save_failed: "이 브라우저에 저장하지 못했습니다 — 저장 공간이 가득 찼거나 차단되었을 수 있습니다.",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "로그인 계정:",
@@ -6584,6 +6632,11 @@ const I18N = {
     footer_privacy: "Политика конфиденциальности",
     footer_terms: "Условия",
     auth_consent_note: "Создавая аккаунт, вы соглашаетесь с:",
+    guest_use_btn: "Использовать как гость",
+    guest_banner_title: "Вы используете Plainscript как гость.",
+    guest_warning: "Этот список хранится только в этом браузере. Очистка данных браузера или переход на другое устройство приведёт к его потере. Ничего не отправляется на сервер.",
+    guest_signup_btn: "Создать аккаунт, чтобы сохранить",
+    guest_save_failed: "Не удалось сохранить в этом браузере — хранилище может быть заполнено или заблокировано.",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "Вход выполнен как",
@@ -7007,6 +7060,11 @@ const I18N = {
     footer_privacy: "Política de Privacidade",
     footer_terms: "Termos",
     auth_consent_note: "Ao criar uma conta, você concorda com:",
+    guest_use_btn: "Usar como convidado",
+    guest_banner_title: "Você está usando o Plainscript como convidado.",
+    guest_warning: "Esta lista é salva apenas neste navegador. Limpar os dados de navegação ou usar outro dispositivo fará com que ela se perca. Nada é enviado a um servidor.",
+    guest_signup_btn: "Crie uma conta para mantê-la",
+    guest_save_failed: "Não foi possível salvar neste navegador — o armazenamento pode estar cheio ou bloqueado.",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "Conectado como",
@@ -7430,6 +7488,11 @@ const I18N = {
     footer_privacy: "Datenschutzerklärung",
     footer_terms: "Nutzungsbedingungen",
     auth_consent_note: "Mit der Erstellung eines Kontos stimmen Sie zu:",
+    guest_use_btn: "Als Gast verwenden",
+    guest_banner_title: "Sie nutzen Plainscript als Gast.",
+    guest_warning: "Diese Liste wird nur in diesem Browser gespeichert. Wenn Sie Ihre Browserdaten löschen oder ein anderes Gerät verwenden, geht sie verloren. Es wird nichts an einen Server gesendet.",
+    guest_signup_btn: "Konto erstellen, um sie zu behalten",
+    guest_save_failed: "Konnte nicht in diesem Browser gespeichert werden — der Speicher ist möglicherweise voll oder blockiert.",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "Angemeldet als",
@@ -7853,6 +7916,11 @@ const I18N = {
     footer_privacy: "プライバシーポリシー",
     footer_terms: "利用規約",
     auth_consent_note: "アカウントを作成すると、以下に同意したことになります：",
+    guest_use_btn: "ゲストとして使う",
+    guest_banner_title: "ゲストとして Plainscript を使っています。",
+    guest_warning: "このリストはこのブラウザだけに保存されます。閲覧データを消去したり別の端末を使うと失われます。サーバーには何も送信されません。",
+    guest_signup_btn: "アカウントを作成して保存する",
+    guest_save_failed: "このブラウザに保存できませんでした。保存領域がいっぱいか、ブロックされている可能性があります。",
 
     /* dynamic UI microcopy — used directly by render functions via t() */
     signed_in_as: "サインイン中：",
@@ -8164,6 +8232,11 @@ const I18N = {
     footer_privacy: "गोपनीयता नीति",
     footer_terms: "शर्तें",
     auth_consent_note: "खाता बनाकर, आप इनसे सहमत होते हैं:",
+    guest_use_btn: "अतिथि के रूप में उपयोग करें",
+    guest_banner_title: "आप Plainscript का उपयोग अतिथि के रूप में कर रहे हैं।",
+    guest_warning: "यह सूची केवल इसी ब्राउज़र में सहेजी जाती है। ब्राउज़िंग डेटा हटाने या दूसरा डिवाइस इस्तेमाल करने पर यह चली जाएगी। सर्वर पर कुछ नहीं भेजा जाता।",
+    guest_signup_btn: "इसे रखने के लिए खाता बनाएं",
+    guest_save_failed: "इस ब्राउज़र में सहेजा नहीं जा सका — संग्रहण भरा या अवरुद्ध हो सकता है।",
     signed_in_as: "इस रूप में साइन इन:",
     sign_out: "साइन आउट",
     sign_in: "साइन इन",
@@ -8562,6 +8635,11 @@ const I18N = {
     footer_privacy: "தனியுரிமைக் கொள்கை",
     footer_terms: "விதிமுறைகள்",
     auth_consent_note: "கணக்கை உருவாக்குவதன் மூலம், இவற்றை ஏற்கிறீர்கள்:",
+    guest_use_btn: "விருந்தினராகப் பயன்படுத்து",
+    guest_banner_title: "நீங்கள் Plainscript ஐ விருந்தினராகப் பயன்படுத்துகிறீர்கள்.",
+    guest_warning: "இந்தப் பட்டியல் இந்த உலாவியில் மட்டுமே சேமிக்கப்படுகிறது. உலாவல் தரவை அழித்தால் அல்லது வேறு சாதனத்தைப் பயன்படுத்தினால் இது இழக்கப்படும். சேவையகத்திற்கு எதுவும் அனுப்பப்படுவதில்லை.",
+    guest_signup_btn: "இதை வைத்திருக்க கணக்கை உருவாக்கவும்",
+    guest_save_failed: "இந்த உலாவியில் சேமிக்க முடியவில்லை — சேமிப்பு நிறைந்திருக்கலாம் அல்லது தடுக்கப்பட்டிருக்கலாம்.",
     signed_in_as: "இவராக உள்நுழைந்துள்ளீர்:",
     sign_out: "வெளியேறு",
     sign_in: "உள்நுழை",
@@ -11702,8 +11780,78 @@ function openSignInModal(){
 }
 
 /* --- database calls (PostgREST) ---------------------------------- */
+/* =================================================================
+   GUEST MODE
+   Lets someone keep a cabinet without making an account. Everything
+   lives in this browser's localStorage and nothing is ever sent to
+   Supabase — which is the honest trade, and the reason the UI warns
+   that clearing browser data wipes it.
+
+   Implemented as a routing layer inside db() rather than by branching
+   at each call site: every medications read/write already goes through
+   db(), so intercepting here means insert/update/delete/list all keep
+   working unchanged and there is no call site left behind to forget.
+
+   Guest mode deliberately does NOT support sharing a cabinet — a share
+   link is served by Supabase to other people, so there is nothing local
+   that could honour it.
+   ================================================================= */
+const GUEST_KEY  = "plainscript.guest_cabinet";
+const GUEST_FLAG = "plainscript.guest";
+let isGuest = false;
+try{ isGuest = localStorage.getItem(GUEST_FLAG) === "1"; }catch(e){}
+
+function guestLoad(){
+  try{ return JSON.parse(localStorage.getItem(GUEST_KEY) || "[]"); }
+  catch(e){ return []; }
+}
+function guestSave(rows){
+  try{ localStorage.setItem(GUEST_KEY, JSON.stringify(rows)); }
+  catch(e){ cabinetStatus(t("guest_save_failed")); }
+}
+
+/* Mimics just enough of PostgREST's shape for the medications table:
+   "medications?select=..." (list), POST (insert), and "?id=eq.<id>"
+   with PATCH (update) or DELETE. Returns the same array-of-rows shape
+   db() would, so callers cannot tell the difference. */
+function guestMedications(path, opts){
+  const rows = guestLoad();
+  const method = (opts.method || "GET").toUpperCase();
+  const matched = path.match(/id=eq\.([^&]+)/);
+  const id = matched ? decodeURIComponent(matched[1]) : null;
+
+  if (method === "GET") return rows;
+
+  if (method === "POST"){
+    const row = Object.assign({
+      id: "guest-" + Date.now() + "-" + Math.random().toString(36).slice(2,8),
+      created_at: new Date().toISOString()
+    }, opts.body || {});
+    delete row.user_id;            // meaningless locally, and never invent one
+    rows.push(row);
+    guestSave(rows);
+    return [row];
+  }
+
+  if (method === "PATCH"){
+    const i = rows.findIndex(r => r.id === id);
+    if (i < 0) return [];
+    Object.assign(rows[i], opts.body || {});
+    guestSave(rows);
+    return [rows[i]];
+  }
+
+  if (method === "DELETE"){
+    guestSave(rows.filter(r => r.id !== id));
+    return null;
+  }
+  return null;
+}
+
 async function db(path, opts){
   opts = opts || {};
+  // guest cabinets never leave the device
+  if (isGuest && path.indexOf("medications") === 0) return guestMedications(path, opts);
   await ensureFreshSession();
   const call = () => fetch(SUPABASE_URL + "/rest/v1/" + path, {
     method: opts.method || "GET",
@@ -11954,7 +12102,9 @@ async function insertMed(typed, d){
   // if a specific person is selected in the filter, tag the new med to them
   const person = (activePerson === "ALL" || activePerson === "") ? null : activePerson;
   const rows = await db("medications", { method:"POST", body:{
-    user_id:    session.user.id,       // RLS double-checks this equals auth.uid()
+    // guests have no account, so there is no user to attribute the row to;
+    // guestMedications() strips this field rather than inventing an id
+    user_id:    session ? session.user.id : null,  // RLS double-checks this equals auth.uid()
     name:       typed,
     generic:    d && d.generic ? titlecase(d.generic) : null,
     brand:      d && d.brand   ? titlecase(d.brand)   : null,
@@ -12372,11 +12522,13 @@ function renderCabinet(){
     return;
   }
 
-  if (!session){
+  if (!session && !isGuest){
     box.innerHTML = `<div class="signin">
       <span class="eyebrow">${esc(t("tab_cabinet"))} · ${esc(t("sign_in"))}</span>
       <h3>${esc(t("cabinet_signedout_title"))}</h3>
       <p>${esc(t("cabinet_signedout_body"))}</p>
+      <p style="margin:14px 0 0;"><button class="ghost" data-act="use-guest">${esc(t("guest_use_btn"))}</button></p>
+      <p class="status" style="padding:8px 0 0;">${esc(t("guest_warning"))}</p>
       ${authError ? `<div class="err" style="margin-bottom:12px;">${esc(t("cabinet_signin_error_prefix"))} ${esc(authError)}</div>` : ""}
       ${magicSent ? `
       <div class="status" style="padding:2px 0 12px;">${esc(t("magic_sent_note_prefix"))} <b>${esc(magicSent)}</b> ${esc(t("magic_sent_note_suffix"))}</div>
@@ -12401,6 +12553,16 @@ function renderCabinet(){
   let html = cabinetIsOffline
     ? `<div class="status" style="padding:0 0 14px;">${esc(t("cabinet_offline_note"))}</div>`
     : "";
+  // Guests get a persistent, honest reminder that this list is only as durable
+  // as their browser storage — shown every time, not dismissible, because
+  // finding out after losing a medication list is far worse than the nagging.
+  if (isGuest){
+    html += `<div class="guest-banner">
+      <b>${esc(t("guest_banner_title"))}</b>
+      <p>${esc(t("guest_warning"))}</p>
+      <button class="mini" data-act="guest-signup">${esc(t("guest_signup_btn"))}</button>
+    </div>`;
+  }
   html += `<div class="field">
     <label class="eyebrow" for="cab-input">${esc(t("add_med_label"))}</label>
     <div class="inrow">
@@ -12431,7 +12593,7 @@ function renderCabinet(){
       <button class="ghost" data-act="print">${t("print_btn")}</button>
       <button class="ghost" data-act="wallet">${t("wallet_btn")}</button>
       <button class="ghost" data-act="insights">${t("insights_btn")}</button>
-      <button class="ghost" data-act="share">${t("share_btn")}</button>
+      ${isGuest ? "" : `<button class="ghost" data-act="share">${t("share_btn")}</button>`}
     </div>
     <div id="share-panel"></div>
     <div id="scan-results" aria-live="polite"></div>`;
@@ -12462,11 +12624,27 @@ function enterApp(opts){
   }
 }
 
+/* Turn on guest mode and open the cabinet. Nothing is migrated or deleted —
+   if they later sign in, their account cabinet is separate and the guest list
+   stays on this device until they clear it. */
+function startGuest(){
+  isGuest = true;
+  try{ localStorage.setItem(GUEST_FLAG, "1"); }catch(e){/* private mode: guest works until reload */}
+  cabinet = guestLoad();
+  selectTab("cabinet");
+  renderAcct();
+  renderCabinet();
+}
+
 document.addEventListener("click", e => {
   const enter = e.target.closest('[data-act="enter-app"]');
   if (enter){ enterApp(); return; }
   const signup = e.target.closest('[data-act="enter-signup"]');
-  if (signup){ enterApp({signup:true}); }
+  if (signup){ enterApp({signup:true}); return; }
+  const guest = e.target.closest('[data-act="use-guest"]');
+  if (guest){ enterApp(); startGuest(); return; }
+  const upgrade = e.target.closest('[data-act="guest-signup"]');
+  if (upgrade && typeof openSignInModal === "function") openSignInModal();
 });
 
 /* The band at the top of My Cabinet. Promotes the three counts that were
@@ -13177,9 +13355,14 @@ $("#cabinet-body").addEventListener("keydown", e => {
     catch(e){ session = null; saveSession(null); }
   }
   renderAcct();
+  // a returning guest gets their local cabinet straight back, no network involved
+  if (!session && isGuest) cabinet = guestLoad();
   renderCabinet();
   if (authError) selectTab("cabinet"); // surface the sign-in error where it's explained
   if (!session) return;
+  // signing in supersedes guest mode; the local guest list is left untouched
+  // on the device rather than silently deleted or silently uploaded
+  if (isGuest){ isGuest = false; try{ localStorage.removeItem(GUEST_FLAG); }catch(e){} }
   scheduleRefresh();
   loadProfile().catch(()=>{/* theme falls back to localStorage */});
   try{ await loadCabinet(); }
