@@ -148,11 +148,13 @@ function loadEngine(stubs = {}) {
     grabFunction("baseTokens"),
     grabFunction("sideHit"),
     grabFunction("sameDrug"),
+    grabFunction("sharedIngredients"),
     grabFunction("resolveAll"),
     grabFunction("labelMentions"),
     grabFunction("analyzeDrugPairs"),
     grabFunction("renderUnverifiedWarning"),
     grabFunction("renderResults"),
+    grabFunction("renderDuplicates"),
     // `function` declarations land on the sandbox object automatically, but
     // `const` bindings are script-scoped and would otherwise be invisible to
     // tests. Re-export the curated data explicitly.

@@ -497,3 +497,72 @@ test("renderResults", async (t) => {
       "the warning must appear before the empty state it qualifies");
   });
 });
+
+/* ---------------------------------------------------------------------------
+   Duplicate active ingredient.
+   Not an interaction — the same medicine taken twice without realising, which
+   is the most common real-world harm for this app's audience (unintentional
+   acetaminophen stacking hidden inside combination products). These guard a
+   safety behaviour, so they assert the finding fires AND that it can't be
+   swallowed by the same-drug dedup.
+   ------------------------------------------------------------------------- */
+test("sharedIngredients", async (t) => {
+  const { sharedIngredients, renderDuplicates } = engine;
+  const withSubs = (name, subs) => ({
+    name, display: name, tokens: new Set([name.toLowerCase()]),
+    label: { substances: subs, generic: name, rxcui: null }, labelUnverified: false
+  });
+
+  await t.test("flags two different products sharing an active ingredient", () => {
+    const shared = sharedIngredients(
+      withSubs("Tylenol", ["acetaminophen"]),
+      withSubs("Vicodin", ["hydrocodone bitartrate", "acetaminophen"]));
+    assert.deepEqual(Array.from(shared), ["acetaminophen"]);
+  });
+
+  await t.test("is case and whitespace insensitive", () => {
+    const shared = sharedIngredients(
+      withSubs("A", ["  Acetaminophen "]), withSubs("B", ["ACETAMINOPHEN"]));
+    assert.deepEqual(Array.from(shared), ["acetaminophen"]);
+  });
+
+  await t.test("returns nothing for genuinely unrelated drugs", () => {
+    assert.deepEqual(Array.from(sharedIngredients(
+      withSubs("warfarin", ["warfarin sodium"]),
+      withSubs("metformin", ["metformin hydrochloride"]))), []);
+  });
+
+  await t.test("returns nothing when either label has no substance data", () => {
+    assert.deepEqual(Array.from(sharedIngredients(withSubs("a", ["x"]), withSubs("b", []))), []);
+    assert.deepEqual(Array.from(sharedIngredients(withSubs("a", ["x"]), { name:"b", tokens:new Set(), label:null })), []);
+  });
+
+  await t.test("reports it through analyzeDrugPairs", () => {
+    const { duplicates } = analyzeDrugPairs([
+      withSubs("Tylenol", ["acetaminophen"]),
+      withSubs("Vicodin", ["hydrocodone bitartrate", "acetaminophen"])]);
+    assert.equal(duplicates.length, 1);
+    assert.deepEqual(Array.from(duplicates[0].shared), ["acetaminophen"]);
+  });
+
+  await t.test("the same product entered twice is NOT reported as a double dose", () => {
+    // sameDrug() must remove this before the shared-ingredient check runs,
+    // otherwise every repeated entry becomes a false alarm
+    const a = withSubs("Tylenol", ["acetaminophen"]);
+    const b = withSubs("Tylenol", ["acetaminophen"]);
+    assert.equal(analyzeDrugPairs([a, b]).duplicates.length, 0);
+  });
+
+  await t.test("renders the shared ingredient and escapes it", () => {
+    const html = renderDuplicates([{
+      A: { display: "Tylenol" }, B: { display: "<img src=x>" }, shared: ["acetaminophen"]
+    }]);
+    assert.match(html, /acetaminophen/);
+    assert.ok(!html.includes("<img src=x>"), "display names must be escaped");
+  });
+
+  await t.test("renders nothing when there are no duplicates", () => {
+    assert.equal(renderDuplicates([]), "");
+    assert.equal(renderDuplicates(undefined), "");
+  });
+});
