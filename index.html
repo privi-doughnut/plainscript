@@ -966,6 +966,7 @@
     border:1px solid var(--note-bar); border-left-width:3px; background:var(--note-bg);
     color:var(--note-ink); border-radius:var(--radius); padding:13px 16px; margin:0 0 16px;
   }
+  .rem-box{margin:14px 0 0;}
   .guest-banner b{font-size:14.5px;}
   .guest-banner p{margin:5px 0 10px; font-size:14px; line-height:1.5;}
 
@@ -3955,6 +3956,11 @@ const I18N = {
     footer_privacy: "Privacy Policy",
     footer_terms: "Terms",
     back_home: "Home",
+    reminders_enable: "Turn on dose reminders",
+    reminders_disable: "Turn off dose reminders",
+    reminders_title: "Plainscript reminder",
+    reminders_note: "Reminders only appear while Plainscript is open in a tab — there's no server sending them when it's closed. Please don't rely on this as your only reminder.",
+    reminders_blocked: "Your browser has blocked notifications for this site. You can allow them in your browser settings.",
     auth_consent_note: "By creating an account, you agree to:",
     guest_use_btn: "Use as guest",
     guest_banner_title: "You're using Plainscript as a guest.",
@@ -4529,6 +4535,11 @@ const I18N = {
     footer_privacy: "Política de privacidad",
     footer_terms: "Términos",
     back_home: "Inicio",
+    reminders_enable: "Activar recordatorios de dosis",
+    reminders_disable: "Desactivar recordatorios de dosis",
+    reminders_title: "Recordatorio de Plainscript",
+    reminders_note: "Los recordatorios solo aparecen mientras Plainscript esté abierto en una pestaña: no hay un servidor que los envíe cuando está cerrado. Por favor, no dependas de esto como tu único recordatorio.",
+    reminders_blocked: "Tu navegador ha bloqueado las notificaciones de este sitio. Puedes permitirlas en la configuración del navegador.",
     auth_consent_note: "Al crear una cuenta, aceptas:",
     guest_use_btn: "Usar como invitado",
     guest_banner_title: "Estás usando Plainscript como invitado.",
@@ -4949,6 +4960,11 @@ const I18N = {
     footer_privacy: "隐私政策",
     footer_terms: "使用条款",
     back_home: "首页",
+    reminders_enable: "开启服药提醒",
+    reminders_disable: "关闭服药提醒",
+    reminders_title: "Plainscript 提醒",
+    reminders_note: "提醒只在 Plainscript 于标签页中打开时出现——关闭后没有服务器发送提醒。请不要把它作为唯一的提醒方式。",
+    reminders_blocked: "您的浏览器已阻止本站通知。您可以在浏览器设置中允许它们。",
     auth_consent_note: "创建账户即表示您同意：",
     guest_use_btn: "以访客身份使用",
     guest_banner_title: "您正在以访客身份使用 Plainscript。",
@@ -5344,6 +5360,11 @@ const I18N = {
     footer_privacy: "Chính sách quyền riêng tư",
     footer_terms: "Điều khoản",
     back_home: "Trang chủ",
+    reminders_enable: "Bật nhắc nhở liều dùng",
+    reminders_disable: "Tắt nhắc nhở liều dùng",
+    reminders_title: "Nhắc nhở từ Plainscript",
+    reminders_note: "Nhắc nhở chỉ xuất hiện khi Plainscript đang mở trong một thẻ — không có máy chủ gửi chúng khi ứng dụng đã đóng. Xin đừng chỉ dựa vào đây làm lời nhắc duy nhất.",
+    reminders_blocked: "Trình duyệt của bạn đã chặn thông báo cho trang này. Bạn có thể cho phép trong cài đặt trình duyệt.",
     auth_consent_note: "Khi tạo tài khoản, bạn đồng ý với:",
     guest_use_btn: "Dùng với tư cách khách",
     guest_banner_title: "Bạn đang dùng Plainscript với tư cách khách.",
@@ -5746,6 +5767,11 @@ const I18N = {
     footer_privacy: "سياسة الخصوصية",
     footer_terms: "الشروط",
     back_home: "الرئيسية",
+    reminders_enable: "تفعيل تذكيرات الجرعات",
+    reminders_disable: "إيقاف تذكيرات الجرعات",
+    reminders_title: "تذكير من Plainscript",
+    reminders_note: "تظهر التذكيرات فقط أثناء فتح Plainscript في علامة تبويب — لا يوجد خادم يرسلها عند إغلاقه. من فضلك لا تعتمد على هذا كتذكيرك الوحيد.",
+    reminders_blocked: "حظر متصفحك الإشعارات لهذا الموقع. يمكنك السماح بها من إعدادات المتصفح.",
     auth_consent_note: "بإنشاء حساب، فإنك توافق على:",
     guest_use_btn: "الاستخدام كضيف",
     guest_banner_title: "أنت تستخدم Plainscript كضيف.",
@@ -6181,6 +6207,11 @@ const I18N = {
     footer_privacy: "Politique de confidentialité",
     footer_terms: "Conditions",
     back_home: "Accueil",
+    reminders_enable: "Activer les rappels de prise",
+    reminders_disable: "Désactiver les rappels de prise",
+    reminders_title: "Rappel Plainscript",
+    reminders_note: "Les rappels n'apparaissent que lorsque Plainscript est ouvert dans un onglet — aucun serveur ne les envoie une fois fermé. N'en faites pas votre seul rappel.",
+    reminders_blocked: "Votre navigateur a bloqué les notifications pour ce site. Vous pouvez les autoriser dans ses paramètres.",
     auth_consent_note: "En créant un compte, vous acceptez :",
     guest_use_btn: "Utiliser en tant qu'invité",
     guest_banner_title: "Vous utilisez Plainscript en tant qu'invité.",
@@ -6616,6 +6647,11 @@ const I18N = {
     footer_privacy: "개인정보 처리방침",
     footer_terms: "이용약관",
     back_home: "홈",
+    reminders_enable: "복용 알림 켜기",
+    reminders_disable: "복용 알림 끄기",
+    reminders_title: "Plainscript 알림",
+    reminders_note: "알림은 Plainscript가 탭에서 열려 있는 동안에만 표시됩니다 — 앱이 닫히면 알림을 보내는 서버가 없습니다. 이것만을 유일한 알림으로 의존하지 마세요.",
+    reminders_blocked: "브라우저가 이 사이트의 알림을 차단했습니다. 브라우저 설정에서 허용할 수 있습니다.",
     auth_consent_note: "계정을 만들면 다음에 동의하게 됩니다:",
     guest_use_btn: "게스트로 사용",
     guest_banner_title: "게스트로 Plainscript를 사용 중입니다.",
@@ -7051,6 +7087,11 @@ const I18N = {
     footer_privacy: "Политика конфиденциальности",
     footer_terms: "Условия",
     back_home: "Главная",
+    reminders_enable: "Включить напоминания о приёме",
+    reminders_disable: "Выключить напоминания о приёме",
+    reminders_title: "Напоминание Plainscript",
+    reminders_note: "Напоминания появляются только пока Plainscript открыт во вкладке — сервера, который отправлял бы их при закрытом приложении, нет. Пожалуйста, не полагайтесь на это как на единственное напоминание.",
+    reminders_blocked: "Ваш браузер заблокировал уведомления для этого сайта. Их можно разрешить в настройках браузера.",
     auth_consent_note: "Создавая аккаунт, вы соглашаетесь с:",
     guest_use_btn: "Использовать как гость",
     guest_banner_title: "Вы используете Plainscript как гость.",
@@ -7486,6 +7527,11 @@ const I18N = {
     footer_privacy: "Política de Privacidade",
     footer_terms: "Termos",
     back_home: "Início",
+    reminders_enable: "Ativar lembretes de dose",
+    reminders_disable: "Desativar lembretes de dose",
+    reminders_title: "Lembrete do Plainscript",
+    reminders_note: "Os lembretes só aparecem enquanto o Plainscript estiver aberto em uma aba — não há servidor para enviá-los quando fechado. Por favor, não dependa disso como seu único lembrete.",
+    reminders_blocked: "Seu navegador bloqueou as notificações deste site. Você pode permiti-las nas configurações do navegador.",
     auth_consent_note: "Ao criar uma conta, você concorda com:",
     guest_use_btn: "Usar como convidado",
     guest_banner_title: "Você está usando o Plainscript como convidado.",
@@ -7921,6 +7967,11 @@ const I18N = {
     footer_privacy: "Datenschutzerklärung",
     footer_terms: "Nutzungsbedingungen",
     back_home: "Startseite",
+    reminders_enable: "Dosis-Erinnerungen aktivieren",
+    reminders_disable: "Dosis-Erinnerungen deaktivieren",
+    reminders_title: "Plainscript-Erinnerung",
+    reminders_note: "Erinnerungen erscheinen nur, solange Plainscript in einem Tab geöffnet ist — es gibt keinen Server, der sie bei geschlossener App sendet. Bitte verlassen Sie sich nicht allein darauf.",
+    reminders_blocked: "Ihr Browser hat Benachrichtigungen für diese Seite blockiert. Sie können sie in den Browsereinstellungen erlauben.",
     auth_consent_note: "Mit der Erstellung eines Kontos stimmen Sie zu:",
     guest_use_btn: "Als Gast verwenden",
     guest_banner_title: "Sie nutzen Plainscript als Gast.",
@@ -8356,6 +8407,11 @@ const I18N = {
     footer_privacy: "プライバシーポリシー",
     footer_terms: "利用規約",
     back_home: "ホーム",
+    reminders_enable: "服用リマインダーをオンにする",
+    reminders_disable: "服用リマインダーをオフにする",
+    reminders_title: "Plainscript のリマインダー",
+    reminders_note: "リマインダーは Plainscript がタブで開いている間だけ表示されます。閉じているときに送信するサーバーはありません。これだけを唯一の通知手段にしないでください。",
+    reminders_blocked: "ブラウザがこのサイトの通知をブロックしています。ブラウザの設定で許可できます。",
     auth_consent_note: "アカウントを作成すると、以下に同意したことになります：",
     guest_use_btn: "ゲストとして使う",
     guest_banner_title: "ゲストとして Plainscript を使っています。",
@@ -8679,6 +8735,11 @@ const I18N = {
     footer_privacy: "गोपनीयता नीति",
     footer_terms: "शर्तें",
     back_home: "होम",
+    reminders_enable: "खुराक अनुस्मारक चालू करें",
+    reminders_disable: "खुराक अनुस्मारक बंद करें",
+    reminders_title: "Plainscript अनुस्मारक",
+    reminders_note: "अनुस्मारक तभी दिखते हैं जब Plainscript किसी टैब में खुला हो — बंद होने पर उन्हें भेजने वाला कोई सर्वर नहीं है। कृपया इसे अपना एकमात्र अनुस्मारक न बनाएं।",
+    reminders_blocked: "आपके ब्राउज़र ने इस साइट की सूचनाएं ब्लॉक कर दी हैं। आप उन्हें ब्राउज़र सेटिंग्स में अनुमति दे सकते हैं।",
     auth_consent_note: "खाता बनाकर, आप इनसे सहमत होते हैं:",
     guest_use_btn: "अतिथि के रूप में उपयोग करें",
     guest_banner_title: "आप Plainscript का उपयोग अतिथि के रूप में कर रहे हैं।",
@@ -9089,6 +9150,11 @@ const I18N = {
     footer_privacy: "தனியுரிமைக் கொள்கை",
     footer_terms: "விதிமுறைகள்",
     back_home: "முகப்பு",
+    reminders_enable: "மருந்து நினைவூட்டல்களை இயக்கு",
+    reminders_disable: "மருந்து நினைவூட்டல்களை அணை",
+    reminders_title: "Plainscript நினைவூட்டல்",
+    reminders_note: "Plainscript ஒரு தாவலில் திறந்திருக்கும் போது மட்டுமே நினைவூட்டல்கள் தோன்றும் — மூடியிருக்கும் போது அனுப்ப சேவையகம் இல்லை. இதை உங்கள் ஒரே நினைவூட்டலாக நம்ப வேண்டாம்.",
+    reminders_blocked: "உங்கள் உலாவி இந்தத் தளத்திற்கான அறிவிப்புகளைத் தடுத்துள்ளது. உலாவி அமைப்புகளில் அனுமதிக்கலாம்.",
     auth_consent_note: "கணக்கை உருவாக்குவதன் மூலம், இவற்றை ஏற்கிறீர்கள்:",
     guest_use_btn: "விருந்தினராகப் பயன்படுத்து",
     guest_banner_title: "நீங்கள் Plainscript ஐ விருந்தினராகப் பயன்படுத்துகிறீர்கள்.",
@@ -12957,6 +13023,113 @@ function medsForActivePerson(){
   return meds.filter(m => (m.person||"").trim() === activePerson);
 }
 
+/* =================================================================
+   DOSE REMINDERS
+   Fires a local notification at the dosing times the user themselves
+   entered. It reminds; it never instructs — the body is the time and
+   the names they saved, nothing that reads as medical direction.
+
+   THE HONEST LIMIT, stated in the UI and not buried here: Plainscript
+   has no push server, so these can only fire while the app is open in
+   a tab. A medication reminder that silently fails is worse than no
+   reminder at all, so the interface says so plainly and tells people
+   not to rely on it as their only one. Adding real background delivery
+   would mean a push server holding users' dosing schedules, which is a
+   meaningful privacy cost and a deliberate non-goal for now.
+   ================================================================= */
+const NOTIF_KEY = "plainscript.reminders";
+const NOTIF_FIRED_KEY = "plainscript.reminders_fired";
+let reminderTimer = null;
+
+function remindersSupported(){
+  return typeof Notification !== "undefined" && typeof Notification.requestPermission === "function";
+}
+function remindersOn(){
+  if (!remindersSupported() || Notification.permission !== "granted") return false;
+  try{ return localStorage.getItem(NOTIF_KEY) === "1"; }catch(e){ return false; }
+}
+
+/* one entry per slot per day, so a reload can't re-fire a dose already
+   announced and can't lose one either */
+function reminderFired(){
+  const today = new Date().toDateString();
+  try{
+    const o = JSON.parse(localStorage.getItem(NOTIF_FIRED_KEY) || "null");
+    if (o && o.date === today) return o;
+  }catch(e){}
+  return { date: today, slots: [] };
+}
+
+function slotsForToday(){
+  const slots = {};
+  (cabinet || []).forEach(m =>
+    parseTimes(m.schedule).forEach(tm => {
+      (slots[tm] = slots[tm] || []).push(titlecase(m.generic || m.brand || m.name));
+    }));
+  return slots;
+}
+
+function checkReminders(){
+  if (!remindersOn()) return;
+  const now = new Date();
+  const hhmm = String(now.getHours()).padStart(2,"0") + ":" + String(now.getMinutes()).padStart(2,"0");
+  const slots = slotsForToday();
+  if (!slots[hhmm]) return;
+  const state = reminderFired();
+  if (state.slots.includes(hhmm)) return;
+  state.slots.push(hhmm);
+  try{ localStorage.setItem(NOTIF_FIRED_KEY, JSON.stringify(state)); }catch(e){}
+  try{
+    new Notification(t("reminders_title"), {
+      body: hhmm + " — " + slots[hhmm].join(", "),
+      icon: "icon-192.png",
+      tag: "plainscript-dose-" + hhmm      // replaces rather than stacks duplicates
+    });
+  }catch(e){ /* some browsers refuse construction outside a SW; nothing to recover */ }
+}
+
+function startReminderTimer(){
+  if (reminderTimer || !remindersOn()) return;
+  reminderTimer = setInterval(checkReminders, 30000);   // 30s: a dose slot is a minute wide
+  checkReminders();
+}
+function stopReminderTimer(){
+  if (reminderTimer) clearInterval(reminderTimer);
+  reminderTimer = null;
+}
+
+async function toggleReminders(){
+  if (!remindersSupported()) return;
+  if (remindersOn()){
+    try{ localStorage.removeItem(NOTIF_KEY); }catch(e){}
+    stopReminderTimer();
+    renderCabinet();
+    return;
+  }
+  // permission is only ever requested from this explicit click, never on load
+  let perm = Notification.permission;
+  if (perm === "default"){
+    try{ perm = await Notification.requestPermission(); }catch(e){ perm = "denied"; }
+  }
+  if (perm !== "granted"){ cabinetStatus(t("reminders_blocked")); return; }
+  try{ localStorage.setItem(NOTIF_KEY, "1"); }catch(e){}
+  startReminderTimer();
+  renderCabinet();
+}
+
+function remindersHTML(meds){
+  if (!remindersSupported()) return "";           // feature-detected, like voice input
+  const hasTimes = meds.some(m => parseTimes(m.schedule).length);
+  if (!hasTimes) return "";                       // nothing to remind about yet
+  const on = remindersOn();
+  return `<div class="rem-box">
+    <button class="${on ? "mini" : "ghost"}" data-act="toggle-reminders" aria-pressed="${on}">
+      ${esc(on ? t("reminders_disable") : t("reminders_enable"))}
+    </button>
+    <p class="status" style="padding:8px 0 0;">${esc(t("reminders_note"))}</p>
+  </div>`;
+}
+
 /* Dosing schedule — optional comma-separated "HH:MM" times per med, and a
    simple "Today" timeline that groups the visible meds by time. */
 function parseTimes(schedule){
@@ -13088,6 +13261,7 @@ function renderCabinet(){
     html += dashboardSummaryHTML(visible);
     html += reminderSummary(visible);
     html += todayScheduleHTML(visible);
+    html += remindersHTML(visible);
     html += `<div class="results">${visible.map(medRowHTML).join("")}</div>
     <div class="cab-tools">
       <button class="ghost" data-act="regimen">${t("regimen_btn")}</button>
@@ -13198,6 +13372,8 @@ document.addEventListener("click", e => {
   if (guest){ enterApp(); startGuest(); return; }
   const upgrade = e.target.closest('[data-act="guest-signup"]');
   if (upgrade && typeof openSignInModal === "function") { openSignInModal(); return; }
+  const rem = e.target.closest('[data-act="toggle-reminders"]');
+  if (rem){ toggleReminders(); return; }
   const home = e.target.closest('[data-act="back-home"]');
   if (home){
     // a navigation, not a preference change: the "entered" flag stays set, so a
@@ -13918,7 +14094,7 @@ $("#cabinet-body").addEventListener("keydown", e => {
   }
   renderAcct();
   // a returning guest gets their local cabinet straight back, no network involved
-  if (!session && isGuest) cabinet = guestLoad();
+  if (!session && isGuest){ cabinet = guestLoad(); startReminderTimer(); }
   renderCabinet();
   if (authError) selectTab("cabinet"); // surface the sign-in error where it's explained
   if (!session) return;
@@ -13930,6 +14106,8 @@ $("#cabinet-body").addEventListener("keydown", e => {
   try{ await loadCabinet(); }
   catch(e){ cabinet = []; cabinetStatus(e.message); }
   renderCabinet();
+  // resume reminders for anyone who already turned them on
+  startReminderTimer();
   if (justSignedIn) selectTab("cabinet"); // land the user on their cabinet after OAuth
 })();
 
