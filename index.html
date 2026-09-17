@@ -33,13 +33,13 @@
      means an alarming thing.
      ============================================================ */
   :root{
-    --paper:#FAF8F6;
-    --card:#FEFDFC;
+    --paper:#F3EDE0;
+    --card:#FBF7EC;
     --ink:#18262F;
     --ink-soft:#495965;
     --ink-faint:#5B6B76;
-    --line:#E6E2DB;
-    --line-soft:#F1EEE9;
+    --line:#E2DACA;
+    --line-soft:#EDE7DA;
     --accent:#11736D;
     --accent-deep:#09534E;
     --accent-wash:#E4F2F1;
@@ -209,6 +209,28 @@
   }
 
   /* [PRIVI - TASK 14] a warm "sepia"/paper theme belongs here — see YOUR_TASKS.md */
+
+
+  /* ---------- logo watermark ----------
+     A barely-there tiling of the Plainscript cross behind everything. Painted
+     as a MASK over var(--ink) rather than a coloured background image, because
+     a data: URI can't read CSS variables — this way the watermark re-tints
+     itself for all seven themes for free. Fixed, so it doesn't scroll with the
+     page, and inert to the pointer. */
+  .bg-pattern{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:var(--ink);
+    /* deliberately at the edge of perception — it should register as texture,
+       not as a pattern you notice and then have to ignore */
+    opacity:.017;
+    -webkit-mask-image:url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='72'%20height='72'%20viewBox='0%200%2072%2072'><g%20fill='%23000'><rect%20x='30'%20y='16'%20width='12'%20height='40'%20rx='4'/><rect%20x='16'%20y='30'%20width='40'%20height='12'%20rx='4'/></g></svg>");
+            mask-image:url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='72'%20height='72'%20viewBox='0%200%2072%2072'><g%20fill='%23000'><rect%20x='30'%20y='16'%20width='12'%20height='40'%20rx='4'/><rect%20x='16'%20y='30'%20width='40'%20height='12'%20rx='4'/></g></svg>");
+    -webkit-mask-size:72px 72px; mask-size:72px 72px;
+    -webkit-mask-repeat:repeat; mask-repeat:repeat;
+  }
+  /* content has to sit above the watermark layer */
+  .safetybar, #landing, header.site, main, footer{position:relative; z-index:1;}
+  @media print{ .bg-pattern{display:none !important;} }
 
   *{box-sizing:border-box;}
   html{-webkit-text-size-adjust:100%;}
@@ -518,6 +540,21 @@
   h1, h2, h3, .headline, .lp-hero h1{text-wrap:balance;}
   .lp-sub, .panel-intro, .status{text-wrap:pretty;}
   .card h3, .map-chip, .med-name, .pair{overflow-wrap:anywhere;}
+
+
+  /* ---------- warmth pass ----------
+     The instrument look is the point, but at full strength it read as cold.
+     Softer corners, a little more air, and warmer rules take the edge off
+     without touching the severity language or the provenance strips, which
+     are the parts that carry credibility. */
+  .card, .scan-summary, .cab-dash, .nofind, .signin, .car-slide{ border-radius:14px; }
+  .card{ padding:20px 22px; }
+  .verdict{ border-radius:12px; }
+  button.go, button.ghost{ border-radius:12px; }
+  input[type=text], .mednote textarea{ border-radius:12px; }
+  .results > * + *{ margin-top:14px; }
+  .panel-intro{ font-size:15.5px; line-height:1.65; }
+  .card h3{ letter-spacing:-.01em; }
 
   main{padding:26px 0 60px;}
   .panel[hidden]{display:none;}
@@ -1146,6 +1183,8 @@
   }catch(e){ /* storage blocked — fall through to the tool */ }
 })();
 </script>
+
+<div class="bg-pattern" aria-hidden="true"></div>
 
 <!-- persistent safety frame -->
 <aside class="safetybar" aria-label="Safety notice"><div class="wrap">
@@ -12066,6 +12105,7 @@ function applyLang(lang, opts){
     }).catch(()=>{});
   }
   refreshDynamicContentForLang();
+  if (typeof fitAllSelects === "function") fitAllSelects();
 }
 
 /* re-renders anything already on screen that was built from JS template
@@ -13310,6 +13350,34 @@ function enterApp(opts){
     if (typeof openSignInModal === "function") openSignInModal();
   }
 }
+
+
+/* A native <select> always sizes to its longest option, so the theme picker sat
+   in a box wide enough for "High contrast" even while showing "Dark", and the
+   language picker in one sized for "Português". CSS can't express "fit the
+   selected option", so measure the selected text and set the width from it.
+   Re-run on change and whenever the language switches, since every option's
+   text changes then. */
+function fitSelect(sel){
+  if (!sel) return;
+  const probe = document.createElement("span");
+  const cs = getComputedStyle(sel);
+  probe.style.cssText = "position:absolute;visibility:hidden;white-space:pre;";
+  probe.style.font = cs.font;
+  probe.style.letterSpacing = cs.letterSpacing;
+  probe.textContent = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : "";
+  document.body.appendChild(probe);
+  sel.style.width = (probe.offsetWidth + 2) + "px";
+  probe.remove();
+}
+function fitAllSelects(){ ["#lang-select", "#theme-select"].forEach(id => fitSelect($(id))); }
+["#lang-select", "#theme-select"].forEach(id => {
+  const el = $(id);
+  if (el) el.addEventListener("change", () => fitSelect(el));
+});
+// fonts load after first paint and change the measurement
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAllSelects);
+fitAllSelects();
 
 /* Feature carousel. Auto-advance is a convenience, never the only way through:
    dots and arrows are real controls, it pauses while you're hovering or have
