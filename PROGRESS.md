@@ -25,6 +25,20 @@ Companion docs: `CLAUDE.md` = architecture + safety rules · `PLAINSCRIPT_ROADMA
 
 ---
 
+## 0b. Shipped 2026-09-17 (second batch)
+- **Guest mode** — a cabinet with no account, stored only in the browser, on web and installed app. Routed inside `db()` so all six medication read/write paths work unchanged. Sharing is unavailable to guests by design (a share link is served by Supabase; nothing local could honour it).
+- **Seven themes** — Light, Dark, Blue, Green, Purple, Rose, High contrast, dark by default. Built on one rule: each theme picks an accent hue and tints the whole neutral ramp to it; **severity never re-themes**, and where an accent and a severity hue compete the accent yields. Red ships as Rose because a true red accent sat 18° from the "major" severity bar. Every text pair measured in-browser: zero below WCAG AA.
+- **3D animated hero** — the cross logo extruded from 16 stacked DOM layers in CSS 3D (no WebGL, no library), full-bleed stretched wordmark behind it, theme-reactive.
+- **Feature carousel**, cross-faded, pauses on hover/focus, off under reduced motion.
+- **Real progress readout** on Check and Cabinet Scan — counts lookups that actually returned; no invented progress.
+- **Dose reminders** — local notifications at the user's own dosing times, grouped per slot, once per slot per day. Honest limit stated in the UI: no push server, so they only fire while the app is open.
+- **Home control** in the app footer (there was previously no route back to the homepage at all).
+- Elevation token in all seven themes, press feedback, `text-wrap: balance` on headings.
+
+**Two pre-existing bugs fixed along the way:** severity pill text was hardcoded white with a `[data-theme="dark"]`-scoped correction, so every other dark-ground theme had white-on-bright-bar at ~3:1; and the high-contrast theme's major bar failed at 2.79:1 (caught by verifying the palette rather than trusting it).
+
+**Still open:** homepage sections 6-10 are Privi's (`YOUR_TASKS.md`); landing copy is English-only while the page claims 13 languages — translate once copy is final.
+
 ## 0. Shipped 2026-09-16/17 (all live)
 - **Homepage** — landing view for signed-out first-time visitors, inside `index.html` (the i18n dictionary and theme machinery live there, so a separate file would have meant duplicating the whole 13-language system). Skipped for `?share=` links, installed PWA, signed-in users, and returning visitors. Content sections deliberately left for Privi — see `YOUR_TASKS.md`.
 - **My Cabinet is now a dashboard** — stat tiles promoted out of the Insights modal, Scan as the single primary action. Neutral ink, never green.
