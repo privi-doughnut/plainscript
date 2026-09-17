@@ -229,3 +229,30 @@ Be honest about the interaction engine (`analyzeDrugPairs`, `sideHit`, `labelMen
 the Supabase security model: you should be able to explain *what they do and why*, which is
 different from claiming you wrote them. "I directed this and I understand how it works, and
 here's the part I wrote myself" is a strong, defensible position — and it's true.
+
+---
+
+### TASK 14 — Design a warm "sepia" theme
+**File:** `index.html`, find the comment `[PRIVI - TASK 14]` in the `<style>` block.
+
+There are four themes now (Dark, Light, Midnight, High contrast). Add a fifth: a warm,
+paper-like sepia that's easy on the eyes for long reading — genuinely useful for the older
+readers this app is aimed at.
+
+**What to do:** copy the whole `[data-theme="midnight"]{ ... }` block, rename the selector to
+`[data-theme="sepia"]`, and change the colour values. Then add one `<option value="sepia">`
+to the theme `<select>` (search for `theme-select`), and add `"sepia"` to the `THEMES` array
+in the JavaScript.
+
+**What to know:** every theme must define the *same complete set* of variables — if you miss
+one it silently inherits from `:root` and looks broken in a way that's hard to spot. Copy the
+whole block and edit values; don't write it from scratch.
+
+**The part that actually matters:** the severity colours (`--major-*`, `--mod-*`, `--minor-*`)
+must stay clearly distinguishable from each other and readable on their backgrounds. That's a
+safety requirement, not an aesthetic one. Ask me to run the contrast checker on your palette
+before you commit — I have a script that measures every pair and tells you if any fall below
+WCAG AA.
+
+**You'll also need a translated name** (`theme_sepia`) in all 13 dictionaries — ask me, don't
+guess at translations.

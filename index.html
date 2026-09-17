@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<!-- Dark is the default. The attribute is set here rather than by script so the
+     first paint is already correct — a light flash before a dark theme loads is
+     the single most noticeable theming bug there is. -->
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8" />
 <!-- viewport-fit=cover is what makes env(safe-area-inset-*) resolve to real values,
@@ -76,6 +79,51 @@
     --safety-bg:#0A0E13;
     --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.4);
   }
+
+  /* ---- midnight: a deeper, bluer dark for low-light reading. Same clinical
+         restraint, less grey. ---- */
+  [data-theme="midnight"]{
+    --paper:#0A0F1C;
+    --card:#111829;
+    --ink:#E6ECF7;
+    --ink-soft:#9AA8C0;
+    --ink-faint:#8795AE;
+    --line:#1E2739;
+    --line-soft:#161D2C;
+    --accent:#4FB8E8;
+    --accent-deep:#7ACDF2;
+    --accent-wash:#0E2A3D;
+    --major-bg:#241318; --major-bar:#E5546A; --major-ink:#F2A9B6;
+    --mod-bg:#241A10;   --mod-bar:#E0902E;   --mod-ink:#F0C689;
+    --minor-bg:#1F1F12; --minor-bar:#CFBA42; --minor-ink:#E4D68C;
+    --note-bg:#161E2E;  --note-bar:#7A89A6;  --note-ink:#B3C0D6;
+    --safety-bg:#060A14;
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 10px 30px rgba(0,0,0,.45);
+  }
+
+  /* ---- high contrast: for low vision and bright-sunlight use. Pure black
+         ground, near-white text, and severity colours pushed to their most
+         separable values — this is an accessibility mode, not a style. ---- */
+  [data-theme="contrast"]{
+    --paper:#000000;
+    --card:#0B0B0B;
+    --ink:#FFFFFF;
+    --ink-soft:#E8E8E8;
+    --ink-faint:#CFCFCF;
+    --line:#5A5A5A;
+    --line-soft:#3A3A3A;
+    --accent:#4FE3D2;
+    --accent-deep:#7FF0E3;
+    --accent-wash:#00302C;
+    --major-bg:#2E0A08; --major-bar:#FF6B5E; --major-ink:#FFB8B0;
+    --mod-bg:#2E1C05;   --mod-bar:#FFA733;   --mod-ink:#FFD394;
+    --minor-bg:#2B2705; --minor-bar:#F2D544; --minor-ink:#FCEB9B;
+    --note-bg:#141414;  --note-bar:#A8A8A8;  --note-ink:#DCDCDC;
+    --safety-bg:#000000;
+    --shadow:0 0 0 1px #5A5A5A;
+  }
+
+  /* [PRIVI - TASK 14] a warm "sepia"/paper theme belongs here — see YOUR_TASKS.md */
 
   *{box-sizing:border-box;}
   html{-webkit-text-size-adjust:100%;}
@@ -200,8 +248,64 @@
   .lp-src{font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:.02em;}
   .lp-nav-actions{display:flex; gap:9px; flex-wrap:wrap;}
 
-  .lp-hero{padding:72px 0 64px;}
+  /* ---------- hero composition ----------
+     Three stacked layers in one grid cell: ghosted wordmark, rotating mark,
+     copy. Only transform and opacity are ever animated — the two properties
+     the compositor can handle without a layout or paint pass. */
+  .lp-hero{padding:72px 0 64px; overflow:hidden;}
+  .lp-hero-inner{position:relative; display:grid;}
+  .lp-hero-inner > *{grid-area:1 / 1;}
+
+  /* Sized to fit the wrap rather than bleed: a wordmark cut off mid-word reads
+     as a layout bug, not as a deliberate crop. 10.5vw keeps all 11 characters
+     inside the container at every width it's shown at. */
+  .lp-ghost{
+    align-self:center; justify-self:center;
+    font-family:var(--serif); font-weight:600; letter-spacing:-.03em;
+    font-size:clamp(44px, 10.5vw, 146px); line-height:1; white-space:nowrap;
+    color:var(--ink); opacity:.05; user-select:none; pointer-events:none;
+  }
+
+  /* offset right so the mark sits beside the copy instead of behind it */
+  .lp-stage{align-self:center; justify-self:end; margin-right:2vw; perspective:900px; pointer-events:none;}
+  .lp-tilt{animation:mark-tilt 19s ease-in-out infinite; transform-style:preserve-3d;}
+  .lp-spin{
+    width:clamp(150px, 26vw, 260px); aspect-ratio:1;
+    transform-style:preserve-3d;
+    animation:mark-spin 28s linear infinite;
+  }
+  .lp-mark{position:absolute; inset:0; transform-style:preserve-3d;}
+  /* Each layer is the same cross, pushed along Z and dimmed with depth, which
+     is what reads as a solid extruded object rather than a flat sticker. */
+  .lp-mark i{
+    position:absolute; inset:0; background:var(--accent);
+    clip-path:polygon(35% 0, 65% 0, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0 65%, 0 35%, 35% 35%);
+    transform:translateZ(calc((var(--i) - 7.5) * 2px));
+    filter:brightness(calc(.5 + (var(--i) / 15) * .6));
+  }
+  @keyframes mark-spin{ from{transform:rotateY(0deg);} to{transform:rotateY(360deg);} }
+  @keyframes mark-tilt{
+    0%,100%{transform:rotateX(9deg) rotateZ(-3deg);}
+    50%    {transform:rotateX(-7deg) rotateZ(3deg);}
+  }
+
+  /* capped so the longest line can't run under the rotating mark */
+  .lp-hero-copy{position:relative; align-self:center; max-width:min(100%, 620px);}
+
+  /* one-time entrance; --d staggers each element */
+  .reveal{animation:reveal .48s cubic-bezier(.33,1,.68,1) both; animation-delay:var(--d,0ms);}
+  @keyframes reveal{ from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:none;} }
+
+  /* Reduced motion degrades to the finished state, never to nothing: the mark
+     still sits there at a considered angle, the copy is simply already in. */
+  @media (prefers-reduced-motion:reduce){
+    .reveal{animation:none;}
+    .lp-spin{animation:none; transform:rotateY(-26deg);}
+    .lp-tilt{animation:none; transform:rotateX(8deg);}
+  }
+
   .lp-hero h1{font-family:var(--serif); font-size:46px; line-height:1.1; font-weight:600; letter-spacing:-.02em; margin:0 0 18px; max-width:16ch;}
+  .lp-accent{color:var(--accent);}
   .lp-sub{font-size:18px; line-height:1.55; color:var(--ink-soft); margin:0 0 26px; max-width:60ch;}
   .lp-cta{display:flex; gap:11px; flex-wrap:wrap; margin-bottom:26px;}
   .lp-strip{font-family:var(--mono); font-size:12.5px; color:var(--ink-faint); letter-spacing:.02em; margin:0 0 10px;}
@@ -223,6 +327,13 @@
     font-family:var(--mono); font-size:12px; color:var(--ink-faint); line-height:1.8;}
   .lp-foot a{color:var(--ink-soft);}
 
+  @media (max-width:900px){
+    /* Below this the mark and the text genuinely collide, so the composition
+       un-stacks: mark above, copy below, each in its own row. */
+    .lp-hero-inner{display:block;}
+    .lp-ghost{display:none;}
+    .lp-stage{display:flex; justify-content:center; margin:0 0 26px;}
+  }
   @media (max-width:560px){
     .lp-hero{padding:44px 0 38px;}
     .lp-hero h1{font-size:33px; max-width:none;}
@@ -885,17 +996,38 @@
     </div>
   </div></header>
 
-  <section class="lp-hero"><div class="wrap">
-    <h1>Understand what you're actually taking.</h1>
-    <p class="lp-sub">Plainscript turns the FDA's own drug labels into plain English and checks
-      whether your medicines interact — free, sourced, and never invented.</p>
-    <div class="lp-cta">
-      <button class="go" data-act="enter-app">Open the tool</button>
-      <button class="ghost" data-act="enter-signup">Create a free account</button>
-      <button class="ghost" data-act="use-guest">Use as guest</button>
+  <section class="lp-hero"><div class="wrap lp-hero-inner">
+    <!-- Layered hero: ghosted wordmark at the back, the extruded mark rotating
+         in the middle, copy in front. The mark is built from stacked DOM layers
+         with CSS 3D rather than WebGL — no library, no build step, and because
+         it's real DOM painted with var(--accent) it re-colours itself for every
+         theme automatically. aria-hidden throughout: it is decoration, and the
+         headline beside it already carries the meaning. -->
+    <div class="lp-ghost" aria-hidden="true">PLAINSCRIPT</div>
+
+    <div class="lp-stage" aria-hidden="true">
+      <div class="lp-tilt"><div class="lp-spin">
+        <div class="lp-mark">
+          <i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i>
+          <i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i>
+          <i style="--i:8"></i><i style="--i:9"></i><i style="--i:10"></i><i style="--i:11"></i>
+          <i style="--i:12"></i><i style="--i:13"></i><i style="--i:14"></i><i style="--i:15"></i>
+        </div>
+      </div></div>
     </div>
-    <p class="lp-strip">openFDA · RxNorm · 13 languages · works offline · no ads · no tracking</p>
-    <p class="lp-note">No account needed. Decoding a medication and checking interactions are free and always will be.</p>
+
+    <div class="lp-hero-copy">
+      <h1 class="reveal" style="--d:0ms">Understand what<br><span class="lp-accent">you're actually taking.</span></h1>
+      <p class="lp-sub reveal" style="--d:140ms">Plainscript turns the FDA's own drug labels into plain English and checks
+        whether your medicines interact — free, sourced, and never invented.</p>
+      <div class="lp-cta reveal" style="--d:210ms">
+        <button class="go" data-act="enter-app">Open the tool</button>
+        <button class="ghost" data-act="enter-signup">Create a free account</button>
+        <button class="ghost" data-act="use-guest">Use as guest</button>
+      </div>
+      <p class="lp-strip reveal" style="--d:280ms">openFDA · RxNorm · 13 languages · works offline · no ads · no tracking</p>
+      <p class="lp-note reveal" style="--d:340ms">No account needed. Decoding a medication and checking interactions are free and always will be.</p>
+    </div>
   </div></section>
 
   <!-- [PRIVI - TASK 6] "The problem" section goes here -->
@@ -940,9 +1072,18 @@
   <div class="brand">
     <h1>Plainscript</h1>
     <span class="tag">// medication reference</span>
-    <button id="theme-toggle" class="themetoggle" aria-label="Switch to dark theme" title="Toggle light / dark">
-      <span class="ticon" aria-hidden="true">☾</span><span class="tlabel" data-i18n="theme_dark">Dark</span>
-    </button>
+    <!-- Same control pattern as the language picker: one <select> rather than a
+         custom swatch popover, so it's keyboard- and screen-reader-native and
+         works in all 13 languages for free. -->
+    <div class="lang-select-wrap">
+      <span class="ticon" aria-hidden="true">◐</span>
+      <select id="theme-select" data-i18n-aria-label="theme_select_aria" aria-label="Colour theme" title="Colour theme">
+        <option value="dark" data-i18n="theme_dark">Dark</option>
+        <option value="light" data-i18n="theme_light">Light</option>
+        <option value="midnight" data-i18n="theme_midnight">Midnight</option>
+        <option value="contrast" data-i18n="theme_contrast">High contrast</option>
+      </select>
+    </div>
     <button id="reading-toggle" class="themetoggle" aria-pressed="false" data-i18n-aria-label="reading_mode_aria" title="Easy-reading mode">
       <span class="ticon" aria-hidden="true">Aa</span><span class="tlabel" data-i18n="reading_mode_label">Easy read</span>
     </button>
@@ -3764,6 +3905,9 @@ const I18N = {
     similar_modal_aria: "Similar and related medications",
     tools_aria: "Tools",
     theme_aria_dark: "Switch to dark theme", theme_aria_light: "Switch to light theme",
+    theme_midnight: "Midnight",
+    theme_contrast: "High contrast",
+    theme_select_aria: "Colour theme",
     remove_medication_aria: "Remove medication",
     personal_note_aria: "Personal note",
     decode_looking_up_prefix: "Looking up",
@@ -4248,6 +4392,9 @@ const I18N = {
     similar_modal_aria: "Medicamentos similares y relacionados",
     tools_aria: "Herramientas",
     theme_aria_dark: "Cambiar a tema oscuro", theme_aria_light: "Cambiar a tema claro",
+    theme_midnight: "Medianoche",
+    theme_contrast: "Alto contraste",
+    theme_select_aria: "Tema de color",
     remove_medication_aria: "Quitar medicamento",
     personal_note_aria: "Nota personal",
     decode_looking_up_prefix: "Buscando",
@@ -4726,6 +4873,9 @@ const I18N = {
     similar_modal_aria: "相似及相关药物",
     tools_aria: "工具",
     theme_aria_dark: "切换到深色主题", theme_aria_light: "切换到浅色主题",
+    theme_midnight: "午夜",
+    theme_contrast: "高对比度",
+    theme_select_aria: "配色主题",
     remove_medication_aria: "移除药物",
     personal_note_aria: "个人备注"
   },
@@ -5114,6 +5264,9 @@ const I18N = {
     similar_modal_aria: "Thuốc tương tự và liên quan",
     tools_aria: "Công cụ",
     theme_aria_dark: "Chuyển sang chế độ tối", theme_aria_light: "Chuyển sang chế độ sáng",
+    theme_midnight: "Nửa đêm",
+    theme_contrast: "Tương phản cao",
+    theme_select_aria: "Chủ đề màu",
     remove_medication_aria: "Xóa thuốc",
     personal_note_aria: "Ghi chú cá nhân"
   },
@@ -5449,6 +5602,9 @@ const I18N = {
     similar_modal_aria: "أدوية مشابهة وذات صلة",
     tools_aria: "أدوات",
     theme_aria_dark: "التبديل إلى المظهر الداكن", theme_aria_light: "التبديل إلى المظهر الفاتح",
+    theme_midnight: "منتصف الليل",
+    theme_contrast: "تباين عالٍ",
+    theme_select_aria: "سمة الألوان",
     remove_medication_aria: "إزالة الدواء",
     personal_note_aria: "ملاحظة شخصية",
     decode_looking_up_prefix: "جارٍ البحث عن",
@@ -5877,6 +6033,9 @@ const I18N = {
     similar_modal_aria: "Médicaments similaires et apparentés",
     tools_aria: "Outils",
     theme_aria_dark: "Passer au thème sombre", theme_aria_light: "Passer au thème clair",
+    theme_midnight: "Minuit",
+    theme_contrast: "Contraste élevé",
+    theme_select_aria: "Thème de couleur",
     remove_medication_aria: "Retirer le médicament",
     personal_note_aria: "Note personnelle",
     decode_looking_up_prefix: "Recherche de",
@@ -6305,6 +6464,9 @@ const I18N = {
     similar_modal_aria: "유사 및 관련 약",
     tools_aria: "도구",
     theme_aria_dark: "어두운 테마로 전환", theme_aria_light: "밝은 테마로 전환",
+    theme_midnight: "미드나이트",
+    theme_contrast: "고대비",
+    theme_select_aria: "색상 테마",
     remove_medication_aria: "약 제거",
     personal_note_aria: "개인 메모",
     decode_looking_up_prefix: "찾는 중:",
@@ -6733,6 +6895,9 @@ const I18N = {
     similar_modal_aria: "Похожие и связанные лекарства",
     tools_aria: "Инструменты",
     theme_aria_dark: "Переключить на тёмную тему", theme_aria_light: "Переключить на светлую тему",
+    theme_midnight: "Полночь",
+    theme_contrast: "Высокий контраст",
+    theme_select_aria: "Цветовая тема",
     remove_medication_aria: "Удалить лекарство",
     personal_note_aria: "Личная заметка",
     decode_looking_up_prefix: "Поиск",
@@ -7161,6 +7326,9 @@ const I18N = {
     similar_modal_aria: "Medicamentos similares e relacionados",
     tools_aria: "Ferramentas",
     theme_aria_dark: "Mudar para o tema escuro", theme_aria_light: "Mudar para o tema claro",
+    theme_midnight: "Meia-noite",
+    theme_contrast: "Alto contraste",
+    theme_select_aria: "Tema de cor",
     remove_medication_aria: "Remover medicamento",
     personal_note_aria: "Nota pessoal",
     decode_looking_up_prefix: "Buscando",
@@ -7589,6 +7757,9 @@ const I18N = {
     similar_modal_aria: "Ähnliche und verwandte Medikamente",
     tools_aria: "Werkzeuge",
     theme_aria_dark: "Zum dunklen Thema wechseln", theme_aria_light: "Zum hellen Thema wechseln",
+    theme_midnight: "Mitternacht",
+    theme_contrast: "Hoher Kontrast",
+    theme_select_aria: "Farbthema",
     remove_medication_aria: "Medikament entfernen",
     personal_note_aria: "Persönliche Notiz",
     decode_looking_up_prefix: "Suche",
@@ -8017,6 +8188,9 @@ const I18N = {
     similar_modal_aria: "類似・関連する薬",
     tools_aria: "ツール",
     theme_aria_dark: "ダークテーマに切り替え", theme_aria_light: "ライトテーマに切り替え",
+    theme_midnight: "ミッドナイト",
+    theme_contrast: "ハイコントラスト",
+    theme_select_aria: "カラーテーマ",
     remove_medication_aria: "薬を削除",
     personal_note_aria: "個人的なメモ",
     decode_looking_up_prefix: "検索中：",
@@ -8403,6 +8577,9 @@ const I18N = {
     similar_modal_aria: "समान और संबंधित दवाएँ",
     tools_aria: "उपकरण",
     theme_aria_dark: "गहरे थीम पर स्विच करें",
+    theme_midnight: "मध्यरात्रि",
+    theme_contrast: "उच्च कंट्रास्ट",
+    theme_select_aria: "रंग थीम",
     theme_aria_light: "हल्के थीम पर स्विच करें",
     remove_medication_aria: "दवा हटाएँ",
     personal_note_aria: "व्यक्तिगत नोट",
@@ -8806,6 +8983,9 @@ const I18N = {
     similar_modal_aria: "ஒத்த மற்றும் தொடர்புடைய மருந்துகள்",
     tools_aria: "கருவிகள்",
     theme_aria_dark: "இருண்ட தீமுக்கு மாறு",
+    theme_midnight: "நள்ளிரவு",
+    theme_contrast: "அதிக மாறுபாடு",
+    theme_select_aria: "வண்ணத் தீம்",
     theme_aria_light: "வெளிர் தீமுக்கு மாறு",
     remove_medication_aria: "மருந்தை அகற்று",
     personal_note_aria: "தனிப்பட்ட குறிப்பு",
@@ -11393,27 +11573,47 @@ $("#drug-list").addEventListener("keydown", e=>{ if(e.key==="Enter") checkIntera
    devices). Profile wins over localStorage once it loads.
    ================================================================= */
 const THEME_KEY = "plainscript.theme";
+/* Dark first because it's the default. "contrast" is an accessibility mode
+   rather than a style, but it lives in the same list so it's one obvious
+   control instead of a separate hidden setting. */
+const THEMES = ["dark", "light", "midnight", "contrast"];
+const DEFAULT_THEME = "dark";
 
-function isDark(){ return document.documentElement.getAttribute("data-theme") === "dark"; }
+function currentTheme(){
+  const t0 = document.documentElement.getAttribute("data-theme");
+  return THEMES.includes(t0) ? t0 : DEFAULT_THEME;
+}
+/* kept because several places still ask "is the background dark?" to pick a
+   contrasting value — every theme except light answers yes */
+function isDark(){ return currentTheme() !== "light"; }
 
-function applyTheme(dark, opts){
+function applyTheme(name, opts){
   opts = opts || {};
-  const btn = $("#theme-toggle");
-  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
-  btn.querySelector(".ticon").textContent  = dark ? "☀" : "☾";
-  btn.querySelector(".tlabel").textContent = dark ? t("theme_light") : t("theme_dark");
-  btn.setAttribute("aria-label", dark ? t("theme_aria_light") : t("theme_aria_dark"));
+  const theme = THEMES.includes(name) ? name : DEFAULT_THEME;
+  document.documentElement.setAttribute("data-theme", theme);
+  const sel = $("#theme-select");
+  if (sel && sel.value !== theme) sel.value = theme;
+  // keep the browser chrome matching the page ground
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", getComputedStyle(document.documentElement).getPropertyValue("--safety-bg").trim() || "#16202E");
   if (opts.persist !== false){
-    try{ localStorage.setItem(THEME_KEY, dark ? "dark" : "light"); }catch(e){}
+    try{ localStorage.setItem(THEME_KEY, theme); }catch(e){}
     // upsert (not update) so it works even if the profile row doesn't exist yet
     if (session) db("profiles", {
-      method:"POST", body:{ id: session.user.id, theme: dark?"dark":"light" },
+      method:"POST", body:{ id: session.user.id, theme: theme },
       prefer:"resolution=merge-duplicates,return=minimal"
     }).catch(()=>{});
   }
 }
-$("#theme-toggle").addEventListener("click", ()=>applyTheme(!isDark()));
-try{ if (localStorage.getItem(THEME_KEY) === "dark") applyTheme(true, {persist:false}); }catch(e){}
+
+$("#theme-select").addEventListener("change", e => applyTheme(e.target.value));
+/* Boot: a stored choice wins; otherwise the dark default already set on <html>
+   stands. Legacy "light"/"dark" values from the old two-way toggle are valid
+   theme names here, so old preferences carry over untouched. */
+try{
+  const stored = localStorage.getItem(THEME_KEY);
+  applyTheme(THEMES.includes(stored) ? stored : DEFAULT_THEME, {persist:false});
+}catch(e){ applyTheme(DEFAULT_THEME, {persist:false}); }
 
 /* easy-reading (dyslexia-friendly) mode — larger, more legible, looser
    spacing. Pure CSS body class, persisted in localStorage like theme. */
@@ -11478,7 +11678,6 @@ function applyLang(lang, opts){
   const select = $("#lang-select");
   if (select) select.value = uiLang;
   applyTranslations();
-  applyTheme(isDark(), {persist:false}); // refresh the theme-toggle's own label text
   if (opts.persist !== false){
     try{ localStorage.setItem(LANG_KEY, uiLang); }catch(e){}
     if (session) db("profiles", {
@@ -11900,7 +12099,7 @@ async function loadProfile(){
   const row = rows && rows[0];
   const savedTheme = row && row.theme;
   if (savedTheme === "dark" || savedTheme === "light"){
-    applyTheme(savedTheme === "dark", {persist:false});
+    applyTheme(savedTheme, {persist:false}); // profile stores the theme name
     try{ localStorage.setItem(THEME_KEY, savedTheme); }catch(e){}
   }
   const savedLang = row && row.lang;
