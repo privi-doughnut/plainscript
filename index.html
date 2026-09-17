@@ -181,6 +181,58 @@
   @keyframes panel-in{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
   @media (prefers-reduced-motion:reduce){ .panel:not([hidden]){animation:none;} }
 
+  /* ---------- homepage / landing ----------
+     Only one of the two views is ever in the document flow; the choice is made
+     before first paint by the script at the top of <body>. Reuses the app's own
+     tokens throughout so the homepage and the tool read as one product. */
+  #landing{display:none;}
+  body.landing-mode #landing{display:block;}
+  body.landing-mode > header.site,
+  body.landing-mode > main,
+  body.landing-mode > footer{display:none;}
+  /* the fixed phone bottom bar belongs to the tool, never the homepage */
+  body.landing-mode .tabs{display:none !important;}
+
+  .lp-nav{border-bottom:1px solid var(--line); background:var(--card); padding:14px 0;}
+  .lp-nav .wrap{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;}
+  .lp-brand{display:flex; flex-direction:column; gap:2px;}
+  .lp-word{font-family:var(--serif); font-size:23px; font-weight:600; letter-spacing:-.01em;}
+  .lp-src{font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:.02em;}
+  .lp-nav-actions{display:flex; gap:9px; flex-wrap:wrap;}
+
+  .lp-hero{padding:72px 0 64px;}
+  .lp-hero h1{font-family:var(--serif); font-size:46px; line-height:1.1; font-weight:600; letter-spacing:-.02em; margin:0 0 18px; max-width:16ch;}
+  .lp-sub{font-size:18px; line-height:1.55; color:var(--ink-soft); margin:0 0 26px; max-width:60ch;}
+  .lp-cta{display:flex; gap:11px; flex-wrap:wrap; margin-bottom:26px;}
+  .lp-strip{font-family:var(--mono); font-size:12.5px; color:var(--ink-faint); letter-spacing:.02em; margin:0 0 10px;}
+  .lp-note{font-size:14px; color:var(--ink-faint); margin:0; max-width:62ch;}
+
+  .lp-limits{padding:64px 0; border-top:1px solid var(--line); background:var(--card);}
+  .lp-limits h2, .lp-end h2{font-family:var(--serif); font-size:33px; font-weight:600; letter-spacing:-.015em; margin:6px 0 16px;}
+  /* Severity colours are reserved for real severity, so this list uses the
+     neutral accent rail — it must read as considered, not as a warning. */
+  .lp-never{list-style:none; padding:0; margin:26px 0 22px; display:grid; gap:12px; max-width:70ch;}
+  .lp-never li{
+    padding:13px 16px; border-left:2px solid var(--accent); background:var(--paper);
+    border-radius:0 var(--radius) var(--radius) 0; font-size:15.5px; line-height:1.5;
+  }
+  .lp-never b{font-weight:600;}
+
+  .lp-end{padding:64px 0 76px; border-top:1px solid var(--line);}
+  .lp-foot{margin:34px 0 0; padding-top:20px; border-top:1px solid var(--line);
+    font-family:var(--mono); font-size:12px; color:var(--ink-faint); line-height:1.8;}
+  .lp-foot a{color:var(--ink-soft);}
+
+  @media (max-width:560px){
+    .lp-hero{padding:44px 0 38px;}
+    .lp-hero h1{font-size:33px; max-width:none;}
+    .lp-sub{font-size:16.5px;}
+    .lp-limits, .lp-end{padding:44px 0;}
+    .lp-limits h2, .lp-end h2{font-size:26px;}
+    .lp-nav .wrap{align-items:flex-start;}
+  }
+  @media print{ #landing{display:none !important;} }
+
   main{padding:26px 0 60px;}
   .panel[hidden]{display:none;}
   .panel-intro{color:var(--ink-soft); font-size:15px; margin:0 0 18px;}
@@ -778,11 +830,98 @@
 </head>
 <body>
 
+<script>
+/* Decide BEFORE first paint whether this visitor lands on the homepage or goes
+   straight to the tool, so neither one flashes before the other.
+   Everything here is a synchronous localStorage read on purpose — no awaiting,
+   no network. Anyone who fails a check just gets the tool, which is the safe
+   default: a storage-blocked browser should never end up stuck on marketing. */
+(function(){
+  try{
+    if (new URLSearchParams(location.search).get("share")) return; // a shared cabinet link owns the whole page
+    if (matchMedia("(display-mode: standalone)").matches) return;  // installed app: start_url IS the tool
+    if (localStorage.getItem("plainscript.entered")) return;       // they've been in before
+    if (localStorage.getItem("plainscript.session")) return;       // signed in
+    document.body.classList.add("landing-mode");
+  }catch(e){ /* storage blocked — fall through to the tool */ }
+})();
+</script>
+
 <!-- persistent safety frame -->
 <div class="safetybar"><div class="wrap">
   <span class="dot" aria-hidden="true"></span>
   <span data-i18n-html="safety_bar"></span>
 </div></div>
+
+<!-- ============================================================
+     HOMEPAGE / LANDING
+     Shown only to signed-out first-time visitors on the open web (see the
+     pre-paint script at the top of <body>). Deliberately NOT device-sniffed:
+     a judge on a laptop and a caregiver on a phone get the same page, and the
+     tool is never gated behind an account.
+     Sections marked [PRIVI] are yours to write — see YOUR_TASKS.md.
+     ============================================================ -->
+<div id="landing">
+  <header class="lp-nav"><div class="wrap">
+    <div class="lp-brand">
+      <span class="lp-word">Plainscript</span>
+      <span class="lp-src">openFDA · RxNorm · NIH</span>
+    </div>
+    <div class="lp-nav-actions">
+      <button class="ghost" data-act="enter-app">Open the tool</button>
+      <button class="go" data-act="enter-signup">Create an account</button>
+    </div>
+  </div></header>
+
+  <section class="lp-hero"><div class="wrap">
+    <h1>Understand what you're actually taking.</h1>
+    <p class="lp-sub">Plainscript turns the FDA's own drug labels into plain English and checks
+      whether your medicines interact — free, sourced, and never invented.</p>
+    <div class="lp-cta">
+      <button class="go" data-act="enter-app">Open the tool</button>
+      <button class="ghost" data-act="enter-signup">Create a free account</button>
+    </div>
+    <p class="lp-strip">openFDA · RxNorm · 13 languages · works offline · no ads · no tracking</p>
+    <p class="lp-note">No account needed. Decoding a medication and checking interactions are free and always will be.</p>
+  </div></section>
+
+  <!-- [PRIVI - TASK 6] "The problem" section goes here -->
+  <!-- [PRIVI - TASK 7] "What it does" feature cards go here -->
+  <!-- [PRIVI - TASK 8] "Where every fact comes from" source cards go here -->
+
+  <section class="lp-limits"><div class="wrap">
+    <span class="eyebrow">What Plainscript will never do</span>
+    <h2>A tool that knows its limits.</h2>
+    <p class="lp-sub">Most health apps promise you everything. These refusals are deliberate design
+      decisions, not missing features — each one is a place where being wrong could hurt somebody.</p>
+    <ul class="lp-never">
+      <li><b>Never diagnoses.</b> It will not guess what's wrong with you.</li>
+      <li><b>Never calculates or recommends a dose.</b> That belongs to your prescriber.</li>
+      <li><b>Never tells you to start, stop, or change a medicine.</b></li>
+      <li><b>Never says a combination is "safe."</b> Only that nothing was found — which is not the same thing, and it says so.</li>
+      <li><b>Never handles an emergency.</b> It routes you to 911 and Poison Control instead.</li>
+    </ul>
+    <p class="lp-note">The one place a language model is used, it may only rephrase text already retrieved
+      from an FDA label — it cannot introduce a medical claim. That rule is enforced on the server, not by trust.</p>
+  </div></section>
+
+  <!-- [PRIVI - TASK 9] "Built for people who get left out" section goes here -->
+  <!-- [PRIVI - TASK 10] "Who made this" — your story, in your voice -->
+
+  <section class="lp-end"><div class="wrap">
+    <h2>Start with one medication.</h2>
+    <p class="lp-sub">Type in something from your cabinet and see what its label actually says.</p>
+    <div class="lp-cta">
+      <button class="go" data-act="enter-app">Open the tool</button>
+    </div>
+    <p class="lp-foot">
+      <a href="privacy.html" data-i18n="footer_privacy"></a> ·
+      <a href="terms.html" data-i18n="footer_terms"></a> ·
+      <a href="https://github.com/privi-doughnut/plainscript" target="_blank" rel="noopener">Source</a> ·
+      <span>Educational reference only. Not medical advice. Not affiliated with or endorsed by the FDA or NIH.</span>
+    </p>
+  </div></section>
+</div>
 
 <header class="site"><div class="wrap">
   <div class="brand">
@@ -12301,6 +12440,34 @@ function renderCabinet(){
   box.innerHTML = html;
   addVoiceButton($("#cab-input")); // fills the field — user still reviews before saving
 }
+
+/* ===================================================================
+   HOMEPAGE / LANDING
+   The show/hide decision already happened before first paint (see the
+   script at the top of <body>); this only handles leaving the homepage.
+   Entering is remembered so a returning visitor goes straight to the
+   tool — the homepage is an introduction, not a toll gate.
+   =================================================================== */
+const ENTERED_KEY = "plainscript.entered";
+
+function enterApp(opts){
+  try{ localStorage.setItem(ENTERED_KEY, "1"); }catch(e){/* private mode — they'll see it again, which is harmless */}
+  document.body.classList.remove("landing-mode");
+  window.scrollTo(0, 0);
+  if (opts && opts.signup){
+    selectTab("cabinet");
+    // openSignInModal only exists once Supabase is configured; without it the
+    // Cabinet tab explains the situation itself, so this stays a no-op.
+    if (typeof openSignInModal === "function") openSignInModal();
+  }
+}
+
+document.addEventListener("click", e => {
+  const enter = e.target.closest('[data-act="enter-app"]');
+  if (enter){ enterApp(); return; }
+  const signup = e.target.closest('[data-act="enter-signup"]');
+  if (signup){ enterApp({signup:true}); }
+});
 
 /* The band at the top of My Cabinet. Promotes the three counts that were
    previously buried inside the Insights modal, and makes "scan my whole
