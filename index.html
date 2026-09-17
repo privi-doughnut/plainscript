@@ -33,72 +33,140 @@
      means an alarming thing.
      ============================================================ */
   :root{
-    --paper:#F4F6F8;
-    --card:#FFFFFF;
-    --ink:#16202E;
-    --ink-soft:#4A5A6E;
-    --ink-faint:#546678; /* darkened from #8194A6 — that was 2.88:1 on --paper, failing WCAG AA for text */
-    --line:#DCE3EA;
-    --line-soft:#E9EEF2;
-    --accent:#0F766E;
-    --accent-deep:#0B5752;
-    --accent-wash:#E6F1EF;
+    --paper:#FAF8F6;
+    --card:#FEFDFC;
+    --ink:#18262F;
+    --ink-soft:#495965;
+    --ink-faint:#5B6B76;
+    --line:#E6E2DB;
+    --line-soft:#F1EEE9;
+    --accent:#11736D;
+    --accent-deep:#09534E;
+    --accent-wash:#E4F2F1;
 
-    /* severity scale — used ONLY for interaction severity */
-    --major-bg:#FBEBEA; --major-bar:#C0392B; --major-ink:#8A241C;
-    --mod-bg:#FCF1E6;   --mod-bar:#D17A12;   --mod-ink:#8F4E08;
-    --minor-bg:#FBF6E6; --minor-bar:#B5920A; --minor-ink:#6F5905;
-    /* neutral states — label mentions and "nothing found" */
-    --note-bg:#EDF1F5;  --note-bar:#54606E;  --note-ink:#3A4759; /* note-bar darkened from #69788A for safe contrast with white pill text */
+    --major-bg:#FBEBE9; --major-bar:#9D3125; --major-ink:#721C13; --major-on:#FFFFFF;
+    --mod-bg:#FBF2E9; --mod-bar:#E18C37; --mod-ink:#724213; --mod-on:#391F05;
+    --minor-bg:#FBF7E9; --minor-bar:#E5BD43; --minor-ink:#725A13; --minor-on:#392C05;
+    --note-bg:#EDF0F3; --note-bar:#4F5C69; --note-ink:#384757; --note-on:#FFFFFF;
 
+    --safety-bg:#18262F;
+    --shadow:0 1px 2px rgba(41,37,32,.05), 0 8px 24px rgba(41,37,32,.07);
     --radius:10px;
-    --shadow:0 1px 2px rgba(22,32,46,.04), 0 8px 24px rgba(22,32,46,.06);
     --mono:"Spline Sans Mono",ui-monospace,Menlo,monospace;
     --sans:"Spline Sans",system-ui,-apple-system,sans-serif;
     --serif:"Newsreader",Georgia,serif;
-    --safety-bg:#16202E;
   }
 
   /* ---- dark theme: same sober clinical instrument, lights turned down.
          Not neon — a calm, low-glare clinical dark. Starts on light. ---- */
   [data-theme="dark"]{
-    --paper:#0F141A;
-    --card:#171E27;
-    --ink:#E4EAF1;
-    --ink-soft:#9DAABA;
-    --ink-faint:#8693A2; /* lightened from #6B7A8B — that was 4.21:1 on dark --paper, failing WCAG AA for text */
-    --line:#273039;
-    --line-soft:#1D242D;
-    --accent:#35C4B8;
-    --accent-deep:#63D6CC;
-    --accent-wash:#123230;
-    --major-bg:#241413; --major-bar:#E5544A; --major-ink:#F1A9A3;
-    --mod-bg:#241910;   --mod-bar:#E08A2E;   --mod-ink:#F0C089;
-    --minor-bg:#211E10; --minor-bar:#D4B33C; --minor-ink:#E6D385;
-    --note-bg:#1A222C;  --note-bar:#7C8A9B;  --note-ink:#B7C3D0;
-    --safety-bg:#0A0E13;
-    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.4);
+    --paper:#0F181A;
+    --card:#1A2628;
+    --ink:#E9F0F1;
+    --ink-soft:#A2B5B9;
+    --ink-faint:#8B9EA2;
+    --line:#2E3F42;
+    --line-soft:#1D282B;
+    --accent:#54B6C9;
+    --accent-deep:#76CADB;
+    --accent-wash:#193338;
+
+    --major-bg:#251513; --major-bar:#B13C2F; --major-ink:#EBA198; --major-on:#FFFFFF;
+    --mod-bg:#251C13; --mod-bar:#D08539; --mod-ink:#EBC298; --mod-on:#2F1A04;
+    --minor-bg:#252113; --minor-bar:#D9B445; --minor-ink:#EBD798; --minor-on:#2F2404;
+    --note-bg:#1B2527; --note-bar:#5E7478; --note-ink:#BECDD0; --note-on:#FFFFFF;
+
+    --safety-bg:#090F11;
+    --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
   }
 
-  /* ---- midnight: a deeper, bluer dark for low-light reading. Same clinical
-         restraint, less grey. ---- */
-  [data-theme="midnight"]{
-    --paper:#0A0F1C;
-    --card:#111829;
-    --ink:#E6ECF7;
-    --ink-soft:#9AA8C0;
-    --ink-faint:#8795AE;
-    --line:#1E2739;
-    --line-soft:#161D2C;
-    --accent:#4FB8E8;
-    --accent-deep:#7ACDF2;
-    --accent-wash:#0E2A3D;
-    --major-bg:#241318; --major-bar:#E5546A; --major-ink:#F2A9B6;
-    --mod-bg:#241A10;   --mod-bar:#E0902E;   --mod-ink:#F0C689;
-    --minor-bg:#1F1F12; --minor-bar:#CFBA42; --minor-ink:#E4D68C;
-    --note-bg:#161E2E;  --note-bar:#7A89A6;  --note-ink:#B3C0D6;
-    --safety-bg:#060A14;
-    --shadow:0 1px 2px rgba(0,0,0,.35), 0 10px 30px rgba(0,0,0,.45);
+
+  /* ---- Rose, not signal-red — deliberately pulled away from the danger colour. ---- */
+  [data-theme="red"]{
+    --paper:#1A0F12;
+    --card:#281A1E;
+    --ink:#F1E9EB;
+    --ink-soft:#B9A2A8;
+    --ink-faint:#A28B91;
+    --line:#422E33;
+    --line-soft:#2B1D20;
+    --accent:#C97390;
+    --accent-deep:#DB94AC;
+    --accent-wash:#2E1F22;
+
+    --major-bg:#251513; --major-bar:#B13C2F; --major-ink:#EBA198; --major-on:#FFFFFF;
+    --mod-bg:#251C13; --mod-bar:#D08539; --mod-ink:#EBC298; --mod-on:#2F1A04;
+    --minor-bg:#252113; --minor-bar:#D9B445; --minor-ink:#EBD798; --minor-on:#2F2404;
+    --note-bg:#271B1E; --note-bar:#785E65; --note-ink:#D0BEC2; --note-on:#FFFFFF;
+
+    --safety-bg:#11090B;
+    --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
+  }
+
+  /* ---- Calm clinical green, muted so an accent can never read as "all clear". ---- */
+  [data-theme="green"]{
+    --paper:#0F1A15;
+    --card:#1A2822;
+    --ink:#E9F1ED;
+    --ink-soft:#A2B9AE;
+    --ink-faint:#8BA297;
+    --line:#2E4239;
+    --line-soft:#1D2B24;
+    --accent:#4CBD88;
+    --accent-deep:#6CD0A1;
+    --accent-wash:#19382A;
+
+    --major-bg:#251513; --major-bar:#B13C2F; --major-ink:#EBA198; --major-on:#FFFFFF;
+    --mod-bg:#251C13; --mod-bar:#D08539; --mod-ink:#EBC298; --mod-on:#2F1A04;
+    --minor-bg:#252113; --minor-bar:#D9B445; --minor-ink:#EBD798; --minor-on:#2F2404;
+    --note-bg:#1B2722; --note-bar:#5E786C; --note-ink:#BED0C7; --note-on:#FFFFFF;
+
+    --safety-bg:#09110D;
+    --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
+  }
+
+  /* ---- Institutional blue — the most conservative of the set. ---- */
+  [data-theme="blue"]{
+    --paper:#0F141A;
+    --card:#1A2128;
+    --ink:#E9EDF1;
+    --ink-soft:#A2ADB9;
+    --ink-faint:#8B96A2;
+    --line:#2E3742;
+    --line-soft:#1D232B;
+    --accent:#669AD6;
+    --accent-deep:#8AB5E5;
+    --accent-wash:#192838;
+
+    --major-bg:#251513; --major-bar:#B13C2F; --major-ink:#EBA198; --major-on:#FFFFFF;
+    --mod-bg:#251C13; --mod-bar:#D08539; --mod-ink:#EBC298; --mod-on:#2F1A04;
+    --minor-bg:#252113; --minor-bar:#D9B445; --minor-ink:#EBD798; --minor-on:#2F2404;
+    --note-bg:#1B2127; --note-bar:#5E6A78; --note-ink:#BEC6D0; --note-on:#FFFFFF;
+
+    --safety-bg:#090C11;
+    --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
+  }
+
+  /* ---- Soft violet — the furthest hue from every severity colour. ---- */
+  [data-theme="purple"]{
+    --paper:#150F1A;
+    --card:#221A28;
+    --ink:#EDE9F1;
+    --ink-soft:#AEA2B9;
+    --ink-faint:#978BA2;
+    --line:#392E42;
+    --line-soft:#241D2B;
+    --accent:#B086D5;
+    --accent-deep:#C9A9E5;
+    --accent-wash:#2A1938;
+
+    --major-bg:#251513; --major-bar:#B13C2F; --major-ink:#EBA198; --major-on:#FFFFFF;
+    --mod-bg:#251C13; --mod-bar:#D08539; --mod-ink:#EBC298; --mod-on:#2F1A04;
+    --minor-bg:#252113; --minor-bar:#D9B445; --minor-ink:#EBD798; --minor-on:#2F2404;
+    --note-bg:#221B27; --note-bar:#6C5E78; --note-ink:#C7BED0; --note-on:#FFFFFF;
+
+    --safety-bg:#0D0911;
+    --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
   }
 
   /* ---- high contrast: for low vision and bright-sunlight use. Pure black
@@ -119,6 +187,9 @@
     --mod-bg:#2E1C05;   --mod-bar:#FFA733;   --mod-ink:#FFD394;
     --minor-bg:#2B2705; --minor-bar:#F2D544; --minor-ink:#FCEB9B;
     --note-bg:#141414;  --note-bar:#A8A8A8;  --note-ink:#DCDCDC;
+    /* the major bar here is a bright coral; white on it is only 2.79:1, so this
+       one takes dark text like the other two bright bars */
+    --major-on:#2B0A06; --mod-on:#2B1A00; --minor-on:#2B2600; --note-on:#111111;
     --safety-bg:#000000;
     --shadow:0 0 0 1px #5A5A5A;
   }
@@ -491,21 +562,22 @@
   .hm-cell{width:26px; height:26px; min-width:26px; border-radius:6px; text-align:center; vertical-align:middle; font-size:13px; line-height:26px; background:var(--paper);}
   .hm-diag{background:transparent;}
   .hm-none{background:var(--paper); border:1px solid var(--line);}
-  .hm-major{background:var(--major-bar); color:#fff;}
-  .hm-moderate{background:var(--mod-bar); color:var(--ink);}
-  .hm-minor{background:var(--minor-bar); color:var(--ink);}
+  .hm-major{background:var(--major-bar); color:var(--major-on);}
+  .hm-moderate{background:var(--mod-bar); color:var(--mod-on);}
+  .hm-minor{background:var(--minor-bar); color:var(--minor-on);}
   .hm-note{background:var(--note-bg); color:var(--note-ink); border:1px solid var(--note-bar);}
   .hm-legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:12px; color:var(--ink-soft); align-items:center;}
   .hm-legend .hm-sw{display:inline-flex; width:20px; height:20px; border-radius:5px; align-items:center; justify-content:center; font-size:12px; margin-right:5px; vertical-align:middle; color:#fff;}
-  .v-major{background:var(--major-bg);} .v-major .bar{background:var(--major-bar);} .v-major .pill{background:var(--major-bar); color:#fff;} .v-major .sev{color:var(--major-ink);}
-  .v-moderate{background:var(--mod-bg);} .v-moderate .bar{background:var(--mod-bar);} .v-moderate .pill{background:var(--mod-bar); color:var(--ink);} .v-moderate .sev{color:var(--mod-ink);}
-  .v-minor{background:var(--minor-bg);} .v-minor .bar{background:var(--minor-bar);} .v-minor .pill{background:var(--minor-bar); color:var(--ink);} .v-minor .sev{color:var(--minor-ink);}
-  .v-note{background:var(--note-bg);} .v-note .bar{background:var(--note-bar);} .v-note .pill{background:var(--note-bar); color:#fff;} .v-note .sev{color:var(--note-ink); font-size:16px;}
+  .v-major{background:var(--major-bg);} .v-major .bar{background:var(--major-bar);} .v-major .pill{background:var(--major-bar); color:var(--major-on);} .v-major .sev{color:var(--major-ink);}
+  .v-moderate{background:var(--mod-bg);} .v-moderate .bar{background:var(--mod-bar);} .v-moderate .pill{background:var(--mod-bar); color:var(--mod-on);} .v-moderate .sev{color:var(--mod-ink);}
+  .v-minor{background:var(--minor-bg);} .v-minor .bar{background:var(--minor-bar);} .v-minor .pill{background:var(--minor-bar); color:var(--minor-on);} .v-minor .sev{color:var(--minor-ink);}
+  .v-note{background:var(--note-bg);} .v-note .bar{background:var(--note-bar);} .v-note .pill{background:var(--note-bar); color:var(--note-on);} .v-note .sev{color:var(--note-ink); font-size:16px;}
 
-  /* dark theme's severity bars are brighter/more saturated than light
-     theme's, so white pill text fails contrast across the board there —
-     verified all four need dark text in dark mode specifically. */
-  [data-theme="dark"] .sev .pill{color:var(--safety-bg);}
+  /* Severity pill text now comes from per-theme --*-on tokens above. This
+     replaces a [data-theme="dark"]-scoped override that never applied to the
+     other dark-ground themes, leaving their bright bars carrying white text at
+     roughly 3:1. An amber bar can never carry white text at 4.5:1 — that's
+     luminance, not taste — so the readable colour has to be declared per bar. */
 
   /* the cautious "nothing found" state — deliberately NOT green */
   .nofind{
@@ -1110,7 +1182,10 @@
       <select id="theme-select" data-i18n-aria-label="theme_select_aria" aria-label="Colour theme" title="Colour theme">
         <option value="dark" data-i18n="theme_dark">Dark</option>
         <option value="light" data-i18n="theme_light">Light</option>
-        <option value="midnight" data-i18n="theme_midnight">Midnight</option>
+        <option value="blue" data-i18n="theme_blue">Blue</option>
+        <option value="green" data-i18n="theme_green">Green</option>
+        <option value="purple" data-i18n="theme_purple">Purple</option>
+        <option value="red" data-i18n="theme_rose">Rose</option>
         <option value="contrast" data-i18n="theme_contrast">High contrast</option>
       </select>
     </div>
@@ -3935,7 +4010,10 @@ const I18N = {
     similar_modal_aria: "Similar and related medications",
     tools_aria: "Tools",
     theme_aria_dark: "Switch to dark theme", theme_aria_light: "Switch to light theme",
-    theme_midnight: "Midnight",
+    theme_blue: "Blue",
+    theme_green: "Green",
+    theme_purple: "Purple",
+    theme_rose: "Rose",
     theme_contrast: "High contrast",
     theme_select_aria: "Colour theme",
     remove_medication_aria: "Remove medication",
@@ -4422,7 +4500,10 @@ const I18N = {
     similar_modal_aria: "Medicamentos similares y relacionados",
     tools_aria: "Herramientas",
     theme_aria_dark: "Cambiar a tema oscuro", theme_aria_light: "Cambiar a tema claro",
-    theme_midnight: "Medianoche",
+    theme_blue: "Azul",
+    theme_green: "Verde",
+    theme_purple: "Morado",
+    theme_rose: "Rosa",
     theme_contrast: "Alto contraste",
     theme_select_aria: "Tema de color",
     remove_medication_aria: "Quitar medicamento",
@@ -4903,7 +4984,10 @@ const I18N = {
     similar_modal_aria: "相似及相关药物",
     tools_aria: "工具",
     theme_aria_dark: "切换到深色主题", theme_aria_light: "切换到浅色主题",
-    theme_midnight: "午夜",
+    theme_blue: "蓝色",
+    theme_green: "绿色",
+    theme_purple: "紫色",
+    theme_rose: "玫瑰色",
     theme_contrast: "高对比度",
     theme_select_aria: "配色主题",
     remove_medication_aria: "移除药物",
@@ -5294,7 +5378,10 @@ const I18N = {
     similar_modal_aria: "Thuốc tương tự và liên quan",
     tools_aria: "Công cụ",
     theme_aria_dark: "Chuyển sang chế độ tối", theme_aria_light: "Chuyển sang chế độ sáng",
-    theme_midnight: "Nửa đêm",
+    theme_blue: "Xanh dương",
+    theme_green: "Xanh lá",
+    theme_purple: "Tím",
+    theme_rose: "Hồng",
     theme_contrast: "Tương phản cao",
     theme_select_aria: "Chủ đề màu",
     remove_medication_aria: "Xóa thuốc",
@@ -5632,7 +5719,10 @@ const I18N = {
     similar_modal_aria: "أدوية مشابهة وذات صلة",
     tools_aria: "أدوات",
     theme_aria_dark: "التبديل إلى المظهر الداكن", theme_aria_light: "التبديل إلى المظهر الفاتح",
-    theme_midnight: "منتصف الليل",
+    theme_blue: "أزرق",
+    theme_green: "أخضر",
+    theme_purple: "بنفسجي",
+    theme_rose: "وردي",
     theme_contrast: "تباين عالٍ",
     theme_select_aria: "سمة الألوان",
     remove_medication_aria: "إزالة الدواء",
@@ -6063,7 +6153,10 @@ const I18N = {
     similar_modal_aria: "Médicaments similaires et apparentés",
     tools_aria: "Outils",
     theme_aria_dark: "Passer au thème sombre", theme_aria_light: "Passer au thème clair",
-    theme_midnight: "Minuit",
+    theme_blue: "Bleu",
+    theme_green: "Vert",
+    theme_purple: "Violet",
+    theme_rose: "Rose",
     theme_contrast: "Contraste élevé",
     theme_select_aria: "Thème de couleur",
     remove_medication_aria: "Retirer le médicament",
@@ -6494,7 +6587,10 @@ const I18N = {
     similar_modal_aria: "유사 및 관련 약",
     tools_aria: "도구",
     theme_aria_dark: "어두운 테마로 전환", theme_aria_light: "밝은 테마로 전환",
-    theme_midnight: "미드나이트",
+    theme_blue: "블루",
+    theme_green: "그린",
+    theme_purple: "퍼플",
+    theme_rose: "로즈",
     theme_contrast: "고대비",
     theme_select_aria: "색상 테마",
     remove_medication_aria: "약 제거",
@@ -6925,7 +7021,10 @@ const I18N = {
     similar_modal_aria: "Похожие и связанные лекарства",
     tools_aria: "Инструменты",
     theme_aria_dark: "Переключить на тёмную тему", theme_aria_light: "Переключить на светлую тему",
-    theme_midnight: "Полночь",
+    theme_blue: "Синяя",
+    theme_green: "Зелёная",
+    theme_purple: "Фиолетовая",
+    theme_rose: "Розовая",
     theme_contrast: "Высокий контраст",
     theme_select_aria: "Цветовая тема",
     remove_medication_aria: "Удалить лекарство",
@@ -7356,7 +7455,10 @@ const I18N = {
     similar_modal_aria: "Medicamentos similares e relacionados",
     tools_aria: "Ferramentas",
     theme_aria_dark: "Mudar para o tema escuro", theme_aria_light: "Mudar para o tema claro",
-    theme_midnight: "Meia-noite",
+    theme_blue: "Azul",
+    theme_green: "Verde",
+    theme_purple: "Roxo",
+    theme_rose: "Rosa",
     theme_contrast: "Alto contraste",
     theme_select_aria: "Tema de cor",
     remove_medication_aria: "Remover medicamento",
@@ -7787,7 +7889,10 @@ const I18N = {
     similar_modal_aria: "Ähnliche und verwandte Medikamente",
     tools_aria: "Werkzeuge",
     theme_aria_dark: "Zum dunklen Thema wechseln", theme_aria_light: "Zum hellen Thema wechseln",
-    theme_midnight: "Mitternacht",
+    theme_blue: "Blau",
+    theme_green: "Grün",
+    theme_purple: "Violett",
+    theme_rose: "Rosé",
     theme_contrast: "Hoher Kontrast",
     theme_select_aria: "Farbthema",
     remove_medication_aria: "Medikament entfernen",
@@ -8218,7 +8323,10 @@ const I18N = {
     similar_modal_aria: "類似・関連する薬",
     tools_aria: "ツール",
     theme_aria_dark: "ダークテーマに切り替え", theme_aria_light: "ライトテーマに切り替え",
-    theme_midnight: "ミッドナイト",
+    theme_blue: "ブルー",
+    theme_green: "グリーン",
+    theme_purple: "パープル",
+    theme_rose: "ローズ",
     theme_contrast: "ハイコントラスト",
     theme_select_aria: "カラーテーマ",
     remove_medication_aria: "薬を削除",
@@ -8607,7 +8715,10 @@ const I18N = {
     similar_modal_aria: "समान और संबंधित दवाएँ",
     tools_aria: "उपकरण",
     theme_aria_dark: "गहरे थीम पर स्विच करें",
-    theme_midnight: "मध्यरात्रि",
+    theme_blue: "नीला",
+    theme_green: "हरा",
+    theme_purple: "बैंगनी",
+    theme_rose: "गुलाबी",
     theme_contrast: "उच्च कंट्रास्ट",
     theme_select_aria: "रंग थीम",
     theme_aria_light: "हल्के थीम पर स्विच करें",
@@ -9013,7 +9124,10 @@ const I18N = {
     similar_modal_aria: "ஒத்த மற்றும் தொடர்புடைய மருந்துகள்",
     tools_aria: "கருவிகள்",
     theme_aria_dark: "இருண்ட தீமுக்கு மாறு",
-    theme_midnight: "நள்ளிரவு",
+    theme_blue: "நீலம்",
+    theme_green: "பச்சை",
+    theme_purple: "ஊதா",
+    theme_rose: "ரோஸ்",
     theme_contrast: "அதிக மாறுபாடு",
     theme_select_aria: "வண்ணத் தீம்",
     theme_aria_light: "வெளிர் தீமுக்கு மாறு",
@@ -11606,7 +11720,7 @@ const THEME_KEY = "plainscript.theme";
 /* Dark first because it's the default. "contrast" is an accessibility mode
    rather than a style, but it lives in the same list so it's one obvious
    control instead of a separate hidden setting. */
-const THEMES = ["dark", "light", "midnight", "contrast"];
+const THEMES = ["dark", "light", "blue", "green", "purple", "red", "contrast"];
 const DEFAULT_THEME = "dark";
 
 function currentTheme(){
