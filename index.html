@@ -55,6 +55,7 @@
     --mono:"Spline Sans Mono",ui-monospace,Menlo,monospace;
     --sans:"Spline Sans",system-ui,-apple-system,sans-serif;
     --serif:"Newsreader",Georgia,serif;
+    --shadow-lift:0 2px 6px rgba(41,37,32,.07), 0 14px 38px rgba(41,37,32,.11);
   }
 
   /* ---- dark theme: same sober clinical instrument, lights turned down.
@@ -78,6 +79,7 @@
 
     --safety-bg:#090F11;
     --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
+    --shadow-lift:0 2px 6px rgba(0,0,0,.4), 0 16px 44px rgba(0,0,0,.5);
   }
 
 
@@ -101,6 +103,7 @@
 
     --safety-bg:#11090B;
     --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
+    --shadow-lift:0 2px 6px rgba(0,0,0,.4), 0 16px 44px rgba(0,0,0,.5);
   }
 
   /* ---- Calm clinical green, muted so an accent can never read as "all clear". ---- */
@@ -123,6 +126,7 @@
 
     --safety-bg:#09110D;
     --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
+    --shadow-lift:0 2px 6px rgba(0,0,0,.4), 0 16px 44px rgba(0,0,0,.5);
   }
 
   /* ---- Institutional blue — the most conservative of the set. ---- */
@@ -145,6 +149,7 @@
 
     --safety-bg:#090C11;
     --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
+    --shadow-lift:0 2px 6px rgba(0,0,0,.4), 0 16px 44px rgba(0,0,0,.5);
   }
 
   /* ---- Soft violet — the furthest hue from every severity colour. ---- */
@@ -167,6 +172,7 @@
 
     --safety-bg:#0D0911;
     --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
+    --shadow-lift:0 2px 6px rgba(0,0,0,.4), 0 16px 44px rgba(0,0,0,.5);
   }
 
   /* ---- high contrast: for low vision and bright-sunlight use. Pure black
@@ -192,6 +198,7 @@
     --major-on:#2B0A06; --mod-on:#2B1A00; --minor-on:#2B2600; --note-on:#111111;
     --safety-bg:#000000;
     --shadow:0 0 0 1px #5A5A5A;
+    --shadow-lift:0 0 0 2px #5A5A5A;
   }
 
   /* [PRIVI - TASK 14] a warm "sepia"/paper theme belongs here — see YOUR_TASKS.md */
@@ -403,6 +410,35 @@
   .lp-strip{font-family:var(--mono); font-size:12.5px; color:var(--ink-faint); letter-spacing:.02em; margin:0 0 10px;}
   .lp-note{font-size:14px; color:var(--ink-faint); margin:0; max-width:62ch;}
 
+  /* ---------- feature carousel ----------
+     Slides are stacked and cross-faded rather than translated on a rail: it
+     keeps every slide at its natural height, needs no width maths, and means
+     only opacity animates. */
+  .lp-feat{padding:64px 0; border-top:1px solid var(--line);}
+  .carousel{margin-top:26px;}
+  .car-track{position:relative; min-height:210px;}
+  .car-slide{
+    position:absolute; inset:0; opacity:0; visibility:hidden;
+    transition:opacity .45s ease, visibility .45s;
+    border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--card); box-shadow:var(--shadow); padding:26px 28px;
+  }
+  .car-slide.is-on{opacity:1; visibility:visible;}
+  .car-num{font-family:var(--mono); font-size:12px; color:var(--accent); letter-spacing:.06em;}
+  .car-slide h3{font-family:var(--serif); font-size:25px; font-weight:600; margin:8px 0 10px;}
+  .car-slide p{margin:0; color:var(--ink-soft); font-size:16px; line-height:1.6; max-width:62ch;}
+
+  .car-controls{display:flex; align-items:center; gap:14px; margin-top:18px;}
+  .car-dots{display:flex; gap:8px; flex:1;}
+  .car-dot{
+    width:28px; height:4px; border-radius:99px; border:none; padding:0; cursor:pointer;
+    background:var(--line); transition:background-color .2s ease;
+  }
+  .car-dot[aria-selected="true"]{background:var(--accent);}
+  .car-dot:focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
+  @media (prefers-reduced-motion:reduce){ .car-slide{transition:none;} }
+  @media (max-width:560px){ .car-track{min-height:290px;} .car-slide{padding:20px;} .car-slide h3{font-size:21px;} }
+
   .lp-limits{padding:64px 0; border-top:1px solid var(--line); background:var(--card);}
   .lp-limits h2, .lp-end h2{font-family:var(--serif); font-size:33px; font-weight:600; letter-spacing:-.015em; margin:6px 0 16px;}
   /* Severity colours are reserved for real severity, so this list uses the
@@ -418,6 +454,15 @@
   .lp-foot{margin:34px 0 0; padding-top:20px; border-top:1px solid var(--line);
     font-family:var(--mono); font-size:12px; color:var(--ink-faint); line-height:1.8;}
   .lp-foot a{color:var(--ink-soft);}
+
+  /* a real <button> because it performs an action rather than navigating, but
+     it sits in a row of links and has to read as one */
+  .linklike{
+    appearance:none; background:none; border:none; padding:0; cursor:pointer;
+    font:inherit; color:var(--accent); text-decoration:underline;
+  }
+  .linklike:hover{color:var(--accent-deep);}
+  .linklike:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:3px;}
 
   @media (max-width:900px){
     /* Below this the mark and the text genuinely collide, so the composition
@@ -435,6 +480,37 @@
     .lp-nav .wrap{align-items:flex-start;}
   }
   @media print{ #landing{display:none !important;} }
+
+  /* ---------- progress readout ----------
+     Paired with the skeletons: the skeleton says "something is coming", the
+     bar says how much of it has actually arrived. */
+  .prog{display:flex; align-items:center; gap:10px; margin:0 0 14px;}
+  .prog-track{flex:1; height:5px; border-radius:99px; background:var(--line-soft); overflow:hidden;}
+  .prog-fill{
+    height:100%; background:var(--accent); border-radius:99px;
+    /* width is the only thing that changes and it's driven by real completions,
+       so a short transition smooths the steps without inventing motion */
+    transition:width .3s cubic-bezier(.33,1,.68,1);
+  }
+  .prog-num{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); white-space:nowrap;}
+  @media (prefers-reduced-motion:reduce){ .prog-fill{transition:none;} }
+
+  /* ---------- depth & press ----------
+     One extra elevation step above --shadow, used only on things you can
+     actually interact with, so raised genuinely means "this responds". */
+  .card, .scan-summary, .cab-dash{transition:box-shadow .18s ease, transform .18s ease;}
+  .card:hover, .scan-summary:hover, .cab-dash:hover{box-shadow:var(--shadow-lift);}
+  button.go, button.ghost, .mini{transition:transform .1s cubic-bezier(.2,.65,.3,1), box-shadow .15s ease, background-color .15s ease, border-color .15s ease, color .15s ease;}
+  button.go{box-shadow:0 1px 2px rgba(0,0,0,.14);}
+  button.go:hover{box-shadow:0 2px 8px rgba(0,0,0,.18);}
+  button.go:active, button.ghost:active, .mini:active:not(:disabled){box-shadow:none;}
+
+  /* ---------- text fit ----------
+     Stops headings breaking with one orphaned word on the last line, and keeps
+     long unbroken drug names from pushing their container sideways. */
+  h1, h2, h3, .headline, .lp-hero h1{text-wrap:balance;}
+  .lp-sub, .panel-intro, .status{text-wrap:pretty;}
+  .card h3, .map-chip, .med-name, .pair{overflow-wrap:anywhere;}
 
   main{padding:26px 0 60px;}
   .panel[hidden]{display:none;}
@@ -1133,7 +1209,54 @@
   </section>
 
   <!-- [PRIVI - TASK 6] "The problem" section goes here -->
-  <!-- [PRIVI - TASK 7] "What it does" feature cards go here -->
+
+  <!-- Feature carousel. Each slide describes something that genuinely exists in
+       the app — inventing a feature here would be the same overclaiming the
+       tool is built to avoid. Auto-advances slowly, pauses on hover and on
+       focus, and stops entirely under prefers-reduced-motion. -->
+  <section class="lp-feat"><div class="wrap">
+    <span class="eyebrow">What it does</span>
+    <h2>Four tools, one medicine cabinet.</h2>
+
+    <div class="carousel" id="feat-carousel">
+      <div class="car-track" id="car-track">
+        <article class="car-slide is-on">
+          <span class="car-num">01</span>
+          <h3>Decode a medication</h3>
+          <p>Type any brand or generic name and get its real FDA label in plain English —
+             what it treats, how it works, side effects, and warnings, laid out as
+             something you can actually scan.</p>
+        </article>
+        <article class="car-slide">
+          <span class="car-num">02</span>
+          <h3>Check an interaction</h3>
+          <p>Enter two or more medicines and get severity-rated, plain-English warnings,
+             each one showing the source it came from. Never a green "safe" — only
+             what was found, and what wasn't.</p>
+        </article>
+        <article class="car-slide">
+          <span class="car-num">03</span>
+          <h3>Scan your whole cabinet</h3>
+          <p>Save what you actually take, then check every medicine against every other
+             one at once — not just a pair — and read the result as a severity grid.</p>
+        </article>
+        <article class="car-slide">
+          <span class="car-num">04</span>
+          <h3>Symptoms, without a diagnosis</h3>
+          <p>An emergency red-flag checklist, plus a guide from everyday symptoms to the
+             usual over-the-counter category. It will not tell you what's wrong with you,
+             and it says so.</p>
+        </article>
+      </div>
+
+      <div class="car-controls">
+        <button class="mini" data-car="prev" aria-label="Previous">‹</button>
+        <div class="car-dots" id="car-dots" role="tablist" aria-label="Features"></div>
+        <button class="mini" data-car="next" aria-label="Next">›</button>
+      </div>
+    </div>
+  </div></section>
+
   <!-- [PRIVI - TASK 8] "Where every fact comes from" source cards go here -->
 
   <section class="lp-limits"><div class="wrap">
@@ -1364,7 +1487,8 @@
   <a id="report-error-link" href="https://github.com/privi-doughnut/plainscript/issues/new?title=Bug%20report&amp;body=%2A%2AWhat%20page%20or%20medication%20were%20you%20looking%20at%3F%2A%2A%0A%0A%0A%2A%2AWhat%20did%20you%20expect%2C%20and%20what%20actually%20happened%3F%2A%2A%0A%0A%0A%2A%2ABrowser%2Fdevice%20%28optional%29%3A%2A%2A%0A" target="_blank" rel="noopener" data-i18n="report_error_link"></a>
    ·
   <a href="privacy.html" data-i18n="footer_privacy"></a> ·
-  <a href="terms.html" data-i18n="footer_terms"></a>
+  <a href="terms.html" data-i18n="footer_terms"></a> ·
+  <button class="linklike" data-act="back-home" data-i18n="back_home"></button>
 </div></footer>
 
 <!-- Keys & URLs. Safe to commit: the Supabase anon key is public by design
@@ -3830,6 +3954,7 @@ const I18N = {
     report_error_link: "Report an error",
     footer_privacy: "Privacy Policy",
     footer_terms: "Terms",
+    back_home: "Home",
     auth_consent_note: "By creating an account, you agree to:",
     guest_use_btn: "Use as guest",
     guest_banner_title: "You're using Plainscript as a guest.",
@@ -4403,6 +4528,7 @@ const I18N = {
     report_error_link: "Reportar un error",
     footer_privacy: "Política de privacidad",
     footer_terms: "Términos",
+    back_home: "Inicio",
     auth_consent_note: "Al crear una cuenta, aceptas:",
     guest_use_btn: "Usar como invitado",
     guest_banner_title: "Estás usando Plainscript como invitado.",
@@ -4822,6 +4948,7 @@ const I18N = {
     report_error_link: "报告错误",
     footer_privacy: "隐私政策",
     footer_terms: "使用条款",
+    back_home: "首页",
     auth_consent_note: "创建账户即表示您同意：",
     guest_use_btn: "以访客身份使用",
     guest_banner_title: "您正在以访客身份使用 Plainscript。",
@@ -5216,6 +5343,7 @@ const I18N = {
     report_error_link: "Báo lỗi",
     footer_privacy: "Chính sách quyền riêng tư",
     footer_terms: "Điều khoản",
+    back_home: "Trang chủ",
     auth_consent_note: "Khi tạo tài khoản, bạn đồng ý với:",
     guest_use_btn: "Dùng với tư cách khách",
     guest_banner_title: "Bạn đang dùng Plainscript với tư cách khách.",
@@ -5617,6 +5745,7 @@ const I18N = {
     report_error_link: "الإبلاغ عن خطأ",
     footer_privacy: "سياسة الخصوصية",
     footer_terms: "الشروط",
+    back_home: "الرئيسية",
     auth_consent_note: "بإنشاء حساب، فإنك توافق على:",
     guest_use_btn: "الاستخدام كضيف",
     guest_banner_title: "أنت تستخدم Plainscript كضيف.",
@@ -6051,6 +6180,7 @@ const I18N = {
     report_error_link: "Signaler une erreur",
     footer_privacy: "Politique de confidentialité",
     footer_terms: "Conditions",
+    back_home: "Accueil",
     auth_consent_note: "En créant un compte, vous acceptez :",
     guest_use_btn: "Utiliser en tant qu'invité",
     guest_banner_title: "Vous utilisez Plainscript en tant qu'invité.",
@@ -6485,6 +6615,7 @@ const I18N = {
     report_error_link: "오류 신고",
     footer_privacy: "개인정보 처리방침",
     footer_terms: "이용약관",
+    back_home: "홈",
     auth_consent_note: "계정을 만들면 다음에 동의하게 됩니다:",
     guest_use_btn: "게스트로 사용",
     guest_banner_title: "게스트로 Plainscript를 사용 중입니다.",
@@ -6919,6 +7050,7 @@ const I18N = {
     report_error_link: "Сообщить об ошибке",
     footer_privacy: "Политика конфиденциальности",
     footer_terms: "Условия",
+    back_home: "Главная",
     auth_consent_note: "Создавая аккаунт, вы соглашаетесь с:",
     guest_use_btn: "Использовать как гость",
     guest_banner_title: "Вы используете Plainscript как гость.",
@@ -7353,6 +7485,7 @@ const I18N = {
     report_error_link: "Relatar um erro",
     footer_privacy: "Política de Privacidade",
     footer_terms: "Termos",
+    back_home: "Início",
     auth_consent_note: "Ao criar uma conta, você concorda com:",
     guest_use_btn: "Usar como convidado",
     guest_banner_title: "Você está usando o Plainscript como convidado.",
@@ -7787,6 +7920,7 @@ const I18N = {
     report_error_link: "Fehler melden",
     footer_privacy: "Datenschutzerklärung",
     footer_terms: "Nutzungsbedingungen",
+    back_home: "Startseite",
     auth_consent_note: "Mit der Erstellung eines Kontos stimmen Sie zu:",
     guest_use_btn: "Als Gast verwenden",
     guest_banner_title: "Sie nutzen Plainscript als Gast.",
@@ -8221,6 +8355,7 @@ const I18N = {
     report_error_link: "間違いを報告",
     footer_privacy: "プライバシーポリシー",
     footer_terms: "利用規約",
+    back_home: "ホーム",
     auth_consent_note: "アカウントを作成すると、以下に同意したことになります：",
     guest_use_btn: "ゲストとして使う",
     guest_banner_title: "ゲストとして Plainscript を使っています。",
@@ -8543,6 +8678,7 @@ const I18N = {
     report_error_link: "त्रुटि की रिपोर्ट करें",
     footer_privacy: "गोपनीयता नीति",
     footer_terms: "शर्तें",
+    back_home: "होम",
     auth_consent_note: "खाता बनाकर, आप इनसे सहमत होते हैं:",
     guest_use_btn: "अतिथि के रूप में उपयोग करें",
     guest_banner_title: "आप Plainscript का उपयोग अतिथि के रूप में कर रहे हैं।",
@@ -8952,6 +9088,7 @@ const I18N = {
     report_error_link: "பிழையைப் புகாரளி",
     footer_privacy: "தனியுரிமைக் கொள்கை",
     footer_terms: "விதிமுறைகள்",
+    back_home: "முகப்பு",
     auth_consent_note: "கணக்கை உருவாக்குவதன் மூலம், இவற்றை ஏற்கிறீர்கள்:",
     guest_use_btn: "விருந்தினராகப் பயன்படுத்து",
     guest_banner_title: "நீங்கள் Plainscript ஐ விருந்தினராகப் பயன்படுத்துகிறீர்கள்.",
@@ -11419,14 +11556,34 @@ function sameDrug(A, B){
 /* Resolve several medicines at once instead of one-at-a-time, but cap how many
    openFDA requests are in flight: a large cabinet firing every lookup in
    parallel risks being throttled by a public, keyless API. Order is preserved. */
-async function resolveAll(names, limit = 5){
+/* Progress readout for multi-lookup operations. Deliberately numeric — "4/7 ·
+   57%" needs no translation, and every value shown is a lookup that genuinely
+   completed rather than an animation pretending to be one. */
+function progressHTML(done, total){
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  return `<div class="prog" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100">
+    <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+    <span class="prog-num">${done}/${total} · ${pct}%</span>
+  </div>`;
+}
+
+function setProgress(hostSel, done, total){
+  const host = $(hostSel);
+  if (host) host.innerHTML = progressHTML(done, total);
+}
+
+async function resolveAll(names, limit = 5, onProgress){
   const out = new Array(names.length);
-  let next = 0;
+  let next = 0, done = 0;
   const runner = async () => {
     while (true){
       const i = next++;
       if (i >= names.length) return;
       out[i] = await resolveForAnalysis(names[i]);
+      done++;
+      // real progress only — this counts lookups that have actually returned.
+      // A medical tool must never show a progress bar it invented.
+      if (onProgress) onProgress(done, names.length);
     }
   };
   await Promise.all(new Array(Math.min(limit, names.length)).fill(0).map(runner));
@@ -11464,9 +11621,10 @@ async function checkInteractions(){
   const inputs = typed.filter(n => { const k = n.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
   const box = $("#check-results");
   if (inputs.length < 2){ box.innerHTML = `<div class="err">${esc(t("check_min_two"))}</div>`; return; }
-  box.innerHTML = `<p class="status" style="padding:0 0 6px;">${esc(t("check_checking_prefix"))} ${inputs.length} ${esc(t("check_checking_suffix"))}</p>${skelResults(Math.min(inputs.length,4))}`;
+  box.innerHTML = `<p class="status" style="padding:0 0 6px;">${esc(t("check_checking_prefix"))} ${inputs.length} ${esc(t("check_checking_suffix"))}</p>
+    <div id="check-prog">${progressHTML(0, inputs.length)}</div>${skelResults(Math.min(inputs.length,4))}`;
 
-  const drugs = await resolveAll(inputs);
+  const drugs = await resolveAll(inputs, 5, (d0, n) => setProgress("#check-prog", d0, n));
 
   const { findings, mentions } = analyzeDrugPairs(drugs);
   renderResults(box, drugs, findings, mentions);
@@ -12967,6 +13125,58 @@ function enterApp(opts){
   }
 }
 
+/* Feature carousel. Auto-advance is a convenience, never the only way through:
+   dots and arrows are real controls, it pauses while you're hovering or have
+   focus inside it, and it doesn't run at all for anyone who asked for reduced
+   motion — an auto-advancing panel is exactly the kind of thing that makes a
+   page unusable if you read slowly. */
+(function initCarousel(){
+  const track = $("#car-track");
+  const dotsHost = $("#car-dots");
+  if (!track || !dotsHost) return;
+  const slides = [...track.querySelectorAll(".car-slide")];
+  if (!slides.length) return;
+
+  let idx = 0, timer = null;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const dots = slides.map((_, i) => {
+    const b = document.createElement("button");
+    b.className = "car-dot";
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-label", String(i + 1));
+    b.addEventListener("click", () => { show(i); restart(); });
+    dotsHost.appendChild(b);
+    return b;
+  });
+
+  function show(n){
+    idx = (n + slides.length) % slides.length;
+    slides.forEach((s, i) => s.classList.toggle("is-on", i === idx));
+    dots.forEach((d, i) => d.setAttribute("aria-selected", i === idx ? "true" : "false"));
+  }
+  function restart(){
+    if (timer) clearInterval(timer);
+    if (reduced) return;                  // manual only
+    timer = setInterval(() => show(idx + 1), 7000);
+  }
+
+  $("#feat-carousel").addEventListener("click", e => {
+    const b = e.target.closest("[data-car]");
+    if (!b) return;
+    show(idx + (b.dataset.car === "next" ? 1 : -1));
+    restart();
+  });
+
+  // pause while it's being read or operated
+  const host = $("#feat-carousel");
+  ["mouseenter","focusin"].forEach(ev => host.addEventListener(ev, () => timer && clearInterval(timer)));
+  ["mouseleave","focusout"].forEach(ev => host.addEventListener(ev, restart));
+
+  show(0);
+  restart();
+})();
+
 /* Turn on guest mode and open the cabinet. Nothing is migrated or deleted —
    if they later sign in, their account cabinet is separate and the guest list
    stays on this device until they clear it. */
@@ -12987,7 +13197,14 @@ document.addEventListener("click", e => {
   const guest = e.target.closest('[data-act="use-guest"]');
   if (guest){ enterApp(); startGuest(); return; }
   const upgrade = e.target.closest('[data-act="guest-signup"]');
-  if (upgrade && typeof openSignInModal === "function") openSignInModal();
+  if (upgrade && typeof openSignInModal === "function") { openSignInModal(); return; }
+  const home = e.target.closest('[data-act="back-home"]');
+  if (home){
+    // a navigation, not a preference change: the "entered" flag stays set, so a
+    // reload still lands them in the tool where they left off
+    document.body.classList.add("landing-mode");
+    window.scrollTo(0, 0);
+  }
 });
 
 /* The band at the top of My Cabinet. Promotes the three counts that were
@@ -13444,9 +13661,11 @@ async function runCabinetScan(){
   if (!meds || meds.length < 2){ box.innerHTML = `<div class="err">${esc(t("scan_min_two"))}</div>`; return; }
   const pairCount = meds.length*(meds.length-1)/2;
   const pairWord = pairCount>1 ? t("scan_pairs_word_plural") : t("scan_pairs_word");
-  box.innerHTML = `<p class="status" style="padding:0 0 6px;">${esc(t("scan_scanning_prefix"))} ${meds.length} ${esc(t("medications_word"))} — ${pairCount} ${esc(pairWord)}…</p>${skelResults(2)}`;
+  box.innerHTML = `<p class="status" style="padding:0 0 6px;">${esc(t("scan_scanning_prefix"))} ${meds.length} ${esc(t("medications_word"))} — ${pairCount} ${esc(pairWord)}…</p>
+    <div id="scan-prog">${progressHTML(0, meds.length)}</div>${skelResults(2)}`;
 
-  const drugs = await resolveAll(meds.map(m => m.generic || m.brand || m.name));
+  const drugs = await resolveAll(meds.map(m => m.generic || m.brand || m.name), 5,
+    (d0, n) => setProgress("#scan-prog", d0, n));
   const { findings, mentions } = analyzeDrugPairs(drugs);
 
   box.innerHTML = renderUnverifiedWarning(drugs)
