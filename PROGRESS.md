@@ -25,6 +25,17 @@ Companion docs: `CLAUDE.md` = architecture + safety rules · `PLAINSCRIPT_ROADMA
 
 ---
 
+## 0. Shipped 2026-09-16/17 (all live)
+- **Homepage** — landing view for signed-out first-time visitors, inside `index.html` (the i18n dictionary and theme machinery live there, so a separate file would have meant duplicating the whole 13-language system). Skipped for `?share=` links, installed PWA, signed-in users, and returning visitors. Content sections deliberately left for Privi — see `YOUR_TASKS.md`.
+- **My Cabinet is now a dashboard** — stat tiles promoted out of the Insights modal, Scan as the single primary action. Neutral ink, never green.
+- **Bottom navigation app-shell** at phone widths, verified in both themes and Arabic RTL.
+- **Privacy Policy + Terms**, footer links in all 13 languages, and a consent moment at signup.
+- **69 engine tests** (`node --test tests/*.test.js`), mutation-verified to actually catch regressions.
+- All P0/P1/P2 audit bugs fixed.
+- **`YOUR_TASKS.md`** — 13 scoped tasks Privi writes himself, easiest to hardest, with a Python→JS cheat sheet.
+
+**Open gap worth tracking:** homepage copy is English-only while the page itself claims 13 languages. Translate once the copy is final (it's structured for it).
+
 ## 1. Only Privi can do these
 - [ ] **"Why I built this"** — fill the `[PRIVI: voice this]` placeholder in `README.md`, in your own voice.
 - [ ] **`[PRIVI: personal spark]` + `[PRIVI: 2-3 real challenges]`** in `CAC_SUBMISSION.md` — every comparable past CAC winner researched (PillPall, CareCompanion, Your Medicine) had a concrete personal story; this is the biggest lever left on the Concept score.
