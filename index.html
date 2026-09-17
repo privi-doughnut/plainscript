@@ -233,6 +233,10 @@
      Only one of the two views is ever in the document flow; the choice is made
      before first paint by the script at the top of <body>. Reuses the app's own
      tokens throughout so the homepage and the tool read as one product. */
+  /* The app's 760px measure is tuned for reading a drug label. A marketing page
+     with a side-by-side hero needs more room, so the landing widens its
+     container; the text inside still caps its own line length. */
+  #landing .wrap{max-width:1120px;}
   #landing{display:none;}
   body.landing-mode #landing{display:block;}
   body.landing-mode > header.site,
@@ -252,22 +256,33 @@
      Three stacked layers in one grid cell: ghosted wordmark, rotating mark,
      copy. Only transform and opacity are ever animated — the two properties
      the compositor can handle without a layout or paint pass. */
-  .lp-hero{padding:72px 0 64px; overflow:hidden;}
-  .lp-hero-inner{position:relative; display:grid;}
-  .lp-hero-inner > *{grid-area:1 / 1;}
-
-  /* Sized to fit the wrap rather than bleed: a wordmark cut off mid-word reads
-     as a layout bug, not as a deliberate crop. 10.5vw keeps all 11 characters
-     inside the container at every width it's shown at. */
-  .lp-ghost{
-    align-self:center; justify-self:center;
-    font-family:var(--serif); font-weight:600; letter-spacing:-.03em;
-    font-size:clamp(44px, 10.5vw, 146px); line-height:1; white-space:nowrap;
-    color:var(--ink); opacity:.05; user-select:none; pointer-events:none;
+  .lp-hero{position:relative; padding:72px 0 64px; overflow:hidden;}
+  /* Two real columns rather than stacked grid areas, so the rotating mark can
+     never land on top of the copy at any width — overlap on body text is the
+     one thing that makes a layered hero unreadable. */
+  .lp-hero-inner{
+    position:relative; display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center; gap:clamp(24px, 4vw, 56px);
   }
 
-  /* offset right so the mark sits beside the copy instead of behind it */
-  .lp-stage{align-self:center; justify-self:end; margin-right:2vw; perspective:900px; pointer-events:none;}
+  /* Full-bleed: spans the viewport edge to edge regardless of width. Anchored
+     to the headline band rather than centred, because large display type can
+     sit over it and stay legible while small grey body copy cannot. */
+  .lp-ghost{
+    position:absolute; inset:0; z-index:0;
+    width:100%; height:100%;
+    opacity:.05; user-select:none; pointer-events:none;
+  }
+  .lp-ghost text{
+    font-family:var(--serif); font-weight:600; fill:var(--ink);
+    /* user units inside the viewBox, not screen px — without this it defaults
+       to 16px and textLength stretches a single thin line across the viewport */
+    font-size:132px;
+  }
+
+  /* its own grid column, so it sits beside the copy and never over it */
+  .lp-stage{position:relative; z-index:1; align-self:center; grid-column:2; grid-row:1; perspective:900px; pointer-events:none;}
   .lp-tilt{animation:mark-tilt 19s ease-in-out infinite; transform-style:preserve-3d;}
   .lp-spin{
     width:clamp(150px, 26vw, 260px); aspect-ratio:1;
@@ -277,20 +292,26 @@
   .lp-mark{position:absolute; inset:0; transform-style:preserve-3d;}
   /* Each layer is the same cross, pushed along Z and dimmed with depth, which
      is what reads as a solid extruded object rather than a flat sticker. */
+  /* Drawn as two crossed rounded bars rather than one clip-path polygon:
+     clip-path can't round its corners, and the softened arm ends are most of
+     what stops the mark reading as a hard medical-cross clipart. */
   .lp-mark i{
-    position:absolute; inset:0; background:var(--accent);
-    clip-path:polygon(35% 0, 65% 0, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0 65%, 0 35%, 35% 35%);
-    transform:translateZ(calc((var(--i) - 7.5) * 2px));
+    position:absolute; inset:0;
+    transform:translateZ(calc((var(--i) - 7.5) * 2.4px));
     filter:brightness(calc(.5 + (var(--i) / 15) * .6));
   }
+  .lp-mark i::before, .lp-mark i::after{
+    content:""; position:absolute; background:var(--accent); border-radius:11px;
+  }
+  .lp-mark i::before{ left:30%; right:30%; top:0; bottom:0; }   /* vertical arm */
+  .lp-mark i::after { top:30%; bottom:30%; left:0; right:0; }   /* horizontal arm */
   @keyframes mark-spin{ from{transform:rotateY(0deg);} to{transform:rotateY(360deg);} }
   @keyframes mark-tilt{
     0%,100%{transform:rotateX(9deg) rotateZ(-3deg);}
     50%    {transform:rotateX(-7deg) rotateZ(3deg);}
   }
 
-  /* capped so the longest line can't run under the rotating mark */
-  .lp-hero-copy{position:relative; align-self:center; max-width:min(100%, 620px);}
+  .lp-hero-copy{position:relative; z-index:2; align-self:center; grid-column:1; grid-row:1;}
 
   /* one-time entrance; --d staggers each element */
   .reveal{animation:reveal .48s cubic-bezier(.33,1,.68,1) both; animation-delay:var(--d,0ms);}
@@ -304,7 +325,7 @@
     .lp-tilt{animation:none; transform:rotateX(8deg);}
   }
 
-  .lp-hero h1{font-family:var(--serif); font-size:46px; line-height:1.1; font-weight:600; letter-spacing:-.02em; margin:0 0 18px; max-width:16ch;}
+  .lp-hero h1{font-family:var(--serif); font-size:clamp(34px, 4.4vw, 54px); line-height:1.08; font-weight:600; letter-spacing:-.02em; margin:0 0 18px; max-width:20ch;}
   .lp-accent{color:var(--accent);}
   .lp-sub{font-size:18px; line-height:1.55; color:var(--ink-soft); margin:0 0 26px; max-width:60ch;}
   .lp-cta{display:flex; gap:11px; flex-wrap:wrap; margin-bottom:26px;}
@@ -996,26 +1017,23 @@
     </div>
   </div></header>
 
-  <section class="lp-hero"><div class="wrap lp-hero-inner">
+  <section class="lp-hero">
+    <!-- Full-bleed ghosted wordmark. Sits outside .wrap so it can span the whole
+         viewport rather than the padded container, and is SVG rather than a text
+         node because textLength + lengthAdjust stretches the word to exactly the
+         available width at any screen size — a font-size guess in vw would either
+         fall short or clip mid-word as the viewport changes. -->
+    <svg class="lp-ghost" viewBox="0 0 1000 96" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <text x="0" y="95" textLength="1000" lengthAdjust="spacingAndGlyphs">PLAINSCRIPT</text>
+    </svg>
+
+    <div class="wrap lp-hero-inner">
     <!-- Layered hero: ghosted wordmark at the back, the extruded mark rotating
          in the middle, copy in front. The mark is built from stacked DOM layers
          with CSS 3D rather than WebGL — no library, no build step, and because
          it's real DOM painted with var(--accent) it re-colours itself for every
          theme automatically. aria-hidden throughout: it is decoration, and the
          headline beside it already carries the meaning. -->
-    <div class="lp-ghost" aria-hidden="true">PLAINSCRIPT</div>
-
-    <div class="lp-stage" aria-hidden="true">
-      <div class="lp-tilt"><div class="lp-spin">
-        <div class="lp-mark">
-          <i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i>
-          <i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i>
-          <i style="--i:8"></i><i style="--i:9"></i><i style="--i:10"></i><i style="--i:11"></i>
-          <i style="--i:12"></i><i style="--i:13"></i><i style="--i:14"></i><i style="--i:15"></i>
-        </div>
-      </div></div>
-    </div>
-
     <div class="lp-hero-copy">
       <h1 class="reveal" style="--d:0ms">Understand what<br><span class="lp-accent">you're actually taking.</span></h1>
       <p class="lp-sub reveal" style="--d:140ms">Plainscript turns the FDA's own drug labels into plain English and checks
@@ -1028,7 +1046,19 @@
       <p class="lp-strip reveal" style="--d:280ms">openFDA · RxNorm · 13 languages · works offline · no ads · no tracking</p>
       <p class="lp-note reveal" style="--d:340ms">No account needed. Decoding a medication and checking interactions are free and always will be.</p>
     </div>
-  </div></section>
+
+    <div class="lp-stage" aria-hidden="true">
+      <div class="lp-tilt"><div class="lp-spin">
+        <div class="lp-mark">
+          <i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i>
+          <i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i>
+          <i style="--i:8"></i><i style="--i:9"></i><i style="--i:10"></i><i style="--i:11"></i>
+          <i style="--i:12"></i><i style="--i:13"></i><i style="--i:14"></i><i style="--i:15"></i>
+        </div>
+      </div></div>
+    </div>
+    </div>
+  </section>
 
   <!-- [PRIVI - TASK 6] "The problem" section goes here -->
   <!-- [PRIVI - TASK 7] "What it does" feature cards go here -->
