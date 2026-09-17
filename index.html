@@ -56,6 +56,7 @@
     --sans:"Spline Sans",system-ui,-apple-system,sans-serif;
     --serif:"Newsreader",Georgia,serif;
     --shadow-lift:0 2px 6px rgba(41,37,32,.07), 0 14px 38px rgba(41,37,32,.11);
+    --on-accent:#FFFFFF;
   }
 
   /* ---- dark theme: same sober clinical instrument, lights turned down.
@@ -80,6 +81,7 @@
     --safety-bg:#090F11;
     --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
     --shadow-lift:0 2px 6px rgba(0,0,0,.4), 0 16px 44px rgba(0,0,0,.5);
+    --on-accent:#06181B;
   }
 
 
@@ -104,6 +106,7 @@
     --safety-bg:#11090B;
     --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
     --shadow-lift:0 2px 6px rgba(0,0,0,.4), 0 16px 44px rgba(0,0,0,.5);
+    --on-accent:#1A0F12;
   }
 
   /* ---- Calm clinical green, muted so an accent can never read as "all clear". ---- */
@@ -127,6 +130,7 @@
     --safety-bg:#09110D;
     --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
     --shadow-lift:0 2px 6px rgba(0,0,0,.4), 0 16px 44px rgba(0,0,0,.5);
+    --on-accent:#0A1A12;
   }
 
   /* ---- Institutional blue — the most conservative of the set. ---- */
@@ -150,6 +154,7 @@
     --safety-bg:#090C11;
     --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
     --shadow-lift:0 2px 6px rgba(0,0,0,.4), 0 16px 44px rgba(0,0,0,.5);
+    --on-accent:#081119;
   }
 
   /* ---- Soft violet — the furthest hue from every severity colour. ---- */
@@ -173,6 +178,7 @@
     --safety-bg:#0D0911;
     --shadow:0 1px 2px rgba(0,0,0,.32), 0 10px 30px rgba(0,0,0,.42);
     --shadow-lift:0 2px 6px rgba(0,0,0,.4), 0 16px 44px rgba(0,0,0,.5);
+    --on-accent:#150F1A;
   }
 
   /* ---- high contrast: for low vision and bright-sunlight use. Pure black
@@ -199,6 +205,7 @@
     --safety-bg:#000000;
     --shadow:0 0 0 1px #5A5A5A;
     --shadow-lift:0 0 0 2px #5A5A5A;
+    --on-accent:#00201C;
   }
 
   /* [PRIVI - TASK 14] a warm "sepia"/paper theme belongs here — see YOUR_TASKS.md */
@@ -255,11 +262,11 @@
      so "on" is unmistakable, and it springs back to the default pill when off */
   .themetoggle[aria-pressed]{ transition:background .15s ease, color .15s ease, box-shadow .15s ease, transform .1s ease; }
   .themetoggle[aria-pressed="true"]{
-    background:var(--accent); border-color:var(--accent); color:#fff;
+    background:var(--accent); border-color:var(--accent); color:var(--on-accent);
     box-shadow:inset 0 2px 4px rgba(0,0,0,.28); transform:translateY(1px);
   }
-  .themetoggle[aria-pressed="true"]:hover{ color:#fff; }
-  .themetoggle[aria-pressed="true"] .ticon{ color:#fff; }
+  .themetoggle[aria-pressed="true"]:hover{ color:var(--on-accent); }
+  .themetoggle[aria-pressed="true"] .ticon{ color:var(--on-accent); }
 
   /* language selector — same pill look as .themetoggle, but a real <select>
      since a single click-toggle only scales to two languages */
@@ -529,7 +536,7 @@
   button.go{
     appearance:none; cursor:pointer; font-family:var(--sans); font-weight:600; font-size:15px;
     padding:13px 20px; border-radius:var(--radius); border:1px solid var(--accent-deep);
-    background:var(--accent); color:#fff;
+    background:var(--accent); color:var(--on-accent);
     transition:transform .12s cubic-bezier(.2,.65,.3,1), background-color .15s ease, border-color .15s ease;
   }
   button.go:hover{background:var(--accent-deep);}
@@ -1141,10 +1148,10 @@
 </script>
 
 <!-- persistent safety frame -->
-<div class="safetybar"><div class="wrap">
+<aside class="safetybar" aria-label="Safety notice"><div class="wrap">
   <span class="dot" aria-hidden="true"></span>
   <span data-i18n-html="safety_bar"></span>
-</div></div>
+</div></aside>
 
 <!-- ============================================================
      HOMEPAGE / LANDING
@@ -1155,6 +1162,10 @@
      Sections marked [PRIVI] are yours to write — see YOUR_TASKS.md.
      ============================================================ -->
 <div id="landing">
+  <!-- its own main landmark: in landing mode the app's <main> is display:none,
+       so without this the document has no main landmark and none of the landing
+       content sits inside one. Only ever one of the two is visible. -->
+  <main class="lp-main">
   <header class="lp-nav"><div class="wrap">
     <div class="lp-brand">
       <span class="lp-word">Plainscript</span>
@@ -1292,6 +1303,7 @@
       <span>Educational reference only. Not medical advice. Not affiliated with or endorsed by the FDA or NIH.</span>
     </p>
   </div></section>
+  </main>
 </div>
 
 <header class="site"><div class="wrap">
