@@ -1211,8 +1211,29 @@
       <span class="lp-src">openFDA · RxNorm · NIH</span>
     </div>
     <div class="lp-nav-actions">
-      <button class="ghost" data-act="enter-app">Open the tool</button>
-      <button class="go" data-act="enter-signup">Create an account</button>
+      <!-- The homepage claims 13 languages, so it has to offer them. Its own
+           select rather than the app header's, since that header is hidden in
+           landing mode; both are kept in sync by applyLang(). -->
+      <div class="lang-select-wrap">
+        <span class="ticon" aria-hidden="true">🌐</span>
+        <select id="lp-lang-select" aria-label="Language" title="Language">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="zh">中文</option>
+          <option value="vi">Tiếng Việt</option>
+          <option value="ar">العربية</option>
+          <option value="fr">Français</option>
+          <option value="ko">한국어</option>
+          <option value="ru">Русский</option>
+          <option value="pt">Português</option>
+          <option value="de">Deutsch</option>
+          <option value="ja">日本語</option>
+          <option value="hi">हिन्दी</option>
+          <option value="ta">தமிழ்</option>
+        </select>
+      </div>
+      <button class="ghost" data-act="enter-app" data-i18n="lp_nav_open">Open the tool</button>
+      <button class="go" data-act="enter-signup" data-i18n="lp_nav_signup">Create an account</button>
     </div>
   </div></header>
 
@@ -1234,16 +1255,15 @@
          theme automatically. aria-hidden throughout: it is decoration, and the
          headline beside it already carries the meaning. -->
     <div class="lp-hero-copy">
-      <h1 class="reveal" style="--d:0ms">Understand what<br><span class="lp-accent">you're actually taking.</span></h1>
-      <p class="lp-sub reveal" style="--d:140ms">Plainscript turns the FDA's own drug labels into plain English and checks
-        whether your medicines interact — free, sourced, and never invented.</p>
+      <h1 class="reveal" style="--d:0ms"><span data-i18n="lp_hero_h1a">Understand what</span><br><span class="lp-accent" data-i18n="lp_hero_h1b">you're actually taking.</span></h1>
+      <p class="lp-sub reveal" style="--d:140ms" data-i18n="lp_hero_sub">Plainscript turns the FDA's own drug labels into plain English and checks whether your medicines interact — free, sourced, and never invented.</p>
       <div class="lp-cta reveal" style="--d:210ms">
-        <button class="go" data-act="enter-app">Open the tool</button>
-        <button class="ghost" data-act="enter-signup">Create a free account</button>
-        <button class="ghost" data-act="use-guest">Use as guest</button>
+        <button class="go" data-act="enter-app" data-i18n="lp_nav_open">Open the tool</button>
+        <button class="ghost" data-act="enter-signup" data-i18n="lp_cta_signup">Create a free account</button>
+        <button class="ghost" data-act="use-guest" data-i18n="lp_cta_guest">Use as guest</button>
       </div>
-      <p class="lp-strip reveal" style="--d:280ms">openFDA · RxNorm · 13 languages · works offline · no ads · no tracking</p>
-      <p class="lp-note reveal" style="--d:340ms">No account needed. Decoding a medication and checking interactions are free and always will be.</p>
+      <p class="lp-strip reveal" style="--d:280ms" data-i18n="lp_strip">openFDA · RxNorm · 13 languages · works offline · no ads · no tracking</p>
+      <p class="lp-note reveal" style="--d:340ms" data-i18n="lp_note">No account needed. Decoding a medication and checking interactions are free and always will be.</p>
     </div>
 
     <div class="lp-stage" aria-hidden="true">
@@ -1266,37 +1286,30 @@
        tool is built to avoid. Auto-advances slowly, pauses on hover and on
        focus, and stops entirely under prefers-reduced-motion. -->
   <section class="lp-feat"><div class="wrap">
-    <span class="eyebrow">What it does</span>
-    <h2>Four tools, one medicine cabinet.</h2>
+    <span class="eyebrow" data-i18n="lp_feat_eyebrow">What it does</span>
+    <h2 data-i18n="lp_feat_h2">Four tools, one medicine cabinet.</h2>
 
     <div class="carousel" id="feat-carousel">
       <div class="car-track" id="car-track">
         <article class="car-slide is-on">
           <span class="car-num">01</span>
-          <h3>Decode a medication</h3>
-          <p>Type any brand or generic name and get its real FDA label in plain English —
-             what it treats, how it works, side effects, and warnings, laid out as
-             something you can actually scan.</p>
+          <h3 data-i18n="lp_s1_t">Decode a medication</h3>
+          <p data-i18n="lp_s1_b">Type any brand or generic name and get its real FDA label in plain English — what it treats, how it works, side effects, and warnings, laid out as something you can actually scan.</p>
         </article>
         <article class="car-slide">
           <span class="car-num">02</span>
-          <h3>Check an interaction</h3>
-          <p>Enter two or more medicines and get severity-rated, plain-English warnings,
-             each one showing the source it came from. Never a green "safe" — only
-             what was found, and what wasn't.</p>
+          <h3 data-i18n="lp_s2_t">Check an interaction</h3>
+          <p data-i18n="lp_s2_b">Enter two or more medicines and get severity-rated, plain-English warnings, each one showing the source it came from. Never a green "safe" — only what was found, and what wasn't.</p>
         </article>
         <article class="car-slide">
           <span class="car-num">03</span>
-          <h3>Scan your whole cabinet</h3>
-          <p>Save what you actually take, then check every medicine against every other
-             one at once — not just a pair — and read the result as a severity grid.</p>
+          <h3 data-i18n="lp_s3_t">Scan your whole cabinet</h3>
+          <p data-i18n="lp_s3_b">Save what you actually take, then check every medicine against every other one at once — not just a pair — and read the result as a severity grid.</p>
         </article>
         <article class="car-slide">
           <span class="car-num">04</span>
-          <h3>Symptoms, without a diagnosis</h3>
-          <p>An emergency red-flag checklist, plus a guide from everyday symptoms to the
-             usual over-the-counter category. It will not tell you what's wrong with you,
-             and it says so.</p>
+          <h3 data-i18n="lp_s4_t">Symptoms, without a diagnosis</h3>
+          <p data-i18n="lp_s4_b">An emergency red-flag checklist, plus a guide from everyday symptoms to the usual over-the-counter category. It will not tell you what's wrong with you, and it says so.</p>
         </article>
       </div>
 
@@ -1311,35 +1324,33 @@
   <!-- [PRIVI - TASK 8] "Where every fact comes from" source cards go here -->
 
   <section class="lp-limits"><div class="wrap">
-    <span class="eyebrow">What Plainscript will never do</span>
-    <h2>A tool that knows its limits.</h2>
-    <p class="lp-sub">Most health apps promise you everything. These refusals are deliberate design
-      decisions, not missing features — each one is a place where being wrong could hurt somebody.</p>
+    <span class="eyebrow" data-i18n="lp_lim_eyebrow">What Plainscript will never do</span>
+    <h2 data-i18n="lp_lim_h2">A tool that knows its limits.</h2>
+    <p class="lp-sub" data-i18n="lp_lim_sub">Most health apps promise you everything. These refusals are deliberate design decisions, not missing features — each one is a place where being wrong could hurt somebody.</p>
     <ul class="lp-never">
-      <li><b>Never diagnoses.</b> It will not guess what's wrong with you.</li>
-      <li><b>Never calculates or recommends a dose.</b> That belongs to your prescriber.</li>
-      <li><b>Never tells you to start, stop, or change a medicine.</b></li>
-      <li><b>Never says a combination is "safe."</b> Only that nothing was found — which is not the same thing, and it says so.</li>
-      <li><b>Never handles an emergency.</b> It routes you to 911 and Poison Control instead.</li>
+      <li><b data-i18n="lp_never1_b">Never diagnoses.</b> <span data-i18n="lp_never1_t">It will not guess what's wrong with you.</span></li>
+      <li><b data-i18n="lp_never2_b">Never calculates or recommends a dose.</b> <span data-i18n="lp_never2_t">That belongs to your prescriber.</span></li>
+      <li><b data-i18n="lp_never3_b">Never tells you to start, stop, or change a medicine.</b></li>
+      <li><b data-i18n="lp_never4_b">Never says a combination is "safe."</b> <span data-i18n="lp_never4_t">Only that nothing was found — which is not the same thing, and it says so.</span></li>
+      <li><b data-i18n="lp_never5_b">Never handles an emergency.</b> <span data-i18n="lp_never5_t">It routes you to 911 and Poison Control instead.</span></li>
     </ul>
-    <p class="lp-note">The one place a language model is used, it may only rephrase text already retrieved
-      from an FDA label — it cannot introduce a medical claim. That rule is enforced on the server, not by trust.</p>
+    <p class="lp-note" data-i18n="lp_lim_note">The one place a language model is used, it may only rephrase text already retrieved from an FDA label — it cannot introduce a medical claim. That rule is enforced on the server, not by trust.</p>
   </div></section>
 
   <!-- [PRIVI - TASK 9] "Built for people who get left out" section goes here -->
   <!-- [PRIVI - TASK 10] "Who made this" — your story, in your voice -->
 
   <section class="lp-end"><div class="wrap">
-    <h2>Start with one medication.</h2>
-    <p class="lp-sub">Type in something from your cabinet and see what its label actually says.</p>
+    <h2 data-i18n="lp_end_h2">Start with one medication.</h2>
+    <p class="lp-sub" data-i18n="lp_end_sub">Type in something from your cabinet and see what its label actually says.</p>
     <div class="lp-cta">
-      <button class="go" data-act="enter-app">Open the tool</button>
+      <button class="go" data-act="enter-app" data-i18n="lp_nav_open">Open the tool</button>
     </div>
     <p class="lp-foot">
       <a href="privacy.html" data-i18n="footer_privacy"></a> ·
       <a href="terms.html" data-i18n="footer_terms"></a> ·
-      <a href="https://github.com/privi-doughnut/plainscript" target="_blank" rel="noopener">Source</a> ·
-      <span>Educational reference only. Not medical advice. Not affiliated with or endorsed by the FDA or NIH.</span>
+      <a href="https://github.com/privi-doughnut/plainscript" target="_blank" rel="noopener" data-i18n="lp_foot_source">Source</a> ·
+      <span data-i18n="lp_foot_disclaimer">Educational reference only. Not medical advice. Not affiliated with or endorsed by the FDA or NIH.</span>
     </p>
   </div></section>
   </main>
@@ -4007,6 +4018,42 @@ const I18N = {
     footer_privacy: "Privacy Policy",
     footer_terms: "Terms",
     back_home: "Home",
+    lp_nav_open: "Open the tool",
+    lp_nav_signup: "Create an account",
+    lp_hero_h1a: "Understand what",
+    lp_hero_h1b: "you're actually taking.",
+    lp_hero_sub: "Plainscript turns the FDA's own drug labels into plain English and checks whether your medicines interact — free, sourced, and never invented.",
+    lp_cta_signup: "Create a free account",
+    lp_cta_guest: "Use as guest",
+    lp_strip: "openFDA · RxNorm · 13 languages · works offline · no ads · no tracking",
+    lp_note: "No account needed. Decoding a medication and checking interactions are free and always will be.",
+    lp_feat_eyebrow: "What it does",
+    lp_feat_h2: "Four tools, one medicine cabinet.",
+    lp_s1_t: "Decode a medication",
+    lp_s1_b: "Type any brand or generic name and get its real FDA label in plain English — what it treats, how it works, side effects, and warnings, laid out as something you can actually scan.",
+    lp_s2_t: "Check an interaction",
+    lp_s2_b: "Enter two or more medicines and get severity-rated, plain-English warnings, each one showing the source it came from. Never a green \\\"safe\\\" — only what was found, and what wasn't.",
+    lp_s3_t: "Scan your whole cabinet",
+    lp_s3_b: "Save what you actually take, then check every medicine against every other one at once — not just a pair — and read the result as a severity grid.",
+    lp_s4_t: "Symptoms, without a diagnosis",
+    lp_s4_b: "An emergency red-flag checklist, plus a guide from everyday symptoms to the usual over-the-counter category. It will not tell you what's wrong with you, and it says so.",
+    lp_lim_eyebrow: "What Plainscript will never do",
+    lp_lim_h2: "A tool that knows its limits.",
+    lp_lim_sub: "Most health apps promise you everything. These refusals are deliberate design decisions, not missing features — each one is a place where being wrong could hurt somebody.",
+    lp_never1_b: "Never diagnoses.",
+    lp_never1_t: "It will not guess what's wrong with you.",
+    lp_never2_b: "Never calculates or recommends a dose.",
+    lp_never2_t: "That belongs to your prescriber.",
+    lp_never3_b: "Never tells you to start, stop, or change a medicine.",
+    lp_never4_b: "Never says a combination is \\\"safe.\\\"",
+    lp_never4_t: "Only that nothing was found — which is not the same thing, and it says so.",
+    lp_never5_b: "Never handles an emergency.",
+    lp_never5_t: "It routes you to 911 and Poison Control instead.",
+    lp_lim_note: "The one place a language model is used, it may only rephrase text already retrieved from an FDA label — it cannot introduce a medical claim. That rule is enforced on the server, not by trust.",
+    lp_end_h2: "Start with one medication.",
+    lp_end_sub: "Type in something from your cabinet and see what its label actually says.",
+    lp_foot_source: "Source",
+    lp_foot_disclaimer: "Educational reference only. Not medical advice. Not affiliated with or endorsed by the FDA or NIH.",
     dup_eyebrow: "Same active ingredient",
     dup_pill: "double dose",
     dup_body_prefix: "Both of these list the same active ingredient:",
@@ -4594,6 +4641,42 @@ const I18N = {
     footer_privacy: "Política de privacidad",
     footer_terms: "Términos",
     back_home: "Inicio",
+    lp_nav_open: "Abrir la herramienta",
+    lp_nav_signup: "Crear una cuenta",
+    lp_hero_h1a: "Entiende lo que",
+    lp_hero_h1b: "realmente estás tomando.",
+    lp_hero_sub: "Plainscript convierte las propias etiquetas de la FDA en lenguaje sencillo y comprueba si tus medicamentos interactúan — gratis, con fuentes, y nunca inventado.",
+    lp_cta_signup: "Crear una cuenta gratis",
+    lp_cta_guest: "Usar como invitado",
+    lp_strip: "openFDA · RxNorm · 13 idiomas · funciona sin conexión · sin anuncios · sin rastreo",
+    lp_note: "No hace falta cuenta. Descifrar un medicamento y comprobar interacciones son gratis y siempre lo serán.",
+    lp_feat_eyebrow: "Qué hace",
+    lp_feat_h2: "Cuatro herramientas, un botiquín.",
+    lp_s1_t: "Descifrar un medicamento",
+    lp_s1_b: "Escribe cualquier nombre comercial o genérico y obtén su etiqueta real de la FDA en lenguaje sencillo: para qué sirve, cómo actúa, efectos secundarios y advertencias, presentado de forma que de verdad puedas leerlo de un vistazo.",
+    lp_s2_t: "Comprobar una interacción",
+    lp_s2_b: "Introduce dos o más medicamentos y recibe advertencias en lenguaje sencillo, clasificadas por gravedad y mostrando cada una su fuente. Nunca un “seguro” en verde: solo lo que se encontró y lo que no.",
+    lp_s3_t: "Revisar todo tu botiquín",
+    lp_s3_b: "Guarda lo que realmente tomas y luego compara cada medicamento con todos los demás a la vez —no solo de dos en dos— y lee el resultado como una cuadrícula de gravedad.",
+    lp_s4_t: "Síntomas, sin diagnóstico",
+    lp_s4_b: "Una lista de señales de alarma urgentes, más una guía de los síntomas cotidianos a la categoría habitual de venta libre. No te dirá qué te pasa, y lo dice claramente.",
+    lp_lim_eyebrow: "Lo que Plainscript nunca hará",
+    lp_lim_h2: "Una herramienta que conoce sus límites.",
+    lp_lim_sub: "La mayoría de las apps de salud te lo prometen todo. Estas negativas son decisiones de diseño deliberadas, no funciones que falten: cada una es un punto donde equivocarse podría hacer daño a alguien.",
+    lp_never1_b: "Nunca diagnostica.",
+    lp_never1_t: "No va a adivinar qué te pasa.",
+    lp_never2_b: "Nunca calcula ni recomienda una dosis.",
+    lp_never2_t: "Eso le corresponde a quien te receta.",
+    lp_never3_b: "Nunca te dice que empieces, dejes o cambies un medicamento.",
+    lp_never4_b: "Nunca dice que una combinación sea “segura”.",
+    lp_never4_t: "Solo que no se encontró nada, que no es lo mismo, y así lo indica.",
+    lp_never5_b: "Nunca atiende una emergencia.",
+    lp_never5_t: "Te remite al 911 y a Poison Control.",
+    lp_lim_note: "En el único punto donde se usa un modelo de lenguaje, solo puede reformular texto ya extraído de una etiqueta de la FDA: no puede introducir ninguna afirmación médica. Esa regla se aplica en el servidor, no por confianza.",
+    lp_end_h2: "Empieza con un medicamento.",
+    lp_end_sub: "Escribe algo de tu botiquín y mira lo que dice de verdad su etiqueta.",
+    lp_foot_source: "Código fuente",
+    lp_foot_disclaimer: "Solo como referencia educativa. No es consejo médico. Sin afiliación ni respaldo de la FDA ni de los NIH.",
     dup_eyebrow: "Mismo ingrediente activo",
     dup_pill: "dosis doble",
     dup_body_prefix: "Ambos indican el mismo ingrediente activo:",
@@ -5027,6 +5110,42 @@ const I18N = {
     footer_privacy: "隐私政策",
     footer_terms: "使用条款",
     back_home: "首页",
+    lp_nav_open: "打开工具",
+    lp_nav_signup: "创建账户",
+    lp_hero_h1a: "看懂你",
+    lp_hero_h1b: "真正在吃的药。",
+    lp_hero_sub: "Plainscript 把 FDA 的官方药品说明书转成通俗中文，并检查你的药物之间是否存在相互作用——免费、有据可查，绝不编造。",
+    lp_cta_signup: "创建免费账户",
+    lp_cta_guest: "以访客身份使用",
+    lp_strip: "openFDA · RxNorm · 13 种语言 · 可离线使用 · 无广告 · 无追踪",
+    lp_note: "无需账户。解读药物和检查相互作用一直都是免费的。",
+    lp_feat_eyebrow: "它能做什么",
+    lp_feat_h2: "四个工具，一个药箱。",
+    lp_s1_t: "解读一种药物",
+    lp_s1_b: "输入任何商品名或通用名，即可获得其真实的 FDA 说明书的通俗解读：治疗什么、如何起效、副作用和警告，排版让你真的读得下去。",
+    lp_s2_t: "检查相互作用",
+    lp_s2_b: "输入两种或更多药物，获得按严重程度分级的通俗警示，每一条都标明来源。绝不会显示绿色的“安全”——只说明发现了什么、没发现什么。",
+    lp_s3_t: "扫描整个药箱",
+    lp_s3_b: "保存你实际在服用的药，然后一次性把每种药与其他所有药逐一比对——不只是两两比较——并以严重程度网格查看结果。",
+    lp_s4_t: "症状，但不做诊断",
+    lp_s4_b: "一份紧急危险信号清单，以及从日常症状到常见非处方类别的指引。它不会告诉你你得了什么病，并且会明说这一点。",
+    lp_lim_eyebrow: "Plainscript 绝不会做的事",
+    lp_lim_h2: "一个知道自己界限的工具。",
+    lp_lim_sub: "大多数健康应用什么都敢承诺。这些拒绝是刻意的设计决定，而不是缺失的功能——每一处都是出错就可能伤害到人的地方。",
+    lp_never1_b: "绝不诊断。",
+    lp_never1_t: "它不会猜测你得了什么病。",
+    lp_never2_b: "绝不计算或推荐剂量。",
+    lp_never2_t: "那是开处方的医生的职责。",
+    lp_never3_b: "绝不告诉你开始、停止或更换某种药物。",
+    lp_never4_b: "绝不说某个组合是“安全的”。",
+    lp_never4_t: "只说没有发现——这并不是一回事，而且它会明确指出。",
+    lp_never5_b: "绝不处理紧急情况。",
+    lp_never5_t: "它会让你拨打 911 和 Poison Control。",
+    lp_lim_note: "在唯一使用语言模型的地方，它只能改写已经从 FDA 说明书中取得的文本——无法引入任何医学论断。这条规则由服务器强制执行，而不是靠信任。",
+    lp_end_h2: "从一种药开始。",
+    lp_end_sub: "输入你药箱里的某种药，看看它的说明书究竟写了什么。",
+    lp_foot_source: "源代码",
+    lp_foot_disclaimer: "仅供教育参考。不构成医疗建议。与 FDA 或 NIH 无关联，也未获其认可。",
     dup_eyebrow: "相同的有效成分",
     dup_pill: "双倍剂量",
     dup_body_prefix: "这两种药都含有相同的有效成分：",
@@ -5435,6 +5554,42 @@ const I18N = {
     footer_privacy: "Chính sách quyền riêng tư",
     footer_terms: "Điều khoản",
     back_home: "Trang chủ",
+    lp_nav_open: "Mở công cụ",
+    lp_nav_signup: "Tạo tài khoản",
+    lp_hero_h1a: "Hiểu rõ thứ bạn",
+    lp_hero_h1b: "đang thực sự uống.",
+    lp_hero_sub: "Plainscript chuyển chính nhãn thuốc của FDA sang ngôn ngữ dễ hiểu và kiểm tra xem các thuốc của bạn có tương tác hay không — miễn phí, có nguồn, và không bao giờ bịa ra.",
+    lp_cta_signup: "Tạo tài khoản miễn phí",
+    lp_cta_guest: "Dùng với tư cách khách",
+    lp_strip: "openFDA · RxNorm · 13 ngôn ngữ · hoạt động ngoại tuyến · không quảng cáo · không theo dõi",
+    lp_note: "Không cần tài khoản. Giải mã một loại thuốc và kiểm tra tương tác là miễn phí và sẽ luôn như vậy.",
+    lp_feat_eyebrow: "Công cụ này làm gì",
+    lp_feat_h2: "Bốn công cụ, một tủ thuốc.",
+    lp_s1_t: "Giải mã một loại thuốc",
+    lp_s1_b: "Nhập bất kỳ tên biệt dược hay tên gốc nào để nhận nhãn FDA thật của thuốc đó bằng ngôn ngữ dễ hiểu: dùng để làm gì, tác dụng ra sao, tác dụng phụ và cảnh báo, trình bày sao cho bạn thực sự đọc lướt được.",
+    lp_s2_t: "Kiểm tra tương tác",
+    lp_s2_b: "Nhập hai loại thuốc trở lên để nhận cảnh báo bằng ngôn ngữ dễ hiểu, có xếp mức độ nghiêm trọng, mỗi cảnh báo đều ghi rõ nguồn. Không bao giờ hiện chữ “an toàn” màu xanh — chỉ cho biết đã tìm thấy gì và chưa tìm thấy gì.",
+    lp_s3_t: "Quét toàn bộ tủ thuốc",
+    lp_s3_b: "Lưu những thuốc bạn thực sự dùng, rồi đối chiếu từng thuốc với tất cả các thuốc còn lại cùng lúc — không chỉ từng cặp — và xem kết quả dưới dạng lưới mức độ nghiêm trọng.",
+    lp_s4_t: "Triệu chứng, nhưng không chẩn đoán",
+    lp_s4_b: "Một danh sách các dấu hiệu nguy hiểm cần cấp cứu, cùng hướng dẫn từ các triệu chứng thường gặp đến nhóm thuốc không kê đơn thông dụng. Nó sẽ không nói bạn mắc bệnh gì, và nó nói rõ điều đó.",
+    lp_lim_eyebrow: "Những điều Plainscript sẽ không bao giờ làm",
+    lp_lim_h2: "Một công cụ biết giới hạn của mình.",
+    lp_lim_sub: "Hầu hết ứng dụng sức khỏe hứa hẹn mọi thứ. Những điều từ chối này là lựa chọn thiết kế có chủ ý, không phải tính năng còn thiếu — mỗi điều đều nằm ở chỗ mà sai sót có thể làm hại ai đó.",
+    lp_never1_b: "Không bao giờ chẩn đoán.",
+    lp_never1_t: "Nó sẽ không đoán xem bạn bị gì.",
+    lp_never2_b: "Không bao giờ tính hay khuyến nghị liều dùng.",
+    lp_never2_t: "Đó là việc của người kê đơn cho bạn.",
+    lp_never3_b: "Không bao giờ bảo bạn bắt đầu, ngừng hay đổi một loại thuốc.",
+    lp_never4_b: "Không bao giờ nói một tổ hợp là “an toàn”.",
+    lp_never4_t: "Chỉ nói là không tìm thấy gì — điều đó không giống nhau, và nó nói rõ như vậy.",
+    lp_never5_b: "Không bao giờ xử lý tình huống cấp cứu.",
+    lp_never5_t: "Nó hướng bạn đến 911 và Poison Control.",
+    lp_lim_note: "Ở nơi duy nhất có dùng mô hình ngôn ngữ, nó chỉ được diễn đạt lại đoạn văn đã lấy từ nhãn FDA — không thể đưa thêm bất kỳ khẳng định y khoa nào. Quy tắc đó được áp dụng ở phía máy chủ, không dựa vào lòng tin.",
+    lp_end_h2: "Bắt đầu với một loại thuốc.",
+    lp_end_sub: "Nhập một thứ trong tủ thuốc của bạn và xem nhãn của nó thực sự ghi gì.",
+    lp_foot_source: "Mã nguồn",
+    lp_foot_disclaimer: "Chỉ là tài liệu tham khảo mang tính giáo dục. Không phải lời khuyên y tế. Không liên kết với và không được FDA hay NIH chứng thực.",
     dup_eyebrow: "Cùng hoạt chất",
     dup_pill: "liều gấp đôi",
     dup_body_prefix: "Cả hai đều ghi cùng một hoạt chất:",
@@ -5850,6 +6005,42 @@ const I18N = {
     footer_privacy: "سياسة الخصوصية",
     footer_terms: "الشروط",
     back_home: "الرئيسية",
+    lp_nav_open: "افتح الأداة",
+    lp_nav_signup: "إنشاء حساب",
+    lp_hero_h1a: "افهم ما",
+    lp_hero_h1b: "تتناوله فعلًا.",
+    lp_hero_sub: "يحوّل Plainscript نشرات الأدوية الرسمية من FDA إلى لغة واضحة، ويتحقق مما إذا كانت أدويتك تتفاعل معًا — مجانًا، بمصادر موثّقة، ودون أي اختلاق.",
+    lp_cta_signup: "إنشاء حساب مجاني",
+    lp_cta_guest: "الاستخدام كضيف",
+    lp_strip: "openFDA · RxNorm · 13 لغة · يعمل دون اتصال · بلا إعلانات · بلا تتبّع",
+    lp_note: "لا حاجة إلى حساب. فهم دواء والتحقق من التفاعلات مجانيان وسيظلان كذلك.",
+    lp_feat_eyebrow: "ماذا يفعل",
+    lp_feat_h2: "أربع أدوات، وخزانة دواء واحدة.",
+    lp_s1_t: "افهم دواءً",
+    lp_s1_b: "اكتب أي اسم تجاري أو علمي لتحصل على نشرة FDA الحقيقية للدواء بلغة واضحة: فيمَ يُستخدم، وكيف يعمل، والآثار الجانبية والتحذيرات، معروضة بطريقة يمكنك تصفّحها فعلًا.",
+    lp_s2_t: "تحقّق من تفاعل",
+    lp_s2_b: "أدخل دواءين أو أكثر لتحصل على تحذيرات بلغة واضحة مصنّفة حسب الخطورة، ويظهر مع كل تحذير مصدره. لن تظهر أبدًا كلمة «آمن» باللون الأخضر — بل فقط ما تم العثور عليه وما لم يُعثر عليه.",
+    lp_s3_t: "افحص خزانة دوائك كاملة",
+    lp_s3_b: "احفظ ما تتناوله فعلًا، ثم قارن كل دواء بكل دواء آخر دفعة واحدة — لا أزواجًا فقط — واقرأ النتيجة كشبكة حسب الخطورة.",
+    lp_s4_t: "الأعراض، دون تشخيص",
+    lp_s4_b: "قائمة بعلامات الخطر الطارئة، مع دليل من الأعراض اليومية إلى فئة الأدوية المتاحة دون وصفة. لن يخبرك بما تعاني منه، وهو يوضّح ذلك صراحةً.",
+    lp_lim_eyebrow: "ما لن يفعله Plainscript أبدًا",
+    lp_lim_h2: "أداة تعرف حدودها.",
+    lp_lim_sub: "معظم تطبيقات الصحة تَعِدك بكل شيء. هذه الرفضات قرارات تصميم مقصودة، وليست ميزات ناقصة — كل واحدة منها موضع قد يؤذي فيه الخطأ إنسانًا.",
+    lp_never1_b: "لا يُشخّص أبدًا.",
+    lp_never1_t: "لن يخمّن ما تعاني منه.",
+    lp_never2_b: "لا يحسب جرعة ولا يوصي بها أبدًا.",
+    lp_never2_t: "هذا من شأن من يصف لك الدواء.",
+    lp_never3_b: "لا يطلب منك أبدًا بدء دواء أو إيقافه أو تغييره.",
+    lp_never4_b: "لا يقول أبدًا إن تركيبة ما «آمنة».",
+    lp_never4_t: "يقول فقط إنه لم يُعثر على شيء — وهذا ليس الأمر نفسه، وهو يوضّح ذلك.",
+    lp_never5_b: "لا يتعامل مع الحالات الطارئة أبدًا.",
+    lp_never5_t: "بل يوجّهك إلى 911 وPoison Control.",
+    lp_lim_note: "في الموضع الوحيد الذي يُستخدم فيه نموذج لغوي، لا يمكنه إلا إعادة صياغة نص مأخوذ مسبقًا من نشرة FDA — ولا يمكنه إضافة أي ادعاء طبي. وتُطبَّق هذه القاعدة على الخادم، لا اعتمادًا على الثقة.",
+    lp_end_h2: "ابدأ بدواء واحد.",
+    lp_end_sub: "اكتب شيئًا من خزانة دوائك وانظر ما تقوله نشرته فعلًا.",
+    lp_foot_source: "الشيفرة المصدرية",
+    lp_foot_disclaimer: "مرجع تعليمي فقط. ليس استشارة طبية. لا ارتباط له بـ FDA أو NIH ولا اعتماد منهما.",
     dup_eyebrow: "نفس المادة الفعالة",
     dup_pill: "جرعة مضاعفة",
     dup_body_prefix: "كلاهما يذكر نفس المادة الفعالة:",
@@ -6298,6 +6489,42 @@ const I18N = {
     footer_privacy: "Politique de confidentialité",
     footer_terms: "Conditions",
     back_home: "Accueil",
+    lp_nav_open: "Ouvrir l'outil",
+    lp_nav_signup: "Créer un compte",
+    lp_hero_h1a: "Comprenez ce que",
+    lp_hero_h1b: "vous prenez vraiment.",
+    lp_hero_sub: "Plainscript traduit les notices officielles de la FDA en langage clair et vérifie si vos médicaments interagissent — gratuit, sourcé, et jamais inventé.",
+    lp_cta_signup: "Créer un compte gratuit",
+    lp_cta_guest: "Utiliser en tant qu'invité",
+    lp_strip: "openFDA · RxNorm · 13 langues · fonctionne hors ligne · sans publicité · sans suivi",
+    lp_note: "Aucun compte nécessaire. Décoder un médicament et vérifier les interactions sont gratuits et le resteront.",
+    lp_feat_eyebrow: "Ce que ça fait",
+    lp_feat_h2: "Quatre outils, une armoire à pharmacie.",
+    lp_s1_t: "Décoder un médicament",
+    lp_s1_b: "Saisissez n'importe quel nom commercial ou générique et obtenez sa véritable notice FDA en langage clair : ce qu'il traite, comment il agit, les effets indésirables et les mises en garde, présentés de façon réellement lisible.",
+    lp_s2_t: "Vérifier une interaction",
+    lp_s2_b: "Entrez deux médicaments ou plus et obtenez des avertissements en langage clair, classés par gravité, chacun indiquant sa source. Jamais de « sans risque » en vert : seulement ce qui a été trouvé, et ce qui ne l'a pas été.",
+    lp_s3_t: "Analyser toute votre armoire",
+    lp_s3_b: "Enregistrez ce que vous prenez réellement, puis comparez chaque médicament à tous les autres d'un coup — pas seulement deux à deux — et lisez le résultat sous forme de grille de gravité.",
+    lp_s4_t: "Symptômes, sans diagnostic",
+    lp_s4_b: "Une liste de signaux d'alerte urgents, plus un guide des symptômes courants vers la catégorie habituelle en vente libre. Il ne vous dira pas ce que vous avez, et il le dit clairement.",
+    lp_lim_eyebrow: "Ce que Plainscript ne fera jamais",
+    lp_lim_h2: "Un outil qui connaît ses limites.",
+    lp_lim_sub: "La plupart des applis santé vous promettent tout. Ces refus sont des choix de conception délibérés, pas des fonctions manquantes : chacun est un endroit où se tromper pourrait blesser quelqu'un.",
+    lp_never1_b: "Ne diagnostique jamais.",
+    lp_never1_t: "Il ne devinera pas ce que vous avez.",
+    lp_never2_b: "Ne calcule ni ne recommande jamais une dose.",
+    lp_never2_t: "Cela revient à votre prescripteur.",
+    lp_never3_b: "Ne vous dit jamais de commencer, d'arrêter ou de changer un médicament.",
+    lp_never4_b: "Ne dit jamais qu'une association est « sans risque ».",
+    lp_never4_t: "Seulement que rien n'a été trouvé — ce qui n'est pas la même chose, et il le précise.",
+    lp_never5_b: "Ne gère jamais une urgence.",
+    lp_never5_t: "Il vous oriente vers le 911 et Poison Control.",
+    lp_lim_note: "Au seul endroit où un modèle de langage est utilisé, il ne peut que reformuler un texte déjà extrait d'une notice FDA : il ne peut introduire aucune affirmation médicale. Cette règle est appliquée côté serveur, pas par confiance.",
+    lp_end_h2: "Commencez par un médicament.",
+    lp_end_sub: "Saisissez quelque chose de votre armoire et voyez ce que sa notice dit vraiment.",
+    lp_foot_source: "Code source",
+    lp_foot_disclaimer: "Référence éducative uniquement. Pas un avis médical. Sans affiliation ni approbation de la FDA ou des NIH.",
     dup_eyebrow: "Même principe actif",
     dup_pill: "double dose",
     dup_body_prefix: "Les deux indiquent le même principe actif :",
@@ -6746,6 +6973,42 @@ const I18N = {
     footer_privacy: "개인정보 처리방침",
     footer_terms: "이용약관",
     back_home: "홈",
+    lp_nav_open: "도구 열기",
+    lp_nav_signup: "계정 만들기",
+    lp_hero_h1a: "내가 실제로 먹는 약을",
+    lp_hero_h1b: "제대로 이해하세요.",
+    lp_hero_sub: "Plainscript는 FDA의 실제 의약품 라벨을 쉬운 말로 바꾸고, 복용 중인 약들이 서로 상호작용하는지 확인합니다. 무료이며, 출처가 있고, 내용을 지어내지 않습니다.",
+    lp_cta_signup: "무료 계정 만들기",
+    lp_cta_guest: "게스트로 사용",
+    lp_strip: "openFDA · RxNorm · 13개 언어 · 오프라인 사용 가능 · 광고 없음 · 추적 없음",
+    lp_note: "계정은 필요 없습니다. 약을 해석하고 상호작용을 확인하는 기능은 무료이며 앞으로도 그렇습니다.",
+    lp_feat_eyebrow: "할 수 있는 일",
+    lp_feat_h2: "네 가지 도구, 하나의 약상자.",
+    lp_s1_t: "약 해석하기",
+    lp_s1_b: "제품명이든 성분명이든 입력하면 그 약의 실제 FDA 라벨을 쉬운 말로 보여줍니다. 무엇에 쓰는지, 어떻게 작용하는지, 부작용과 경고까지, 실제로 눈으로 훑을 수 있게 정리해서 보여줍니다.",
+    lp_s2_t: "상호작용 확인하기",
+    lp_s2_b: "두 가지 이상의 약을 입력하면 심각도가 표시된 쉬운 말 경고가 나오고, 각각 출처가 함께 표시됩니다. 초록색 “안전”은 절대 표시하지 않습니다. 무엇이 발견되었고 무엇이 발견되지 않았는지만 알려줍니다.",
+    lp_s3_t: "약상자 전체 검사",
+    lp_s3_b: "실제로 복용하는 약을 저장한 뒤, 두 개씩이 아니라 모든 약을 한 번에 서로 대조해 확인하고, 결과를 심각도 표로 확인하세요.",
+    lp_s4_t: "증상, 진단은 하지 않습니다",
+    lp_s4_b: "응급 위험 신호 점검표와, 일상적인 증상에서 일반적인 일반의약품 분류로 가는 안내입니다. 무엇이 잘못되었는지 알려주지 않으며, 그 점을 분명히 밝힙니다.",
+    lp_lim_eyebrow: "Plainscript가 절대 하지 않는 것",
+    lp_lim_h2: "자기 한계를 아는 도구.",
+    lp_lim_sub: "대부분의 건강 앱은 모든 것을 약속합니다. 여기 적힌 거부는 빠진 기능이 아니라 의도한 설계 결정입니다. 하나하나가 틀렸을 때 누군가 다칠 수 있는 지점이기 때문입니다.",
+    lp_never1_b: "절대 진단하지 않습니다.",
+    lp_never1_t: "무엇이 잘못되었는지 추측하지 않습니다.",
+    lp_never2_b: "절대 용량을 계산하거나 권하지 않습니다.",
+    lp_never2_t: "그것은 처방하는 의사의 몫입니다.",
+    lp_never3_b: "약을 시작하거나 중단하거나 바꾸라고 절대 말하지 않습니다.",
+    lp_never4_b: "어떤 조합도 “안전하다”고 절대 말하지 않습니다.",
+    lp_never4_t: "아무것도 발견되지 않았다고 할 뿐이며, 그것은 같은 뜻이 아니고, 그 점을 분명히 밝힙니다.",
+    lp_never5_b: "응급 상황을 절대 처리하지 않습니다.",
+    lp_never5_t: "911과 Poison Control로 안내합니다.",
+    lp_lim_note: "언어 모델이 쓰이는 단 한 곳에서도, 이미 FDA 라벨에서 가져온 문장을 다시 풀어 쓰는 것만 가능하며 새로운 의학적 주장을 넣을 수 없습니다. 이 규칙은 신뢰가 아니라 서버에서 강제됩니다.",
+    lp_end_h2: "약 하나로 시작해 보세요.",
+    lp_end_sub: "약상자에 있는 약을 입력하고, 그 라벨에 실제로 무엇이 쓰여 있는지 확인해 보세요.",
+    lp_foot_source: "소스 코드",
+    lp_foot_disclaimer: "교육용 참고 자료일 뿐입니다. 의학적 조언이 아닙니다. FDA나 NIH와 제휴하거나 승인받지 않았습니다.",
     dup_eyebrow: "동일한 유효성분",
     dup_pill: "중복 복용",
     dup_body_prefix: "두 제품 모두 같은 유효성분을 표시합니다:",
@@ -7194,6 +7457,42 @@ const I18N = {
     footer_privacy: "Политика конфиденциальности",
     footer_terms: "Условия",
     back_home: "Главная",
+    lp_nav_open: "Открыть инструмент",
+    lp_nav_signup: "Создать аккаунт",
+    lp_hero_h1a: "Поймите, что вы",
+    lp_hero_h1b: "на самом деле принимаете.",
+    lp_hero_sub: "Plainscript переводит официальные инструкции FDA на понятный язык и проверяет, взаимодействуют ли ваши лекарства между собой — бесплатно, со ссылками на источник и никогда не выдумывая.",
+    lp_cta_signup: "Создать бесплатный аккаунт",
+    lp_cta_guest: "Использовать как гость",
+    lp_strip: "openFDA · RxNorm · 13 языков · работает офлайн · без рекламы · без слежки",
+    lp_note: "Аккаунт не нужен. Разобрать лекарство и проверить взаимодействия бесплатно и останется бесплатным.",
+    lp_feat_eyebrow: "Что он делает",
+    lp_feat_h2: "Четыре инструмента, одна аптечка.",
+    lp_s1_t: "Разобрать лекарство",
+    lp_s1_b: "Введите любое торговое или международное название и получите настоящую инструкцию FDA понятным языком: от чего препарат, как действует, побочные эффекты и предупреждения — и всё это в виде, который действительно можно просмотреть глазами.",
+    lp_s2_t: "Проверить взаимодействие",
+    lp_s2_b: "Введите два и более препарата и получите понятные предупреждения с указанием степени тяжести, каждое со своим источником. Никакого зелёного «безопасно» — только то, что было найдено, и то, что найдено не было.",
+    lp_s3_t: "Проверить всю аптечку",
+    lp_s3_b: "Сохраните то, что вы действительно принимаете, и сверьте каждый препарат со всеми остальными сразу — не только попарно — а результат прочитайте как таблицу по степени тяжести.",
+    lp_s4_t: "Симптомы, но без диагноза",
+    lp_s4_b: "Список тревожных признаков, требующих неотложной помощи, и путеводитель от повседневных симптомов к обычной безрецептурной категории. Он не скажет вам, что с вами не так, и прямо об этом предупреждает.",
+    lp_lim_eyebrow: "Чего Plainscript не сделает никогда",
+    lp_lim_h2: "Инструмент, знающий свои границы.",
+    lp_lim_sub: "Большинство приложений о здоровье обещают вам всё. Эти отказы — осознанные проектные решения, а не недостающие функции: каждый из них там, где ошибка могла бы навредить человеку.",
+    lp_never1_b: "Никогда не ставит диагноз.",
+    lp_never1_t: "Он не будет гадать, что с вами.",
+    lp_never2_b: "Никогда не рассчитывает и не рекомендует дозу.",
+    lp_never2_t: "Это дело того, кто выписывает вам лекарство.",
+    lp_never3_b: "Никогда не советует начать, прекратить или поменять препарат.",
+    lp_never4_b: "Никогда не говорит, что сочетание «безопасно».",
+    lp_never4_t: "Только что ничего не найдено — а это не одно и то же, и он прямо об этом пишет.",
+    lp_never5_b: "Никогда не работает с неотложными случаями.",
+    lp_never5_t: "Он направляет вас в 911 и Poison Control.",
+    lp_lim_note: "В единственном месте, где используется языковая модель, ей разрешено лишь пересказать текст, уже полученный из инструкции FDA, — она не может добавить ни одного медицинского утверждения. Это правило соблюдается на сервере, а не держится на доверии.",
+    lp_end_h2: "Начните с одного лекарства.",
+    lp_end_sub: "Введите что-нибудь из своей аптечки и посмотрите, что на самом деле написано в инструкции.",
+    lp_foot_source: "Исходный код",
+    lp_foot_disclaimer: "Только образовательный справочник. Не медицинская консультация. Не связан с FDA или NIH и ими не одобрен.",
     dup_eyebrow: "Одно и то же действующее вещество",
     dup_pill: "двойная доза",
     dup_body_prefix: "Оба указывают одно и то же действующее вещество:",
@@ -7642,6 +7941,42 @@ const I18N = {
     footer_privacy: "Política de Privacidade",
     footer_terms: "Termos",
     back_home: "Início",
+    lp_nav_open: "Abrir a ferramenta",
+    lp_nav_signup: "Criar uma conta",
+    lp_hero_h1a: "Entenda o que",
+    lp_hero_h1b: "você realmente toma.",
+    lp_hero_sub: "O Plainscript transforma as próprias bulas da FDA em linguagem simples e verifica se seus medicamentos interagem — gratuito, com fontes, e nunca inventado.",
+    lp_cta_signup: "Criar uma conta gratuita",
+    lp_cta_guest: "Usar como convidado",
+    lp_strip: "openFDA · RxNorm · 13 idiomas · funciona offline · sem anúncios · sem rastreamento",
+    lp_note: "Não precisa de conta. Decifrar um medicamento e verificar interações são gratuitos e sempre serão.",
+    lp_feat_eyebrow: "O que faz",
+    lp_feat_h2: "Quatro ferramentas, um armário de remédios.",
+    lp_s1_t: "Decifrar um medicamento",
+    lp_s1_b: "Digite qualquer nome comercial ou genérico e receba a bula real da FDA em linguagem simples: para que serve, como age, efeitos colaterais e advertências, organizados de um jeito que dá para ler de verdade.",
+    lp_s2_t: "Verificar uma interação",
+    lp_s2_b: "Informe dois ou mais medicamentos e receba avisos em linguagem simples, classificados por gravidade, cada um mostrando sua fonte. Nunca um “seguro” em verde: apenas o que foi encontrado e o que não foi.",
+    lp_s3_t: "Analisar todo o seu armário",
+    lp_s3_b: "Salve o que você realmente toma e compare cada medicamento com todos os outros de uma vez — não apenas aos pares — e leia o resultado como uma grade de gravidade.",
+    lp_s4_t: "Sintomas, sem diagnóstico",
+    lp_s4_b: "Uma lista de sinais de alerta de emergência, além de um guia dos sintomas do dia a dia para a categoria comum de venda livre. Ele não vai dizer o que você tem, e deixa isso claro.",
+    lp_lim_eyebrow: "O que o Plainscript nunca fará",
+    lp_lim_h2: "Uma ferramenta que conhece seus limites.",
+    lp_lim_sub: "A maioria dos apps de saúde promete tudo. Estas recusas são decisões de projeto deliberadas, não funções que faltam: cada uma é um ponto em que errar poderia machucar alguém.",
+    lp_never1_b: "Nunca diagnostica.",
+    lp_never1_t: "Ele não vai adivinhar o que você tem.",
+    lp_never2_b: "Nunca calcula nem recomenda uma dose.",
+    lp_never2_t: "Isso cabe a quem prescreve.",
+    lp_never3_b: "Nunca diz para você começar, parar ou mudar um medicamento.",
+    lp_never4_b: "Nunca diz que uma combinação é “segura”.",
+    lp_never4_t: "Apenas que nada foi encontrado — o que não é a mesma coisa, e ele avisa isso.",
+    lp_never5_b: "Nunca lida com uma emergência.",
+    lp_never5_t: "Ele encaminha você ao 911 e ao Poison Control.",
+    lp_lim_note: "No único ponto em que um modelo de linguagem é usado, ele só pode reformular um texto já obtido de uma bula da FDA: não pode introduzir nenhuma afirmação médica. Essa regra é aplicada no servidor, não por confiança.",
+    lp_end_h2: "Comece com um medicamento.",
+    lp_end_sub: "Digite algo do seu armário e veja o que a bula realmente diz.",
+    lp_foot_source: "Código-fonte",
+    lp_foot_disclaimer: "Apenas referência educacional. Não é orientação médica. Sem afiliação ou endosso da FDA ou do NIH.",
     dup_eyebrow: "Mesmo ingrediente ativo",
     dup_pill: "dose dupla",
     dup_body_prefix: "Ambos indicam o mesmo ingrediente ativo:",
@@ -8090,6 +8425,42 @@ const I18N = {
     footer_privacy: "Datenschutzerklärung",
     footer_terms: "Nutzungsbedingungen",
     back_home: "Startseite",
+    lp_nav_open: "Werkzeug öffnen",
+    lp_nav_signup: "Konto erstellen",
+    lp_hero_h1a: "Verstehen Sie, was",
+    lp_hero_h1b: "Sie wirklich einnehmen.",
+    lp_hero_sub: "Plainscript übersetzt die offiziellen FDA-Beipackzettel in klares Deutsch und prüft, ob Ihre Medikamente sich gegenseitig beeinflussen — kostenlos, belegt und nie erfunden.",
+    lp_cta_signup: "Kostenloses Konto erstellen",
+    lp_cta_guest: "Als Gast verwenden",
+    lp_strip: "openFDA · RxNorm · 13 Sprachen · funktioniert offline · keine Werbung · kein Tracking",
+    lp_note: "Kein Konto nötig. Ein Medikament zu entschlüsseln und Wechselwirkungen zu prüfen ist kostenlos und bleibt es.",
+    lp_feat_eyebrow: "Was es macht",
+    lp_feat_h2: "Vier Werkzeuge, eine Hausapotheke.",
+    lp_s1_t: "Ein Medikament entschlüsseln",
+    lp_s1_b: "Geben Sie einen Handels- oder Wirkstoffnamen ein und erhalten Sie den echten FDA-Beipackzettel in klarer Sprache: wogegen es hilft, wie es wirkt, Nebenwirkungen und Warnhinweise — so aufbereitet, dass man es wirklich überfliegen kann.",
+    lp_s2_t: "Eine Wechselwirkung prüfen",
+    lp_s2_b: "Geben Sie zwei oder mehr Medikamente ein und erhalten Sie nach Schweregrad eingestufte Warnungen in klarer Sprache, jede mit ihrer Quelle. Nie ein grünes „sicher“ — nur, was gefunden wurde und was nicht.",
+    lp_s3_t: "Die ganze Hausapotheke prüfen",
+    lp_s3_b: "Speichern Sie, was Sie tatsächlich einnehmen, und prüfen Sie dann jedes Medikament auf einmal gegen jedes andere — nicht nur paarweise — und lesen Sie das Ergebnis als Raster nach Schweregrad.",
+    lp_s4_t: "Symptome, ohne Diagnose",
+    lp_s4_b: "Eine Liste von Warnzeichen für den Notfall, dazu ein Wegweiser von Alltagsbeschwerden zur üblichen rezeptfreien Kategorie. Es sagt Ihnen nicht, was Ihnen fehlt, und sagt das auch deutlich.",
+    lp_lim_eyebrow: "Was Plainscript niemals tun wird",
+    lp_lim_h2: "Ein Werkzeug, das seine Grenzen kennt.",
+    lp_lim_sub: "Die meisten Gesundheits-Apps versprechen Ihnen alles. Diese Verweigerungen sind bewusste Entwurfsentscheidungen, keine fehlenden Funktionen: Jede steht an einer Stelle, an der ein Irrtum jemandem schaden könnte.",
+    lp_never1_b: "Stellt niemals eine Diagnose.",
+    lp_never1_t: "Es wird nicht raten, was Ihnen fehlt.",
+    lp_never2_b: "Berechnet oder empfiehlt niemals eine Dosis.",
+    lp_never2_t: "Das ist Sache Ihrer verordnenden Ärztin oder Ihres Arztes.",
+    lp_never3_b: "Sagt Ihnen niemals, ein Medikament zu beginnen, abzusetzen oder zu wechseln.",
+    lp_never4_b: "Sagt niemals, eine Kombination sei „sicher“.",
+    lp_never4_t: "Nur, dass nichts gefunden wurde — was nicht dasselbe ist, und es sagt das auch.",
+    lp_never5_b: "Behandelt niemals einen Notfall.",
+    lp_never5_t: "Es verweist Sie stattdessen an 911 und Poison Control.",
+    lp_lim_note: "An der einzigen Stelle, an der ein Sprachmodell eingesetzt wird, darf es nur bereits aus einem FDA-Beipackzettel abgerufenen Text umformulieren — es kann keine medizinische Aussage hinzufügen. Diese Regel wird auf dem Server durchgesetzt, nicht auf Vertrauen gebaut.",
+    lp_end_h2: "Fangen Sie mit einem Medikament an.",
+    lp_end_sub: "Geben Sie etwas aus Ihrer Hausapotheke ein und sehen Sie, was auf dem Beipackzettel wirklich steht.",
+    lp_foot_source: "Quellcode",
+    lp_foot_disclaimer: "Nur als Bildungsreferenz. Keine medizinische Beratung. Keine Verbindung zur FDA oder zu den NIH und von diesen nicht unterstützt.",
     dup_eyebrow: "Gleicher Wirkstoff",
     dup_pill: "doppelte Dosis",
     dup_body_prefix: "Beide enthalten denselben Wirkstoff:",
@@ -8538,6 +8909,42 @@ const I18N = {
     footer_privacy: "プライバシーポリシー",
     footer_terms: "利用規約",
     back_home: "ホーム",
+    lp_nav_open: "ツールを開く",
+    lp_nav_signup: "アカウントを作成",
+    lp_hero_h1a: "自分が実際に",
+    lp_hero_h1b: "飲んでいる薬を理解する。",
+    lp_hero_sub: "Plainscript は FDA の添付文書そのものをやさしい日本語にし、薬どうしが相互作用するかを確認します。無料で、出典があり、内容を作り出すことはありません。",
+    lp_cta_signup: "無料アカウントを作成",
+    lp_cta_guest: "ゲストとして使う",
+    lp_strip: "openFDA · RxNorm · 13 言語 · オフラインでも動作 · 広告なし · 追跡なし",
+    lp_note: "アカウントは不要です。薬を読み解くことも相互作用を調べることも無料で、これからも無料です。",
+    lp_feat_eyebrow: "できること",
+    lp_feat_h2: "4 つの機能、ひとつの薬箱。",
+    lp_s1_t: "薬を読み解く",
+    lp_s1_b: "商品名でも一般名でも入力すれば、その薬の実際の FDA 添付文書をやさしい言葉で表示します。何に使う薬か、どう効くか、副作用、警告を、実際に目で追える形で整理します。",
+    lp_s2_t: "相互作用を調べる",
+    lp_s2_b: "2 つ以上の薬を入力すると、重症度つきのやさしい警告が表示され、どれも出典が示されます。緑色の「安全」は決して出しません。見つかったことと、見つからなかったことだけをお伝えします。",
+    lp_s3_t: "薬箱まるごと確認",
+    lp_s3_b: "実際に飲んでいる薬を保存すると、2 つずつではなく、すべての薬を一度に総当たりで確認し、結果を重症度の表として読めます。",
+    lp_s4_t: "症状、ただし診断はしません",
+    lp_s4_b: "緊急の危険サインのチェックリストと、日常の症状から一般的な市販薬のカテゴリーへの手引きです。あなたの病名を告げることはありませんし、その点もはっきり書いています。",
+    lp_lim_eyebrow: "Plainscript が決してしないこと",
+    lp_lim_h2: "自分の限界を知っている道具。",
+    lp_lim_sub: "多くの健康アプリは何でもできると約束します。ここに挙げた「しないこと」は、機能が足りないのではなく意図した設計判断です。どれも、間違えれば人を傷つけかねない場所だからです。",
+    lp_never1_b: "決して診断しません。",
+    lp_never1_t: "あなたの病名を推測することはありません。",
+    lp_never2_b: "決して用量を計算したり勧めたりしません。",
+    lp_never2_t: "それは処方する医師の役割です。",
+    lp_never3_b: "薬を始める・やめる・変えるよう指示することは決してありません。",
+    lp_never4_b: "組み合わせが「安全」だとは決して言いません。",
+    lp_never4_t: "見つからなかったと言うだけで、それは同じ意味ではなく、その旨も明記します。",
+    lp_never5_b: "緊急時の対応は決して行いません。",
+    lp_never5_t: "911 と Poison Control に案内します。",
+    lp_lim_note: "言語モデルを使う唯一の場面でも、FDA 添付文書から取得済みの文章を言い換えることしかできず、医学的な主張を新たに加えることはできません。この制約は信頼に任せるのではなく、サーバー側で強制されています。",
+    lp_end_h2: "まずは 1 つの薬から。",
+    lp_end_sub: "薬箱にある薬を入力して、その添付文書に実際に何と書かれているか見てみてください。",
+    lp_foot_source: "ソースコード",
+    lp_foot_disclaimer: "教育目的の参考情報です。医療上の助言ではありません。FDA や NIH とは無関係で、承認も受けていません。",
     dup_eyebrow: "同じ有効成分",
     dup_pill: "二重服用",
     dup_body_prefix: "どちらにも同じ有効成分が記載されています：",
@@ -8874,6 +9281,42 @@ const I18N = {
     footer_privacy: "गोपनीयता नीति",
     footer_terms: "शर्तें",
     back_home: "होम",
+    lp_nav_open: "टूल खोलें",
+    lp_nav_signup: "खाता बनाएं",
+    lp_hero_h1a: "समझें कि आप असल में",
+    lp_hero_h1b: "क्या ले रहे हैं।",
+    lp_hero_sub: "Plainscript, FDA के असली दवा लेबल को सरल भाषा में बदलता है और जाँचता है कि आपकी दवाएँ आपस में टकराती हैं या नहीं — मुफ़्त, स्रोत के साथ, और कभी गढ़ा हुआ नहीं।",
+    lp_cta_signup: "मुफ़्त खाता बनाएं",
+    lp_cta_guest: "अतिथि के रूप में उपयोग करें",
+    lp_strip: "openFDA · RxNorm · 13 भाषाएँ · ऑफ़लाइन काम करता है · कोई विज्ञापन नहीं · कोई ट्रैकिंग नहीं",
+    lp_note: "खाते की ज़रूरत नहीं। दवा को समझना और इंटरैक्शन जाँचना मुफ़्त है और हमेशा रहेगा।",
+    lp_feat_eyebrow: "यह क्या करता है",
+    lp_feat_h2: "चार टूल, एक दवा का बक्सा।",
+    lp_s1_t: "दवा को समझें",
+    lp_s1_b: "कोई भी ब्रांड या जेनेरिक नाम लिखें और उस दवा का असली FDA लेबल सरल भाषा में पाएँ: किस काम आती है, कैसे असर करती है, दुष्प्रभाव और चेतावनियाँ — ऐसे सजाकर कि आप सचमुच पढ़ सकें।",
+    lp_s2_t: "इंटरैक्शन जाँचें",
+    lp_s2_b: "दो या ज़्यादा दवाएँ डालें और गंभीरता के अनुसार दर्जा दी गई, सरल भाषा की चेतावनियाँ पाएँ, हर एक अपने स्रोत के साथ। हरे रंग का “सुरक्षित” कभी नहीं — सिर्फ़ यह कि क्या मिला और क्या नहीं मिला।",
+    lp_s3_t: "पूरा दवा बक्सा जाँचें",
+    lp_s3_b: "जो आप सचमुच लेते हैं उसे सहेजें, फिर हर दवा को बाकी सब दवाओं से एक साथ जाँचें — सिर्फ़ जोड़ियों में नहीं — और नतीजा गंभीरता की तालिका के रूप में पढ़ें।",
+    lp_s4_t: "लक्षण, बिना निदान के",
+    lp_s4_b: "आपात चेतावनी संकेतों की सूची, साथ ही रोज़मर्रा के लक्षणों से आम बिना-पर्चे वाली श्रेणी तक का मार्गदर्शन। यह आपको नहीं बताएगा कि आपको क्या हुआ है, और यह बात साफ़ कहता है।",
+    lp_lim_eyebrow: "Plainscript कभी क्या नहीं करेगा",
+    lp_lim_h2: "अपनी सीमाएँ जानने वाला उपकरण।",
+    lp_lim_sub: "ज़्यादातर स्वास्थ्य ऐप आपसे सब कुछ का वादा करते हैं। ये इनकार जान-बूझकर लिए गए डिज़ाइन फ़ैसले हैं, छूटी हुई सुविधाएँ नहीं — हर एक वहाँ है जहाँ ग़लती किसी को नुक़सान पहुँचा सकती है।",
+    lp_never1_b: "कभी निदान नहीं करता।",
+    lp_never1_t: "यह अंदाज़ा नहीं लगाएगा कि आपको क्या हुआ है।",
+    lp_never2_b: "कभी खुराक की गणना या सिफ़ारिश नहीं करता।",
+    lp_never2_t: "वह आपके डॉक्टर का काम है।",
+    lp_never3_b: "कभी नहीं कहता कि कोई दवा शुरू करें, बंद करें या बदलें।",
+    lp_never4_b: "कभी नहीं कहता कि कोई मेल “सुरक्षित” है।",
+    lp_never4_t: "सिर्फ़ यह कि कुछ नहीं मिला — जो एक ही बात नहीं है, और यह इसे साफ़ बताता है।",
+    lp_never5_b: "आपात स्थिति कभी नहीं संभालता।",
+    lp_never5_t: "यह आपको 911 और Poison Control के पास भेजता है।",
+    lp_lim_note: "जिस एक जगह भाषा मॉडल का उपयोग होता है, वहाँ भी वह केवल FDA लेबल से पहले ही लिए गए पाठ को दोबारा शब्दों में रख सकता है — कोई नया चिकित्सीय दावा नहीं जोड़ सकता। यह नियम भरोसे पर नहीं, सर्वर पर लागू होता है।",
+    lp_end_h2: "एक दवा से शुरू करें।",
+    lp_end_sub: "अपने दवा बक्से से कुछ लिखें और देखें कि उसका लेबल असल में क्या कहता है।",
+    lp_foot_source: "सोर्स कोड",
+    lp_foot_disclaimer: "केवल शैक्षिक संदर्भ। चिकित्सीय सलाह नहीं। FDA या NIH से कोई संबंध नहीं और न ही उनका समर्थन प्राप्त है।",
     dup_eyebrow: "एक ही सक्रिय घटक",
     dup_pill: "दोहरी खुराक",
     dup_body_prefix: "दोनों में एक ही सक्रिय घटक सूचीबद्ध है:",
@@ -9297,6 +9740,42 @@ const I18N = {
     footer_privacy: "தனியுரிமைக் கொள்கை",
     footer_terms: "விதிமுறைகள்",
     back_home: "முகப்பு",
+    lp_nav_open: "கருவியைத் திற",
+    lp_nav_signup: "கணக்கை உருவாக்கு",
+    lp_hero_h1a: "நீங்கள் உண்மையில் எடுப்பதை",
+    lp_hero_h1b: "புரிந்துகொள்ளுங்கள்.",
+    lp_hero_sub: "Plainscript, FDA-வின் உண்மையான மருந்து லேபிள்களை எளிய மொழியில் மாற்றி, உங்கள் மருந்துகள் ஒன்றோடொன்று இடைவினை புரிகிறதா எனச் சரிபார்க்கிறது — இலவசம், ஆதாரத்துடன், ஒருபோதும் கற்பனையாக அல்ல.",
+    lp_cta_signup: "இலவச கணக்கை உருவாக்கு",
+    lp_cta_guest: "விருந்தினராகப் பயன்படுத்து",
+    lp_strip: "openFDA · RxNorm · 13 மொழிகள் · இணையம் இல்லாமலும் இயங்கும் · விளம்பரங்கள் இல்லை · கண்காணிப்பு இல்லை",
+    lp_note: "கணக்கு தேவையில்லை. மருந்தைப் புரிந்துகொள்வதும் இடைவினைகளைச் சரிபார்ப்பதும் இலவசம், எப்போதும் இலவசமாகவே இருக்கும்.",
+    lp_feat_eyebrow: "இது என்ன செய்கிறது",
+    lp_feat_h2: "நான்கு கருவிகள், ஒரே மருந்துப் பெட்டி.",
+    lp_s1_t: "ஒரு மருந்தைப் புரிந்துகொள்",
+    lp_s1_b: "எந்த வணிகப் பெயரையோ பொதுப் பெயரையோ உள்ளிட்டால், அந்த மருந்தின் உண்மையான FDA லேபிள் எளிய மொழியில் கிடைக்கும்: எதற்குப் பயன்படுகிறது, எப்படி வேலை செய்கிறது, பக்கவிளைவுகள், எச்சரிக்கைகள் — நீங்கள் உண்மையிலேயே படிக்கக்கூடிய வகையில்.",
+    lp_s2_t: "இடைவினையைச் சரிபார்",
+    lp_s2_b: "இரண்டு அல்லது அதற்கு மேற்பட்ட மருந்துகளை உள்ளிட்டால், தீவிரத்தின் அடிப்படையில் தரப்படுத்தப்பட்ட எளிய மொழி எச்சரிக்கைகள் கிடைக்கும், ஒவ்வொன்றும் அதன் ஆதாரத்தைக் காட்டும். பச்சை நிற “பாதுகாப்பானது” ஒருபோதும் காட்டப்படாது — என்ன கண்டறியப்பட்டது, என்ன கண்டறியப்படவில்லை என்பது மட்டுமே.",
+    lp_s3_t: "மருந்துப் பெட்டி முழுவதையும் சரிபார்",
+    lp_s3_b: "நீங்கள் உண்மையில் எடுப்பதைச் சேமித்து, ஒவ்வொரு மருந்தையும் மற்ற எல்லா மருந்துகளுடனும் ஒரே நேரத்தில் ஒப்பிடுங்கள் — இரண்டிரண்டாக மட்டுமல்ல — முடிவைத் தீவிர அட்டவணையாகப் படியுங்கள்.",
+    lp_s4_t: "அறிகுறிகள், நோயறிதல் இல்லாமல்",
+    lp_s4_b: "அவசர எச்சரிக்கை அறிகுறிகளின் பட்டியல், மேலும் அன்றாட அறிகுறிகளிலிருந்து வழக்கமான மருந்துச்சீட்டு தேவையில்லாத வகைக்கான வழிகாட்டி. உங்களுக்கு என்ன பிரச்சினை என்று இது சொல்லாது, அதை வெளிப்படையாகவே கூறுகிறது.",
+    lp_lim_eyebrow: "Plainscript ஒருபோதும் செய்யாதவை",
+    lp_lim_h2: "தன் எல்லைகளை அறிந்த ஒரு கருவி.",
+    lp_lim_sub: "பெரும்பாலான சுகாதார செயலிகள் எல்லாவற்றையும் உறுதியளிக்கின்றன. இந்த மறுப்புகள் விடுபட்ட வசதிகள் அல்ல, வேண்டுமென்றே எடுக்கப்பட்ட வடிவமைப்பு முடிவுகள் — ஒவ்வொன்றும் தவறு நேர்ந்தால் ஒருவருக்குத் தீங்கு விளைவிக்கக்கூடிய இடம்.",
+    lp_never1_b: "ஒருபோதும் நோயறிதல் செய்யாது.",
+    lp_never1_t: "உங்களுக்கு என்ன பிரச்சினை என்று இது ஊகிக்காது.",
+    lp_never2_b: "ஒருபோதும் அளவைக் கணக்கிடாது, பரிந்துரைக்காது.",
+    lp_never2_t: "அது உங்களுக்கு மருந்து எழுதுபவரின் பொறுப்பு.",
+    lp_never3_b: "ஒரு மருந்தைத் தொடங்கவோ, நிறுத்தவோ, மாற்றவோ ஒருபோதும் சொல்லாது.",
+    lp_never4_b: "ஒரு சேர்க்கை “பாதுகாப்பானது” என்று ஒருபோதும் சொல்லாது.",
+    lp_never4_t: "எதுவும் கண்டறியப்படவில்லை என்று மட்டுமே — அது ஒன்றல்ல, அதையும் இது தெளிவாகச் சொல்கிறது.",
+    lp_never5_b: "அவசரநிலையை ஒருபோதும் கையாளாது.",
+    lp_never5_t: "இது உங்களை 911 மற்றும் Poison Control-க்கு வழிநடத்தும்.",
+    lp_lim_note: "மொழி மாதிரி பயன்படுத்தப்படும் ஒரே இடத்திலும், FDA லேபிளிலிருந்து ஏற்கனவே எடுக்கப்பட்ட உரையை மறுவடிவம் செய்ய மட்டுமே முடியும் — எந்த மருத்துவக் கூற்றையும் புதிதாகச் சேர்க்க முடியாது. இந்த விதி நம்பிக்கையின் மீதல்ல, சேவையகத்திலேயே அமல்படுத்தப்படுகிறது.",
+    lp_end_h2: "ஒரு மருந்திலிருந்து தொடங்குங்கள்.",
+    lp_end_sub: "உங்கள் மருந்துப் பெட்டியிலிருந்து ஒன்றை உள்ளிட்டு, அதன் லேபிள் உண்மையில் என்ன சொல்கிறது எனப் பாருங்கள்.",
+    lp_foot_source: "மூலக் குறியீடு",
+    lp_foot_disclaimer: "கல்வி நோக்கிலான குறிப்பு மட்டுமே. மருத்துவ ஆலோசனை அல்ல. FDA அல்லது NIH உடன் தொடர்பில்லை, அவர்களின் அங்கீகாரமும் இல்லை.",
     dup_eyebrow: "ஒரே செயல்படு பொருள்",
     dup_pill: "இரட்டை அளவு",
     dup_body_prefix: "இரண்டிலும் ஒரே செயல்படு பொருள் பட்டியலிடப்பட்டுள்ளது:",
@@ -12247,6 +12726,8 @@ function applyLang(lang, opts){
   document.documentElement.dir = RTL_LANGS.includes(uiLang) ? "rtl" : "ltr";
   const select = $("#lang-select");
   if (select) select.value = uiLang;
+  const lpSelect = $("#lp-lang-select");            // the homepage has its own
+  if (lpSelect) lpSelect.value = uiLang;
   applyTranslations();
   if (opts.persist !== false){
     try{ localStorage.setItem(LANG_KEY, uiLang); }catch(e){}
@@ -12269,6 +12750,8 @@ function refreshDynamicContentForLang(){
 }
 
 $("#lang-select").addEventListener("change", e => applyLang(e.target.value));
+const lpLang = $("#lp-lang-select");
+if (lpLang) lpLang.addEventListener("change", e => applyLang(e.target.value));
 /* NOTE: the actual "restore stored language on load" call happens at the
    very bottom of this script (in initAccounts), not here — applyLang()
    touches SB_ENABLED/session/cabinet, which aren't declared yet at this
@@ -13521,8 +14004,8 @@ function fitSelect(sel){
   sel.style.width = (probe.offsetWidth + 2) + "px";
   probe.remove();
 }
-function fitAllSelects(){ ["#lang-select", "#theme-select"].forEach(id => fitSelect($(id))); }
-["#lang-select", "#theme-select"].forEach(id => {
+function fitAllSelects(){ ["#lang-select", "#theme-select", "#lp-lang-select"].forEach(id => fitSelect($(id))); }
+["#lang-select", "#theme-select", "#lp-lang-select"].forEach(id => {
   const el = $(id);
   if (el) el.addEventListener("change", () => fitSelect(el));
 });
