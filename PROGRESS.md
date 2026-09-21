@@ -97,7 +97,9 @@ Companion docs: `CLAUDE.md` = architecture + safety rules · `PLAINSCRIPT_ROADMA
 
 **Open finding — [Medium] the Claude proxy Worker is open + unauthenticated:**
 - CORS defaults to `*` and there's no auth/rate-limit, so anyone with the (public) proxy URL can send rephrase/qa requests and **burn the Anthropic API budget**. Per-call cost is capped (input ≤6000 chars, max_tokens 400/700) and it can only rephrase/extract — no data-breach — but volume abuse is possible.
-- **Recommended mitigations (cheap → thorough):** (1) set an **Anthropic account spend cap** (caps the financial blast radius no matter what — do this first); (2) `npx wrangler secret put ALLOWED_ORIGIN -c wrangler.worker.jsonc` = your site origin (stops cross-site browser abuse); (3) add Cloudflare rate-limiting on the worker route if abuse ever appears.
+- **CORRECTED 2026-09-21 after a full security review.** The earlier advice here overstated what `ALLOWED_ORIGIN` buys. `worker.js` only *sets* a CORS response header; it never rejects on `Origin`. CORS is browser-enforced, so a `curl` loop or any server-side script ignores it completely — the origin check stops cross-site browser abuse and does essentially nothing against the actual threat.
+- **Real cost:** input is capped ~24k chars and output at 700 tokens, so roughly **$0.02–0.03 of Anthropic spend per request**, uncapped in volume, against a URL published in `config.js`.
+- **Mitigations in the order that actually matters:** (1) **set an Anthropic account spend cap** — five minutes, and it caps the blast radius no matter what else is true; (2) **Cloudflare Rate Limiting on the Worker route** (~20 req/min/IP) — this is the actual control; (3) origin allow-listing, worth doing but understand its limits. A client-side shared secret is pointless: anything in the bundle is public.
 
 ---
 
