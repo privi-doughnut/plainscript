@@ -1,258 +1,341 @@
-# Privi's task list
+# Privi's tasks — step by step
 
-Work you write yourself, ordered easiest → hardest. Each task says **what** to do and
-**what you need to know** — deliberately not the finished code, because the point is that
-you wrote it. If you get stuck on one, ask me and I'll explain the concept rather than
-hand you the answer.
+Written assuming you've never done this before. Every task tells you the exact line, what
+you're looking at, and what to change. The one thing I don't give you is the finished line
+itself — you type that. That's the whole difference between this being your work and mine.
 
-Nothing here is busywork. Every task is real, was on the actual to-do list, and I left it
-for you on purpose.
+If you get stuck for more than ten minutes on any of these, stop and ask me. Being stuck is
+information, not failure.
 
 ---
 
-## First: how to run and check your work
+## Every single time you sit down
 
 ```sh
 cd ~/plainscript-remote
-python3 -m http.server 8899          # then open http://localhost:8899/index.html
-node --test tests/*.test.js          # 69 tests — run before AND after every change
+python3 -m http.server 8899
 ```
+Leave that running. Open `http://localhost:8899/index.html`.
 
-If the tests pass before your change and fail after, you broke something. That's the
-whole point of having them. `git diff` shows exactly what you changed.
+**Then unregister the service worker, or your changes won't show up:**
+DevTools (`Cmd+Option+I`) → **Application** tab → **Service Workers** → **Unregister** → `Cmd+Shift+R`.
 
-**Service worker gotcha:** the app caches itself for offline use, so your changes may not
-show up on reload. Open DevTools → Application → Service Workers → Unregister, then
-hard-reload. This bit me too.
-
----
-
-## Python → JavaScript, the parts you'll actually need
-
-You know Python from AP CSP. Almost everything transfers; the syntax is just noisier.
-
-| Python | JavaScript |
-|---|---|
-| `x = 5` | `const x = 5;` (or `let x = 5;` if it changes) |
-| `print(x)` | `console.log(x);` |
-| `f"I have {n} meds"` | `` `I have ${n} meds` `` (backticks, not quotes) |
-| `len(items)` | `items.length` |
-| `[m for m in meds if m.notes]` | `meds.filter(m => m.notes)` |
-| `[m.name for m in meds]` | `meds.map(m => m.name)` |
-| `def f(a): return a + 1` | `function f(a){ return a + 1; }` |
-| `if a and not b:` | `if (a && !b) {` |
-| `# comment` | `// comment` |
-| dict `{"a": 1}` | object `{a: 1}` — access with `obj.a` |
-
-Three rules that will save you an hour each:
-1. **Semicolons end statements**, braces `{}` group them. Python's indentation means nothing here.
-2. `===` compares, `=` assigns. Always use `===`, never `==`.
-3. `m => m.notes` is just a mini-function: "given m, give back m.notes". Same as a Python lambda.
-
----
-
-# TIER 1 — CSS only (no logic, hard to break)
-
-### TASK 1 — Make small buttons thumb-friendly
-**File:** `index.html`, the `.mini{` rule at about line 423.
-
-Those buttons come out about 32px tall. Apple's guidance is 44px minimum for anything you
-tap with a thumb, and ours are under it — annoying on a phone, and it's a real
-accessibility point you can defend to a judge.
-
-**What to know:** the rule already has `padding:8px 13px`. You want the *total* height to
-reach 44px. You can either increase the vertical padding or add a `min-height`. `min-height`
-is the more honest fix because padding also affects the text position.
-
-**Check it:** DevTools → inspect a `.mini` button → the box model shows computed height.
-
----
-
-### TASK 2 — Kill the fake font sizes
-**File:** `index.html`, the `<style>` block.
-
-Search the CSS for `13.5px`, `14.5px`, `15.5px`, `12.5px`, `11.5px`, `10.5px`. The design
-rule is that each step in a type scale should be at least ~1.25× the one below it, or the
-human eye can't tell them apart. A jump from 14px to 14.5px is 1.03× — literally nobody
-can see it, so it buys zero hierarchy while making the file inconsistent.
-
-**What to do:** round each one to the nearest "real" size already used nearby (12, 13, 14,
-15, 16, 18). Change one, reload, look at it. If it looks the same — that's the point, it
-proves the half-pixel was doing nothing.
-
-**Careful:** do these one at a time and look after each. If something looks worse, put it back.
-
----
-
-### TASK 3 — Spacing tokens (the biggest visual-polish win available)
-**File:** `index.html`, the `:root{` block near line 32, then the CSS below it.
-
-Right now the stylesheet uses **27 different spacing values** (2, 3, 4, 5, 6, 7, 8, 9, 10,
-11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 26, 30, 40…). Professional stylesheets pick about
-eight and never freehand a number again. That single difference is most of what makes a
-design feel deliberate instead of assembled.
-
-**Step 1:** in `:root{`, next to the existing colour variables, add your own scale:
-```
---space-1: 4px;  --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
---space-5: 24px; --space-6: 32px;  --space-7: 48px;
-```
-**Step 2:** pick ONE section of CSS (start with `.lp-` homepage rules — newest, lowest risk)
-and replace hardcoded values with `var(--space-N)`, rounding to the nearest. `13px` → `var(--space-3)`.
-
-**What to know:** `var(--name)` just substitutes the value you defined. Look at how the file
-already does this with `var(--radius)` and `var(--accent)`.
-
-Do one section, reload, confirm nothing moved much, commit. Then the next. **Do not attempt
-the whole file in one go.**
-
----
-
-# TIER 2 — HTML content (your words, your homepage)
-
-These are the `[PRIVI - TASK n]` comments sitting in the homepage in `index.html`. Search
-for `[PRIVI` to find them. Copy the structure of the section I already wrote
-(`<section class="lp-limits">`) — same `<div class="wrap">`, same heading pattern.
-
-### TASK 6 — "The problem"
-Why this app needs to exist. Two things, in this order: **your personal story** (who you
-watched struggle with a label — this is the single highest-value paragraph in the entire
-project, every CAC winner I researched had one), then the structural fact: the National
-Library of Medicine shut off its free public drug-interaction API in January 2024, so the
-free, authoritative way to check this mostly disappeared.
-
-Keep it under about 120 words. Don't dress it up. The plain version is stronger.
-
-### TASK 7 — "What it does"
-Three or four short blocks: Decode, Check interactions, My Cabinet, Symptoms. One sentence
-each, describing what it *actually* does. Do not invent a feature that isn't built.
-
-### TASK 8 — "Where every fact comes from"
-Three blocks: openFDA, RxNorm, and the hand-curated interaction set. For each, say what it
-*is* and what it *can't* do. The honesty is the selling point — this is the section that
-separates you from a content farm.
-
-### TASK 9 — "Built for people who get left out"
-13 languages (list a few in their own script: Español · 中文 · Tiếng Việt · العربية), right-to-left
-support, pictogram mode, read-aloud, easy-read, installs and works offline. All checkable
-facts, no adjectives needed.
-
-### TASK 10 — "Who made this"
-One paragraph, signed, first person, your actual voice. Not polished marketing. This is the
-part a judge remembers.
-
----
-
-# TIER 3 — Real JavaScript (small, but genuinely code)
-
-### TASK 11 — Delete four dead translation keys
-**File:** `index.html`
-
-`food_allergy_combo_note`, `signed_in_as`, and `ref_checking` are translated into all 13
-languages but referenced nowhere in the code — leftovers from removed features. Each
-appears exactly 13 times (once per language dictionary) and zero times in actual code.
-
-**What to do:** search for each key and delete its line from all 13 dictionaries.
-
-**What to know:** this teaches you the file's structure better than anything else — you'll
-see all 13 language blocks and how they mirror each other. Run the tests after.
-
-**Verify first:** `grep -c "food_allergy_combo_note" index.html` should print `13`. If it
-prints more, it IS used somewhere and you should stop and ask me.
-
-### TASK 12 — Surface the glossary hint
-**File:** `index.html`
-
-There's a translated string `glossary_hint` — "Underlined words have a plain-English
-definition — tap them." It exists in all 13 languages and is **never shown to anyone**. The
-glossary tooltips work, but nothing tells users they're tappable.
-
-**What to do:** display it somewhere sensible near content that has glossary terms.
-
-**What to know:** use `t("glossary_hint")` to get the translated text — look at how other
-strings do it. Because the translation already exists, this works in all 13 languages the
-moment you add it. Free win.
-
-### TASK 13 — Add a fourth stat tile to the dashboard
-**File:** `index.html`, `dashboardSummaryHTML()` (search for it).
-
-The dashboard shows three counts: total medications, how many matched an FDA label, how
-many have a personal note. Add a fourth: **how many have dosing times set.**
-
-**What to know:** the existing counts are computed like this:
-```js
-const noted = meds.filter(m => m.notes).length;
-```
-That's the Python `len([m for m in meds if m.notes])`. The dosing-times field on a
-medication is `m.schedule`. Then copy one of the three `<div class="stat-tile">` lines and
-adjust it.
-
-**Catch you'll hit:** the tiles are laid out in a 3-column grid (`.stat-tiles` uses
-`repeat(3,1fr)`), and on phones it switches to 2 columns. A fourth tile will change how that
-looks — go look at it on a narrow window and decide whether the grid needs adjusting. That
-judgement call is the actual work here.
-
-**Also:** you'll need a label for it. Every user-facing string in this app goes through the
-13 dictionaries — so decide with me whether to add a new translated key or reuse one.
-
----
-
-## How to commit your work
-
+**Before you change anything:**
 ```sh
+node --test tests/*.test.js
+```
+Should say `# pass 78`. That's your "before" photo.
+
+**When you're done with a task:**
+```sh
+node --test tests/*.test.js      # still 78? good
 git add index.html
-git commit -m "Short description of what you changed"
+git commit -m "describe what you changed"
 git push origin main
 ```
 
-Cloudflare auto-deploys from GitHub, so it's live within a minute or two. Check the real
-site after pushing.
+**If you break something and want out:**
+```sh
+git diff                 # shows exactly what you changed
+git checkout index.html  # throws it all away, back to last commit
+```
+You cannot permanently break anything that's committed.
 
 ---
 
-## What to study, for defending this to a judge
+# TASK 1 — Bigger tap targets
+**Time: 10 minutes. Difficulty: lowest. Do this one first.**
 
-Priority order — these are the parts you can genuinely understand in the time available:
+**Go to line 747** of `index.html`. (In most editors: `Ctrl+G` then type 747. Or `Cmd+F`
+and search for `.mini{`.)
 
-1. **Everything you wrote from this list.** Be able to explain any line of it cold.
-2. **`dashboardSummaryHTML()` and `medRowHTML()`** — straightforward functions that build
-   HTML from data. If you understand `.filter()` and template strings, you understand these.
-3. **The i18n system** — `t("key")` looks up a string in the current language's dictionary,
-   falling back to English. Simple idea, and the 13-language support is a genuine
-   differentiator worth being able to explain.
-4. **The safety rules in `CLAUDE.md`** — the non-goals, why there's never a green "safe",
-   why the AI may only rephrase retrieved text. You made these calls; own them completely.
-   This is the most impressive part of the project and it's *product* judgement, not code.
-5. **`tests/engine.test.js`** — what's tested and why those functions specifically.
+You'll see this:
 
-Be honest about the interaction engine (`analyzeDrugPairs`, `sideHit`, `labelMentions`) and
-the Supabase security model: you should be able to explain *what they do and why*, which is
-different from claiming you wrote them. "I directed this and I understand how it works, and
-here's the part I wrote myself" is a strong, defensible position — and it's true.
+```css
+  .mini{
+    appearance:none; cursor:pointer; font-family:var(--mono); font-size:12px; letter-spacing:.03em;
+    padding:8px 13px; border:1px solid var(--line); border-radius:20px;
+    background:var(--card); color:var(--ink-soft);
+    transition:transform .12s ...;
+  }
+```
+
+**What this is:** the styling for every small button in the app. `padding:8px 13px` means
+8 pixels of space above and below the text, 13 left and right. With a 12px font, that adds
+up to roughly 32px tall.
+
+**The problem:** Apple's guidance is that anything you tap with a thumb should be at least
+44px tall. Ours is 32. On a phone that's fiddly, and it's a real accessibility point.
+
+**What to do:** add ONE new property inside that block — a rule that sets a minimum height
+of 44 pixels. The property is called `min-height`. CSS properties are written
+`name:value;` — so you want the name, a colon, `44px`, and a semicolon, on its own line
+inside the braces.
+
+**Why `min-height` and not bigger padding?** Padding also pushes the text around. Minimum
+height leaves the text where it is and only grows the box if it needs to.
+
+**Check it worked:** reload, right-click any small button (like "Close" on a popup) →
+**Inspect**. The box at the bottom of DevTools shows the computed size. It should say 44.
+
+**Commit message suggestion:** `Raise small button tap targets to 44px minimum`
 
 ---
 
-### TASK 14 — Design a warm "sepia" theme
-**File:** `index.html`, find the comment `[PRIVI - TASK 14]` in the `<style>` block.
+# TASK 2 — Delete the invisible font sizes
+**Time: 30 minutes. Difficulty: low, but do it slowly.**
 
-There are four themes now (Dark, Light, Midnight, High contrast). Add a fifth: a warm,
-paper-like sepia that's easy on the eyes for long reading — genuinely useful for the older
-readers this app is aimed at.
+**The idea first:** a type scale should have steps you can actually see. The rule of thumb
+is each step should be at least 1.25× the one below. We have `14px` and `14.5px` sitting
+next to each other — that's 1.03×. Nobody on earth can see that difference, so it buys zero
+hierarchy while making the file inconsistent.
 
-**What to do:** copy the whole `[data-theme="midnight"]{ ... }` block, rename the selector to
-`[data-theme="sepia"]`, and change the colour values. Then add one `<option value="sepia">`
-to the theme `<select>` (search for `theme-select`), and add `"sepia"` to the `THEMES` array
-in the JavaScript.
+**Here is every one of them, with its line number.** Work top to bottom.
 
-**What to know:** every theme must define the *same complete set* of variables — if you miss
-one it silently inherits from `:root` and looks broken in a way that's hard to spot. Copy the
-whole block and edit values; don't write it from scratch.
+| Line | Currently | Round to |
+|---|---|---|
+| 272 | `font-size:15.5px` | 15px or 16px |
+| 439 | `font-size:12.5px` | 12px or 13px |
+| 478 | `font-size:15.5px` | 15px or 16px |
+| 506 | `font-size:16.5px` | 16px or 17px |
+| 524 | `font-size:11.5px` | 11px or 12px |
+| 556 | `font-size:15.5px` | 15px or 16px |
+| 652 | `font-size:11.5px` | 11px or 12px |
+| 656 | `font-size:12.5px` | 12px or 13px |
+| 662 | `font-size:12.5px` | 12px or 13px |
+| 664 | `font-size:10.5px` | 10px or 11px |
+| 665 | `font-size:14.5px` | 14px or 15px |
+| 666 | `font-size:13.5px` | 13px or 14px |
+| 709 | `font-size:14.5px` | 14px or 15px |
+| 736 | `font-size:14.5px` | 14px or 15px |
+| 739 | `font-size:12.5px` | 12px or 13px |
+| 744 | `font-size:11.5px` | 11px or 12px |
+| 773 | `font-size:14.5px` | 14px or 15px |
+| 776 | `font-size:14.5px` | 14px or 15px |
+| 790 | `font-size:14.5px` | 14px or 15px |
+| 817 | `font-size:11.5px` | 11px or 12px |
 
-**The part that actually matters:** the severity colours (`--major-*`, `--mod-*`, `--minor-*`)
-must stay clearly distinguishable from each other and readable on their backgrounds. That's a
-safety requirement, not an aesthetic one. Ask me to run the contrast checker on your palette
-before you commit — I have a script that measures every pair and tells you if any fall below
-WCAG AA.
+**How to choose up or down:** look at what's around it. If it's body text, round up. If it's
+a small label or caption, round down. When genuinely unsure, round down — smaller text
+rarely breaks a layout, bigger text sometimes does.
 
-**You'll also need a translated name** (`theme_sepia`) in all 13 dictionaries — ask me, don't
-guess at translations.
+**Line numbers shift as you edit.** They shift by zero here because you're replacing text
+on a line, not adding lines. But if something looks wrong, search for the value instead of
+trusting the number.
+
+**Do about five, then reload and look.** If something looks worse, change that one back.
+
+**Commit message suggestion:** `Round half-pixel font sizes to the type scale`
+
+---
+
+# TASK 11 — Delete four dead translation keys
+**Time: 30 minutes. Difficulty: low. This one teaches you the file better than any other.**
+
+**Background:** every piece of text in the app exists 13 times, once per language, in 13
+big blocks called dictionaries. Three keys in there are translated into all 13 languages
+and used absolutely nowhere — leftovers from features that got removed.
+
+**First, prove they're actually dead.** In your terminal:
+
+```sh
+grep -c "food_allergy_combo_note" index.html
+```
+This counts how many times that text appears. **It should print exactly `13`** — once per
+dictionary, zero times in real code. Do the same for `signed_in_as` and `ref_checking`.
+
+> **If any of them prints more than 13, STOP and tell me.** That means it IS used somewhere
+> and deleting it would break something.
+
+**Then delete them.** Search (`Cmd+F`) for `food_allergy_combo_note`. You'll land on a line
+that looks like:
+
+```js
+    food_allergy_combo_note: "Some English text here",
+```
+
+Delete that whole line. Then hit "find next" and delete the next one. Thirteen times. Then
+the same for the other two keys.
+
+**Starting line numbers** (they'll shift as you delete, so use search, not the numbers):
+`signed_in_as` ≈ 4083, `ref_checking` ≈ 4176, `food_allergy_combo_note` ≈ 4357.
+
+**After:** `grep -c "food_allergy_combo_note" index.html` should print `0`. Reload the app
+and click around — everything should look identical, because nothing was using them.
+
+**Commit message suggestion:** `Remove three unused translation keys`
+
+---
+
+# TASK 12 — Show the glossary hint
+**Time: 45 minutes. Difficulty: medium — this is your first real JavaScript.**
+
+**Background:** the app underlines medical words that have a plain-English definition — tap
+one and you get an explanation. There's already a translated sentence for this in all 13
+languages: `glossary_hint`, which reads *"Underlined words have a plain-English definition —
+tap them."*
+
+**It is currently shown to nobody.** The feature works; nothing tells users it exists.
+
+**Your job:** display it somewhere sensible — near content that has underlined terms. The
+Symptoms tab is the obvious home.
+
+**What you need to know:** to get translated text in this app you call `t("key_name")`.
+So `t("glossary_hint")` gives you that sentence in whatever language the user picked.
+You get all 13 languages for free the moment you use it.
+
+**Find a pattern to copy.** Search for `class="status"` — you'll find lines like:
+
+```js
+<p class="status">${esc(t("some_key"))}</p>
+```
+
+That's the shape: a paragraph, the `status` class for small grey text, `t(...)` for the
+translation, and `esc(...)` which makes text safe to put on a page.
+
+**Where to put it:** find where the Symptoms tab renders its content and add a line like
+that above the symptom list. Search for `tab_symptoms` or `SYMPTOM_CATEGORIES` to find the
+neighbourhood.
+
+**Check it:** switch the language using the picker in the header. Your new line should
+change language too. If it does, you did it right.
+
+**Commit message suggestion:** `Show the glossary hint so users know terms are tappable`
+
+---
+
+# TASK 13 — A fourth stat tile
+**Time: 1 hour. Difficulty: medium. Real JavaScript.**
+
+**Go to line 14232**, `function dashboardSummaryHTML(meds)`. This builds the summary band at
+the top of My Cabinet — the three counts.
+
+You'll see three lines that look like this:
+
+```js
+  const total   = meds.length;
+  const matched = meds.filter(m => m.generic || m.rxcui).length;
+  const noted   = meds.filter(m => m.notes).length;
+```
+
+**Read that middle one in Python:** `meds.filter(m => m.notes).length` is exactly
+`len([m for m in meds if m.notes])`. Take the list, keep only the ones where `m.notes` has
+something in it, count what's left.
+
+**Your job:** add a fourth count — how many medicines have **dosing times** set. The field
+is called `m.schedule`.
+
+**Step 1:** add a fourth `const` line following that same pattern.
+
+**Step 2:** below those, find the three `<div class="stat-tile">` lines. Copy one, change it
+to use your new count.
+
+**Step 3 — the actual work.** The tiles sit in a 3-column grid (`.stat-tiles` uses
+`repeat(3,1fr)`), and on phones it switches to 2. A fourth tile changes how that looks.
+Resize your browser narrow and decide whether the grid needs adjusting. **That judgement is
+the real task; the counting is the easy part.**
+
+**Step 4:** it needs a label. Every user-facing string goes through the 13 dictionaries —
+so come to me and we'll add a translated key together rather than you hardcoding English.
+
+**Commit message suggestion:** `Add a dosing-times count to the cabinet summary`
+
+---
+
+# TASK 3 — Spacing tokens
+**Time: 2 hours. Difficulty: medium. Save this for when you're comfortable.**
+
+The stylesheet uses **27 different spacing values**. Professional stylesheets pick about
+eight and never freehand a number again. That single difference is most of what makes a
+design feel deliberate rather than assembled.
+
+**Step 1:** find `:root{` near line 32. It's a list of named values like `--accent:#11736D;`.
+Add your own scale to that list:
+```css
+--space-1: 4px;  --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+--space-5: 24px; --space-6: 32px;  --space-7: 48px;
+```
+
+**Step 2:** pick ONE section of CSS and replace hardcoded spacing with `var(--space-N)`,
+rounding to the nearest. `13px` becomes `var(--space-3)`. Start with the `.lp-` rules — the
+homepage — because it's the newest code and lowest risk.
+
+**`var(--name)` just substitutes the value you defined.** The file already does this
+everywhere with `var(--radius)` and `var(--accent)`.
+
+**Do one section, reload, confirm nothing moved much, commit. Then the next.**
+**Do not attempt the whole file in one go.** You will hate it and you will break something.
+
+---
+
+# TASK 14 — A sepia theme
+**Time: 45 minutes. Difficulty: low-medium.**
+
+Find `[PRIVI - TASK 14]` in the style block (around line 211).
+
+**Step 1:** find `[data-theme="midnight"]{` — actually it's gone now, so use
+`[data-theme="blue"]{`. Copy the ENTIRE block, from `[data-theme="blue"]{` down to its
+closing `}`. Paste it where the TASK 14 comment is.
+
+**Step 2:** change `"blue"` to `"sepia"` in your copy, then change the colour values to a
+warm, paper-like palette.
+
+**Step 3:** add `<option value="sepia">` to the theme dropdown — search `theme-select`.
+
+**Step 4:** add `"sepia"` to the `THEMES` array in the JavaScript — search `const THEMES`.
+
+> **Every theme must define the same complete set of variables.** If you miss one it
+> silently falls back and looks broken in a way that's genuinely hard to spot. Copy the
+> whole block and edit values — don't write it from scratch.
+
+**The part that actually matters:** the severity colours (`--major-*`, `--mod-*`,
+`--minor-*`) must stay clearly different from each other and readable on their backgrounds.
+That's a safety requirement, not taste. **Ask me to run the contrast checker on your palette
+before you commit** — I have a script that measures every pair.
+
+You'll also need a translated name (`theme_sepia`) in all 13 dictionaries — ask, don't guess.
+
+---
+
+# TASKS 6–10 — The homepage, in your words
+**Time: ~3 hours total. Difficulty: low (it's writing, not code).**
+
+Search for `[PRIVI - TASK` in `index.html` to find the five empty spots.
+
+**Copy the shape of the section I already wrote.** Look at `<section class="lp-limits">` —
+same `<div class="wrap">`, same heading pattern. You're filling in a template.
+
+- **TASK 6 — "The problem."** Your personal story first: who you watched struggle with a
+  label. Then the fact: the National Library of Medicine shut off its free public
+  drug-interaction API in January 2024. Under 120 words. **This is the single
+  highest-value paragraph in the entire project.** Don't dress it up.
+- **TASK 7 — "What it does."** Four blocks, one sentence each. Don't invent a feature.
+- **TASK 8 — "Where every fact comes from."** openFDA, RxNorm, the curated set — and what
+  each one *can't* do. The honesty is the selling point.
+- **TASK 9 — "Built for people who get left out."** 13 languages in their own script, RTL,
+  pictogram mode, read-aloud, offline. Checkable facts, no adjectives.
+- **TASK 10 — "Who made this."** One paragraph, signed, first person, your actual voice.
+
+**Write them in English.** When all five are done, bring them to me and I'll translate the
+whole set into the other 12 languages in one pass.
+
+---
+
+## Getting to 13 October
+
+Three weeks from today. The video is the critical path — everything else can slip, that
+can't.
+
+| When | What |
+|---|---|
+| **Week 1** (Sep 21–27) | Tasks 1, 2, 11. **Write your story** (Task 6) — the video needs it. |
+| **Week 2** (Sep 28–Oct 4) | Tasks 7–10 (rest of homepage), Task 12, Task 14. **Record the video.** |
+| **Week 3** (Oct 5–11) | Tasks 3, 13. Write the AI disclosure. Fill the two legal placeholders. Re-record the video if it needs it. |
+| **Oct 12–13** | Buffer. Submit. |
+
+Two things that are not optional and only you can do: **the demo video** and **your story**.
+Judges see *only* the video — not the app, not the repo. If everything else slipped and
+those two were done, you'd still have a real submission.
+
+**Real deadline is 12:00 PM EDT on 26 October** — targeting the 13th gives you almost two
+weeks of slack. That's a good call.
