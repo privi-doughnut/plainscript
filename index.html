@@ -11076,8 +11076,6 @@ function baseTokens(name){
   const n = name.trim().toLowerCase();
   const set = new Set([n]);
   if (ALIASES[n]) set.add(ALIASES[n]);
-  // also split multiword brand like "ms contin"
-  if (ALIASES[n]) {} 
   return set;
 }
 
