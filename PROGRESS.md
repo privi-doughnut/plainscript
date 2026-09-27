@@ -146,6 +146,60 @@ Risk-spotting pass only (no legal skill/plugin exists on this machine). Get an a
 | FDA Software-as-a-Medical-Device / CDS boundary | Likely fine | Low-Med | Current non-goals (no diagnosis, no dosing, never "safe," always sourced, always routes emergencies out) keep it in the low-risk zone. Don't add anything that recommends a course of action. |
 | App store requirements (if native/PWA-wrapped later) | Not ready | Med-High, only if pursued | Apple/Google both require a live privacy-policy URL and **in-app self-service account deletion** for account-creating apps — Plainscript has neither yet; deletion needs a service-role-key server function (can't be done from the anon client key). Deferred per the 2026-09-16 mobile-scope decision (PWA-only for CAC). |
 
+
+## 7b. Legal follow-up (2026-09-27) — NOT LEGAL ADVICE
+
+Researched in-session after four attempts to run it as a background agent died on rate
+limits. Narrower than the original preflight; covers only what changed since. **Still not
+legal advice — an attorney should review before wide public launch.**
+
+**Finding 1 — the FDA analysis is sharper than §7 said, and it does not depend on the new
+duplicate-ingredient warning.** FDA's [CDS guidance](https://www.fda.gov/medical-devices/software-medical-device-samd/clinical-decision-support-software-frequently-asked-questions-faqs)
+is explicit that *"software functions intended for patients or caregivers do not meet the
+exclusion criteria"*, because the statutory Cures Act exclusion only covers software
+supporting **healthcare professionals**. Plainscript is patient-facing, so **it never had
+the exclusion to lose.** Drug-interaction and allergy alerts and duplicate-therapy warnings
+are named as non-device CDS *for clinician tools*; that naming does not carry over to a
+consumer app.
+
+What Plainscript actually relies on is FDA's lower enforcement priority for low-risk
+patient-facing tools, and staying there depends on the non-goals — no diagnosis, no dosing,
+no telling anyone to start or stop a medicine. The duplicate-ingredient warning stays on the
+right side of that line because it states a fact printed on both labels and routes to a
+pharmacist; it does not tell anyone what to do about it. **Keep it that way.** If it ever
+said "stop taking one of these", the analysis changes.
+
+**Finding 2 — the shared-device defect and the FTC Health Breach Notification Rule.** The
+[HBNR](https://www.ftc.gov/legal-library/browse/rules/health-breach-notification-rule)
+defines a breach broadly — unauthorized *acquisition* of identifiable health information,
+and the FTC is explicit it is "not limited to cybersecurity intrusions or nefarious
+behavior." A health app that can draw information from multiple sources is likely a covered
+personal health record, which Plainscript plausibly is.
+
+The honest read: notification duties attach to **acquisition**, and there is no evidence any
+person's data was acquired by anyone — the app has no analytics, so this is unknowable
+rather than disproven. Fixed before any known exposure, on a project with no confirmed
+users, this is very unlikely to trigger a notification duty. **But the reason to care is the
+precedent**: the FTC's $1.5M GoodRx action turned on this rule, and the lesson is that the
+bar for "covered health app" is lower than founders assume.
+
+**Actions, sorted honestly:**
+- *Legally required:* nothing newly identified. The §7 items stand — the biggest is still the
+  Washington MHMDA-style prominent disclosure, which the published privacy policy now covers.
+- *Strongly advisable:* fill the two live placeholders (contact address, governing-law state).
+  A published policy containing `[PRIVI: …]` is worse than no policy — it reads as unfinished
+  to exactly the person who would care.
+- *Strongly advisable:* keep the duplicate-ingredient warning informational. Never let it
+  become an instruction.
+- *Nice to have:* a short written note of the shared-device defect and its fix, dated. If
+  anyone ever asks, "found it ourselves, fixed it, here's when" is a much better answer than
+  reconstructing it later. `ACCESSIBILITY.md` is the model.
+
+**Not researched, still open:** whether being a minor affects enforceability of his Terms,
+and whether forming an entity is worth it. Both were Priority 2 and got cut when the
+research had to be done inline. Neither is urgent; both are worth a real lawyer's five
+minutes rather than my guess.
+
 ## 8. Feature/moving-parts gap-check (2026-09-16)
 
 Checked what's actually wired vs. what `PLAINSCRIPT_ROADMAP.md` claims. Good news: `config.js` already has live Supabase + Worker keys, so accounts, My Cabinet, and Plain-English mode are genuinely live in production — the roadmap doc's ⬜ marks on those are just stale. Glossary tooltips also already exist.
