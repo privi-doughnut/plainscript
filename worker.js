@@ -14,8 +14,14 @@
  *   2. npx wrangler deploy -c wrangler.worker.jsonc
  *   3. npx wrangler secret put ANTHROPIC_API_KEY -c wrangler.worker.jsonc
  *      (paste your Anthropic API key when prompted)
- *   4. (Optional) set ALLOWED_ORIGIN to your site URL to lock CORS to just
- *      your site: npx wrangler secret put ALLOWED_ORIGIN -c wrangler.worker.jsonc
+ *   4. (Optional) set ALLOWED_ORIGIN to your site URL: npx wrangler secret put
+ *      ALLOWED_ORIGIN -c wrangler.worker.jsonc. NOTE this only sets a CORS
+ *      response header — it stops other WEBSITES using this endpoint from a
+ *      browser, and does nothing against a script. See the throttle note below.
+ *   4b. REQUIRED, and neither is in this file: set an Anthropic account spend
+ *      cap, and add a Cloudflare Rate Limiting rule on this Worker's route.
+ *      Those are the only things that actually bound abuse of a public proxy
+ *      holding your API key.
  *   5. Copy the deployed URL (printed by step 2) into config.js as
  *      CLAUDE_PROXY_URL, then commit so the live site picks it up.
  * The old dashboard "Edit code / Quick edit" button is gone for many Workers
@@ -170,6 +176,47 @@ Output ONLY valid JSON, nothing before or after, in exactly this shape:
 {"quotes":[{"section":"<section key the sentence came from>","quote":"<the verbatim sentence>"}]}
 If nothing in the label answers the question, output exactly: {"quotes":[]}`;
 
+/* ---------------------------------------------------------------------------
+   ABUSE THROTTLE — partial mitigation, read this before trusting it.
+
+   This Worker holds Privi's own Anthropic key and is reachable by anyone: the
+   URL is published in config.js. CORS does NOT protect it — the handler only
+   SETS an Access-Control-Allow-Origin response header, and CORS is enforced by
+   browsers. A curl loop or any server-side script ignores it completely. At
+   roughly $0.02-0.03 of upstream spend per request, unbounded volume is a
+   four-figure bill on a student's card.
+
+   What this adds: a per-IP counter held in the isolate's memory, plus an early
+   size check so an oversized payload is rejected before it can reach Anthropic.
+
+   What it does NOT do, and must not be mistaken for: Workers run many isolates
+   across many locations and recycle them freely, so this counter is neither
+   global nor durable. A distributed or patient attacker walks straight past it.
+   It raises the cost of casual abuse; it does not cap spend.
+
+   THE ACTUAL CONTROLS, both outside this file:
+     1. An Anthropic account spend cap. Bounds the damage no matter what.
+     2. A Cloudflare Rate Limiting rule on this Worker's route.
+   --------------------------------------------------------------------------- */
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX       = 20;        // per IP per window, per isolate
+const MAX_BODY_BYTES = 40_000;    // generous vs. the ~24k the client can legitimately send
+const hits = new Map();
+
+function rateLimited(request){
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  const now = Date.now();
+  const rec = hits.get(ip);
+  if (!rec || now - rec.start > RATE_WINDOW_MS){
+    hits.set(ip, { start: now, n: 1 });
+    // keep the map from growing without bound in a long-lived isolate
+    if (hits.size > 5000) hits.clear();
+    return false;
+  }
+  rec.n += 1;
+  return rec.n > RATE_MAX;
+}
+
 export default {
   async fetch(request, env) {
     const origin = env.ALLOWED_ORIGIN || "*";
@@ -181,6 +228,12 @@ export default {
 
     if (request.method === "OPTIONS") return new Response(null, { headers: cors });
     if (request.method !== "POST") return json({ error: "POST only" }, 405, cors);
+
+    if (rateLimited(request)) return json({ error: "rate limited" }, 429, cors);
+
+    // reject oversized payloads before they can cost anything upstream
+    const declared = Number(request.headers.get("Content-Length") || 0);
+    if (declared > MAX_BODY_BYTES) return json({ error: "payload too large" }, 413, cors);
 
     let body;
     try { body = await request.json(); }
