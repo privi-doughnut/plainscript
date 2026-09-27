@@ -9,37 +9,89 @@ information, not failure.
 
 ---
 
-## Every single time you sit down
+# THE ROUTINE — start, code, push
+
+Three phases. Same three every single time you sit down.
+
+## 1 · START (about 60 seconds)
+
+Open Terminal and run these two lines:
 
 ```sh
 cd ~/plainscript-remote
 python3 -m http.server 8899
 ```
-Leave that running. Open `http://localhost:8899/index.html`.
 
-**Then unregister the service worker, or your changes won't show up:**
-DevTools (`Cmd+Option+I`) → **Application** tab → **Service Workers** → **Unregister** → `Cmd+Shift+R`.
+**Leave that window open** — it's the little web server that shows you your own copy of the
+site. Closing it stops the site working locally. Open a **second** Terminal tab
+(`Cmd+T`) for everything else.
 
-**Before you change anything:**
+In your browser, go to: **http://localhost:8899/index.html**
+
+> ### Do this once per session or you'll lose twenty minutes
+> The app saves a copy of itself to work offline, which means **your edits won't show up.**
+> It will look exactly like you did it wrong when you didn't.
+>
+> Press `Cmd+Option+I` → click **Application** at the top → **Service Workers** in the left
+> sidebar → click **Unregister** → then press `Cmd+Shift+R` to hard-reload.
+
+Now check nothing was already broken before you touch it:
+
 ```sh
 node --test tests/*.test.js
 ```
-Should say `# pass 78`. That's your "before" photo.
 
-**When you're done with a task:**
+You want **`# pass 78`**. That's your "before" photo.
+
+*If it says `node: bad option: --test`, your terminal picked up an old Node. Use the full
+path instead:*
 ```sh
-node --test tests/*.test.js      # still 78? good
+/Users/privivijayakumar/.nvm/versions/node/v22.23.1/bin/node --test tests/*.test.js
+```
+
+## 2 · CODE
+
+1. Open `index.html` in your editor.
+2. Jump to the line the task names — in VS Code, `Ctrl+G` then type the number.
+   To find something by what it *says* on screen, `Cmd+F` and search the visible text.
+3. Make the change the task describes.
+4. **Save** (`Cmd+S`).
+5. Switch to the browser and **reload** (`Cmd+R`). Look at it.
+6. Run the tests again. Still 78? Good. Went down? Your change caused it — see below.
+
+Change **one thing at a time** and look after each. Five changes then a reload means five
+suspects when something breaks.
+
+## 3 · PUSH
+
+```sh
 git add index.html
-git commit -m "describe what you changed"
+git commit -m "Short description of what you changed"
 git push origin main
 ```
 
-**If you break something and want out:**
-```sh
-git diff                 # shows exactly what you changed
-git checkout index.html  # throws it all away, back to last commit
-```
-You cannot permanently break anything that's committed.
+That's it. Cloudflare picks it up and the real site updates within a minute or two.
+Check it at **https://plainscript.its-the-prithivi-show.workers.dev/**
+
+`git add` chooses what to save · `git commit` saves it with a note · `git push` sends it up.
+
+**Commit after every finished task**, not once at the end of the day. Small commits are
+easy to undo; one giant commit is not.
+
+---
+
+## When something goes wrong
+
+| What happened | What to type |
+|---|---|
+| What did I even change? | `git diff` |
+| Undo everything since my last commit | `git checkout index.html` |
+| Tests were 78, now they're not | `git diff` — look at what you touched, or undo and redo it smaller |
+| Page looks completely broken | `Cmd+Option+I` → **Console** tab. A red line is the error. Send it to me. |
+| My edit isn't showing up | You skipped the service-worker step. Go back to phase 1. |
+
+**You cannot permanently break anything that's committed and pushed.** Worst case you throw
+away uncommitted work and start that one task again. That's the whole reason we commit often.
 
 ---
 
