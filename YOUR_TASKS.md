@@ -600,6 +600,127 @@ widen the window or hover the tab to see the full title). Switch languages and c
 title updates too.
 **Commit:** `Update the browser tab title to match the active tool`
 
+## BONUS CODE 6 — Remember your last tab across reloads · 20 min
+
+**Goal:** right now every reload lands you back on Decode. Remember whichever tab you were
+last on.
+
+**Find it:** Cmd+F → `READING_KEY` (~line 12700). Read the two lines right around it — one
+saves a value to `localStorage` wrapped in `try/catch`, the other reads it back on load.
+That's the whole pattern used everywhere in this file for "remember this between visits."
+
+**Example (the exact pattern, for a different saved value):**
+```js
+try{ localStorage.setItem("plainscript.lastDrug", name); }catch(e){}
+// ...later, on load...
+const lastDrug = (()=>{ try{ return localStorage.getItem("plainscript.lastDrug"); }catch(e){ return null; } })();
+```
+**Hint:** inside `selectTab` (same function as Bonus Code 5), save `which` under a new key
+like `"plainscript.lastTab"` every time it's called. Then, near where `TABS.forEach(...)`
+wires up the click listeners, read that key back — if it's set and still a valid tab name
+(check it's in the `TABS` array), call `selectTab` with it instead of leaving the default.
+**Check:** switch to Check or Cabinet, reload the page — it should open on the tab you left.
+**Commit:** `Remember the last tab across reloads`
+
+## BONUS CODE 7 — "/" jumps straight to the Decode search box · 20 min
+
+**Goal:** a common pattern on real sites (GitHub does this) — press `/` anywhere on the
+page and the main search box gets focus, so you don't have to click it first.
+
+**Find it:** Cmd+F → `addEventListener("keydown", onEsc)` style listeners elsewhere in the
+file for the pattern of a page-wide key listener, or simpler: Cmd+F →
+`$("#decode-input").addEventListener("keydown"` — that's the input you're giving a shortcut
+*to*. You're adding a new, separate listener on `document` (not on the input) that checks
+which key was pressed.
+
+**Example (the pattern — a different key, different target):**
+```js
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && document.activeElement) document.activeElement.blur();
+});
+```
+**Hint:** your condition needs two checks, not one: the key is `/`, **and** the user isn't
+already typing in a text field (otherwise typing a real `/` character anywhere would hijack
+it). `e.target.tagName` tells you what's focused — compare it against `"INPUT"` and
+`"TEXTAREA"`. If both checks pass, call `e.preventDefault()` (stops the `/` from being typed)
+and `.focus()` the decode input.
+**Check:** click somewhere empty on the page, press `/` — the Decode box should focus. Type
+a `/` while already inside a text field — it should type normally, not hijack focus.
+**Commit:** `Add / keyboard shortcut to focus the Decode search box`
+
+## BONUS CODE 8 — A "Copy result" button on Decode · 30 min
+
+**Goal:** let someone copy a drug's plain-English summary to paste into a text or email,
+for a family member who isn't looking at the app themselves.
+
+**Find it:** Cmd+F → `function addReadAloudButton` (~line 11327). It's called right next to
+where you added Task 4's line, and it does almost exactly what you need: it creates a
+button, adds it into the results box, and — look at the lines inside it that build `parts`
+and join them into `text` — it already assembles the full plain-text version of the result
+for the read-aloud feature. Copying uses the same assembled text.
+
+**Example (the clipboard half of the pattern, used elsewhere for a share link):**
+```js
+try{
+  await navigator.clipboard.writeText(someText);
+  btn.textContent = t("share_copied");
+  setTimeout(()=>{ btn.textContent = originalLabel; }, 1500);
+}catch(e){ /* clipboard blocked — fail quietly */ }
+```
+**Hint:** write a new function `addCopyButton(box)` modeled on `addReadAloudButton` —
+same button-creation lines, same `parts`/`text`-building lines — but instead of starting
+speech synthesis on click, it copies `text` to the clipboard and flashes the button's label
+to say "Copied!" for a second and a half. Call your new function right next to where
+`addReadAloudButton(box)` is already called.
+**Check:** decode a drug, click your new button, paste (Cmd+V) into Notes or Messages —
+the plain-text summary should appear.
+**Commit:** `Add a copy-result button to Decode`
+
+## BONUS CODE 9 — A severity-color legend on the Check tab · 25 min
+
+**Goal:** `major`/`moderate`/`minor` already show in amber/orange/red pills on results, but
+nothing explains what the three words and colors mean until you've already run a check.
+Add a small legend above the results that shows all three up front.
+
+**Find it:** Cmd+F → `class="panel-intro" data-i18n-html="check_intro"` (~line 1445) — your
+legend goes right after that line, before `id="check-results"`. Then Cmd+F → `.v-major{` (a
+little above line 691) to see how severity coloring actually works: a wrapping class
+(`.v-major`, `.v-moderate`, `.v-minor`) controls the colors of anything with class `.pill`
+inside it.
+
+**Example (the pattern — a chip using one of those wrapper classes, outside a real result):**
+```html
+<span class="v-moderate"><span class="pill">moderate</span></span>
+```
+**Hint:** write three of those side by side, one per severity, each pill showing its own
+word (use the existing `sev_major`/`sev_moderate`/`sev_minor` translation keys you can find
+by searching `sev_major:` rather than typing the English words directly — then it's already
+translated). Wrap the three in a small flex row (inline `style="display:flex; gap:10px;"`
+is fine for something this small).
+**Check:** the Check tab shows all three severity colors and words before you've typed
+anything.
+**Commit:** `Add a severity color legend to the Check tab`
+
+## BONUS CODE 10 — Show how many drugs you've added to Check · 15 min
+
+**Goal:** the Check tab caps you at 15 drugs (`MAX_CHECK_ROWS`) but never tells you where
+you stand until you hit the limit. Show a running count.
+
+**Find it:** Cmd+F → `function syncAddDrugBtn` (~line 12228). It already runs every time a
+row is added — it currently only disables the button at the limit. You're adding one more
+line inside it.
+
+**Example (the pattern — a different running count, shown as plain text):**
+```js
+$("#status-line").textContent = `${done} of ${total} complete`;
+```
+**Hint:** you need a small element to write into — add
+`<span class="status" id="drug-count"></span>` once in the HTML near `id="add-drug"`, then
+inside `syncAddDrugBtn`, set its `textContent` using `list.children.length` and
+`MAX_CHECK_ROWS` the same way the example does.
+**Check:** add and remove rows on the Check tab and watch the count update live.
+**Commit:** `Show a running count of drugs added to Check`
+
 ---
 
 # 6 · FEATURE IDEAS (what judges notice)
