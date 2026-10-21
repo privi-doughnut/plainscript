@@ -533,25 +533,48 @@ rule *you* added. **Hint:** the name between the quotes has to match the name in
 **Check:** `node --test tests/*.test.js` → `# pass 79` (one more than 78).
 **Commit:** `Add test for warfarin + amiodarone rule`
 
-## BONUS CODE 2 — Add 3 glossary words · 40 min
-**Goal:** more hard words become tappable with plain meanings.
+## BONUS CODE 2 — Add glossary words (batch of ~30) · 2–3 hrs
+**Goal:** more hard words become tappable with plain meanings. This one scales well —
+each word is the same one-line pattern repeated, so doing 30 is just doing 1 thirty times.
 **Find it:** Cmd+F → `"idiopathic":"with no known cause"` (line ~11434). The list above it
-is the model.
-**Gotcha:** every entry ends with a comma **except the last one.** When you add under
-`idiopathic`, put a comma after its closing quote first.
+is the model — one line per word, `"word":"meaning",`.
+**Gotcha:** every entry ends with a comma **except the very last one in the object.** Since
+you're adding a whole block under `idiopathic`, put a comma after *its* closing quote, then
+every line you add also ends in a comma except your final new line.
 **Example:**
 ```js
   "idiopathic":"with no known cause",
-  "nauseated":"feeling like you might throw up"
+  "nauseated":"feeling like you might throw up",
+  "swollen":"puffy or larger than usual from fluid buildup"
 ```
-(Don't use that exact word — pick your own.)
-**Rules:** words must be lowercase. Meaning is one short plain phrase. **Look up every term
-at medlineplus.gov** (search the word) and use their meaning — don't write it from memory.
-Good candidates: `hematuria`, `arrhythmia`, `anaphylaxis`, `neuropathy`, `photosensitivity`,
-`thrombocytopenia`, `hyponatremia`. Pick three that appear in real drug labels (decode a few
-drugs and see which words are not underlined).
-**Check:** decode a drug whose label has the word; it should be underlined.
-**Commit:** `Add three glossary terms from MedlinePlus`
+(Don't use those exact words — pick your own, from the candidate list below.)
+**Rules:** words must be lowercase. Meaning is one short plain phrase, **under 8 words if
+you can.** **Look up every term at medlineplus.gov** (search the word, use their wording,
+in your own simplification) — never write a definition from memory. Pick ones that actually
+appear in real labels: decode several drugs across different drug classes (a statin, an
+antibiotic, an antidepressant, a blood pressure med, a painkiller) and watch for words that
+*aren't* already underlined.
+
+**A candidate pool to pick ~30 from** (none of these are in the glossary yet — verify every
+meaning yourself at MedlinePlus, don't trust this list for the *meaning*, only as a starting
+point for which *words* are worth adding):
+`hematuria`, `arrhythmia`, `anaphylaxis`, `neuropathy`, `photosensitivity`,
+`thrombocytopenia`, `hyponatremia`, `leukopenia`, `neutropenia`, `agranulocytosis`,
+`angioedema`, `hepatomegaly`, `nephropathy`, `hyperkalemia`, `hypokalemia`,
+`hypercalcemia`, `hypocalcemia`, `rhabdomyolysis`, `hepatitis`, `pancreatitis`,
+`vasculitis`, `myalgia`, `arthralgia`, `paresthesia`, `tinnitus`, `vertigo`, `insomnia`,
+`somnolence`, `cachexia`, `dysphagia`, `dysuria`, `polyuria`, `oliguria`, `anuria`,
+`hirsutism`, `gynecomastia`, `xerostomia`, `stomatitis`, `petechiae`, `ecchymosis`,
+`jaundice`, `cholestasis`, `nystagmus`, `ataxia`, `dystonia`, `akathisia`.
+(That's ~45 — pick whichever ~30 you actually see on real labels, skip the rest.)
+
+**A faster way to work through 30:** open a scratch note, decode 8–10 real drugs across
+different classes first and write down every unfamiliar word you see that isn't already
+underlined. That gives you a real, label-sourced list before you touch MedlinePlus — faster
+than guessing from the pool above and then checking each one is actually used anywhere.
+**Check:** after adding all of them, decode a handful of different drugs and confirm the new
+words show up underlined. Run the tests (`node --test tests/*.test.js`) — still `# pass 78`.
+**Commit:** one commit is fine for the whole batch: `Add ~30 glossary terms from MedlinePlus`
 
 ## BONUS CODE 3 — "Last reviewed" date · 20 min
 **Goal:** the footer or Check tab says when the rule list was last verified. Honest and
@@ -759,6 +782,16 @@ and it's reading and writing, not hard code.
 17. warfarin + itraconazole
 18. methotrexate + omeprazole
 19. metoprolol + verapamil
+
+**Doing this as a batch (recommended — 4–5 at once):** this is the one Feature task where
+batching genuinely helps, both for your diff and for review. Pick 4–5 pairs from the list
+above, verify and draft all of them following the steps below, then send me all 4–5 drafts
+**in one message**, each with its source paragraph, instead of five separate messages. I'll
+check all of them together Friday, and you commit them (one commit per rule, or all 4–5 in
+one commit — either is fine, there's no rule here beyond each rule being correct) once I've
+confirmed. Doing them one pair at a time, fully, is what makes this safe to batch — don't
+draft all 5 severities/sentences from guessing a pattern across pairs; each one still needs
+its own trip to its own label.
 
 **How to verify one:** **dailymed.nlm.nih.gov** → search the drug (say, amiodarone) → open
 the label → find section **7 · Drug Interactions**. **A real label documents interactions
@@ -1003,10 +1036,10 @@ In the video you say one plain sentence of this.
 | ~~Thu Oct 15~~ | ~~Tasks 2 and 3~~ |
 | ~~Fri Oct 16~~ | ~~Task 4~~ |
 | ~~Sat–Sun Oct 17–18~~ | ~~Task 5~~ |
-| **Wed Oct 21 (today)** | ✅ Tasks 1–5 done and pushed. Feature 1: pick a candidate, read its label, draft your `what`/`why`/`mgmt` sentences — send them to me, don't commit yet. |
-| **Thu Oct 22 — solo day, no live check-in** | The self-contained ones: **Feature 2, Feature 5 (glossary modal), Bonus Code 2/3/4/5, Bonus Writing 1** (legal blanks). None of these need me to check anything mid-task. If there's time left, draft (don't finalize) Tasks 6a/8/9/10 and the README blurb — rough is fine, we'll tighten wording Friday. |
-| **Fri Oct 23, 10:00 AM** | Back with me: finalize and commit Feature 1's rule, Bonus Code 1 (its test), review your homepage drafts, **video planning**, first practice take. |
-| **Sat–Sun Oct 24–25** | Finish homepage writing + translations, record and edit the video, write the AI disclosure, run the full checklist below. |
+| **Wed Oct 21 (today)** | ✅ Tasks 1–5 done and pushed. Feature 1: pick 4–5 candidates, read their labels, draft your `what`/`why`/`mgmt` sentences for all of them — send them to me, don't commit yet. |
+| **Thu Oct 22 — solo day, no live check-in** | The self-contained ones: **Feature 2, Feature 5 (glossary modal), Bonus Code 2 (~30 glossary words), Bonus Code 3/4/5/6/7/8/9/10, Bonus Writing 1** (legal blanks). None of these need me to check anything mid-task. If there's time left, draft (don't finalize) Tasks 6a/8/9/10 and the README blurb — rough is fine, we'll tighten wording Friday. |
+| **Fri Oct 23, 10:00 AM** | Back with me: finalize and commit Feature 1's batch, Bonus Code 1 (its test), review your homepage drafts, **video planning**, first practice take. **Submitting today is a stretch goal, not the plan** — it's only realistic if the video's recorded, the homepage is written, and the disclosure is accurate by end of day. Don't rush any of those three to hit Friday; Sun Oct 25 is the real backstop below. |
+| **Sat–Sun Oct 24–25** | Whatever's left: finish homepage writing + translations, record and edit the video, write the AI disclosure, run the full checklist below. |
 | **Submit by end of Sun Oct 25** | leaves Monday morning as real buffer, not the deadline itself. |
 | Mon Oct 26, before noon | Buffer only. Hard deadline: **12:00 PM EDT.** |
 
