@@ -11317,6 +11317,7 @@ async function decode(){
   // plain-English glossary tooltips on the medical jargon in the label text.
   addReadAloudButton(box);
   applyGlossary(box);
+  if (box.querySelector(".gloss")) box.insertAdjacentHTML("beforeend", `<p class="status">${esc(t("glossary_hint"))}</p>`);
 }
 
 /* Read-aloud (Web Speech synthesis, feature-detected — silently absent
