@@ -1,10 +1,9 @@
 # PLAINSCRIPT — Privi's complete guide
 
-Today is **Wed Oct 14**. **Deadline: Monday Oct 26, 12:00 PM EDT.** Aim to submit **Fri Oct 23**
-so the weekend is buffer, not panic.
+Today is **Wed Oct 21**. **Deadline: Monday Oct 26, 12:00 PM EDT.** 5 days left.
 
 You don't have to understand everything. You have to do ONE small task, see it work, and
-save it. **Do Task 1 today. It's one line.**
+save it. You're already on a good run — keep going one task at a time.
 
 ## How this guide works
 
@@ -116,6 +115,9 @@ You type "warfarin" ──► RxNorm (NIH)  : fixes spelling, finds the official
   current language.
 - **RLS** — Row-Level Security: the database rule that keeps users' data separate.
 - **Regex** — a search pattern (`\d` means "any digit").
+- **Severity scale, least to greatest:** `minor` → `moderate` → `major`. Colors follow the
+  same order: amber → orange → red. These words are the only three the app is allowed to
+  use for severity — never anything softer or stronger.
 
 ---
 
@@ -196,7 +198,7 @@ and send it to me.
 
 # 3 · CODING TASKS 1–5
 
-## TASK 1 — Bigger buttons · 10 min · one line
+## ✅ TASK 1 — DONE — Bigger buttons · 10 min · one line
 
 **Goal:** small buttons are 32px tall; phone guidelines say 44px, so they're hard to tap.
 
@@ -222,7 +224,7 @@ guideline: 44.
 **Check:** reload, right-click a small button → Inspect → look for 44 in the box diagram.
 **Commit:** `Raise small button tap targets to 44px`
 
-## TASK 2 — Round the half-pixel font sizes · 30 min
+## ✅ TASK 2 — DONE — Round the half-pixel font sizes · 30 min
 
 **Goal:** sizes like `14.5px` are invisible differences that make the CSS messy. Round
 every one **down**.
@@ -239,7 +241,7 @@ skip it and mention it to me.
 
 **Commit:** `Round half-pixel font sizes down`
 
-## TASK 3 — Delete 3 dead translation keys · 30 min
+## ✅ TASK 3 — DONE — Delete 3 dead translation keys · 30 min
 
 **Goal:** three text entries exist in all 13 languages and the app never uses them. Dead
 code makes the file harder to read.
@@ -261,7 +263,7 @@ again: it must print `0`. Reload, switch a couple of languages, click around.
 
 **Commit:** `Remove three unused translation keys`
 
-## TASK 4 — Tell people the underlined words are tappable · 45 min · first real code
+## ✅ TASK 4 — DONE — Tell people the underlined words are tappable · 45 min · first real code
 
 **Goal:** drug results underline hard medical words; tapping one shows a plain meaning.
 Nobody is told that. The sentence already exists in all 13 languages as `glossary_hint`.
@@ -298,7 +300,7 @@ below the `decode` function — the code that builds them has `class="..."`. And
 language, check again.
 **Commit:** `Show the glossary hint when results have tappable terms`
 
-## TASK 5 — A fourth stat tile · 1 hr
+## ✅ TASK 5 — DONE — A fourth stat tile · 1 hr
 
 **Goal:** My Cabinet shows three summary counts. Add one: how many medicines have dosing
 times set.
@@ -567,6 +569,37 @@ carousel buttons already have (`aria-label="Next"`). **Example:**
 If a match already has `aria-label`, skip it. Tell me the list before you commit and I'll
 translate the labels.
 
+## BONUS CODE 5 — Browser tab title changes with the tool · 20 min
+
+**Goal:** right now the browser tab always says "Plainscript — Medication Reference," even
+if you're on the Check tab or Cabinet. A small, real touch: make the tab title reflect
+which tool is open.
+
+**Find it:** Cmd+F → `function selectTab`. It's short — a loop that shows the right panel
+and marks the right tab button as selected, then one line below it wires every tab button
+to call it on click.
+
+**Example (the pattern — updating something else every time a value changes):**
+```js
+function setVolume(v){
+  current = v;
+  $("#vol-label").textContent = v + "%";   // <- the line that reacts to the change
+}
+```
+Whatever changes (`v`, or here, `which`) drives a side effect written as its own line
+inside the function.
+
+**Hint:** inside `selectTab`, you have a parameter called `which` — it's one of
+`"decode"`, `"check"`, `"cabinet"`, `"symptoms"`. Each of those already has a matching
+translation key: `tab_decode`, `tab_check`, `tab_cabinet`, `tab_symptoms` (Cmd+F any of
+those to see them in the English dictionary). Set `document.title` to something built from
+`t("tab_" + which)` plus `" — Plainscript"`.
+
+**Check:** click between tabs and watch the actual browser tab text change (you may need to
+widen the window or hover the tab to see the full title). Switch languages and confirm the
+title updates too.
+**Commit:** `Update the browser tab title to match the active tool`
+
 ---
 
 # 6 · FEATURE IDEAS (what judges notice)
@@ -585,17 +618,41 @@ and it's reading and writing, not hard code.
 - Never say a combination is safe. Never tell anyone to start, stop, or change a dose. The
   last line is some form of "ask a pharmacist or doctor."
 
-**Candidates (well documented, but you verify each):**
+**Candidates (well documented, but you verify each) — pick any one to start:**
 1. warfarin + amiodarone
 2. warfarin + ciprofloxacin
 3. methotrexate + trimethoprim
 4. lithium + lisinopril
+5. simvastatin + amiodarone
+6. digoxin + verapamil
+7. digoxin + clarithromycin
+8. lisinopril + ibuprofen
+9. sertraline + ibuprofen
+10. tramadol + phenelzine
+11. fluconazole + phenytoin
+12. carbamazepine + warfarin
+13. phenytoin + warfarin
+14. metformin + topiramate
+15. sildenafil + tamsulosin
+16. clarithromycin + colchicine
+17. warfarin + itraconazole
+18. methotrexate + omeprazole
+19. metoprolol + verapamil
 
 **How to verify one:** **dailymed.nlm.nih.gov** → search the drug (say, amiodarone) → open
-the label → find section **7 · Drug Interactions** → find the other drug named there.
-Write down what it says and which section. Judge severity from the words ("contraindicated",
-"avoid", "monitor closely"). **Send me what you found before you commit; I'll check it
-against the label.**
+the label → find section **7 · Drug Interactions**. **A real label documents interactions
+with lots of different drugs at once** — amiodarone's label also mentions grapefruit juice,
+digoxin, statins, and several others that have nothing to do with your pair. That's normal.
+Find the one paragraph that names **your specific second drug** (say, warfarin) and ignore
+everything else on the page — that paragraph is your whole source.
+
+Write down what that paragraph says and which section it's in. Judge severity from its own
+words ("contraindicated," "avoid," "monitor closely") against the scale above (minor <
+moderate < major). Then write your `what` / `why` / `mgmt` sentences **yourself, in your own
+words** — this is the one part of this task I won't write for you, since it's the actual
+content you're submitting as your own work. **Send me your three sentences plus the source
+paragraph before you commit; I'll check your wording against the label**, not write it for
+you.
 
 **Find it:** Cmd+F → `Hospitals routinely hold metformin`. That's the last rule. Scroll a
 few lines to the line that is just `];`. Click at the end of the line above it (it ends
@@ -821,14 +878,16 @@ In the video you say one plain sentence of this.
 
 | Day | Do |
 |---|---|
-| **Wed Oct 14 (today)** | Open VS Code and the terminal. **Task 1.** Push it. |
-| **Thu Oct 15** | Tasks 2 and 3. First rough draft of your story (6a). |
-| **Fri Oct 16** | Task 4. **Video planning with me**, first practice take. |
-| **Sat–Sun Oct 17–18** | Feature 1 (verify + add 2 rules), Task 5, Feature 2. Task 6. |
-| **Mon–Wed Oct 19–21** | Tasks 6a, 8, 9, 10. Bonus writing 1–3. Record the video. |
-| **Thu Oct 22** | Upload video (Public). Write the AI disclosure. Bonus code if time. |
-| **Fri Oct 23** | **Submit.** |
-| Sat–Mon Oct 24–26 | Buffer. Hard deadline: **Mon 12:00 PM EDT.** |
+| ~~Wed Oct 14~~ | ~~Task 1~~ |
+| ~~Thu Oct 15~~ | ~~Tasks 2 and 3~~ |
+| ~~Fri Oct 16~~ | ~~Task 4~~ |
+| ~~Sat–Sun Oct 17–18~~ | ~~Task 5~~ |
+| **Wed Oct 21 (today)** | ✅ Tasks 1–5 done and pushed. Feature 1: pick a candidate, read its label, draft your `what`/`why`/`mgmt` sentences — send them to me, don't commit yet. |
+| **Thu Oct 22 — solo day, no live check-in** | The self-contained ones: **Feature 2, Feature 5 (glossary modal), Bonus Code 2/3/4/5, Bonus Writing 1** (legal blanks). None of these need me to check anything mid-task. If there's time left, draft (don't finalize) Tasks 6a/8/9/10 and the README blurb — rough is fine, we'll tighten wording Friday. |
+| **Fri Oct 23, 10:00 AM** | Back with me: finalize and commit Feature 1's rule, Bonus Code 1 (its test), review your homepage drafts, **video planning**, first practice take. |
+| **Sat–Sun Oct 24–25** | Finish homepage writing + translations, record and edit the video, write the AI disclosure, run the full checklist below. |
+| **Submit by end of Sun Oct 25** | leaves Monday morning as real buffer, not the deadline itself. |
+| Mon Oct 26, before noon | Buffer only. Hard deadline: **12:00 PM EDT.** |
 
 **If time runs out, protect these in order:**
 1. The video (only you can make it)
