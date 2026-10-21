@@ -269,7 +269,7 @@
     letter-spacing:-.01em; margin:0; line-height:1;
   }
   .brand .tag{font-family:var(--mono); font-size:12px; color:var(--accent-deep); letter-spacing:.04em;}
-  .lede{margin:12px 0 0; color:var(--ink-soft); max-width:60ch; font-size:15.5px;}
+  .lede{margin:12px 0 0; color:var(--ink-soft); max-width:60ch; font-size:16px;}
 
   .themetoggle{
     margin-left:auto; align-self:center; appearance:none; cursor:pointer;
@@ -436,7 +436,7 @@
   .lp-accent{color:var(--accent);}
   .lp-sub{font-size:18px; line-height:1.55; color:var(--ink-soft); margin:0 0 26px; max-width:60ch;}
   .lp-cta{display:flex; gap:11px; flex-wrap:wrap; margin-bottom:26px;}
-  .lp-strip{font-family:var(--mono); font-size:12.5px; color:var(--ink-faint); letter-spacing:.02em; margin:0 0 10px;}
+  .lp-strip{font-family:var(--mono); font-size:13px; color:var(--ink-faint); letter-spacing:.02em; margin:0 0 10px;}
   .lp-note{font-size:14px; color:var(--ink-faint); margin:0; max-width:62ch;}
 
   /* ---------- feature carousel ----------
@@ -475,7 +475,7 @@
   .lp-never{list-style:none; padding:0; margin:26px 0 22px; display:grid; gap:12px; max-width:70ch;}
   .lp-never li{
     padding:13px 16px; border-left:2px solid var(--accent); background:var(--paper);
-    border-radius:0 var(--radius) var(--radius) 0; font-size:15.5px; line-height:1.5;
+    border-radius:0 var(--radius) var(--radius) 0; font-size:16px; line-height:1.5;
   }
   .lp-never b{font-weight:600;}
 
@@ -503,7 +503,7 @@
   @media (max-width:560px){
     .lp-hero{padding:44px 0 38px;}
     .lp-hero h1{font-size:33px; max-width:none;}
-    .lp-sub{font-size:16.5px;}
+    .lp-sub{font-size:17px;}
     .lp-limits, .lp-end{padding:44px 0;}
     .lp-limits h2, .lp-end h2{font-size:26px;}
     .lp-nav .wrap{align-items:flex-start;}
@@ -521,7 +521,7 @@
        so a short transition smooths the steps without inventing motion */
     transition:width .3s cubic-bezier(.33,1,.68,1);
   }
-  .prog-num{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); white-space:nowrap;}
+  .prog-num{font-family:var(--mono); font-size:12px; color:var(--ink-faint); white-space:nowrap;}
   @media (prefers-reduced-motion:reduce){ .prog-fill{transition:none;} }
 
   /* ---------- depth & press ----------
@@ -553,7 +553,7 @@
   button.go, button.ghost{ border-radius:12px; }
   input[type=text], .mednote textarea{ border-radius:12px; }
   .results > * + *{ margin-top:14px; }
-  .panel-intro{ font-size:15.5px; line-height:1.65; }
+  .panel-intro{ font-size:16px; line-height:1.65; }
   .card h3{ letter-spacing:-.01em; }
 
   main{padding:26px 0 60px;}
@@ -649,21 +649,21 @@
   .row .src{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:6px;}
   .expand{
     appearance:none; background:none; border:none; cursor:pointer; padding:0; margin-top:6px;
-    font-family:var(--mono); font-size:11.5px; color:var(--accent-deep); letter-spacing:.03em;
+    font-family:var(--mono); font-size:12px; color:var(--accent-deep); letter-spacing:.03em;
   }
   .expand:hover{text-decoration:underline;}
   .expand:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
-  .pe-toggle{display:inline-flex; gap:6px; align-items:center; margin-top:8px; font-size:12.5px; color:var(--ink-faint); font-family:var(--mono);}
+  .pe-toggle{display:inline-flex; gap:6px; align-items:center; margin-top:8px; font-size:13px; color:var(--ink-faint); font-family:var(--mono);}
 
   /* ---------- interaction verdict ---------- */
   .verdict{display:flex; border-radius:var(--radius); overflow:hidden; border:1px solid var(--line); box-shadow:var(--shadow);}
   .verdict .bar{width:6px; flex:none;}
   .verdict .vbody{padding:15px 18px; flex:1;}
-  .verdict .pair{font-family:var(--mono); font-size:12.5px; color:var(--ink-soft); letter-spacing:.02em;}
+  .verdict .pair{font-family:var(--mono); font-size:13px; color:var(--ink-soft); letter-spacing:.02em;}
   .verdict .sev{font-family:var(--serif); font-size:19px; font-weight:600; margin:3px 0 0; display:flex; align-items:center; gap:9px;}
-  .sev .pill{font-family:var(--mono); font-size:10.5px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:3px 8px; border-radius:20px;}
-  .verdict p{margin:9px 0 0; font-size:14.5px;}
-  .verdict .mgmt{margin-top:8px; font-size:13.5px; color:var(--ink-soft);}
+  .sev .pill{font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:3px 8px; border-radius:20px;}
+  .verdict p{margin:9px 0 0; font-size:15px;}
+  .verdict .mgmt{margin-top:8px; font-size:14px; color:var(--ink-soft);}
   .verdict .src{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:9px;}
 
   /* pill text colors are picked per severity to actually hit 4.5:1 against
@@ -706,7 +706,7 @@
   }
   .nofind .eyebrow{color:var(--note-ink);}
   .nofind h3{font-family:var(--serif); font-weight:600; font-size:18px; margin:4px 0 6px; color:var(--note-ink);}
-  .nofind p{margin:0; font-size:14.5px; color:var(--ink-soft);}
+  .nofind p{margin:0; font-size:15px; color:var(--ink-soft);}
 
   /* ---------- status / errors ---------- */
   .status{font-family:var(--mono); font-size:13px; color:var(--ink-soft); padding:14px 0;}
@@ -733,15 +733,15 @@
   details summary::-webkit-details-marker{display:none;}
   details summary .chev{font-family:var(--mono); color:var(--accent); transition:transform .2s;}
   details[open] summary .chev{transform:rotate(90deg);}
-  details .content{padding:0 2px 16px; color:var(--ink-soft); font-size:14.5px;}
+  details .content{padding:0 2px 16px; color:var(--ink-soft); font-size:15px;}
   details .content p{margin:0 0 10px;} details .content p:last-child{margin:0;}
   details .content a{color:var(--accent-deep);}
-  details .content code{font-family:var(--mono); font-size:12.5px; background:var(--line-soft); padding:1px 5px; border-radius:4px; color:var(--ink);}
+  details .content code{font-family:var(--mono); font-size:13px; background:var(--line-soft); padding:1px 5px; border-radius:4px; color:var(--ink);}
 
   /* ---------- accounts + My Cabinet (Phase 2) ---------- */
   .acct{display:inline-flex; align-items:center; gap:8px; align-self:center;}
   .acct .who{
-    font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);
+    font-family:var(--mono); font-size:12px; color:var(--ink-faint);
     max-width:190px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   .mini{
@@ -770,10 +770,10 @@
     box-shadow:var(--shadow); padding:22px 20px;
   }
   .signin h3{font-family:var(--serif); font-size:20px; font-weight:600; margin:6px 0 8px;}
-  .signin p{margin:0 0 14px; color:var(--ink-soft); font-size:14.5px; max-width:58ch;}
+  .signin p{margin:0 0 14px; color:var(--ink-soft); font-size:15px; max-width:58ch;}
   .providers{display:flex; gap:9px; flex-wrap:wrap;}
   .provider{
-    appearance:none; cursor:pointer; font-family:var(--sans); font-weight:600; font-size:14.5px;
+    appearance:none; cursor:pointer; font-family:var(--sans); font-weight:600; font-size:15px;
     padding:12px 18px; border-radius:var(--radius); border:1px solid var(--line);
     background:var(--card); color:var(--ink); display:inline-flex; gap:9px; align-items:center;
   }
@@ -787,7 +787,7 @@
   .mednote{margin-top:10px;}
   .mednote p{margin:0 0 4px; font-size:14px; color:var(--ink-soft); font-style:italic;}
   .mednote textarea{
-    width:100%; font-family:var(--sans); font-size:14.5px; padding:10px 12px;
+    width:100%; font-family:var(--sans); font-size:15px; padding:10px 12px;
     border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink);
     resize:vertical; min-height:64px;
   }
@@ -814,7 +814,7 @@
   }
   .scan-summary .headline{font-family:var(--serif); font-size:20px; font-weight:600; margin:2px 0 0;}
   .scan-summary .counts{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
-  .scan-summary .count-pill{font-family:var(--mono); font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:20px;}
+  .scan-summary .count-pill{font-family:var(--mono); font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px;}
   .cpill-major{background:var(--major-bg); color:var(--major-ink); border:1px solid var(--major-bar);}
   .cpill-mod{background:var(--mod-bg); color:var(--mod-ink); border:1px solid var(--mod-bar);}
   .cpill-minor{background:var(--minor-bg); color:var(--minor-ink); border:1px solid var(--minor-bar);}
