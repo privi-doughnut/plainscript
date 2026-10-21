@@ -656,6 +656,56 @@ touches the engine and its tests, so we do it together after Features 1–2.
 The app advertises three severity levels but has zero minor rules. Either you find one real
 minor interaction from a label, or we drop the tier. Tell me which.
 
+## FEATURE 5 — A standalone glossary reference · 1-2 hrs · Privi's idea
+
+**Goal:** right now the glossary only shows up reactively — tap an underlined word, get
+a meaning. There's no way to just browse the whole list. Add a "Glossary" button near the
+theme/language pickers that opens a scrollable list of every term the app knows.
+
+**Find it (the button):** Cmd+F → `id="level-toggle"` (~line 1382). That's a button built
+from the same `themetoggle` shape as `reading-toggle` just above it — copy that shape for
+your new button.
+
+**Example (a different button, same shape):**
+```html
+<button id="example-toggle" class="themetoggle" title="Example">
+  <span class="ticon" aria-hidden="true">*</span><span class="tlabel">Example</span>
+</button>
+```
+**Hint:** copy `reading-toggle`'s button exactly, give it a new `id`, swap the icon
+character and the label text. You're not toggling anything on/off, so you can drop
+`aria-pressed`.
+
+**Wiring the click:** Cmd+F → `$("#reading-toggle").addEventListener` (~line 12702). That's
+the whole pattern: find the button by id, listen for a click, call a function. Your button's
+click should call a new function you write — something like `openGlossaryModal()`.
+
+**The modal itself:** Cmd+F → `async function openScanModal` (~line 12078). That's a
+complete modal from scratch: an overlay, a close button, closing on Escape and on
+click-outside. Copy that *shape* — overlay, `modal-box`, `modal-head`, `modal-body`,
+`close()`, the Esc listener — but skip everything about `stream` and `video`; you don't
+need a camera.
+
+**The content:** the data you're listing already exists — Cmd+F → `const GLOSSARY` (line
+11360). It's a plain `{term: meaning}` object. You need one row per entry, sorted
+alphabetically. *Example of the pattern (looping over a different object):*
+```js
+const rows = Object.keys(SOME_OBJECT).sort()
+  .map(k => `<li><b>${esc(k)}</b> -- ${esc(SOME_OBJECT[k])}</li>`).join("");
+```
+Read as Python: `"".join(f"<li>{k} -- {v}</li>" for k,v in sorted(obj.items()))`.
+**Hint:** swap `SOME_OBJECT` for `GLOSSARY`, wrap the joined `rows` in a `<ul>`, and put that
+`<ul>` inside your modal's `modal-body`.
+
+**Check:** click your new button from any tab (not just after decoding something) — a
+scrollable alphabetical list of every term pops up, with a working Close button and Escape
+key, and it doesn't block any other feature.
+**Commit:** `Add a standalone glossary reference modal`
+
+(Optional, for consistency: add English keys `glossary_btn_label: "Glossary"` and
+`glossary_modal_title: "Glossary"` near `check_intro:`, same way as Feature 2 — then tell me
+and I'll translate them.)
+
 **Do not build:** anything that diagnoses, a dose calculator, more languages, analytics.
 
 ---
