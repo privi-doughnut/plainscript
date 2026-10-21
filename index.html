@@ -1029,7 +1029,7 @@
     display:flex; gap:12px; align-items:center; flex-wrap:wrap;
     margin-top:14px; padding-top:14px; border-top:1px solid var(--line);
   }
-  .stat-tiles{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .stat-tiles{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
   .stat-tile{ border:1px solid var(--line); border-radius:12px; padding:14px; text-align:center; background:var(--card); }
   .stat-num{ font-family:var(--serif); font-size:30px; font-weight:600; color:var(--accent-deep); line-height:1; }
   .stat-lbl{ font-size:12px; color:var(--ink-soft); margin-top:6px; }
@@ -4113,6 +4113,7 @@ const I18N = {
     insights_total: "medications",
     insights_matched: "matched to an FDA label",
     insights_noted: "with a personal note",
+    insights_scheduled: "with dosing times",
     insights_classes: "By drug class",
     insights_unclassified: "No class on label",
     insights_empty: "Add a couple of medications to see insights.",
@@ -14193,11 +14194,13 @@ function dashboardSummaryHTML(meds){
   const total   = meds.length;
   const matched = meds.filter(m => m.generic || m.rxcui).length;
   const noted   = meds.filter(m => m.notes).length;
+  const scheduled = meds.filter(m => parseTimes(m.schedule).length).length;
   return `<div class="cab-dash">
     <span class="eyebrow">${esc(t("your_cabinet_eyebrow"))}</span>
     <div class="stat-tiles" style="margin-top:10px;">
       <div class="stat-tile"><div class="stat-num">${total}</div><div class="stat-lbl">${esc(t("insights_total"))}</div></div>
       <div class="stat-tile"><div class="stat-num">${matched}</div><div class="stat-lbl">${esc(t("insights_matched"))}</div></div>
+      <div class="stat-tile"><div class="stat-num">${scheduled}</div><div class="stat-lbl">${esc(t("insights_scheduled"))}</div></div>
       <div class="stat-tile"><div class="stat-num">${noted}</div><div class="stat-lbl">${esc(t("insights_noted"))}</div></div>
     </div>
     ${meds.length >= 2 ? `<div class="cab-dash-action">
