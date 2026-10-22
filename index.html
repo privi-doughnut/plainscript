@@ -1446,6 +1446,7 @@
     <div class="druglist" id="drug-list"></div>
     <div class="checkbar">
       <button class="ghost" id="add-drug" data-i18n="add_drug_btn"></button>
+      <span class="status" id="drug-count"></span>
       <button class="go" id="check-btn" data-i18n="check_btn"></button>
     </div>
     <div class="results" id="check-results" aria-live="polite"></div>
@@ -12227,6 +12228,7 @@ function addVoiceButton(inputEl, autoSubmit){
    analysis, so cap the rows — a longer list belongs in My Cabinet → Scan. */
 const MAX_CHECK_ROWS = 15;
 function syncAddDrugBtn(){
+  $("#status-line").textContent = `${list.children.length} of ${MAX_CHECK_ROWS} complete`;
   const btn = $("#add-drug"), list = $("#drug-list");
   if (!btn || !list) return;
   const full = list.children.length >= MAX_CHECK_ROWS;
