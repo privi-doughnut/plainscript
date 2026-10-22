@@ -12683,6 +12683,7 @@ function selectTab(which){
     $("#tab-"+t).setAttribute("aria-selected", on);
     $("#panel-"+t).hidden = !on;
   }
+  document.title = t("tab_" + which) + " — Plainscript";
 }
 TABS.forEach(t => $("#tab-"+t).addEventListener("click", ()=>selectTab(t)));
 
