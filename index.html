@@ -1453,6 +1453,7 @@
   <section class="panel" id="panel-check" role="tabpanel" aria-labelledby="tab-check" hidden>
     <p class="panel-intro" data-i18n-html="check_intro"></p>
     <p class="status" id="rule-count"></p>
+    <p class="status" id="last-reviewed"></p>
     <div class="druglist" id="drug-list"></div>
     <div class="checkbar">
       <button class="ghost" id="add-drug" data-i18n="add_drug_btn"></button>
@@ -11416,10 +11417,10 @@ const GLOSSARY = {
   "polyuria":"excessive urination",
   "oliguria":"low urine output",
   "anuria":"no urine output",
-  "arrhythemia":"irregular heartbeat rhythm",
+  "arrhythmia":"irregular heartbeat rhythm",
   "anaphylaxis":"a severe, potentially life-threatening allergic reaction",
   "angioedema":"severe swelling beneath the skin, often around the eyes and lips",
-  "vasulitis":"inflammation of blood vessels that can restrict blood flow",
+  "vasculitis":"inflammation of blood vessels that can restrict blood flow",
   "thrombocytopenia":"low platelet count in the blood",
   "leukopenia":"a reduction in the number of white blood cells in the blood, which weakens the immune system",
   "neutropenia":"an abnormally low count of neutrophils, a specific type of white blood cell that fights infections",
@@ -12286,9 +12287,9 @@ function addVoiceButton(inputEl, autoSubmit){
    analysis, so cap the rows — a longer list belongs in My Cabinet → Scan. */
 const MAX_CHECK_ROWS = 15;
 function syncAddDrugBtn(){
-  $("#status-line").textContent = `${list.children.length} of ${MAX_CHECK_ROWS} complete`;
   const btn = $("#add-drug"), list = $("#drug-list");
   if (!btn || !list) return;
+  $("#drug-count").textContent = `${list.children.length} of ${MAX_CHECK_ROWS} complete`;
   const full = list.children.length >= MAX_CHECK_ROWS;
   btn.disabled = full;
   btn.title = full ? `You can check up to ${MAX_CHECK_ROWS} medicines at once — for a longer list, save them in My Cabinet and use Scan.` : "";
@@ -12850,7 +12851,8 @@ function applyLang(lang, opts){
    strings (not data-i18n), so a language switch mid-session doesn't
    leave stale-language content sitting next to freshly-translated chrome */
 function refreshDynamicContentForLang(){
-  $("#rule-count").textContent = t("rule_count_prefix") + " " + items.length + " " + t("rule_count_suffix");
+  $("#rule-count").textContent = t("rule_count_prefix") + " " + INTERACTIONS.length + " " + t("rule_count_suffix");
+  $("#last-reviewed").textContent = t("last_reviewed");
   renderSymptomList();
   if (typeof renderAcct === "function") renderAcct();
   if (typeof renderCabinet === "function" && SB_ENABLED) renderCabinet();
