@@ -479,6 +479,22 @@
   }
   .lp-never b{font-weight:600;}
 
+  /* Collapsed-by-default long-form text (currently just the Task 6a story) —
+     shows the opening hook, fades out, and expands on click. Re-usable: give
+     any future long section the same .lp-story / .lp-story-toggle pair. */
+  .lp-story{max-height:170px; overflow:hidden; position:relative; transition:max-height .35s ease;}
+  .lp-story:not(.is-open)::after{
+    content:""; position:absolute; left:0; right:0; bottom:0; height:70px;
+    background:linear-gradient(to bottom, transparent, var(--card));
+  }
+  .lp-story.is-open{max-height:3000px;}
+  .lp-story-toggle{
+    appearance:none; cursor:pointer; border:none; background:none; padding:0; margin-top:14px;
+    font-family:var(--mono); font-size:13px; font-weight:600; letter-spacing:.03em; color:var(--accent);
+  }
+  .lp-story-toggle:hover{text-decoration:underline;}
+  @media (prefers-reduced-motion:reduce){ .lp-story{transition:none;} }
+
   .lp-end{padding:64px 0 76px; border-top:1px solid var(--line);}
   .lp-foot{margin:34px 0 0; padding-top:20px; border-top:1px solid var(--line);
     font-family:var(--mono); font-size:12px; color:var(--ink-faint); line-height:1.8;}
@@ -1280,13 +1296,16 @@
   </section>
 
   <!-- [PRIVI - TASK 6] "The problem" section goes here -->
-   <section class="lp-feat"><div class="wrap">
+   <section class="lp-limits"><div class="wrap">
   <span class="eyebrow">I think I need to be a pharmacist to understand these labels?</span>
   <h2>A Doctorate In Labels</h2>
+  <div class="lp-story" id="story-6a">
   <p class="lp-sub">I've been obsessed with pill bottle labels ever since I could read. As a bored kid, I'd decipher my parents' medicine bottles to try and figure out exactly what they did. It was a difficult obsession, unfortunately, because my parents thought I was trying to be the world's youngest addict and went to extreme lengths to hide their medicine in our small apartment. Ultimately, my little brother didn't understand my interest, so it waned for a time. But it always bothered me how I couldn't, for the life of me, figure out what a medicine did just from the label.</p>
   <p class="lp-sub">It bothered me a lot more when my cousin died due to complications from his medication. I loved him dearly; he was the older brother I wish I had. His family were poor farmers, and he worked the land to support his aging parents. I'll never forget when I was nine, he told me (Translated), "I'm glad you have a gift, kid, so use your education well. Life is a heavy burden you know, but if you endure it, you've got potential to go far, even beyond the people who've got it better than us. Dedicate your heart, and you'll rise above it all little brother."</p>
   <p class="lp-sub">He always wanted to retire to a small goat farm in the Swiss Alps, but, a doctor prescribed him blood thinners but never told him what they did and how he needed to live his life while on them. Unaware the medicine in his body was being amplified by his other prescriptions, he accidentally cut himself with a scythe while working. Assuming it'd clot, he kept working and bled out among his crops a month before his wedding. Turns out he also had developing leukemia, so I suppose it was a matter of time, but he shouldn't have gone so soon you know? I miss him a lot.</p>
   <p class="lp-sub">When the National Library of Medicine shut down its free drug-interaction API, it left a massive empty space in a field I'm passionate about, so I figured I'd go for it. I built this app so nobody has to endure what his family went through, and so medical negligence takes fewer lives. Labels should never require a pharmacist to read. Thank you for reading my story. I hope this app takes a worry off your plate so you can safely chase your dreams. I'm glad I get to protect your peace of mind. Dedicate your heart.</p>
+  </div>
+  <button type="button" class="lp-story-toggle" data-story="story-6a" aria-expanded="false" aria-controls="story-6a"></button>
 </div></section>
 
   <!-- Feature carousel. Each slide describes something that genuinely exists in
@@ -1318,6 +1337,31 @@
           <span class="car-num">04</span>
           <h3 data-i18n="lp_s4_t">Symptoms, without a diagnosis</h3>
           <p data-i18n="lp_s4_b">An emergency red-flag checklist, plus a guide from everyday symptoms to the usual over-the-counter category. It will not tell you what's wrong with you, and it says so.</p>
+        </article>
+        <article class="car-slide">
+          <span class="car-num">05</span>
+          <h3 data-i18n="lp_s5_t">Scan the bottle</h3>
+          <p data-i18n="lp_s5_b">Point your phone's camera at the barcode and skip typing the name — Decode looks it up automatically.</p>
+        </article>
+        <article class="car-slide">
+          <span class="car-num">06</span>
+          <h3 data-i18n="lp_s6_t">Speaks your language</h3>
+          <p data-i18n="lp_s6_b">Switch between 13 languages any time, including Arabic, which flips the entire layout right-to-left.</p>
+        </article>
+        <article class="car-slide">
+          <span class="car-num">07</span>
+          <h3 data-i18n="lp_s7_t">Bring it to an appointment</h3>
+          <p data-i18n="lp_s7_b">Print a one-page summary of everything you take, or share a read-only link with a caregiver or doctor.</p>
+        </article>
+        <article class="car-slide">
+          <span class="car-num">08</span>
+          <h3 data-i18n="lp_s8_t">Tap any hard word</h3>
+          <p data-i18n="lp_s8_b">Underlined medical terms — like tachycardia or hepatotoxicity — show a plain-English meaning the moment you tap them.</p>
+        </article>
+        <article class="car-slide">
+          <span class="car-num">09</span>
+          <h3 data-i18n="lp_s9_t">Installs like an app</h3>
+          <p data-i18n="lp_s9_b">Add it to your home screen from the browser and it opens instantly, even with no signal.</p>
         </article>
       </div>
 
@@ -4047,11 +4091,23 @@ const I18N = {
     lp_s1_t: "Decode a medication",
     lp_s1_b: "Type any brand or generic name and get its real FDA label in plain English — what it treats, how it works, side effects, and warnings, laid out as something you can actually scan.",
     lp_s2_t: "Check an interaction",
-    lp_s2_b: "Enter two or more medicines and get severity-rated, plain-English warnings, each one showing the source it came from. Never a green \\\"safe\\\" — only what was found, and what wasn't.",
+    lp_s2_b: "Enter two or more medicines and get severity-rated, plain-English warnings, each one showing the source it came from. Never a green \"safe\" — only what was found, and what wasn't.",
     lp_s3_t: "Scan your whole cabinet",
     lp_s3_b: "Save what you actually take, then check every medicine against every other one at once — not just a pair — and read the result as a severity grid.",
     lp_s4_t: "Symptoms, without a diagnosis",
     lp_s4_b: "An emergency red-flag checklist, plus a guide from everyday symptoms to the usual over-the-counter category. It will not tell you what's wrong with you, and it says so.",
+    lp_s5_t: "Scan the bottle",
+    lp_s5_b: "Point your phone's camera at the barcode and skip typing the name — Decode looks it up automatically.",
+    lp_s6_t: "Speaks your language",
+    lp_s6_b: "Switch between 13 languages any time, including Arabic, which flips the entire layout right-to-left.",
+    lp_s7_t: "Bring it to an appointment",
+    lp_s7_b: "Print a one-page summary of everything you take, or share a read-only link with a caregiver or doctor.",
+    lp_s8_t: "Tap any hard word",
+    lp_s8_b: "Underlined medical terms — like tachycardia or hepatotoxicity — show a plain-English meaning the moment you tap them.",
+    lp_s9_t: "Installs like an app",
+    lp_s9_b: "Add it to your home screen from the browser and it opens instantly, even with no signal.",
+    story_read_more: "Read the full story ↓",
+    story_read_less: "Show less ↑",
     lp_lim_eyebrow: "What Plainscript will never do",
     lp_lim_h2: "A tool that knows its limits.",
     lp_lim_sub: "Most health apps promise you everything. These refusals are deliberate design decisions, not missing features — each one is a place where being wrong could hurt somebody.",
@@ -12853,6 +12909,9 @@ function applyLang(lang, opts){
 function refreshDynamicContentForLang(){
   $("#rule-count").textContent = t("rule_count_prefix") + " " + INTERACTIONS.length + " " + t("rule_count_suffix");
   $("#last-reviewed").textContent = t("last_reviewed");
+  document.querySelectorAll(".lp-story-toggle").forEach(btn=>{
+    btn.textContent = t(btn.getAttribute("aria-expanded") === "true" ? "story_read_less" : "story_read_more");
+  });
   renderSymptomList();
   if (typeof renderAcct === "function") renderAcct();
   if (typeof renderCabinet === "function" && SB_ENABLED) renderCabinet();
@@ -14204,6 +14263,21 @@ fitAllSelects();
   show(0);
   restart();
 })();
+
+/* "Read the full story" toggle on long collapsed sections (.lp-story +
+   .lp-story-toggle pair, currently just the Task 6a problem section).
+   Same two-label-swap pattern as the read-aloud button. Re-usable for
+   any future long section — just reuse the same two classes. */
+document.querySelectorAll(".lp-story-toggle").forEach(btn=>{
+  const story = document.getElementById(btn.dataset.story);
+  if (!story) return;
+  btn.textContent = t("story_read_more");
+  btn.addEventListener("click", ()=>{
+    const open = story.classList.toggle("is-open");
+    btn.setAttribute("aria-expanded", open);
+    btn.textContent = t(open ? "story_read_less" : "story_read_more");
+  });
+});
 
 /* Turn on guest mode and open the cabinet. Nothing is migrated or deleted —
    if they later sign in, their account cabinet is separate and the guest list
