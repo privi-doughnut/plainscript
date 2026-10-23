@@ -1437,6 +1437,9 @@
       <span class="ticon" aria-hidden="true">🧒</span><span class="tlabel" data-i18n="explain_simpler_label">Simpler</span>
     </button>
     <!-- [PRIVI - FEATURE 5] add your new Glossary button here, same shape as the two above -->
+    <button id="glossary-toggle" class="themetoggle" data-i18n-aria-label="glossary_aria" title="Glossary">
+      <span class="ticon" aria-hidden="true">📖</span><span class="tlabel" data-i18n="glossary_label">Glossary</span>
+    </button>
     <div class="lang-select-wrap">
       <span class="ticon" aria-hidden="true">🌐</span>
       <select id="lang-select" aria-label="Switch language" title="Language">
@@ -3997,6 +4000,8 @@ const I18N = {
     decode_btn: "Decode",
 
     check_intro: "Add two or more medications. Plainscript checks them against a curated set of well‑documented interactions <em>and</em> cross‑references each drug's official FDA label.",
+    glossary_label: "Glossary",
+    glossary_aria: "Browse the glossary",
     rule_count_prefix: "Checks against",
     rule_count_suffix: "curated, sourced interaction rules.",
     last_reviewed: "Rule list was last verified Oct 2026",
@@ -11554,6 +11559,21 @@ function applyGlossary(scope){
     if (any){ out += esc(raw.slice(last)); p.innerHTML = out; p.dataset.glossed = "1"; }
   });
 }
+function openGlossaryModal(){
+  const trigger = document.activeElement;
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  const rows = Object.keys(GLOSSARY).sort()
+    .map(k => `<li><b>${esc(k)}</b> — ${esc(GLOSSARY[k])}</li>`).join("");
+  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-label="${esc(t("glossary_aria"))}" style="max-width:480px;">
+      <div class="modal-head"><h2>${esc(t("glossary_label"))}</h2><button class="mini" data-act="close">${t("close_btn")}</button></div>
+      <div class="modal-body"><ul>${rows}</ul></div></div>`;
+    document.body.appendChild(overlay);
+  function onEsc(e){ if (e.key==="Escape") close(); }
+  function close(){ overlay.remove(); document.removeEventListener("keydown", onEsc); if (trigger&&trigger.focus) trigger.focus(); }
+  document.addEventListener("keydown", onEsc);
+  overlay.addEventListener("click", e => { if (e.target===overlay) close(); const b=e.target.closest('[data-act="close"]'); if (b) close(); });
+}
 /* [PRIVI - FEATURE 5] write openGlossaryModal() here — modeled on
    openCabinetInsights (Cmd+F that name), see YOUR_TASKS.md */
 // one global handler: any click closes open popovers; a click on a term opens its own
@@ -12865,6 +12885,8 @@ function applyReadingMode(on, opts){
 }
 $("#reading-toggle").addEventListener("click", ()=>applyReadingMode(!document.body.classList.contains("easy-read")));
 try{ if (localStorage.getItem(READING_KEY)) applyReadingMode(true, {persist:false}); }catch(e){}
+
+$("#glossary-toggle").addEventListener("click", ()=> openGlossaryModal());
 
 /* "Explain even simpler" reading level — flips the plain-English rewrite
    between the default 8th-grade level and an explain-like-I'm-10 level.
