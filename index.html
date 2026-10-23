@@ -12678,14 +12678,30 @@ $("#symptom-btn").addEventListener("click", runSymptomLookup);
    ================================================================= */
 const TABS = ["decode","check","cabinet","symptoms"];
 function selectTab(which){
-  for (const t of TABS){
-    const on = t === which;
-    $("#tab-"+t).setAttribute("aria-selected", on);
-    $("#panel-"+t).hidden = !on;
+  for (const tab of TABS){
+    const on = tab === which;
+    $("#tab-"+tab).setAttribute("aria-selected", on);
+    $("#panel-"+tab).hidden = !on;
   }
   document.title = t("tab_" + which) + " — Plainscript";
+  try{
+    localStorage.setItem("plainscript.lastTab", which);
+  }catch(e){}
 }
 TABS.forEach(t => $("#tab-"+t).addEventListener("click", ()=>selectTab(t)));
+const lastTab = (() => {
+  try {
+    return localStorage.getItem("plainscript.lastTab");
+  } catch (e) {
+    return null;
+  }
+})();
+
+if (lastTab && TABS.includes(lastTab)) {
+  selectTab(lastTab);
+} else {
+  selectTab("decode"); 
+}
 
 $("#decode-btn").addEventListener("click", decode);
 $("#decode-input").addEventListener("keydown", e=>{ if(e.key==="Enter") decode(); });
@@ -12748,6 +12764,8 @@ try{
   const stored = localStorage.getItem(THEME_KEY);
   applyTheme(THEMES.includes(stored) ? stored : DEFAULT_THEME, {persist:false});
 }catch(e){ applyTheme(DEFAULT_THEME, {persist:false}); }
+
+
 
 /* easy-reading (dyslexia-friendly) mode — larger, more legible, looser
    spacing. Pure CSS body class, persisted in localStorage like theme. */
