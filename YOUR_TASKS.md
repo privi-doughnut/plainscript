@@ -253,9 +253,8 @@ your `what` / `why` / `mgmt` sentences **yourself, in your own words** — the o
 I won't write for you, since it's the content you're submitting as your own work. Send me
 your sentences plus the source paragraph before you commit.
 
-**Find it:** Cmd+F → `Hospitals routinely hold metformin` — that's the last rule. A few lines
-down is a line that's just `];`. Click the end of the line above it (ends `},`), Enter, add
-your new rule(s) there.
+**Find it:** Cmd+F → `[PRIVI - FEATURE 1]` — a comment marking exactly where to add your
+rule(s), right above the `];` that closes the list.
 
 **Example (made-up shape — not a real rule, don't copy the facts):**
 ```js
@@ -281,8 +280,8 @@ Check tab. Run the tests — still `# pass 78`? Only English is needed; I transl
 
 ### BONUS CODE 1 — Add a test for each rule you added · 30 min · do this right after Feature 1
 **Goal:** a test that fails if someone accidentally deletes a rule.
-**Find it:** `tests/engine.test.js`, Cmd+F → `the warfarin + NSAID major rule is present`
-(~line 53) — a real, working model test, already doing exactly the pattern you need:
+**Find it:** `tests/engine.test.js`, Cmd+F → `[PRIVI - BONUS 1]` — right under the real,
+working model test (the warfarin + NSAID one) that does exactly the pattern you need:
 ```js
   await t.test("the drugone + drugtwo rule is present", () => {
     const found = INTERACTIONS.some((r) =>
@@ -303,16 +302,18 @@ your rule's `a:`/`b:` lists exactly.
 meaning. Add a "Glossary" button near the theme/language pickers that opens a scrollable
 list of every term the app knows.
 
-**The button:** Cmd+F → `id="level-toggle"` — copy that button's exact shape (it's built on
-the same `themetoggle` class as `reading-toggle` just above it), give it a new `id`, a new
-icon character, and label text. You're not toggling anything on/off, so you can drop
-`aria-pressed`.
+**The button:** Cmd+F → `[PRIVI - FEATURE 5]` (there are two — one here in the header, by
+the theme/language pickers). Copy the `level-toggle` button right above it (same
+`themetoggle` class as `reading-toggle`), give it a new `id`, a new icon character, and
+label text. You're not toggling anything on/off, so you can drop `aria-pressed`.
 
 **Wiring the click:** Cmd+F → `$("#reading-toggle").addEventListener` — find by id, listen
 for a click, call a function you write (e.g. `openGlossaryModal()`).
 
-**The modal itself — closely related real example:** Cmd+F → `function openCabinetInsights`.
-Read the whole function; it's short and it's almost exactly your task already solved for a
+**The modal itself — closely related real example:** the second `[PRIVI - FEATURE 5]` marker
+(Cmd+F it again) sits right after `function applyGlossary` — that's where your new function
+goes. Then Cmd+F → `function openCabinetInsights` to read the model: it's short and it's
+almost exactly your task already solved for a
 different list: it builds an `overlay`, fills a `modal-box` with content built from
 **looping over a list and joining the results into one HTML string** (look at how it builds
 `bars` from `Object.entries(counts)`), appends the overlay to the page, and wires up
@@ -340,11 +341,13 @@ pops up, with a working Close button and Escape key.
 **Goal:** press `/` anywhere on the page and the Decode search box gets focus — the same
 pattern GitHub uses for its search bar.
 
-**Closely related (the shape, not an exact match):** Cmd+F → `document.addEventListener("keydown"`
-— there are several of these already in the file (mostly inside modals, closing on Escape).
-They all follow the same shape: listen on `document`, check `e.key`, act. Yours is the first
-one that also has to check *where the keypress happened* before acting — new for this file,
-but the surrounding shape (a document-level key listener) is everywhere.
+**Find it:** Cmd+F → `[PRIVI - BONUS 7]` — your new listener goes right there.
+
+**Closely related (the shape, not an exact match):** search `document.addEventListener("keydown"`
+elsewhere in the file (mostly inside modals, closing on Escape). They all follow the same
+shape: listen on `document`, check `e.key`, act. Yours is the first one that also has to
+check *where the keypress happened* before acting — new for this file, but the surrounding
+shape (a document-level key listener) is everywhere.
 
 **Step by step:**
 1. `document.addEventListener("keydown", e => { ... })` — a function that runs on every
@@ -376,12 +379,15 @@ text field, type a literal `/` — it types normally, nothing hijacked.
 
 **Goal:** let someone copy a drug's plain-English summary to paste into a text or email.
 
-**Closely related — a function that already does almost exactly this:** Cmd+F →
-`function addReadAloudButton` (~line 11398). It's called right next to where your Task 4
-line lives. Read it: it creates a button, appends it into the results box, and — look at the
-lines building `parts` and joining them into `text` — it already assembles the *entire*
-plain-text version of the result. You need that same assembled text; you're just doing
-something different with it once you have it.
+**Find it:** two `[PRIVI - BONUS 8]` markers — one right after `function addReadAloudButton`
+(write your new function there), one right after `addReadAloudButton(box);` inside `decode()`
+(call your new function there too).
+
+**Closely related — a function that already does almost exactly this:** read
+`addReadAloudButton` itself: it creates a button, appends it into the results box, and —
+look at the lines building `parts` and joining them into `text` — it already assembles the
+*entire* plain-text version of the result. You need that same assembled text; you're just
+doing something different with it once you have it.
 
 **The clipboard half — also already used elsewhere (Cmd+F `navigator.clipboard.writeText`,
 ~line 13471):**
@@ -422,9 +428,8 @@ Use the existing `sev_major`/`sev_moderate`/`sev_minor` translation keys for the
 instead of typing them — Cmd+F `sev_major:` to find them — so your legend is already
 translated into all 13 languages for free.
 
-**Where it goes:** Cmd+F → `class="panel-intro" data-i18n-html="check_intro"` — put your
-three chips right after that line, before `id="check-results"`. Wrap them in a flex row:
-`style="display:flex; gap:10px;"` is enough for something this small.
+**Where it goes:** Cmd+F → `[PRIVI - BONUS 9]` — your three chips go right there. Wrap them
+in a flex row: `style="display:flex; gap:10px;"` is enough for something this small.
 **Check:** the Check tab shows all three severity colors and words before you've typed
 anything.
 **Commit:** `Add a severity color legend to the Check tab`
@@ -500,7 +505,7 @@ Drafts for the factual ones are in `CAC_SUBMISSION.md`; the personal ones you wr
 | Time | On screen | What you say |
 |---|---|---|
 | 0:00–0:15 | You, or the homepage | Your name, school, district. "This is Plainscript. It turns the FDA's own drug labels into plain English and checks whether your medicines interact." |
-| 0:15–0:45 | Homepage, scrolling slowly | Your story, in your words. Then: "In January 2024 the National Library of Medicine shut down its free public drug-interaction API." |
+| 0:15–0:45 | Homepage, scrolling slowly | Your story, in your words. Then: "In January 2024 the National Library of Medicine shut down its free public drug-interaction API." Optional, if time allows — one sentence on why this isn't just another lookup tool: "What's out there is either built for clinicians, like Epocrates, or doesn't tell you where its answers came from. Plainscript does both — plain English, and every claim is sourced." **This is the first thing to cut if you're running long** — none of the six required video elements depend on it. |
 | 0:45–1:00 | "Built for people who get left out" | Who it's for: older adults, caregivers, non-native English speakers, anyone with low health literacy. |
 | 1:00–1:25 | **Decode** tab, live | Type a real drug. Point at the source line: "every fact here shows where it came from." |
 | 1:25–1:50 | **Check** tab, live | warfarin + aspirin — a real major interaction. Then an undocumented pair, landing on the empty state: "it says nothing was *found* — never that you're safe." |
@@ -538,10 +543,17 @@ Fill the bracket with only what you **actually** did. The exact wording is yours
 
 | Day | Do |
 |---|---|
-| **Fri Oct 23 (today)** | Feature 1 first — pick 4–5 candidates, read labels, draft sentences, send them to me. While waiting / after: Bonus Code 1, Feature 5, Bonus Codes 7/8/9, Bonus Writing 1, Tasks 8/9/10, video planning. |
-| **Sat–Sun Oct 24–25** | Whatever's left from today, translations, record and edit the video, write the AI disclosure, run the checklist below. |
-| **Submit by end of Sun Oct 25** | leaves Monday morning as real buffer, not the deadline itself. |
-| Mon Oct 26, before noon | Buffer only. Hard deadline: **12:00 PM EDT.** |
+| **Fri Oct 23 (today)** | Feature 1 first — pick 4–5 candidates, read labels, draft sentences, send them to me. Then whatever else you get to: Bonus Code 1, Feature 5, Bonus Codes 7/8/9, Bonus Writing 1, Tasks 8/9/10. |
+| **Sat Oct 24 — target submit day** | Record and edit the video (your stated real bottleneck), finish any writing tasks left over, answer the two remaining contest questions out loud to me, final AI disclosure. I drive the actual submission once the video's ready — see the note below. |
+| Sun Oct 25 | Buffer if Saturday slips. |
+| Mon Oct 26, before noon | Hard deadline: **12:00 PM EDT.** Do not treat this as the target — it's the wall. |
+
+**On submitting:** you asked me to handle the actual submission. I will — but I need the
+real submission form link from you first (I won't guess a government/contest URL), and
+once the video + answers are ready, I'll show you the exact filled-out form before I click
+anything, since it's a one-shot, no-late-entries, name-and-school-attached government
+submission. Same for YouTube: I can drive the upload, but I'll confirm with you at the
+moment it goes **public**, not before.
 
 **If time runs out, protect these in order:** the video → your story (6a/8/9/10, README,
 contest answers) → the accurate AI disclosure → everything else.
