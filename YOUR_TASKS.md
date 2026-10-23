@@ -98,7 +98,9 @@ searched the whole file for icon-only buttons missing an `aria-label` and found 
 one (carousel arrows, close buttons, remove buttons) already has one. Nothing for you to do
 there; it's just been crossed off.
 
-**Features:** Feature 2 ("Checks against N rules" line).
+**Features:** Feature 2 ("Checks against N rules" line) · Feature 5 (the standalone glossary
+modal — button, keys, `openGlossaryModal()`, and the click wiring, all four pieces written
+and connected by you; verified live with zero console errors).
 
 **Also fixed today, by me, during review** (noting this here so your AI disclosure stays
 accurate — this wasn't your work, it was debugging + polish on top of it):
@@ -296,7 +298,7 @@ your rule's `a:`/`b:` lists exactly.
 **Check:** `node --test tests/*.test.js` → pass count goes up by one per test added.
 **Commit:** `Add test for <drug> + <drug> rule`
 
-### FEATURE 5 — A standalone glossary reference · Privi's idea
+### ✅ FEATURE 5 — DONE — A standalone glossary reference · Privi's idea
 
 **Goal:** right now the glossary only shows up reactively — tap an underlined word, get a
 meaning. Add a "Glossary" button near the theme/language pickers that opens a scrollable
@@ -595,7 +597,7 @@ ready if a judge asks "what did you write."
 
 | Day | Do |
 |---|---|
-| **Fri Oct 23 (today)** | Feature 1 first — pick 4–5 candidates, read labels, draft sentences, send them to me. Then whatever else you get to: Bonus Code 1, Feature 5, Bonus Codes 7/8/9, Bonus Writing 1, Tasks 8/9/10. |
+| **Fri Oct 23 (today)** | Feature 1 first — pick 4–5 candidates, read labels, draft sentences, send them to me. Then whatever else you get to: Bonus Code 1, Bonus Codes 7/8/9, Bonus Writing 1, Tasks 8/9/10. |
 | **Sat Oct 24 — target submit day** | Record and edit the video (your stated real bottleneck), finish any writing tasks left over, answer the two remaining contest questions out loud to me, final AI disclosure. I drive the actual submission once the video's ready — see the note below. |
 | Sun Oct 25 | Buffer if Saturday slips. |
 | Mon Oct 26, before noon | Hard deadline: **12:00 PM EDT.** Do not treat this as the target — it's the wall. |
