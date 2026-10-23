@@ -1452,6 +1452,7 @@
   <!-- ===================== PANEL 2: CHECK ===================== -->
   <section class="panel" id="panel-check" role="tabpanel" aria-labelledby="tab-check" hidden>
     <p class="panel-intro" data-i18n-html="check_intro"></p>
+    <p class="status" id="rule-count"></p>
     <div class="druglist" id="drug-list"></div>
     <div class="checkbar">
       <button class="ghost" id="add-drug" data-i18n="add_drug_btn"></button>
@@ -3947,6 +3948,8 @@ const I18N = {
     decode_btn: "Decode",
 
     check_intro: "Add two or more medications. Plainscript checks them against a curated set of well‑documented interactions <em>and</em> cross‑references each drug's official FDA label.",
+    rule_count_prefix: "Checks against",
+    rule_count_suffix: "curated, sourced interaction rules.",
     last_reviewed: "Rule list was last verified Oct 2026",
     add_drug_btn: "+ Add another medication",
     check_btn: "Check interactions",
@@ -12847,6 +12850,7 @@ function applyLang(lang, opts){
    strings (not data-i18n), so a language switch mid-session doesn't
    leave stale-language content sitting next to freshly-translated chrome */
 function refreshDynamicContentForLang(){
+  $("#rule-count").textContent = t("rule_count_prefix") + " " + items.length + " " + t("rule_count_suffix");
   renderSymptomList();
   if (typeof renderAcct === "function") renderAcct();
   if (typeof renderCabinet === "function" && SB_ENABLED) renderCabinet();
