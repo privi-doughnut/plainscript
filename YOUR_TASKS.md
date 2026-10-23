@@ -516,6 +516,52 @@ Drafts for the factual ones are in `CAC_SUBMISSION.md`; the personal ones you wr
 **Rules of thumb:** don't narrate clicks, say what problem each thing solves · 2–3 takes,
 use your best · test demo drugs before recording · Do Not Disturb on.
 
+### Full script — read-through reference, not a script to recite word-for-word
+
+Fill in `[your name]` / `[grade]` / `[school]` / `[district]` — I don't have those. ~420
+words ≈ 2:30–2:50 spoken.
+
+> Hi, I'm [your name], a [grade]-grader at [school] in [district]. This is Plainscript — it
+> turns the FDA's own drug labels into plain English, and checks whether your medicines
+> interact.
+>
+> I've been obsessed with pill bottle labels since I could read — I used to try to decode my
+> parents' medicine bottles just to figure out what they did. It bothered me that I never
+> could. It bothered me a lot more when my cousin died from complications with his
+> medication — he was prescribed blood thinners and was never told how they'd interact with
+> what else he was taking. When I found out the National Library of Medicine shut down its
+> free drug-interaction API back in January 2024, I realized the honest, free way to check
+> this had basically disappeared. What's out there instead is either built for clinicians,
+> like Epocrates, or it doesn't tell you where its answer came from. Plainscript does both —
+> plain English, and every claim is sourced.
+>
+> It's built for people clinical language leaves behind — older adults juggling several
+> prescriptions, caregivers managing medicine for someone else, non-native English speakers,
+> anyone with limited health literacy.
+>
+> *(Decode tab, live)* Here's Decode. I'll type a real drug... and it pulls the actual FDA
+> label and explains it in plain English — what it treats, how it works, side effects — and
+> every fact shows exactly where it came from.
+>
+> *(Check tab, live)* Here's Check. Warfarin and aspirin — a real, documented major
+> interaction, severity-rated, sourced. Now a pair with nothing documented... it says nothing
+> was found. It never says you're safe. That's deliberate.
+>
+> *(Cabinet Scan)* This is Cabinet Scan — every medicine in your list checked against every
+> other one at once, not just a pair, shown as a heatmap.
+>
+> I built this with JavaScript, SQL, Cloudflare Workers, Supabase, and the openFDA and
+> RxNorm APIs. *(switch language to Arabic)* It also works in thirteen languages — watch what
+> happens when I switch to Arabic... the entire layout flips right-to-left.
+>
+> One more thing, honestly: I built this with a lot of help from an AI coding assistant. It
+> wrote most of the code. But every decision about what this app does and doesn't do — that's
+> mine. *(point to "What Plainscript will never do")* It never diagnoses, never recommends a
+> dose, never tells you to start or stop a medicine, and it never says a combination is safe.
+> Knowing what a tool should refuse to do is part of designing it.
+>
+> That's Plainscript. Thanks for watching.
+
 ## THE AI DISCLOSURE (be exact)
 
 > I designed Plainscript, chose what it does and what it will refuse to do, and wrote the
@@ -525,6 +571,12 @@ use your best · test demo drugs before recording · Do Not Disturb on.
 > retrieved from FDA labels, and the server prevents it from adding medical claims.
 
 Fill the bracket with only what you **actually** did. The exact wording is yours.
+
+**This now also lives on the site itself** — `ai-disclosure.html`, linked in the footer next
+to Privacy/Terms, same visual theme as both. I drafted its content from the real commit
+history; review it (Cmd+F `[PRIVI:` finds the one line only you can write) before it counts
+as final. It's a good thing to point the camera at in the video, and a good link to have
+ready if a judge asks "what did you write."
 
 ## Things judges might ask (practice answering)
 
