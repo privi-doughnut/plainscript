@@ -1,9 +1,10 @@
 # PLAINSCRIPT — Privi's complete guide
 
-Today is **Wed Oct 21**. **Deadline: Monday Oct 26, 12:00 PM EDT.** 5 days left.
+Today is **Fri Oct 23**. **Deadline: Monday Oct 26, 12:00 PM EDT.** 3 days left.
 
 You don't have to understand everything. You have to do ONE small task, see it work, and
-save it. You're already on a good run — keep going one task at a time.
+save it. Thursday was a genuinely strong solo day — 9 tasks pushed, including writing your
+real homepage story. Keep going one task at a time.
 
 ## How this guide works
 
@@ -339,7 +340,7 @@ steps 1 and 2.
 Judges are congressional staffers, not engineers. The code shows skill; **your words show
 why it matters.** Yes — you write the homepage paragraphs. Here's exactly how.
 
-## First, a one-line CSS fix so your new sections look right · Task 6 · 10 min
+## ✅ First, a one-line CSS fix so your new sections look right · Task 6 · 10 min · DONE
 
 **Goal:** headings in some homepage sections aren't styled like the others. Fix once, so your
 new sections look right.
@@ -398,7 +399,7 @@ Same, but `class="lp-limits"`. Use it for every *other* section so they alternat
 - Need two paragraphs? Add another `<p class="lp-sub">…</p>` or use
   `<p class="lp-note">…</p>` for small gray print.
 
-## TASK 6a — "The problem" (marker 6) · the most important thing you'll write
+## ✅ TASK 6a — DONE — "The problem" (marker 6) · the most important thing you'll write
 
 **Goal:** the first thing a judge reads after the hero. Your real story.
 
@@ -533,7 +534,7 @@ rule *you* added. **Hint:** the name between the quotes has to match the name in
 **Check:** `node --test tests/*.test.js` → `# pass 79` (one more than 78).
 **Commit:** `Add test for warfarin + amiodarone rule`
 
-## BONUS CODE 2 — Add glossary words (batch of ~30) · 2–3 hrs
+## ✅ BONUS CODE 2 — DONE (you added ~47!) — Add glossary words
 **Goal:** more hard words become tappable with plain meanings. This one scales well —
 each word is the same one-line pattern repeated, so doing 30 is just doing 1 thirty times.
 **Find it:** Cmd+F → `"idiopathic":"with no known cause"` (line ~11434). The list above it
@@ -576,7 +577,7 @@ than guessing from the pool above and then checking each one is actually used an
 words show up underlined. Run the tests (`node --test tests/*.test.js`) — still `# pass 78`.
 **Commit:** one commit is fine for the whole batch: `Add ~30 glossary terms from MedlinePlus`
 
-## BONUS CODE 3 — "Last reviewed" date · 20 min
+## ✅ BONUS CODE 3 — DONE — "Last reviewed" date · 20 min
 **Goal:** the footer or Check tab says when the rule list was last verified. Honest and
 judge-friendly.
 **Find it:** Cmd+F → `check_intro:` (first hit, English). Add a line under it of your own
@@ -592,7 +593,7 @@ carousel buttons already have (`aria-label="Next"`). **Example:**
 If a match already has `aria-label`, skip it. Tell me the list before you commit and I'll
 translate the labels.
 
-## BONUS CODE 5 — Browser tab title changes with the tool · 20 min
+## ✅ BONUS CODE 5 — DONE — Browser tab title changes with the tool · 20 min
 
 **Goal:** right now the browser tab always says "Plainscript — Medication Reference," even
 if you're on the Check tab or Cabinet. A small, real touch: make the tab title reflect
@@ -623,7 +624,7 @@ widen the window or hover the tab to see the full title). Switch languages and c
 title updates too.
 **Commit:** `Update the browser tab title to match the active tool`
 
-## BONUS CODE 6 — Remember your last tab across reloads · 20 min
+## ✅ BONUS CODE 6 — DONE — Remember your last tab across reloads · 20 min
 
 **Goal:** right now every reload lands you back on Decode. Remember whichever tab you were
 last on.
@@ -724,7 +725,7 @@ is fine for something this small).
 anything.
 **Commit:** `Add a severity color legend to the Check tab`
 
-## BONUS CODE 10 — Show how many drugs you've added to Check · 15 min
+## ✅ BONUS CODE 10 — DONE — Show how many drugs you've added to Check · 15 min
 
 **Goal:** the Check tab caps you at 15 drugs (`MAX_CHECK_ROWS`) but never tells you where
 you stand until you hit the limit. Show a running count.
@@ -836,7 +837,7 @@ few lines to the line that is just `];`. Click at the end of the line above it (
 the Check tab. Run the tests. Only English is needed; I translate the rest.
 **Commit:** `Add warfarin + amiodarone interaction rule`
 
-## FEATURE 2 — "Checks against N rules" line · 45 min
+## ✅ FEATURE 2 — DONE — "Checks against N rules" line · 45 min
 
 A real number on the Check tab that grows every time you add a rule.
 
@@ -1036,10 +1037,10 @@ In the video you say one plain sentence of this.
 | ~~Thu Oct 15~~ | ~~Tasks 2 and 3~~ |
 | ~~Fri Oct 16~~ | ~~Task 4~~ |
 | ~~Sat–Sun Oct 17–18~~ | ~~Task 5~~ |
-| **Wed Oct 21 (today)** | ✅ Tasks 1–5 done and pushed. Feature 1: pick 4–5 candidates, read their labels, draft your `what`/`why`/`mgmt` sentences for all of them — send them to me, don't commit yet. |
-| **Thu Oct 22 — solo day, no live check-in** | The self-contained ones: **Feature 2, Feature 5 (glossary modal), Bonus Code 2 (~30 glossary words), Bonus Code 3/4/5/6/7/8/9/10, Bonus Writing 1** (legal blanks). None of these need me to check anything mid-task. If there's time left, draft (don't finalize) Tasks 6a/8/9/10 and the README blurb — rough is fine, we'll tighten wording Friday. |
-| **Fri Oct 23, 10:00 AM** | Back with me: finalize and commit Feature 1's batch, Bonus Code 1 (its test), review your homepage drafts, **video planning**, first practice take. **Submitting today is a stretch goal, not the plan** — it's only realistic if the video's recorded, the homepage is written, and the disclosure is accurate by end of day. Don't rush any of those three to hit Friday; Sun Oct 25 is the real backstop below. |
-| **Sat–Sun Oct 24–25** | Whatever's left: finish homepage writing + translations, record and edit the video, write the AI disclosure, run the full checklist below. |
+| ~~Wed Oct 21~~ | ~~Tasks 1–5, CSS heading fix (Task 6)~~ |
+| ~~Thu Oct 22~~ | ~~Bonus Codes 2/3/5/6/10, Feature 2, and Task 6a (the homepage story) — 9 commits, solo, no live check-in. Three real bugs turned up in audit Friday morning and got fixed (see note below); nothing was lost.~~ |
+| **Fri Oct 23 (today)** | Feature 1 hasn't been started yet — that's today's first job: pick 4–5 candidates from the list below, read their real labels, draft your `what`/`why`/`mgmt` sentences yourself, send them to me with the source paragraphs. Once I check them and you commit, still open today if there's time: Bonus Code 1 (its test), Feature 5 (glossary modal), the remaining Bonus Codes (4/7/8/9), Bonus Writing 1 (legal blanks), and **video planning**. |
+| **Sat–Sun Oct 24–25** | Whatever's left: Tasks 8/9/10 + the rest of the homepage writing, translations, record and edit the video, write the AI disclosure, run the full checklist below. |
 | **Submit by end of Sun Oct 25** | leaves Monday morning as real buffer, not the deadline itself. |
 | Mon Oct 26, before noon | Buffer only. Hard deadline: **12:00 PM EDT.** |
 
