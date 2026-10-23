@@ -56,6 +56,9 @@ test("curated data", async (t) => {
       (r.b.includes("warfarin") && r.a.includes("ibuprofen")));
     assert.ok(found, "the textbook warfarin/NSAID bleeding interaction is missing");
   });
+
+  // [PRIVI - BONUS 1] add one t.test(...) here per rule you added in Feature 1,
+  // modeled on the warfarin + NSAID test above
 });
 
 /* ------------------------------------------------------------------ *

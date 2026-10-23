@@ -1435,6 +1435,7 @@
     <button id="level-toggle" class="themetoggle" aria-pressed="false" data-i18n-aria-label="explain_simpler_aria" title="Explain even simpler" hidden>
       <span class="ticon" aria-hidden="true">🧒</span><span class="tlabel" data-i18n="explain_simpler_label">Simpler</span>
     </button>
+    <!-- [PRIVI - FEATURE 5] add your new Glossary button here, same shape as the two above -->
     <div class="lang-select-wrap">
       <span class="ticon" aria-hidden="true">🌐</span>
       <select id="lang-select" aria-label="Switch language" title="Language">
@@ -1498,6 +1499,7 @@
     <p class="panel-intro" data-i18n-html="check_intro"></p>
     <p class="status" id="rule-count"></p>
     <p class="status" id="last-reviewed"></p>
+    <!-- [PRIVI - BONUS 9] add your severity-color legend here -->
     <div class="druglist" id="drug-list"></div>
     <div class="checkbar">
       <button class="ghost" id="add-drug" data-i18n="add_drug_btn"></button>
@@ -10453,6 +10455,7 @@ const INTERACTIONS = [
     mgmt:{en:"Hospitals routinely hold metformin before/after contrast imaging per protocol.",
           es:"Los hospitales rutinariamente pausan la metformina antes/después de estudios con contraste, según el protocolo.",
           zh:"医院通常会按照规程，在使用含碘造影剂前后常规暂停二甲双胍。", vi:"Các bệnh viện thường quy định tạm ngừng metformin trước/sau khi chụp chiếu có cản quang theo đúng quy trình.", ar:"تُوقف المستشفيات الميتفورمين بشكل روتيني قبل/بعد التصوير بالتباين وفقًا للبروتوكول.", fr:"Les hôpitaux suspendent systématiquement la metformine avant/après l'imagerie avec contraste selon le protocole.", ko:"병원은 프로토콜에 따라 조영 영상 검사 전후에 메트포르민을 일상적으로 중단합니다.", ru:"Больницы по протоколу рутинно приостанавливают метформин до/после контрастной визуализации.", pt:"Os hospitais rotineiramente suspendem a metformina antes/depois de imagens com contraste, conforme o protocolo.", de:"Krankenhäuser setzen Metformin gemäß Protokoll routinemäßig vor/nach Kontrastmittel-Bildgebung aus.", ja:"病院ではプロトコルに従い、造影画像検査の前後で日常的にメトホルミンを中止します。", hi:"अस्पताल प्रोटोकॉल के अनुसार कंट्रास्ट इमेजिंग से पहले/बाद में नियमित रूप से metformin रोकते हैं।", ta:"மருத்துவமனைகள் நெறிமுறைப்படி மாறுதல் படமெடுப்புக்கு முன்/பின் metformin ஐ வழக்கமாக நிறுத்திவைக்கின்றன."} }
+  /* [PRIVI - FEATURE 1] add your new interaction rule(s) here, right above this line */
 ];
 
 /* ---- SYMPTOM → OTC CATEGORY (Symptoms tab) -----------------------
@@ -11388,6 +11391,7 @@ async function decode(){
   // accessibility: a read-aloud button (Web Speech, feature-detected) and
   // plain-English glossary tooltips on the medical jargon in the label text.
   addReadAloudButton(box);
+  // [PRIVI - BONUS 8] call your new addCopyButton(box) here too
   applyGlossary(box);
   if (box.querySelector(".gloss")) box.insertAdjacentHTML("beforeend", `<p class="status">${esc(t("glossary_hint"))}</p>`);
 }
@@ -11424,6 +11428,9 @@ function addReadAloudButton(box){
   const head = card.querySelector(".card-head") || card;
   head.appendChild(btn);
 }
+
+/* [PRIVI - BONUS 8] write addCopyButton(box) here, modeled on
+   addReadAloudButton above */
 
 /* Plain-English glossary — taps a scary medical word for a one-line
    definition. Curated (Plainscript's own content), never invented per
@@ -11532,6 +11539,8 @@ function applyGlossary(scope){
     if (any){ out += esc(raw.slice(last)); p.innerHTML = out; p.dataset.glossed = "1"; }
   });
 }
+/* [PRIVI - FEATURE 5] write openGlossaryModal() here — modeled on
+   openCabinetInsights (Cmd+F that name), see YOUR_TASKS.md */
 // one global handler: any click closes open popovers; a click on a term opens its own
 document.addEventListener("click", e => {
   const g = e.target.closest(".gloss");
@@ -12760,8 +12769,10 @@ const lastTab = (() => {
 if (lastTab && TABS.includes(lastTab)) {
   selectTab(lastTab);
 } else {
-  selectTab("decode"); 
+  selectTab("decode");
 }
+
+/* [PRIVI - BONUS 7] add your "/" keyboard shortcut listener here */
 
 $("#decode-btn").addEventListener("click", decode);
 $("#decode-input").addEventListener("keydown", e=>{ if(e.key==="Enter") decode(); });
