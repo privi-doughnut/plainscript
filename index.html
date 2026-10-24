@@ -1439,7 +1439,10 @@
   <section class="lp-feat"><div class="wrap">
     <span class="eyebrow">Who made this</span>
     <h2>A sophomore, mostly out of his depth.</h2>
+    <div class="lp-story" id="story-10">
     <p class="lp-sub">I'm Privi, a sophomore at Ballantine Ridge High School in the Charlotte-Mecklenburg County School District. I'm primarily a Python coder, so building this almost entirely in JavaScript was genuinely hard. The syntax took a while to get used to, and functions especially were never my strong suit, even in Python, honestly. Being forced to use them constantly on this project is what finally made them click for me. I didn't always take coding seriously either, my first real project took five months to finish, but somewhere along the way, especially after AP Computer Science, it became one of my favorite hobbies. My advice to another student building something like this: whatever you put into a project is what you get out of it, and if it's something that could actually affect people's lives, give it your best. Build what excites you, and the feeling when you finally finish is pure euphoria. So get excited.</p>
+    </div>
+    <button type="button" class="lp-story-toggle" data-story="story-10" aria-expanded="false" aria-controls="story-10"></button>
   </div></section>
 
   <section class="lp-end"><div class="wrap">
@@ -15019,18 +15022,22 @@ fitAllSelects();
 })();
 
 /* "Read the full story" toggle on long collapsed sections (.lp-story +
-   .lp-story-toggle pair, currently just the Task 6a problem section).
-   Same two-label-swap pattern as the read-aloud button. Re-usable for
-   any future long section — just reuse the same two classes. */
+   .lp-story-toggle pair). Same two-label-swap pattern as the read-aloud
+   button. Delegated (not wired per-button at boot) so it also works on
+   .lp-story-toggle buttons rendered later into dynamic content — decode
+   results, interaction verdicts — without needing to be re-wired after
+   every render. */
 document.querySelectorAll(".lp-story-toggle").forEach(btn=>{
+  if (!btn.textContent) btn.textContent = t("story_read_more");
+});
+document.addEventListener("click", e => {
+  const btn = e.target.closest(".lp-story-toggle");
+  if (!btn) return;
   const story = document.getElementById(btn.dataset.story);
   if (!story) return;
-  btn.textContent = t("story_read_more");
-  btn.addEventListener("click", ()=>{
-    const open = story.classList.toggle("is-open");
-    btn.setAttribute("aria-expanded", open);
-    btn.textContent = t(open ? "story_read_less" : "story_read_more");
-  });
+  const open = story.classList.toggle("is-open");
+  btn.setAttribute("aria-expanded", open);
+  btn.textContent = t(open ? "story_read_less" : "story_read_more");
 });
 
 /* Turn on guest mode and open the cabinet. Nothing is migrated or deleted —
