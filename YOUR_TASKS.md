@@ -35,7 +35,7 @@ medicine against every other one). Plus Symptoms: an emergency red-flag list + O
 never a diagnosis.
 
 **How it flows:** you type "warfarin" → RxNorm (NIH) fixes spelling and finds the official
-drug ID → openFDA returns the real label text → `INTERACTIONS` (17 hand-checked rules in
+drug ID → openFDA returns the real label text → `INTERACTIONS` (36 hand-checked rules in
 `index.html`, each with a severity) flags anything documented between your drugs. Claude is
 used in exactly one optional place: rephrasing label text that was already fetched, in a
 locked, rephrase-only prompt on the server (`worker.js`) — it can't add claims.
@@ -47,7 +47,7 @@ real severity · never diagnoses, doses, or says start/stop a medicine.
 
 **Severity scale, least to greatest:** `minor` → `moderate` → `major`.
 
-**Files:** `index.html` is the whole app (~15,000 lines). `tests/engine.test.js` is 78
+**Files:** `index.html` is the whole app (~15,000 lines). `tests/engine.test.js` is 97
 automated checks. `worker.js` is the locked AI proxy. `privacy.html`/`terms.html` are the
 legal pages. `README.md` is the public overview. `CAC_SUBMISSION.md` has contest-answer
 drafts + the video script.
@@ -60,7 +60,7 @@ drafts + the video script.
 **C.** Chrome → `http://localhost:8899/index.html`. Once per session: Cmd+Option+I →
 Application → Service Workers → Unregister, then Cmd+Shift+R.
 **D.** Before starting: `node --test tests/*.test.js` (or the full nvm path below if that
-errors) — look for `# pass 78` or more.
+errors) — look for `# pass 97` or more (started at 78, grew after Feature 1 + Bonus Code 1).
 ```sh
 /Users/privivijayakumar/.nvm/versions/node/v22.23.1/bin/node --test tests/*.test.js
 ```
@@ -100,7 +100,21 @@ there; it's just been crossed off.
 
 **Features:** Feature 2 ("Checks against N rules" line) · Feature 5 (the standalone glossary
 modal — button, keys, `openGlossaryModal()`, and the click wiring, all four pieces written
-and connected by you; verified live with zero console errors).
+and connected by you; verified live with zero console errors) · **Feature 1** — 19 new
+interaction rules (17 → 36 total), each individually drafted by you, fact-checked against
+real FDA/DailyMed sources and standard clinical references, with corrections made where
+your severity judgment or wording didn't match the source. Verified live (warfarin +
+amiodarone renders correctly as a Major card).
+
+**⚠️ Not committed yet** — you're away from the Mac with no remote access tonight. The
+Feature 1 edit is sitting on disk, safe, waiting for your three `git` lines whenever you're
+back or have remote access. Nothing is lost by waiting.
+
+**Bonus Code 1** — done, but written by me rather than you: one existence-check test per
+new rule (97 tests total, up from 78), pure mechanical substitution of already-decided drug
+names into the existing test pattern, no content or judgment involved. Also uncommitted,
+same as Feature 1. Worth a short, honest mention in your disclosure's "what Claude wrote"
+side if you want to be extra precise, though the blanket statement already covers it.
 
 **Also fixed today, by me, during review** (noting this here so your AI disclosure stays
 accurate — this wasn't your work, it was debugging + polish on top of it):
@@ -145,7 +159,7 @@ needs to contrast with it:
   label.
 - RxNorm = NIH's official drug names; fixes misspellings. Can't: say anything about
   interactions.
-- Curated rules = 17 pairs a person checked against FDA labels, each with severity. Can't:
+- Curated rules = 36 pairs a person checked against FDA labels, each with severity. Can't:
   cover every pair — "nothing found" is not "safe."
 
 **Closely related:** look at the "What Plainscript will never do" section right below this
@@ -220,7 +234,7 @@ each. Send them to me; I'll check them against the contest rules, not rewrite th
 
 ## Code — today's priority
 
-### FEATURE 1 — Add real interaction rules · the most important thing left · BEST ONE
+### ✅ FEATURE 1 — DONE (uncommitted) — Add real interaction rules
 
 The checker uses 17 hand-written rules. This is the single most useful thing left to do, and
 it's reading + writing, not hard code — a JS rule object is just a Python dict with string
@@ -277,10 +291,10 @@ the list needs one, like a trailing comma in a Python list literal, except JS ac
 requires it between items).
 
 **Hint:** read the neighboring rules to copy their tone. Test by typing both drugs in the
-Check tab. Run the tests — still `# pass 78`? Only English is needed; I translate the rest.
+Check tab. Run the tests — count should only go up from here, never down.
 **Commit (per rule, or for the whole batch):** `Add <drug> + <drug> interaction rule`
 
-### BONUS CODE 1 — Add a test for each rule you added · 30 min · do this right after Feature 1
+### ✅ BONUS CODE 1 — DONE (uncommitted) — Add a test for each rule you added
 **Goal:** a test that fails if someone accidentally deletes a rule.
 **Find it:** `tests/engine.test.js`, Cmd+F → `[PRIVI - BONUS 1]` — right under the real,
 working model test (the warfarin + NSAID one) that does exactly the pattern you need:
@@ -597,7 +611,7 @@ ready if a judge asks "what did you write."
 
 | Day | Do |
 |---|---|
-| **Fri Oct 23 (today)** | Feature 1 first — pick 4–5 candidates, read labels, draft sentences, send them to me. Then whatever else you get to: Bonus Code 1, Bonus Codes 7/8/9, Bonus Writing 1, Tasks 8/9/10. |
+| **Fri Oct 23 (today)** | ✅ Feature 1 (19 rules, verified) and Bonus Code 1 both done — not yet committed, waiting until you're back at the Mac. Whatever else you got to tonight: Bonus Codes 7/8/9, Bonus Writing 1, Tasks 8/9/10. |
 | **Sat Oct 24 — target submit day** | Record and edit the video (your stated real bottleneck), finish any writing tasks left over, answer the two remaining contest questions out loud to me, final AI disclosure. I drive the actual submission once the video's ready — see the note below. |
 | Sun Oct 25 | Buffer if Saturday slips. |
 | Mon Oct 26, before noon | Hard deadline: **12:00 PM EDT.** Do not treat this as the target — it's the wall. |
@@ -622,5 +636,5 @@ contest answers) → the accurate AI disclosure → everything else.
 - [ ] Live site loads on your phone
 - [ ] Source link works: https://github.com/privi-doughnut/plainscript
 - [ ] Anthropic spend limit set + Cloudflare rate limit on the Worker
-- [ ] Tests still say `# pass 78` (or more)
+- [ ] Tests still say `# pass 97` (or more)
 - [ ] Submitted at least a day before Monday noon
