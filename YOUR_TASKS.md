@@ -466,6 +466,10 @@ slightly more playful hover state on the feature cards. None of this affects jud
 pure polish. If there's real time left after Sunday's checklist is clean, tell me and I'll
 either build it or walk you through the simplest one (scroll-reveal) as a mini lesson.
 
+**Also noted:** a hover effect (lift + drop shadow) on the source/feature list items — like
+the ones in "Every fact traces back to one of three places" — so the homepage reads as more
+interactive, not just static text.
+
 **Do not build:** anything that diagnoses, a dose calculator, more languages, analytics.
 
 ---
