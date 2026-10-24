@@ -22,7 +22,7 @@
 <meta name="apple-mobile-web-app-title" content="Plainscript" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet" />
 <style>
   /* ============================================================
      PLAINSCRIPT — design tokens
@@ -909,6 +909,14 @@
     .modal-box{animation:overlayIn .16s ease both;}   /* crossfade only, no motion */
   }
   .modal-head{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:14px;}
+  /* ---------- glossary modal: alphabetical sections ---------- */
+  .gloss-section + .gloss-section{margin-top:18px;}
+  .gloss-section .gloss-letter{
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.1em;
+    color:var(--accent); margin:0 0 6px; padding-bottom:4px; border-bottom:1px solid var(--line);
+  }
+  .gloss-section ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px;}
+  .gloss-section li{font-size:14.5px; line-height:1.5;}
   .modal-head h2{font-family:var(--serif); font-size:21px; font-weight:600; margin:0;}
   .modal-tabs{display:flex; gap:4px; border-bottom:1px solid var(--line); margin-bottom:16px; flex-wrap:wrap;}
   .mtab{
@@ -950,7 +958,8 @@
   /* easy-reading (dyslexia-friendly) mode — opt-in via header toggle */
   body.easy-read{ --reading-scale:1.12; }
   body.easy-read .card-body p, body.easy-read .row p, body.easy-read .panel-intro,
-  body.easy-read .selfcare-row p, body.easy-read .relief-note, body.easy-read .lede{
+  body.easy-read .selfcare-row p, body.easy-read .relief-note, body.easy-read .lede,
+  body.easy-read .glossary-modal li{
     font-size:calc(1em * var(--reading-scale)); line-height:1.85; letter-spacing:0.01em; word-spacing:0.06em;
     font-family:"Atkinson Hyperlegible","Verdana",var(--sans);
   }
@@ -12187,11 +12196,22 @@ function openGlossaryModal(){
   const trigger = document.activeElement;
   const overlay = document.createElement("div");
   overlay.className = "modal-overlay";
-  const rows = Object.keys(GLOSSARY).sort()
-    .map(k => `<li><b>${esc(k)}</b> — ${esc(GLOSSARY[k])}</li>`).join("");
-  overlay.innerHTML = `<div class="modal-box" role="dialog" aria-modal="true" aria-label="${esc(t("glossary_aria"))}" style="max-width:480px;">
+  // group alphabetically (A, B, C…) rather than one long flat list — each
+  // section is already alphabetized for free since GLOSSARY's keys are
+  // sorted before being bucketed by first letter
+  const sections = {};
+  Object.keys(GLOSSARY).sort((a,b)=>a.localeCompare(b)).forEach(k=>{
+    const letter = k[0].toUpperCase();
+    (sections[letter] = sections[letter] || []).push(k);
+  });
+  const body = Object.keys(sections).sort().map(letter => `
+    <div class="gloss-section">
+      <h3 class="gloss-letter">${esc(letter)}</h3>
+      <ul>${sections[letter].map(k => `<li><b>${esc(k)}</b> — ${esc(GLOSSARY[k])}</li>`).join("")}</ul>
+    </div>`).join("");
+  overlay.innerHTML = `<div class="modal-box glossary-modal" role="dialog" aria-modal="true" aria-label="${esc(t("glossary_aria"))}" style="max-width:480px;">
       <div class="modal-head"><h2>${esc(t("glossary_label"))}</h2><button class="mini" data-act="close">${t("close_btn")}</button></div>
-      <div class="modal-body"><ul>${rows}</ul></div></div>`;
+      <div class="modal-body">${body}</div></div>`;
     document.body.appendChild(overlay);
   function onEsc(e){ if (e.key==="Escape") close(); }
   function close(){ overlay.remove(); document.removeEventListener("keydown", onEsc); if (trigger&&trigger.focus) trigger.focus(); }
