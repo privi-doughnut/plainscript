@@ -21,9 +21,11 @@ in January 2024. The people most affected are exactly those least served by
 clinical jargon: older adults, caregivers managing several people's medicines,
 non-native English speakers, and anyone with limited health literacy.
 
-[PRIVI: 2–3 sentences on the personal spark — who you saw struggle with a
-label, or the moment you realized this was worth building. This is the part
-judges remember. Keep it real and specific.]
+My cousin died from a medication interaction nobody ever warned him about. He
+was on blood thinners and had no idea how they'd interact with everything
+else he was taking, and a small cut turned fatal because of it. That's the
+moment this stopped being a coding idea and became something I had to
+actually finish.
 
 ## What Plainscript does
 - **Decode** — type any drug (brand or generic) and get a plain-English
@@ -74,14 +76,19 @@ Control. Knowing what a tool should *refuse* to do is part of the design.
   offline service worker.
 
 ## Challenges & what I learned
-[PRIVI: pick 2–3 real ones in your own words. Strong candidates from the build:]
 - Designing an AI feature that is *useful* but *cannot* fabricate medical
   claims — the two-condition verbatim guardrail on "Ask the label."
 - Handling the loss of a free interaction API by building and reviewing a
   curated interaction set responsibly.
 - Making one interface genuinely usable across 13 languages, right-to-left
   layouts, and low-literacy users.
-- [PRIVI: what was hardest for *you*, and what you'd do differently.]
+- The hardest part for me personally wasn't any of that, it was just learning
+  JavaScript well enough to actually direct this project instead of only
+  reviewing it. I came in as a Python coder, and functions especially never
+  clicked for me until I was forced to use them constantly here. If I did it
+  again, I'd start the translation work earlier instead of leaving most of it
+  for the final few days, which is exactly when a judge reviewing the project
+  found real gaps in it that I had to scramble to fix.
 
 ## What's next
 Google sign-in, a demo video, and continued security hardening; the framework
@@ -108,7 +115,7 @@ to verify a working app.
 | Time | On screen | What you say |
 |---|---|---|
 | 0:00–0:15 | You, or the homepage | Your name, school, district. "This is Plainscript. It turns the FDA's own drug labels into plain English and checks whether your medicines interact." *Gets three required elements done immediately.* |
-| 0:15–0:45 | Homepage, scrolling slowly | **`[PRIVI: your story]`** — who you watched struggle with a label. Then the structural fact: "In January 2024 the National Library of Medicine shut down its free public drug-interaction API. The authoritative free way to check this mostly disappeared." |
+| 0:15–0:45 | Homepage, scrolling slowly | **"My cousin died from a medication interaction nobody ever told him about. He was on blood thinners and didn't know how they'd interact with what else he was taking."** Then the structural fact: "In January 2024 the National Library of Medicine shut down its free public drug-interaction API. The authoritative free way to check this mostly disappeared." |
 | 0:45–1:00 | "Built for people who get left out" section | Who it's for, explicitly: older adults, caregivers managing several people's medicines, non-native English speakers, anyone with low health literacy. |
 | 1:00–1:25 | Decode tab, live | Type a real drug. Point at the source line under a claim: "every fact here shows where it came from." |
 | 1:25–1:50 | Check tab, live | **warfarin + aspirin.** Real major interaction. Then do a pair with nothing documented and land on the empty state: "it says nothing was *found* — it never says you're safe. That's deliberate." |
@@ -187,7 +194,12 @@ inflate: the restraint is the differentiator.
 - A real bug: a failed FDA lookup used to look identical to "we checked and found
   nothing" — in a medication tool that is a safety bug, not a styling one.
 
-**What you'd do differently** — `[PRIVI: yours]`. An honest answer beats a polished one.
+**What you'd do differently** — Start the translation work earlier. A lot of the
+13-language work got left for the last few days of the deadline, and a judge
+reviewing the project found real gaps in it that I had to scramble to fix. I'd
+also lean into JavaScript sooner instead of treating it like a detour from
+Python — functions didn't click for me until I had no choice but to use them
+constantly.
 
 **Who it's for** — older adults, caregivers managing several people's medicines,
 non-native English speakers, people with low health literacy.

@@ -63,7 +63,7 @@
 - ✅ **Voice input** — a mic button next to Decode, Check, and My Cabinet's inputs (Web Speech API, feature-detected — silently absent in browsers that don't support it, like Firefox). Decode auto-searches on speech since it's read-only; My Cabinet just fills the field so you can review before saving.
 
 ## Phase 6 — Trust & launch polish 🔨
-- 🔨 **"Why I built this"** — a placeholder is in `README.md`, explicitly marked `[PRIVI: voice this]` with a few prompts. Deliberately NOT written for you in a fake voice — this is the one item on this whole roadmap only you can actually finish.
+- ✅ **"Why I built this"** — filled in `README.md`, in Privi's own voice.
 - ✅ **FAQ** + full **sources/methodology page** — 6 new questions added to the existing methodology accordion (substitute for a pharmacist?, why isn't my med showing up, data freshness, free forever?, caregiving for someone else, what if I find an error).
 - ✅ **"Report an error"** feedback loop — a footer link to a pre-filled GitHub Issues form (not a mailto, to avoid baking a personal email into public source — swap it for something else if you'd rather).
 - ✅ Accessibility pass — computed real WCAG contrast ratios for every core color pair in both themes (found and fixed several failures), added missing focus-visible states, fixed a pre-existing unstyled remove button, corrected ARIA roles on the similar/related modal's tabs.

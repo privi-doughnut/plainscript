@@ -48,12 +48,12 @@ Companion docs: `CLAUDE.md` = architecture + safety rules · `PLAINSCRIPT_ROADMA
 - All P0/P1/P2 audit bugs fixed.
 - **`YOUR_TASKS.md`** — 13 scoped tasks Privi writes himself, easiest to hardest, with a Python→JS cheat sheet.
 
-**Open gap worth tracking:** homepage copy is English-only while the page itself claims 13 languages. Translate once the copy is final (it's structured for it).
+**Resolved 2026-10-24:** the i18n gap above is closed — every curated rule, UI string, and the severity-key tooltips are translated into all 13 languages, with a regression test guarding it.
 
 ## 1. Only Privi can do these
-- [ ] **"Why I built this"** — fill the `[PRIVI: voice this]` placeholder in `README.md`, in your own voice.
-- [ ] **`[PRIVI: personal spark]` + `[PRIVI: 2-3 real challenges]`** in `CAC_SUBMISSION.md` — every comparable past CAC winner researched (PillPall, CareCompanion, Your Medicine) had a concrete personal story; this is the biggest lever left on the Concept score.
-- [ ] **CAC demo video** — required for the submission per the 2026 rules.
+- [X] **"Why I built this"** — `README.md` is filled, in Privi's own voice.
+- [X] **Personal spark + challenges** in `CAC_SUBMISSION.md` — filled from material Privi already gave (the cousin story, the Python-to-JavaScript learning curve).
+- [ ] **CAC demo video** — required for the submission per the 2026 rules. Still the one real blocker.
 - [ ] **Deploy commit `e6fc0f4`** — `npx wrangler deploy -c wrangler.jsonc` from `~/plainscript-remote` (direct wrangler execution is blocked for Claude by the auto-mode classifier; run with the `!` prefix).
 - [ ] **Enable Google sign-in** — Supabase → Authentication → Providers → Google: toggle on + Client ID/Secret from Google Cloud Console (OAuth "Web application"); set that client's Authorized redirect URI to `https://rxwbyyhukmxsknmhhzsn.supabase.co/auth/v1/callback`. (Magic-link already works, so this is optional-ish.)
 - [ ] **Check Cloudflare Workers Builds** — the git auto-deploy stalled on 2026-08-03/04. Fallback that works reliably: `npx wrangler deploy -c wrangler.jsonc` run from `~/plainscript-remote` (NOT `~` — the config path is repo-relative). Worth confirming the pipeline is healthy.
@@ -186,9 +186,8 @@ bar for "covered health app" is lower than founders assume.
 **Actions, sorted honestly:**
 - *Legally required:* nothing newly identified. The §7 items stand — the biggest is still the
   Washington MHMDA-style prominent disclosure, which the published privacy policy now covers.
-- *Strongly advisable:* fill the two live placeholders (contact address, governing-law state).
-  A published policy containing `[PRIVI: …]` is worse than no policy — it reads as unfinished
-  to exactly the person who would care.
+- *Done:* the two live placeholders (contact address, governing-law state) are filled in
+  `privacy.html`/`terms.html`.
 - *Strongly advisable:* keep the duplicate-ingredient warning informational. Never let it
   become an instruction.
 - *Nice to have:* a short written note of the shared-device defect and its fix, dated. If
