@@ -431,10 +431,10 @@
 
   .lp-hero h1{font-family:var(--serif); font-size:clamp(34px, 4.4vw, 54px); line-height:1.08; font-weight:600; letter-spacing:-.02em; margin:0 0 18px; max-width:20ch;}
   .lp-accent{color:var(--accent);}
-  .lp-sub{font-size:18px; line-height:1.55; color:var(--ink-soft); margin:0 0 26px; max-width:60ch;}
+  .lp-sub{font-size:18px; line-height:1.55; color:var(--ink-soft); margin:0 0 26px; max-width:90ch;}
   .lp-cta{display:flex; gap:11px; flex-wrap:wrap; margin-bottom:26px;}
   .lp-strip{font-family:var(--mono); font-size:13px; color:var(--ink-faint); letter-spacing:.02em; margin:0 0 10px;}
-  .lp-note{font-size:14px; color:var(--ink-faint); margin:0; max-width:62ch;}
+  .lp-note{font-size:14px; color:var(--ink-faint); margin:0; max-width:90ch;}
 
   /* ---------- feature carousel ----------
      Slides are stacked and cross-faded rather than translated on a rail: it
@@ -452,7 +452,7 @@
   .car-slide.is-on{opacity:1; visibility:visible;}
   .car-num{font-family:var(--mono); font-size:12px; color:var(--accent); letter-spacing:.06em;}
   .car-slide h3{font-family:var(--serif); font-size:25px; font-weight:600; margin:8px 0 10px;}
-  .car-slide p{margin:0; color:var(--ink-soft); font-size:16px; line-height:1.6; max-width:62ch;}
+  .car-slide p{margin:0; color:var(--ink-soft); font-size:16px; line-height:1.6; max-width:90ch;}
 
   .car-controls{display:flex; align-items:center; gap:14px; margin-top:18px;}
   .car-dots{display:flex; gap:8px; flex:1;}
@@ -469,7 +469,7 @@
   .lp-limits h2, .lp-end h2, .lp-feat h2{font-family:var(--serif); font-size:33px; font-weight:600; letter-spacing:-.015em; margin:6px 0 16px;}
   /* Severity colours are reserved for real severity, so this list uses the
      neutral accent rail — it must read as considered, not as a warning. */
-  .lp-never{list-style:none; padding:0; margin:26px 0 22px; display:grid; gap:12px; max-width:70ch;}
+  .lp-never{list-style:none; padding:0; margin:26px 0 22px; display:grid; gap:12px; max-width:95ch;}
   .lp-never li{
     padding:13px 16px; border-left:2px solid var(--accent); background:var(--paper);
     border-radius:0 var(--radius) var(--radius) 0; font-size:16px; line-height:1.5;
@@ -1388,7 +1388,7 @@
     </ul>
   </div></section>
 
-  <section class="lp-limits"><div class="wrap">
+  <section class="lp-feat"><div class="wrap">
     <span class="eyebrow" data-i18n="lp_lim_eyebrow">What Plainscript will never do</span>
     <h2 data-i18n="lp_lim_h2">A tool that knows its limits.</h2>
     <p class="lp-sub" data-i18n="lp_lim_sub">Most health apps promise you everything. These refusals are deliberate design decisions, not missing features — each one is a place where being wrong could hurt somebody.</p>
@@ -1402,7 +1402,7 @@
     <p class="lp-note" data-i18n="lp_lim_note">The one place a language model is used, it may only rephrase text already retrieved from an FDA label — it cannot introduce a medical claim. That rule is enforced on the server, not by trust.</p>
   </div></section>
 
-  <section class="lp-feat"><div class="wrap">
+  <section class="lp-limits"><div class="wrap">
     <span class="eyebrow">Who this is built for</span>
     <h2>Built for people who get left out.</h2>
     <p class="lp-sub">Most health tools assume English, a reliable connection, and no trouble reading. Plainscript doesn't.</p>
@@ -1415,7 +1415,7 @@
     </ul>
   </div></section>
 
-  <section class="lp-limits"><div class="wrap">
+  <section class="lp-feat"><div class="wrap">
     <span class="eyebrow">Who made this</span>
     <h2>A sophomore, mostly out of his depth.</h2>
     <p class="lp-sub">I'm Privi, a sophomore at Ballantine Ridge High School in the Charlotte-Mecklenburg County School District. I'm primarily a Python coder, so building this almost entirely in JavaScript was genuinely hard — the syntax took a while, and functions especially were never my strong suit, even in Python. Being forced to use them constantly on this project is what finally made them click. I didn't always take coding seriously — my first real project took five months to finish — but somewhere along the way, especially after AP Computer Science, it became one of my favorite hobbies. My advice to another student building something like this: whatever you put into a project is what you get out of it, and if it's something that could actually affect people's lives, give it your best. Build what excites you, and the feeling when you finally finish is pure euphoria. So get excited.</p>
@@ -11970,18 +11970,28 @@ function addReadAloudButton(box){
   const reset = ()=>{ speaking = false; btn.textContent = t("read_aloud"); };
   btn.addEventListener("click", ()=>{
     if (speaking){ window.speechSynthesis.cancel(); reset(); return; }
+    // Only the drug name and actual prose paragraphs -- not section eyebrows
+    // like "FDA LABEL · MECHANISM OF ACTION", which read aloud as label noise
+    // ("mechanism of action. acetaminophen...") rather than natural speech.
     const parts = [];
-    box.querySelectorAll(".card .name, .card .eyebrow, .card p[data-role='text']").forEach(el=>{
-      const s = (el.textContent||"").trim(); if (s) parts.push(s);
+    box.querySelectorAll(".card .name, .card p[data-role='text']").forEach(el=>{
+      let s = (el.textContent||"").trim();
+      if (!s) return;
+      s = s.replace(/[.!?]+$/, ""); // strip trailing punctuation so joining below never doubles it up
+      parts.push(s);
     });
     const text = parts.join(". ");
     if (!text) return;
     const u = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices() || [];
-    const v = voices.find(v => (v.lang||"").toLowerCase().startsWith(uiLang));
+    const langVoices = voices.filter(v => (v.lang||"").toLowerCase().startsWith(uiLang));
+    // prefer a non-local (cloud) voice when one's available -- e.g. Chrome's
+    // "Google ..." voices -- the OS's bundled default voice tends to sound
+    // noticeably more robotic
+    const v = langVoices.find(v => v.localService === false) || langVoices[0];
     if (v) u.voice = v;
     u.lang = (v && v.lang) || uiLang;
-    u.rate = 0.98; u.onend = reset; u.onerror = reset;
+    u.rate = 0.85; u.onend = reset; u.onerror = reset;
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(u);
     speaking = true; btn.textContent = t("read_stop");
