@@ -602,6 +602,27 @@
   button.ghost:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
   button.ghost:active{transform:scale(.97);}
 
+  /* ---------- sitewide interactive feedback ----------
+     A small hover "pop" and a mechanical press-down on every clickable
+     control, not just the two button classes above -- chips, tabs, FAQ
+     disclosures, the theme/language pickers. Deliberately subtle: a 1px
+     lift and a 3% press, nothing bouncy. The rule was "if it's in the
+     user's face, it's a turn off" -- anything louder than this overshoots
+     that. prefers-reduced-motion already kills all transitions globally
+     (see the *{transition:none} rule near the top), so this degrades to
+     an instant (not animated) state change there, never literally absent. */
+  button:not(:disabled), [role="button"], summary, .tab, .mtab, .lang-select-wrap{
+    transition: transform .12s cubic-bezier(.2,.65,.3,1);
+  }
+  button:not(:disabled):hover, [role="button"]:hover, summary:hover,
+  .tab:hover, .mtab:hover, .lang-select-wrap:hover{
+    transform: translateY(-1px);
+  }
+  button:not(:disabled):active, [role="button"]:active, summary:active,
+  .tab:active, .mtab:active{
+    transform: scale(.97);
+  }
+
   .druglist{display:flex; flex-direction:column; gap:9px; margin:0 0 12px;}
   .drugrow{display:flex; gap:9px; align-items:center;}
   /* .rm is reused for both the pairwise Check-tab row AND the My Cabinet
@@ -13447,6 +13468,42 @@ document.addEventListener("keydown", e => {
     e.preventDefault();
     $("#decode-input").focus();
   }
+});
+
+/* ---- soft "clack" click sound ----------------------------------------
+   A short, quiet synthesized tick on every real control click (buttons,
+   tabs, chips, FAQ disclosures) — a little bit of the "it responded"
+   feedback a mechanical keyboard gives you, kept deliberately quiet and
+   brief so it never reads as a notification sound. Synthesized with Web
+   Audio rather than an audio file, so there's nothing to fetch and
+   nothing added to the no-runtime-dependencies rule. The AudioContext is
+   created lazily on the first real click, never on page load, to stay
+   inside browser autoplay policy. */
+let _clickAudioCtx = null;
+function playClickSound(){
+  try{
+    if (!_clickAudioCtx) _clickAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = _clickAudioCtx;
+    if (ctx.state === "suspended") ctx.resume();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(950, now);
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(2200, now);
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.05, now + 0.002);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+    osc.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+    osc.start(now); osc.stop(now + 0.04);
+  }catch(e){ /* Web Audio unavailable — fail quietly, this is pure polish */ }
+}
+document.addEventListener("click", e => {
+  const el = e.target.closest && e.target.closest(
+    'button:not(:disabled), [role="button"], summary, .tab, .mtab, .lang-select-wrap');
+  if (el) playClickSound();
 });
 $("#decode-btn").addEventListener("click", decode);
 $("#decode-clear-btn").addEventListener("click", ()=>{
