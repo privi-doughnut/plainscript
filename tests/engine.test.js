@@ -793,12 +793,49 @@ test("sharedIngredients", async (t) => {
     assert.deepEqual(Array.from(duplicates[0].shared), ["acetaminophen"]);
   });
 
-  await t.test("the same product entered twice is NOT reported as a double dose", () => {
+  await t.test("the same product entered twice is NOT reported as a double dose, but IS reported as entered twice", () => {
     // sameDrug() must remove this before the shared-ingredient check runs,
-    // otherwise every repeated entry becomes a false alarm
+    // otherwise every repeated entry becomes a false alarm -- but it should
+    // not vanish silently either (Feature 3): the engine should say *something*
+    // useful about it instead of a `continue` with no trace.
     const a = withSubs("Tylenol", ["acetaminophen"]);
     const b = withSubs("Tylenol", ["acetaminophen"]);
-    assert.equal(analyzeDrugPairs([a, b]).duplicates.length, 0);
+    const result = analyzeDrugPairs([a, b]);
+    assert.equal(result.duplicates.length, 0);
+    assert.equal(result.sameDrugPairs.length, 1);
+    assert.equal(result.sameDrugPairs[0].A.display, "Tylenol");
+    assert.equal(result.sameDrugPairs[0].B.display, "Tylenol");
+  });
+
+  await t.test("brand and generic of the same drug (matching rxcui) are also caught as the same medicine", () => {
+    const brand = { name: "Tylenol", display: "Tylenol", tokens: new Set(["tylenol"]),
+      label: { substances: ["acetaminophen"], generic: "acetaminophen", rxcui: "161" }, labelUnverified: false };
+    const generic = { name: "acetaminophen", display: "Acetaminophen", tokens: new Set(["acetaminophen"]),
+      label: { substances: ["acetaminophen"], generic: "acetaminophen", rxcui: "161" }, labelUnverified: false };
+    const result = analyzeDrugPairs([brand, generic]);
+    assert.equal(result.duplicates.length, 0, "same rxcui is the SAME drug, not two products sharing an ingredient");
+    assert.equal(result.sameDrugPairs.length, 1);
+  });
+
+  await t.test("renderSameDrugPairs explains a literal repeat vs. a brand/generic match differently", () => {
+    const i18nSandbox = loadEngine({
+      t: (k) => ({
+        samedrug_eyebrow: "Entered twice", samedrug_pill: "same medicine",
+        samedrug_body_same: "{{name}} appears twice in this check — there's only one unique medicine here to compare, not two.",
+        samedrug_body_diff: "{{a}} and {{b}} are the same medicine under different names (brand vs. generic, or a matching ingredient) — this list only has one unique medicine to compare, not two.",
+      }[k] || k),
+    });
+    const { renderSameDrugPairs } = i18nSandbox;
+
+    const literalRepeat = renderSameDrugPairs([{ A: withSubs("Tylenol", []), B: withSubs("Tylenol", []) }]);
+    assert.match(literalRepeat, /Tylenol appears twice/);
+    assert.ok(!/\bsafe\b/i.test(literalRepeat));
+
+    const brandGeneric = renderSameDrugPairs([{ A: withSubs("Tylenol", []), B: withSubs("Acetaminophen", []) }]);
+    assert.match(brandGeneric, /Tylenol and Acetaminophen are the same medicine/);
+
+    assert.equal(renderSameDrugPairs([]), "");
+    assert.equal(renderSameDrugPairs(undefined), "");
   });
 
   await t.test("renders the shared ingredient and escapes it", () => {

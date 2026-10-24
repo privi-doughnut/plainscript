@@ -155,6 +155,7 @@ function loadEngine(stubs = {}) {
     grabFunction("analyzeDrugPairs"),
     grabFunction("renderUnverifiedWarning"),
     grabFunction("renderUncertainDuplicates"),
+    grabFunction("renderSameDrugPairs"),
     grabFunction("renderResults"),
     grabFunction("renderDuplicates"),
     // `function` declarations land on the sandbox object automatically, but

@@ -299,7 +299,7 @@
   .lang-select-wrap select{
     appearance:none; -webkit-appearance:none; border:none; background:transparent;
     font-family:var(--mono); font-size:12px; letter-spacing:.03em; color:var(--ink-soft);
-    cursor:pointer; padding:8px 2px; outline:none;
+    cursor:pointer; padding:10px 4px; outline:none;
   }
   .lang-select-wrap select:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px;}
   /* the dropdown's own option list renders with the OS/browser's native
@@ -705,6 +705,14 @@
   .v-moderate{background:var(--mod-bg);} .v-moderate .bar{background:var(--mod-bar);} .v-moderate .pill{background:var(--mod-bar); color:var(--mod-on);} .v-moderate .sev{color:var(--mod-ink);}
   .v-minor{background:var(--minor-bg);} .v-minor .bar{background:var(--minor-bar);} .v-minor .pill{background:var(--minor-bar); color:var(--minor-on);} .v-minor .sev{color:var(--minor-ink);}
   .v-note{background:var(--note-bg);} .v-note .bar{background:var(--note-bar);} .v-note .pill{background:var(--note-bar); color:var(--note-on);} .v-note .sev{color:var(--note-ink); font-size:16px;}
+
+  /* ---------- severity legend (Check tab) ---------- */
+  .severity-legend{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:12px 16px; margin:4px 0 12px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .severity-legend .sev-legend-row{display:flex; gap:14px; flex-wrap:wrap;}
+  .severity-legend .sev{display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600;}
 
   /* Severity pill text now comes from per-theme --*-on tokens above. This
      replaces a [data-theme="dark"]-scoped override that never applied to the
@@ -1522,11 +1530,13 @@
     <p class="panel-intro" data-i18n-html="check_intro"></p>
     <p class="status" id="rule-count"></p>
     <p class="status" id="last-reviewed"></p>
-<div style="display:flex; gap:10px;">
-  <span class="v-major"><span class="pill" data-i18n="sev_major"></span></span>
-  <span class="v-moderate"><span class="pill" data-i18n="sev_moderate"></span></span>
-  <span class="v-minor"><span class="pill" data-i18n="sev_minor"></span></span>
-</div>
+    <div class="severity-legend">
+      <span class="eyebrow" data-i18n="severity_key_label"></span>
+      <div class="sev-legend-row">
+        <span class="v-major sev"><span class="pill">major</span> <span data-i18n="sev_major"></span></span>
+        <span class="v-moderate sev"><span class="pill">moderate</span> <span data-i18n="sev_moderate"></span></span>
+      </div>
+    </div>
     <div class="druglist" id="drug-list"></div>
     <div class="checkbar">
       <button class="ghost" id="add-drug" data-i18n="add_drug_btn"></button>
@@ -4164,6 +4174,9 @@ const I18N = {
     dup_body_suffix: "Taking them together can mean a double dose of the same medicine without realising it.",
     dup_ask: "Ask a pharmacist before taking these together.",
     dup_src: "Both FDA labels list this active ingredient",
+    samedrug_eyebrow: "Entered twice", samedrug_pill: "same medicine",
+    samedrug_body_same: "{{name}} appears twice in this check — there's only one unique medicine here to compare, not two.",
+    samedrug_body_diff: "{{a}} and {{b}} are the same medicine under different names (brand vs. generic, or a matching ingredient) — this list only has one unique medicine to compare, not two.",
     check_denom_prefix: "Checked against",
     check_denom_suffix: "documented interaction pairs. That is a small set, so most combinations are not in it. This is not a clearance.",
     reminders_enable: "Turn on dose reminders",
@@ -4253,6 +4266,7 @@ const I18N = {
     check_checking_prefix: "Checking",
     check_checking_suffix: "medications against the curated set and their FDA labels…",
     documented_interactions: "Documented interactions",
+    severity_key_label: "Severity key",
     sev_major: "Major interaction", sev_moderate: "Moderate interaction", sev_minor: "Minor interaction",
     why_label: "Why:", mgmt_label: "What people usually do:",
     src_curated_interaction: "Source: curated from FDA prescribing information &amp; standard clinical references",
@@ -4813,6 +4827,9 @@ const I18N = {
     dup_body_suffix: "Tomarlos juntos puede significar una dosis doble del mismo medicamento sin darte cuenta.",
     dup_ask: "Consulta a un farmacéutico antes de tomarlos juntos.",
     dup_src: "Ambas etiquetas de la FDA indican este ingrediente activo",
+    samedrug_eyebrow: "Añadido dos veces", samedrug_pill: "mismo medicamento",
+    samedrug_body_same: "{{name}} aparece dos veces en esta verificación — aquí solo hay un medicamento único para comparar, no dos.",
+    samedrug_body_diff: "{{a}} y {{b}} son el mismo medicamento bajo nombres distintos (marca frente a genérico, o un ingrediente coincidente) — esta lista solo tiene un medicamento único para comparar, no dos.",
     check_denom_prefix: "Comparado con",
     check_denom_suffix: "pares de interacciones documentadas. Es un conjunto pequeño, así que la mayoría de las combinaciones no están incluidas. Esto no es una autorización.",
     reminders_enable: "Activar recordatorios de dosis",
@@ -4867,6 +4884,7 @@ const I18N = {
     check_checking_prefix: "Revisando",
     check_checking_suffix: "medicamentos contra el conjunto curado y sus etiquetas de la FDA…",
     documented_interactions: "Interacciones documentadas",
+    severity_key_label: "Clave de gravedad",
     sev_major: "Interacción grave", sev_moderate: "Interacción moderada", sev_minor: "Interacción leve",
     why_label: "Por qué:", mgmt_label: "Qué suele hacerse:",
     src_curated_interaction: "Fuente: curado a partir de información de prescripción de la FDA y referencias clínicas estándar",
@@ -5305,6 +5323,9 @@ const I18N = {
     dup_body_suffix: "同时服用可能在不知不觉中造成同一种药物的双倍剂量。",
     dup_ask: "同时服用前请咨询药剂师。",
     dup_src: "两份 FDA 标签都列出了该有效成分",
+    samedrug_eyebrow: "重复添加", samedrug_pill: "同一种药物",
+    samedrug_body_same: "{{name}} 在本次检查中出现了两次——这里实际上只有一种独特的药物可供比较，而不是两种。",
+    samedrug_body_diff: "{{a}} 和 {{b}} 是同一种药物的不同名称（品牌名与通用名，或成分相同）——这份清单实际上只有一种独特的药物可供比较，而不是两种。",
     check_denom_prefix: "已比对",
     check_denom_suffix: "对已记录的相互作用组合。这个集合很小，大多数组合并不在其中。这不代表通过检查。",
     reminders_enable: "开启服药提醒",
@@ -5348,6 +5369,7 @@ const I18N = {
     check_min_two: "请至少输入两种药物进行比较。",
     check_checking_prefix: "正在检查", check_checking_suffix: "种药物，对照整理的集合及其FDA标签…",
     documented_interactions: "已记录的相互作用",
+    severity_key_label: "严重程度图例",
     sev_major: "严重相互作用", sev_moderate: "中度相互作用", sev_minor: "轻度相互作用",
     why_label: "为什么：", mgmt_label: "人们通常会怎么做：",
     src_curated_interaction: "来源：根据FDA处方信息和标准临床参考文献整理",
@@ -5774,6 +5796,9 @@ const I18N = {
     dup_body_suffix: "Dùng chung có thể vô tình gây ra liều gấp đôi của cùng một thuốc.",
     dup_ask: "Hãy hỏi dược sĩ trước khi dùng chung.",
     dup_src: "Cả hai nhãn FDA đều ghi hoạt chất này",
+    samedrug_eyebrow: "Đã nhập hai lần", samedrug_pill: "cùng một loại thuốc",
+    samedrug_body_same: "{{name}} xuất hiện hai lần trong lần kiểm tra này — ở đây chỉ có một loại thuốc duy nhất để so sánh, không phải hai.",
+    samedrug_body_diff: "{{a}} và {{b}} là cùng một loại thuốc nhưng mang tên khác nhau (tên biệt dược và tên chung, hoặc trùng hoạt chất) — danh sách này chỉ có một loại thuốc duy nhất để so sánh, không phải hai.",
     check_denom_prefix: "Đã đối chiếu với",
     check_denom_suffix: "cặp tương tác đã được ghi nhận. Đây là tập hợp nhỏ, nên hầu hết các kết hợp không có trong đó. Đây không phải là sự chấp thuận.",
     reminders_enable: "Bật nhắc nhở liều dùng",
@@ -5817,6 +5842,7 @@ const I18N = {
     check_min_two: "Vui lòng nhập ít nhất hai loại thuốc để so sánh.",
     check_checking_prefix: "Đang kiểm tra", check_checking_suffix: "loại thuốc, đối chiếu với bộ dữ liệu đã biên soạn và nhãn FDA của chúng…",
     documented_interactions: "Tương tác đã ghi nhận",
+    severity_key_label: "Chú giải mức độ nghiêm trọng",
     sev_major: "Tương tác nghiêm trọng", sev_moderate: "Tương tác mức độ vừa", sev_minor: "Tương tác nhẹ",
     why_label: "Vì sao:", mgmt_label: "Mọi người thường làm gì:",
     src_curated_interaction: "Nguồn: biên soạn từ thông tin kê đơn của FDA &amp; các tài liệu tham khảo lâm sàng tiêu chuẩn",
@@ -6250,6 +6276,9 @@ const I18N = {
     dup_body_suffix: "تناولهما معًا قد يعني جرعة مضاعفة من الدواء نفسه دون أن تدرك.",
     dup_ask: "اسأل الصيدلي قبل تناولهما معًا.",
     dup_src: "كلا ملصقي FDA يذكران هذه المادة الفعالة",
+    samedrug_eyebrow: "أُدخل مرتين", samedrug_pill: "نفس الدواء",
+    samedrug_body_same: "{{name}} يظهر مرتين في هذا الفحص — يوجد هنا دواء واحد فريد فقط للمقارنة، وليس اثنين.",
+    samedrug_body_diff: "{{a}} و{{b}} هما نفس الدواء بأسماء مختلفة (اسم تجاري مقابل اسم عام، أو مادة فعالة متطابقة) — تحتوي هذه القائمة على دواء واحد فريد فقط للمقارنة، وليس اثنين.",
     check_denom_prefix: "تمت المقارنة مع",
     check_denom_suffix: "أزواج تفاعل موثّقة. هذه مجموعة صغيرة، لذا معظم التركيبات ليست ضمنها. هذا ليس تصريحًا بالأمان.",
     reminders_enable: "تفعيل تذكيرات الجرعات",
@@ -6306,6 +6335,7 @@ const I18N = {
     check_checking_prefix: "جارٍ التحقق من",
     check_checking_suffix: "أدوية مقابل المجموعة المُعدّة وملصقات FDA الخاصة بها…",
     documented_interactions: "التفاعلات الموثّقة",
+    severity_key_label: "مفتاح الخطورة",
     sev_major: "تفاعل كبير", sev_moderate: "تفاعل متوسط", sev_minor: "تفاعل طفيف",
     why_label: "لماذا:", mgmt_label: "ما يفعله الناس عادةً:",
     src_curated_interaction: "المصدر: مُعدّ من معلومات وصف FDA والمراجع السريرية القياسية",
@@ -6757,6 +6787,9 @@ const I18N = {
     dup_body_suffix: "Les prendre ensemble peut représenter une double dose du même médicament sans que vous le sachiez.",
     dup_ask: "Demandez à un pharmacien avant de les prendre ensemble.",
     dup_src: "Les deux étiquettes FDA indiquent ce principe actif",
+    samedrug_eyebrow: "Ajouté deux fois", samedrug_pill: "même médicament",
+    samedrug_body_same: "{{name}} apparaît deux fois dans cette vérification — il n'y a ici qu'un seul médicament unique à comparer, pas deux.",
+    samedrug_body_diff: "{{a}} et {{b}} sont le même médicament sous des noms différents (marque ou générique, ou un ingrédient identique) — cette liste ne contient qu'un seul médicament unique à comparer, pas deux.",
     check_denom_prefix: "Comparé à",
     check_denom_suffix: "paires d'interactions documentées. C'est un ensemble restreint : la plupart des combinaisons n'y figurent pas. Ce n'est pas un feu vert.",
     reminders_enable: "Activer les rappels de prise",
@@ -6813,6 +6846,7 @@ const I18N = {
     check_checking_prefix: "Vérification de",
     check_checking_suffix: "médicaments par rapport à l'ensemble sélectionné et à leurs étiquettes FDA…",
     documented_interactions: "Interactions documentées",
+    severity_key_label: "Légende de gravité",
     sev_major: "Interaction majeure", sev_moderate: "Interaction modérée", sev_minor: "Interaction mineure",
     why_label: "Pourquoi :", mgmt_label: "Ce que les gens font habituellement :",
     src_curated_interaction: "Source : sélectionné à partir des informations de prescription de la FDA &amp; des références cliniques standard",
@@ -7264,6 +7298,9 @@ const I18N = {
     dup_body_suffix: "함께 복용하면 자신도 모르게 같은 약을 두 배로 복용하게 될 수 있습니다.",
     dup_ask: "함께 복용하기 전에 약사에게 문의하세요.",
     dup_src: "두 FDA 라벨 모두 이 유효성분을 표시합니다",
+    samedrug_eyebrow: "두 번 입력됨", samedrug_pill: "동일한 약",
+    samedrug_body_same: "{{name}}이(가) 이 검사에서 두 번 나타납니다 — 여기에는 비교할 고유한 약이 하나뿐이며, 둘이 아닙니다.",
+    samedrug_body_diff: "{{a}}와(과) {{b}}는 이름만 다를 뿐 같은 약입니다(브랜드명과 일반명, 또는 동일 성분) — 이 목록에는 비교할 고유한 약이 하나뿐이며, 둘이 아닙니다.",
     check_denom_prefix: "다음과 대조했습니다:",
     check_denom_suffix: "건의 문서화된 상호작용 쌍. 작은 집합이므로 대부분의 조합은 포함되어 있지 않습니다. 이것은 안전 승인이 아닙니다.",
     reminders_enable: "복용 알림 켜기",
@@ -7320,6 +7357,7 @@ const I18N = {
     check_checking_prefix: "확인 중:",
     check_checking_suffix: "개 약을 정리된 자료 및 FDA 라벨과 대조하는 중…",
     documented_interactions: "문서화된 상호작용",
+    severity_key_label: "심각도 범례",
     sev_major: "중대한 상호작용", sev_moderate: "중등도 상호작용", sev_minor: "경미한 상호작용",
     why_label: "왜:", mgmt_label: "사람들이 보통 하는 것:",
     src_curated_interaction: "출처: FDA 처방 정보 &amp; 표준 임상 참고 자료에서 정리",
@@ -7771,6 +7809,9 @@ const I18N = {
     dup_body_suffix: "Приём вместе может незаметно привести к двойной дозе одного и того же лекарства.",
     dup_ask: "Спросите фармацевта, прежде чем принимать их вместе.",
     dup_src: "Оба ярлыка FDA указывают это действующее вещество",
+    samedrug_eyebrow: "Введено дважды", samedrug_pill: "одно и то же лекарство",
+    samedrug_body_same: "{{name}} появляется дважды в этой проверке — здесь только одно уникальное лекарство для сравнения, а не два.",
+    samedrug_body_diff: "{{a}} и {{b}} — это одно и то же лекарство под разными названиями (торговое и непатентованное, или совпадающее действующее вещество) — в этом списке только одно уникальное лекарство для сравнения, а не два.",
     check_denom_prefix: "Сверено с",
     check_denom_suffix: "задокументированных пар взаимодействий. Это небольшой набор, поэтому большинства сочетаний в нём нет. Это не допуск.",
     reminders_enable: "Включить напоминания о приёме",
@@ -7827,6 +7868,7 @@ const I18N = {
     check_checking_prefix: "Проверка",
     check_checking_suffix: "лекарств по составленному набору и их этикеткам FDA…",
     documented_interactions: "Задокументированные взаимодействия",
+    severity_key_label: "Легенда серьёзности",
     sev_major: "Серьёзное взаимодействие", sev_moderate: "Умеренное взаимодействие", sev_minor: "Незначительное взаимодействие",
     why_label: "Почему:", mgmt_label: "Что обычно делают:",
     src_curated_interaction: "Источник: составлено из информации о назначении FDA &amp; стандартных клинических справочников",
@@ -8278,6 +8320,9 @@ const I18N = {
     dup_body_suffix: "Tomá-los juntos pode significar uma dose dupla do mesmo medicamento sem você perceber.",
     dup_ask: "Pergunte a um farmacêutico antes de tomá-los juntos.",
     dup_src: "Ambos os rótulos da FDA indicam este ingrediente ativo",
+    samedrug_eyebrow: "Adicionado duas vezes", samedrug_pill: "mesmo medicamento",
+    samedrug_body_same: "{{name}} aparece duas vezes nesta verificação — aqui há apenas um medicamento único para comparar, não dois.",
+    samedrug_body_diff: "{{a}} e {{b}} são o mesmo medicamento com nomes diferentes (marca versus genérico, ou um ingrediente correspondente) — esta lista tem apenas um medicamento único para comparar, não dois.",
     check_denom_prefix: "Comparado com",
     check_denom_suffix: "pares de interação documentados. É um conjunto pequeno, então a maioria das combinações não está nele. Isto não é uma liberação.",
     reminders_enable: "Ativar lembretes de dose",
@@ -8334,6 +8379,7 @@ const I18N = {
     check_checking_prefix: "Verificando",
     check_checking_suffix: "medicamentos com o conjunto selecionado e suas bulas da FDA…",
     documented_interactions: "Interações documentadas",
+    severity_key_label: "Legenda de gravidade",
     sev_major: "Interação grave", sev_moderate: "Interação moderada", sev_minor: "Interação leve",
     why_label: "Por quê:", mgmt_label: "O que as pessoas costumam fazer:",
     src_curated_interaction: "Fonte: selecionado das informações de prescrição da FDA &amp; referências clínicas padrão",
@@ -8785,6 +8831,9 @@ const I18N = {
     dup_body_suffix: "Beides zusammen einzunehmen kann unbemerkt eine doppelte Dosis desselben Wirkstoffs bedeuten.",
     dup_ask: "Fragen Sie eine Apothekerin oder einen Apotheker, bevor Sie beides zusammen einnehmen.",
     dup_src: "Beide FDA-Etiketten führen diesen Wirkstoff auf",
+    samedrug_eyebrow: "Zweimal eingegeben", samedrug_pill: "gleiches Medikament",
+    samedrug_body_same: "{{name}} taucht in dieser Prüfung zweimal auf — hier gibt es nur ein einzigartiges Medikament zum Vergleichen, nicht zwei.",
+    samedrug_body_diff: "{{a}} und {{b}} sind dasselbe Medikament unter verschiedenen Namen (Marke gegenüber Generikum, oder ein übereinstimmender Wirkstoff) — diese Liste enthält nur ein einzigartiges Medikament zum Vergleichen, nicht zwei.",
     check_denom_prefix: "Abgeglichen mit",
     check_denom_suffix: "dokumentierten Wechselwirkungspaaren. Das ist ein kleiner Satz, die meisten Kombinationen sind nicht enthalten. Das ist keine Freigabe.",
     reminders_enable: "Dosis-Erinnerungen aktivieren",
@@ -8841,6 +8890,7 @@ const I18N = {
     check_checking_prefix: "Prüfe",
     check_checking_suffix: "Medikamente anhand der kuratierten Sammlung und ihrer FDA-Etiketten…",
     documented_interactions: "Dokumentierte Wechselwirkungen",
+    severity_key_label: "Schweregrad-Legende",
     sev_major: "Schwere Wechselwirkung", sev_moderate: "Mäßige Wechselwirkung", sev_minor: "Geringe Wechselwirkung",
     why_label: "Warum:", mgmt_label: "Was Menschen üblicherweise tun:",
     src_curated_interaction: "Quelle: kuratiert aus FDA-Verschreibungsinformationen &amp; klinischen Standardreferenzen",
@@ -9292,6 +9342,9 @@ const I18N = {
     dup_body_suffix: "一緒に飲むと、気づかないうちに同じ薬を二重に服用することになりかねません。",
     dup_ask: "一緒に飲む前に薬剤師に相談してください。",
     dup_src: "両方の FDA ラベルにこの有効成分が記載されています",
+    samedrug_eyebrow: "2回入力されました", samedrug_pill: "同じ薬",
+    samedrug_body_same: "{{name}} がこの確認の中で2回出てきます——ここには比較できる固有の薬が1つしかなく、2つではありません。",
+    samedrug_body_diff: "{{a}} と {{b}} は名前が違うだけで同じ薬です（先発品名と一般名、または同じ成分）——このリストには比較できる固有の薬が1つしかなく、2つではありません。",
     check_denom_prefix: "照合した件数：",
     check_denom_suffix: "件の記録済み相互作用の組み合わせ。これは小さな集合で、ほとんどの組み合わせは含まれていません。安全確認ではありません。",
     reminders_enable: "服用リマインダーをオンにする",
@@ -9348,6 +9401,7 @@ const I18N = {
     check_checking_prefix: "確認中：",
     check_checking_suffix: "件の薬を厳選セットとFDAラベルに照合しています…",
     documented_interactions: "記録された相互作用",
+    severity_key_label: "重症度の凡例",
     sev_major: "重大な相互作用", sev_moderate: "中等度の相互作用", sev_minor: "軽度の相互作用",
     why_label: "なぜ：", mgmt_label: "人々が通常すること：",
     src_curated_interaction: "出所：FDAの処方情報 &amp; 標準的な臨床リファレンスから厳選",
@@ -9688,6 +9742,9 @@ const I18N = {
     dup_body_suffix: "इन्हें साथ लेने पर बिना जाने एक ही दवा की दोहरी खुराक हो सकती है।",
     dup_ask: "इन्हें साथ लेने से पहले किसी फार्मासिस्ट से पूछें।",
     dup_src: "दोनों FDA लेबल इस सक्रिय घटक को सूचीबद्ध करते हैं",
+    samedrug_eyebrow: "दो बार जोड़ी गई", samedrug_pill: "एक ही दवा",
+    samedrug_body_same: "{{name}} इस जांच में दो बार दिखाई देती है — यहाँ तुलना करने के लिए केवल एक ही अनूठी दवा है, दो नहीं।",
+    samedrug_body_diff: "{{a}} और {{b}} अलग-अलग नामों के तहत एक ही दवा हैं (ब्रांड बनाम जेनेरिक, या मिलता-जुलता घटक) — इस सूची में तुलना करने के लिए केवल एक ही अनूठी दवा है, दो नहीं।",
     check_denom_prefix: "इनसे मिलान किया गया:",
     check_denom_suffix: "प्रलेखित इंटरैक्शन जोड़े। यह एक छोटा सेट है, इसलिए अधिकांश संयोजन इसमें नहीं हैं। यह मंज़ूरी नहीं है।",
     reminders_enable: "खुराक अनुस्मारक चालू करें",
@@ -9769,6 +9826,7 @@ const I18N = {
     check_checking_prefix: "जाँचा जा रहा है",
     check_checking_suffix: "दवाओं को चयनित समूह और उनके FDA लेबल से…",
     documented_interactions: "प्रलेखित परस्पर क्रियाएँ",
+    severity_key_label: "गंभीरता कुंजी",
     sev_major: "गंभीर परस्पर क्रिया",
     sev_moderate: "मध्यम परस्पर क्रिया",
     sev_minor: "हल्की परस्पर क्रिया",
@@ -10170,6 +10228,9 @@ const I18N = {
     dup_body_suffix: "இவற்றை ஒன்றாக எடுத்துக்கொள்வது தெரியாமலேயே ஒரே மருந்தின் இரட்டை அளவாக மாறலாம்.",
     dup_ask: "இவற்றை ஒன்றாக எடுப்பதற்கு முன் மருந்தாளரிடம் கேளுங்கள்.",
     dup_src: "இரண்டு FDA லேபிள்களும் இந்த செயல்படு பொருளைப் பட்டியலிடுகின்றன",
+    samedrug_eyebrow: "இரண்டு முறை சேர்க்கப்பட்டது", samedrug_pill: "அதே மருந்து",
+    samedrug_body_same: "{{name}} இந்த சோதனையில் இரண்டு முறை தோன்றுகிறது — இங்கே ஒப்பிட ஒரே ஒரு தனித்துவமான மருந்து மட்டுமே உள்ளது, இரண்டு அல்ல.",
+    samedrug_body_diff: "{{a}} மற்றும் {{b}} வெவ்வேறு பெயர்களில் ஒரே மருந்து (பிராண்ட் எதிராக ஜெனரிக், அல்லது பொருந்தும் பொருள்) — இந்தப் பட்டியலில் ஒப்பிட ஒரே ஒரு தனித்துவமான மருந்து மட்டுமே உள்ளது, இரண்டு அல்ல.",
     check_denom_prefix: "இத்தனையுடன் சரிபார்க்கப்பட்டது:",
     check_denom_suffix: "ஆவணப்படுத்தப்பட்ட இடைவினை இணைகள். இது சிறிய தொகுப்பு, எனவே பெரும்பாலான சேர்க்கைகள் அதில் இல்லை. இது அனுமதி அல்ல.",
     reminders_enable: "மருந்து நினைவூட்டல்களை இயக்கு",
@@ -10251,6 +10312,7 @@ const I18N = {
     check_checking_prefix: "சரிபார்க்கப்படுகிறது",
     check_checking_suffix: "மருந்துகளை தேர்ந்தெடுக்கப்பட்ட தொகுப்பு மற்றும் அவற்றின் FDA லேபிள்களுடன்…",
     documented_interactions: "ஆவணப்படுத்தப்பட்ட இடைவினைகள்",
+    severity_key_label: "தீவிரத்தன்மை விளக்கப்படம்",
     sev_major: "பெரிய இடைவினை",
     sev_moderate: "மிதமான இடைவினை",
     sev_minor: "சிறிய இடைவினை",
@@ -13002,10 +13064,11 @@ function analyzeDrugPairs(drugs){
   const mentions = [];            // FDA-label cross-references
   const duplicates = [];          // same active ingredient in two different products
   const uncertainDuplicates = []; // ingredient overlap couldn't be checked — no label data
+  const sameDrugPairs = [];       // the exact same medicine entered more than once
   for (let i=0;i<drugs.length;i++){
     for (let j=i+1;j<drugs.length;j++){
       const A=drugs[i], B=drugs[j];
-      if (sameDrug(A,B)) continue;
+      if (sameDrug(A,B)){ sameDrugPairs.push({A, B}); continue; }
 
       // checked before the curated rules: a double dose is its own problem and
       // shouldn't be hidden just because the pair also has an interaction rule
@@ -13025,7 +13088,7 @@ function analyzeDrugPairs(drugs){
       if (m) mentions.push(m);
     }
   }
-  return { findings, mentions, duplicates, uncertainDuplicates };
+  return { findings, mentions, duplicates, uncertainDuplicates, sameDrugPairs };
 }
 
 async function checkInteractions(){
@@ -13041,8 +13104,8 @@ async function checkInteractions(){
 
   const drugs = await resolveAll(inputs, 5, (d0, n) => setProgress("#check-prog", d0, n));
 
-  const { findings, mentions, duplicates, uncertainDuplicates } = analyzeDrugPairs(drugs);
-  renderResults(box, drugs, findings, mentions, duplicates, uncertainDuplicates);
+  const { findings, mentions, duplicates, uncertainDuplicates, sameDrugPairs } = analyzeDrugPairs(drugs);
+  renderResults(box, drugs, findings, mentions, duplicates, uncertainDuplicates, sameDrugPairs);
 }
 
 /* check whether drug X's FDA interaction text names drug Y */
@@ -13085,10 +13148,36 @@ function renderDuplicates(duplicates){
   return html;
 }
 
-function renderResults(box, drugs, findings, mentions, duplicates, uncertainDuplicates){
+/* "You entered the same medicine twice" — informational, not an alarm: unlike
+   renderDuplicates (two DIFFERENT products sharing an ingredient, a real
+   double-dose risk), this fires when sameDrug() found the exact same product
+   under two names (brand vs. generic, or a literal repeat), so there's really
+   only one unique medicine in the comparison, not a dosing problem by itself. */
+function renderSameDrugPairs(sameDrugPairs){
+  if (!sameDrugPairs || !sameDrugPairs.length) return "";
+  let html = "";
+  for (const d of sameDrugPairs){
+    const same = d.A.display.trim().toLowerCase() === d.B.display.trim().toLowerCase();
+    const body = same
+      ? t("samedrug_body_same").replace("{{name}}", esc(d.A.display))
+      : t("samedrug_body_diff").replace("{{a}}", esc(d.A.display)).replace("{{b}}", esc(d.B.display));
+    html += `<div class="verdict v-note">
+      <div class="bar"></div>
+      <div class="vbody">
+        <div class="pair">${esc(d.A.display)} ✕ ${esc(d.B.display)}</div>
+        <div class="sev"><span class="pill">${esc(t("samedrug_pill"))}</span> ${esc(t("samedrug_eyebrow"))}</div>
+        <p>${body}</p>
+      </div>
+    </div>`;
+  }
+  return html;
+}
+
+function renderResults(box, drugs, findings, mentions, duplicates, uncertainDuplicates, sameDrugPairs){
   let html = renderUnverifiedWarning(drugs);
   html += renderUncertainDuplicates(uncertainDuplicates);
   html += renderDuplicates(duplicates);
+  html += renderSameDrugPairs(sameDrugPairs);
 
   // order curated findings by severity
   const rank = {major:0,moderate:1,minor:2};
@@ -14757,7 +14846,11 @@ function fitSelect(sel){
   probe.style.letterSpacing = cs.letterSpacing;
   probe.textContent = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : "";
   document.body.appendChild(probe);
-  sel.style.width = (probe.offsetWidth + 2) + "px";
+  // box-sizing:border-box means this width must also cover the select's own
+  // left+right padding (8px total) plus a little slack for sub-pixel font
+  // rounding between this probe span and the real rendered <select> text —
+  // a too-tight buffer here clips the last character or two.
+  sel.style.width = (probe.offsetWidth + 16) + "px";
   probe.remove();
 }
 function fitAllSelects(){ ["#lang-select", "#theme-select", "#lp-lang-select"].forEach(id => fitSelect($(id))); }
@@ -15358,11 +15451,12 @@ async function runCabinetScan(){
 
   const drugs = await resolveAll(meds.map(m => m.generic || m.brand || m.name), 5,
     (d0, n) => setProgress("#scan-prog", d0, n));
-  const { findings, mentions, duplicates, uncertainDuplicates } = analyzeDrugPairs(drugs);
+  const { findings, mentions, duplicates, uncertainDuplicates, sameDrugPairs } = analyzeDrugPairs(drugs);
 
   box.innerHTML = renderUnverifiedWarning(drugs)
     + renderUncertainDuplicates(uncertainDuplicates)
     + renderDuplicates(duplicates)
+    + renderSameDrugPairs(sameDrugPairs)
     + renderScanSummary(findings, mentions)
     + renderCabinetMap(meds)
     + renderCabinetHeatmap(drugs, findings, mentions)
