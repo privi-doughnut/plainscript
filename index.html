@@ -1522,7 +1522,11 @@
     <p class="panel-intro" data-i18n-html="check_intro"></p>
     <p class="status" id="rule-count"></p>
     <p class="status" id="last-reviewed"></p>
-    <!-- [PRIVI - BONUS 9] add your severity-color legend here -->
+<div style="display:flex; gap:10px;">
+  <span class="v-major"><span class="pill" data-i18n="sev_major"></span></span>
+  <span class="v-moderate"><span class="pill" data-i18n="sev_moderate"></span></span>
+  <span class="v-minor"><span class="pill" data-i18n="sev_minor"></span></span>
+</div>
     <div class="druglist" id="drug-list"></div>
     <div class="checkbar">
       <button class="ghost" id="add-drug" data-i18n="add_drug_btn"></button>
