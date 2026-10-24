@@ -11889,7 +11889,7 @@ async function decode(){
   // accessibility: a read-aloud button (Web Speech, feature-detected) and
   // plain-English glossary tooltips on the medical jargon in the label text.
   addReadAloudButton(box);
-  // [PRIVI - BONUS 8] call your new addCopyButton(box) here too
+  addCopyButton(box);  
   applyGlossary(box);
   if (box.querySelector(".gloss")) box.insertAdjacentHTML("beforeend", `<p class="status">${esc(t("glossary_hint"))}</p>`);
 }
@@ -11927,9 +11927,31 @@ function addReadAloudButton(box){
   head.appendChild(btn);
 }
 
-/* [PRIVI - BONUS 8] write addCopyButton(box) here, modeled on
-   addReadAloudButton above */
+function addCopyButton(box){
+  const card = box.querySelector(".card");    
+  if (!card) return;                           
 
+  const btn = document.createElement("button"); 
+  btn.type = "button"; btn.className = "readaloud-btn copy-btn"; btn.textContent = t("share_copy_btn");
+  const originalLabel = btn.textContent;  
+
+  btn.addEventListener("click", async ()=>{
+    const parts = [];
+    box.querySelectorAll(".card .name, .card .eyebrow, .card p[data-role='text']").forEach(el=>{
+      const s = (el.textContent||"").trim(); if (s) parts.push(s);
+    });
+    
+    const text = parts.join(". ");               
+    if (!text) return; 
+    try{
+  await navigator.clipboard.writeText(text);
+  btn.textContent = t("share_copied");
+  setTimeout(()=>{ btn.textContent = originalLabel; }, 1500);
+  }catch(e){ /* clipboard blocked — fail quietly */ }                          
+  });
+  const head = card.querySelector(".card-head") || card;
+    head.appendChild(btn);
+}
 /* Plain-English glossary — taps a scary medical word for a one-line
    definition. Curated (Plainscript's own content), never invented per
    drug. Wraps whole-word matches in the label prose; a click shows a
@@ -13290,8 +13312,12 @@ if (lastTab && TABS.includes(lastTab)) {
   selectTab("decode");
 }
 
-/* [PRIVI - BONUS 7] add your "/" keyboard shortcut listener here */
-
+document.addEventListener("keydown", e => {
+  if (e.key === "/" && e.target.tagName !== "INPUT"){
+    e.preventDefault();
+    $("#decode-input").focus();
+  }
+});
 $("#decode-btn").addEventListener("click", decode);
 $("#decode-input").addEventListener("keydown", e=>{ if(e.key==="Enter") decode(); });
 addVoiceButton($("#decode-input"), decode); // auto-decodes on speech — read-only, no side effect
