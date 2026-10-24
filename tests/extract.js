@@ -144,6 +144,7 @@ function loadEngine(stubs = {}) {
     grabConstBlock("ALIASES"),
     ...CLASS_GROUPS.map(grabConstLine),
     grabConstBlock("INTERACTIONS"),
+    grabConstBlock("I18N"),
     // the engine itself
     grabFunction("baseTokens"),
     grabFunction("sideHit"),
@@ -161,6 +162,7 @@ function loadEngine(stubs = {}) {
     // tests. Re-export the curated data explicitly.
     `globalThis.INTERACTIONS = INTERACTIONS;
      globalThis.ALIASES = ALIASES;
+     globalThis.I18N = I18N;
      globalThis.esc = esc;
      globalThis.titlecase = titlecase;
      ${CLASS_GROUPS.map((g) => `globalThis.${g} = ${g};`).join("\n     ")}`,

@@ -144,13 +144,20 @@ undisclosed, it is disqualifying.
 >
 > The AI wrote a large share of the code, particularly the interaction engine and the
 > database security model. I directed that work, reviewed it, and can explain how it
-> works. `[PRIVI: name the specific parts you wrote yourself — see YOUR_TASKS.md]`
+> works. What I actually wrote myself: the homepage's story about my cousin, around
+> fifty glossary terms I checked against MedlinePlus one by one, several entries in the
+> drug-interaction list I personally verified against the real FDA label, and a handful
+> of interface features — things like the rule-counter and remembering your last tab.
 >
 > I also asked for the parts that could hurt someone to be tested, and they are: the
-> functions that decide whether two medicines interact have 69 automated tests, which is
+> functions that decide whether two medicines interact have 102 automated tests, which is
 > in the repository and which I can walk through.
 >
-> `[PRIVI: one honest sentence on what you learned that you didn't know before.]`
+> Honestly, the thing that stuck with me most building this: a missing answer and a safe
+> answer can look exactly the same if you're not careful — my app almost showed that for
+> Tylenol and Vicodin together, because the FDA doesn't even have a label for Vicodin
+> anymore. Catching that bug taught me more about what "I don't know" is supposed to mean
+> than anything else in this whole project.
 
 **Why this version is strong:** it leads with the decisions that are genuinely yours,
 is specific rather than vague, and volunteers the test suite as evidence of engineering

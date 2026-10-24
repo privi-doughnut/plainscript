@@ -17,7 +17,7 @@ const { loadEngine, drug } = require("./extract.js");
 const engine = loadEngine();
 const {
   sameDrug, sideHit, baseTokens, labelMentions, analyzeDrugPairs,
-  renderUnverifiedWarning, renderResults, INTERACTIONS, ALIASES, NSAIDS,
+  renderUnverifiedWarning, renderResults, INTERACTIONS, ALIASES, NSAIDS, I18N,
 } = engine;
 
 /* ------------------------------------------------------------------ *
@@ -767,7 +767,17 @@ test("sharedIngredients", async (t) => {
   });
 
   await t.test("renderUncertainDuplicates names the unresolved drug and explains why", () => {
-    const { renderUncertainDuplicates } = engine;
+    // uncertain_dup_* are real i18n keys (translated in all 13 languages), so
+    // stub t() with the actual English strings rather than the module-level
+    // identity stub, to exercise the real {{names}} interpolation path.
+    const i18nSandbox = loadEngine({
+      t: (k) => ({
+        uncertain_dup_title: "Couldn't check {{names}} for overlapping ingredients",
+        uncertain_dup_body_one: "No FDA label was found under this name — this happens with some older or discontinued combination products. If it combines more than one ingredient (for example, an opioid with acetaminophen), try searching each ingredient separately so it can actually be checked.",
+        uncertain_dup_body_many: "No FDA label was found under these names — this happens with some older or discontinued combination products. If either one combines more than one ingredient (for example, an opioid with acetaminophen), try searching each ingredient separately so it can actually be checked.",
+      }[k] || k),
+    });
+    const { renderUncertainDuplicates } = i18nSandbox;
     const tylenol = withSubs("Tylenol", ["acetaminophen"]);
     const vicodin = { name: "vicodin", display: "Vicodin", tokens: new Set(["vicodin"]), label: null, labelUnverified: false };
     const html = renderUncertainDuplicates([{ A: tylenol, B: vicodin }]);
@@ -802,5 +812,32 @@ test("sharedIngredients", async (t) => {
   await t.test("renders nothing when there are no duplicates", () => {
     assert.equal(renderDuplicates([]), "");
     assert.equal(renderDuplicates(undefined), "");
+  });
+});
+
+test("i18n completeness", async (t) => {
+  // Regression guard: a prior audit found 16 UI keys (glossary labels, landing-page
+  // sections, the rule-count line) present only in English, silently falling back
+  // for every one of the other 12 languages despite the app's "13 languages" claim.
+  // Every I18N language block must carry every key the English block does.
+  const LANGS = Object.keys(I18N).filter((l) => l !== "en");
+
+  await t.test("every language has every English key", () => {
+    const enKeys = Object.keys(I18N.en);
+    for (const lang of LANGS) {
+      const missing = enKeys.filter((k) => !(k in I18N[lang]));
+      assert.deepEqual(missing, [], `${lang} is missing keys: ${missing.join(", ")}`);
+    }
+  });
+
+  await t.test("the uncertain-duplicates safety warning is translated, not just present", () => {
+    // This specific string is the one shown when a drug (e.g. a discontinued
+    // product like Vicodin) has no FDA label to check for overlapping ingredients
+    // -- it must not silently stay in English for non-English users.
+    for (const lang of ["en", ...LANGS]) {
+      assert.ok(I18N[lang].uncertain_dup_title, `${lang} missing uncertain_dup_title`);
+      assert.ok(I18N[lang].uncertain_dup_body_one, `${lang} missing uncertain_dup_body_one`);
+      assert.ok(I18N[lang].uncertain_dup_body_many, `${lang} missing uncertain_dup_body_many`);
+    }
   });
 });

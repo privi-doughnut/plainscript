@@ -6,7 +6,7 @@ A plain-English medication reference. Decode what a drug actually is, and check 
 
 ## Why I built this
 
-I've been obsessed with medicine labels since I was a kid, trying to figure out what my parents' pill bottles actually did. That curiosity turned into something heavier when my cousin died from a medication interaction nobody warned him about — he was on blood thinners and was never told how they'd interact with everything else he took. When I found out the National Library of Medicine shut down its free drug-interaction API in January 2024, I realized the honest, free way to check this had basically disappeared. So I built Plainscript to be exactly that: every fact sourced from the FDA or NIH, severity-rated interaction warnings, and an app that's honest when it doesn't know something instead of guessing.
+I've been obsessed with medicine labels since I was a kid, trying to figure out what my parents' pill bottles actually did — my mom thought I was trying to be the world's youngest addict, honestly. It got a lot more real when my cousin died from a medication interaction nobody warned him about. He was on blood thinners, never told what that meant for how he lived, and he bled out from a work accident a month before his wedding. I miss him a lot. The National Library of Medicine killed its free drug-interaction API in January 2024, and the honest way to check this basically disappeared. So I built Plainscript to be that — sourced from the FDA and NIH, and honest when it doesn't know something.
 
 ## Run it
 Open `index.html` in a browser, or serve the folder (`python3 -m http.server`). No build step, no dependencies. Deploys as-is to GitHub Pages or Netlify.
@@ -14,7 +14,7 @@ Open `index.html` in a browser, or serve the folder (`python3 -m http.server`). 
 ## What works today
 - **Decode** — enter a brand or generic name; get what it treats, how it works, side effects, drug class, brand/generic, boxed warnings, and a full FDA label details section (ingredients, warnings, precautions, dosage as printed), pulled live from the drug's FDA label. Misspellings show close RxNorm matches to pick from instead of one silent guess. A "Similar & related meds" popup surfaces other drugs in the same class, other forms/strengths of the same ingredient, and combination products that contain it (so you can spot accidental double-dosing).
 - **Check interactions** — enter 2+ meds; get severity-rated, plain-English, sourced warnings from a curated interaction set plus a cross-reference of each drug's FDA label.
-- **Light / dark theme** — sober clinical styling; light by default, and your choice survives reloads.
+- **Light / dark theme** — sober clinical styling; dark by default, and your choice survives reloads.
 - Mobile-first and accessible.
 - **My Cabinet** *(needs the free Supabase setup below)* — sign in with Google or a passwordless email link, save the meds you actually take with your own notes. Your list is protected by row-level security: only you can read it.
 - **Cabinet Scan** — one tap scans everything in My Cabinet against everything else (not just a pair), with a severity summary, a scannable cabinet map, and a "what to ask your pharmacist" question list grounded in what was actually found.

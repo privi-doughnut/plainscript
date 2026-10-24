@@ -74,7 +74,7 @@ The NLM shut down its free drug-interaction API on **Jan 2, 2024** — don't go 
 2. Cross-referencing each drug's openFDA `drug_interactions` label text (broad, but no severity — always labeled as "noted on the FDA label," never severity-rated).
 
 ## Aesthetic
-Sober, clinical, trustworthy — credibility beats flair here. Cool clinical paper, navy ink, one restrained teal accent. Severity colors (amber → orange → red) are reserved ONLY for interaction severity, so an alarming color always means an alarming thing. **Light theme is default; a sober clinical dark theme toggles on.** Type: Newsreader (serif) for headings, Spline Sans for UI, Spline Sans Mono for data strips (the "structured drug-label" look is the signature). Mobile-first, accessible: visible focus states, `prefers-reduced-motion`, ARIA on the tabs/live regions.
+Sober, clinical, trustworthy — credibility beats flair here. Cool clinical paper, navy ink, one restrained teal accent. Severity colors (amber → orange → red) are reserved ONLY for interaction severity, so an alarming color always means an alarming thing. **Dark theme is default; a sober clinical light theme toggles on.** Type: Newsreader (serif) for headings, Spline Sans for UI, Spline Sans Mono for data strips (the "structured drug-label" look is the signature). Mobile-first, accessible: visible focus states, `prefers-reduced-motion`, ARIA on the tabs/live regions.
 
 ## Current state
 As of 2026-07-21, **Phases 0–4 are code-complete and Phase 5/6 are nearly done** (~80% of the full roadmap). `PROGRESS.md` is the up-to-date status dashboard — trust it over this section for exact current state, since it gets refreshed every session. Highlights:
