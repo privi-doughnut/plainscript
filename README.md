@@ -6,11 +6,7 @@ A plain-English medication reference. Decode what a drug actually is, and check 
 
 ## Why I built this
 
-*[PRIVI: voice this — write it yourself, first person, casual, the way you'd actually explain it to someone. Don't let this get filled in with generic AI copy; a few honest sentences beat a polished paragraph that doesn't sound like you. Things you could touch on, if any of them are true for you:*
-- *what got you thinking about this — a moment where a medication label or a drug interaction was confusing (yours, a family member's, anyone's)*
-- *why FDA/NIH data specifically, and why it mattered to you to never invent a fact*
-- *what you want a CAC/ISEF judge — or just a random visitor — to walk away understanding about the problem*
-*]*
+I've been obsessed with medicine labels since I was a kid, trying to figure out what my parents' pill bottles actually did. That curiosity turned into something heavier when my cousin died from a medication interaction nobody warned him about — he was on blood thinners and was never told how they'd interact with everything else he took. When I found out the National Library of Medicine shut down its free drug-interaction API in January 2024, I realized the honest, free way to check this had basically disappeared. So I built Plainscript to be exactly that: every fact sourced from the FDA or NIH, severity-rated interaction warnings, and an app that's honest when it doesn't know something instead of guessing.
 
 ## Run it
 Open `index.html` in a browser, or serve the folder (`python3 -m http.server`). No build step, no dependencies. Deploys as-is to GitHub Pages or Netlify.

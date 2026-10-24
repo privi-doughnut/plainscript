@@ -208,9 +208,6 @@
     --on-accent:#00201C;
   }
 
-  /* [PRIVI - TASK 14] a warm "sepia"/paper theme belongs here — see YOUR_TASKS.md */
-
-
   /* ---------- logo watermark ----------
      A barely-there tiling of the Plainscript cross behind everything. Painted
      as a MASK over var(--ink) rather than a coloured background image, because
@@ -1295,7 +1292,6 @@
     </div>
   </section>
 
-  <!-- [PRIVI - TASK 6] "The problem" section goes here -->
    <section class="lp-limits"><div class="wrap">
   <span class="eyebrow">I think I need to be a pharmacist to understand these labels?</span>
   <h2>A Doctorate In Labels</h2>
@@ -1373,7 +1369,6 @@
     </div>
   </div></section>
 
-  <!-- [PRIVI - TASK 8] "Where every fact comes from" source cards go here -->
   <section class="lp-limits"><div class="wrap">
     <span class="eyebrow">Sources</span>
     <h2>Every fact traces back to one of three places.</h2>
@@ -1399,7 +1394,6 @@
     <p class="lp-note" data-i18n="lp_lim_note">The one place a language model is used, it may only rephrase text already retrieved from an FDA label — it cannot introduce a medical claim. That rule is enforced on the server, not by trust.</p>
   </div></section>
 
-  <!-- [PRIVI - TASK 9] "Built for people who get left out" section goes here -->
   <section class="lp-feat"><div class="wrap">
     <span class="eyebrow">Who this is built for</span>
     <h2>Built for people who get left out.</h2>
@@ -1413,7 +1407,6 @@
     </ul>
   </div></section>
 
-  <!-- [PRIVI - TASK 10] "Who made this" — your story, in your voice -->
   <section class="lp-limits"><div class="wrap">
     <span class="eyebrow">Who made this</span>
     <h2>A sophomore, mostly out of his depth.</h2>
@@ -1463,7 +1456,6 @@
     <button id="level-toggle" class="themetoggle" aria-pressed="false" data-i18n-aria-label="explain_simpler_aria" title="Explain even simpler" hidden>
       <span class="ticon" aria-hidden="true">🧒</span><span class="tlabel" data-i18n="explain_simpler_label">Simpler</span>
     </button>
-    <!-- [PRIVI - FEATURE 5] add your new Glossary button here, same shape as the two above -->
     <button id="glossary-toggle" class="themetoggle" data-i18n-aria-label="glossary_aria" title="Glossary">
       <span class="ticon" aria-hidden="true">📖</span><span class="tlabel" data-i18n="glossary_label">Glossary</span>
     </button>
@@ -11695,8 +11687,6 @@ function openGlossaryModal(){
   document.addEventListener("keydown", onEsc);
   overlay.addEventListener("click", e => { if (e.target===overlay) close(); const b=e.target.closest('[data-act="close"]'); if (b) close(); });
 }
-/* [PRIVI - FEATURE 5] write openGlossaryModal() here — modeled on
-   openCabinetInsights (Cmd+F that name), see YOUR_TASKS.md */
 // one global handler: any click closes open popovers; a click on a term opens its own
 document.addEventListener("click", e => {
   const g = e.target.closest(".gloss");
