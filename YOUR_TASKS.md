@@ -104,17 +104,20 @@ and connected by you; verified live with zero console errors) · **Feature 1** �
 interaction rules (17 → 36 total), each individually drafted by you, fact-checked against
 real FDA/DailyMed sources and standard clinical references, with corrections made where
 your severity judgment or wording didn't match the source. Verified live (warfarin +
-amiodarone renders correctly as a Major card).
-
-**⚠️ Not committed yet** — you're away from the Mac with no remote access tonight. The
-Feature 1 edit is sitting on disk, safe, waiting for your three `git` lines whenever you're
-back or have remote access. Nothing is lost by waiting.
+amiodarone renders correctly as a Major card). **Pushed to GitHub** (commit `540edd7`).
 
 **Bonus Code 1** — done, but written by me rather than you: one existence-check test per
 new rule (97 tests total, up from 78), pure mechanical substitution of already-decided drug
-names into the existing test pattern, no content or judgment involved. Also uncommitted,
-same as Feature 1. Worth a short, honest mention in your disclosure's "what Claude wrote"
+names into the existing test pattern, no content or judgment involved. Pushed in the same
+commit as Feature 1. Worth a short, honest mention in your disclosure's "what Claude wrote"
 side if you want to be extra precise, though the blanket statement already covers it.
+
+**Homepage writing, finished:** Task 8 ("Every fact traces back to one of three places" —
+drafted by me from pre-approved facts, you reviewed) · Task 9 ("Built for people who get
+left out" — same, drafted by me from the facts already in the guide) · Task 10 ("Who made
+this" — your own dictated bio and advice to other students, trimmed by me at your request
+down to closing-paragraph length; the heading was mine, you approved it). All three
+committed, not yet pushed.
 
 **Also fixed today, by me, during review** (noting this here so your AI disclosure stays
 accurate — this wasn't your work, it was debugging + polish on top of it):
@@ -136,7 +139,7 @@ accurate — this wasn't your work, it was debugging + polish on top of it):
 
 ## Writing (no code — your words, your voice)
 
-### TASK 8 — "Where every fact comes from" (marker 8)
+### ✅ TASK 8 — DONE — "Where every fact comes from" (marker 8)
 
 **Goal:** show judges you didn't invent anything. Three small cards.
 
@@ -167,7 +170,7 @@ one (Cmd+F `lp_lim_eyebrow`) — same `lp-limits` + `lp-never` list shape you're
 with different content. Yours comes right before it.
 **Commit:** `Write the homepage sources section`
 
-### TASK 9 — "Built for people who get left out" (marker 9)
+### ✅ TASK 9 — DONE — "Built for people who get left out" (marker 9)
 
 **Goal:** who this is *for*, in concrete, real features.
 
@@ -189,7 +192,7 @@ copy that structure, swap the content.
 **Hint:** open the app and try each feature before you write it down.
 **Commit:** `Write the homepage accessibility section`
 
-### TASK 10 — "Who made this" (marker 10)
+### ✅ TASK 10 — DONE — "Who made this" (marker 10)
 
 **Goal:** one paragraph, first person, your voice. A student, a real person.
 
@@ -615,8 +618,8 @@ ready if a judge asks "what did you write."
 
 | Day | Do |
 |---|---|
-| **Fri Oct 23 (today)** | ✅ Feature 1 (19 rules, verified) and Bonus Code 1 both done — not yet committed, waiting until you're back at the Mac. Whatever else you got to tonight: Bonus Codes 7/8/9, Bonus Writing 1, Tasks 8/9/10. |
-| **Sat Oct 24 — target submit day** | Record and edit the video (your stated real bottleneck), finish any writing tasks left over, answer the two remaining contest questions out loud to me, final AI disclosure. I drive the actual submission once the video's ready — see the note below. |
+| ~~Fri Oct 23~~ | ~~Feature 1 (19 rules), Bonus Code 1, Tasks 8/9/10 — all pushed.~~ |
+| **Sat Oct 24 — target submit day** | Still open: Bonus Codes 7/8/9, Bonus Writing 1 (legal blanks) and 2 (README), the two remaining contest answers, the final AI disclosure line, and — the real bottleneck — recording and editing the video. I drive the actual submission once the video's ready; see the note below. |
 | Sun Oct 25 | Buffer if Saturday slips. |
 | Mon Oct 26, before noon | Hard deadline: **12:00 PM EDT.** Do not treat this as the target — it's the wall. |
 
