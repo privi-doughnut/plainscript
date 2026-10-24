@@ -1418,7 +1418,7 @@
   <section class="lp-feat"><div class="wrap">
     <span class="eyebrow">Who made this</span>
     <h2>A sophomore, mostly out of his depth.</h2>
-    <p class="lp-sub">I'm Privi, a sophomore at Ballantine Ridge High School in the Charlotte-Mecklenburg County School District. I'm primarily a Python coder, so building this almost entirely in JavaScript was genuinely hard — the syntax took a while, and functions especially were never my strong suit, even in Python. Being forced to use them constantly on this project is what finally made them click. I didn't always take coding seriously — my first real project took five months to finish — but somewhere along the way, especially after AP Computer Science, it became one of my favorite hobbies. My advice to another student building something like this: whatever you put into a project is what you get out of it, and if it's something that could actually affect people's lives, give it your best. Build what excites you, and the feeling when you finally finish is pure euphoria. So get excited.</p>
+    <p class="lp-sub">I'm Privi, a sophomore at Ballantine Ridge High School in the Charlotte-Mecklenburg County School District. I'm primarily a Python coder, so building this almost entirely in JavaScript was genuinely hard. The syntax took a while to get used to, and functions especially were never my strong suit, even in Python, honestly. Being forced to use them constantly on this project is what finally made them click for me. I didn't always take coding seriously either, my first real project took five months to finish, but somewhere along the way, especially after AP Computer Science, it became one of my favorite hobbies. My advice to another student building something like this: whatever you put into a project is what you get out of it, and if it's something that could actually affect people's lives, give it your best. Build what excites you, and the feeling when you finally finish is pure euphoria. So get excited.</p>
   </div></section>
 
   <section class="lp-end"><div class="wrap">
@@ -1534,8 +1534,8 @@
     <div class="severity-legend">
       <span class="eyebrow" data-i18n="severity_key_label"></span>
       <div class="sev-legend-row">
-        <span class="v-major sev"><span class="pill">major</span> <span data-i18n="sev_major"></span></span>
-        <span class="v-moderate sev"><span class="pill">moderate</span> <span data-i18n="sev_moderate"></span></span>
+        <span class="v-major sev" role="button" tabindex="0" data-i18n-aria-label="explain_aria" data-i18n-explain="sev_major_explain"><span class="pill">major</span> <span data-i18n="sev_major"></span></span>
+        <span class="v-moderate sev" role="button" tabindex="0" data-i18n-aria-label="explain_aria" data-i18n-explain="sev_moderate_explain"><span class="pill">moderate</span> <span data-i18n="sev_moderate"></span></span>
       </div>
     </div>
     <div class="druglist" id="drug-list"></div>
@@ -4268,6 +4268,8 @@ const I18N = {
     check_checking_suffix: "medications against the curated set and their FDA labels…",
     documented_interactions: "Documented interactions",
     severity_key_label: "Severity key",
+    sev_major_explain: "Could cause serious or life-threatening harm. Every major rule was checked by hand against a real FDA label or standard clinical reference before being added.",
+    sev_moderate_explain: "Usually manageable with monitoring or spacing doses apart, but still worth asking a pharmacist about. Checked the same way as major rules: against a real FDA label or clinical reference.",
     sev_major: "Major interaction", sev_moderate: "Moderate interaction", sev_minor: "Minor interaction",
     why_label: "Why:", mgmt_label: "What people usually do:",
     src_curated_interaction: "Source: curated from FDA prescribing information &amp; standard clinical references",
@@ -4886,6 +4888,8 @@ const I18N = {
     check_checking_suffix: "medicamentos contra el conjunto curado y sus etiquetas de la FDA…",
     documented_interactions: "Interacciones documentadas",
     severity_key_label: "Clave de gravedad",
+    sev_major_explain: "Puede causar daño grave o potencialmente mortal. Cada regla «grave» se verificó a mano contra una etiqueta real de la FDA o una referencia clínica estándar antes de añadirla.",
+    sev_moderate_explain: "Generalmente manejable con monitoreo o espaciando las dosis, pero aun así vale la pena preguntarle a un farmacéutico. Verificada de la misma manera que las reglas graves: contra una etiqueta real de la FDA o una referencia clínica.",
     sev_major: "Interacción grave", sev_moderate: "Interacción moderada", sev_minor: "Interacción leve",
     why_label: "Por qué:", mgmt_label: "Qué suele hacerse:",
     src_curated_interaction: "Fuente: curado a partir de información de prescripción de la FDA y referencias clínicas estándar",
@@ -5371,6 +5375,8 @@ const I18N = {
     check_checking_prefix: "正在检查", check_checking_suffix: "种药物，对照整理的集合及其FDA标签…",
     documented_interactions: "已记录的相互作用",
     severity_key_label: "严重程度图例",
+    sev_major_explain: "可能造成严重甚至危及生命的伤害。每条「严重」规则在加入前都经过人工核对，对照真实的FDA标签或标准临床参考资料。",
+    sev_moderate_explain: "通常可以通过监测或错开服药时间来管理，但仍值得咨询药剂师。核实方式与严重规则相同：对照真实的FDA标签或临床参考资料。",
     sev_major: "严重相互作用", sev_moderate: "中度相互作用", sev_minor: "轻度相互作用",
     why_label: "为什么：", mgmt_label: "人们通常会怎么做：",
     src_curated_interaction: "来源：根据FDA处方信息和标准临床参考文献整理",
@@ -5844,6 +5850,8 @@ const I18N = {
     check_checking_prefix: "Đang kiểm tra", check_checking_suffix: "loại thuốc, đối chiếu với bộ dữ liệu đã biên soạn và nhãn FDA của chúng…",
     documented_interactions: "Tương tác đã ghi nhận",
     severity_key_label: "Chú giải mức độ nghiêm trọng",
+    sev_major_explain: "Có thể gây hại nghiêm trọng hoặc đe dọa tính mạng. Mỗi quy tắc 'nghiêm trọng' đều được kiểm tra thủ công đối chiếu với nhãn FDA thật hoặc tài liệu tham khảo lâm sàng chuẩn trước khi được thêm vào.",
+    sev_moderate_explain: "Thường có thể kiểm soát được bằng cách theo dõi hoặc giãn cách liều dùng, nhưng vẫn đáng để hỏi dược sĩ. Được kiểm tra theo cách tương tự như quy tắc nghiêm trọng: đối chiếu với nhãn FDA thật hoặc tài liệu tham khảo lâm sàng.",
     sev_major: "Tương tác nghiêm trọng", sev_moderate: "Tương tác mức độ vừa", sev_minor: "Tương tác nhẹ",
     why_label: "Vì sao:", mgmt_label: "Mọi người thường làm gì:",
     src_curated_interaction: "Nguồn: biên soạn từ thông tin kê đơn của FDA &amp; các tài liệu tham khảo lâm sàng tiêu chuẩn",
@@ -6337,6 +6345,8 @@ const I18N = {
     check_checking_suffix: "أدوية مقابل المجموعة المُعدّة وملصقات FDA الخاصة بها…",
     documented_interactions: "التفاعلات الموثّقة",
     severity_key_label: "مفتاح الخطورة",
+    sev_major_explain: "يمكن أن يسبب ضررًا شديدًا أو مهددًا للحياة. كل قاعدة 'كبيرة' تم التحقق منها يدويًا مقابل ملصق FDA حقيقي أو مرجع سريري معتمد قبل إضافتها.",
+    sev_moderate_explain: "عادة ما يمكن التحكم به بالمراقبة أو بالمباعدة بين الجرعات، لكن يستحق سؤال الصيدلي مع ذلك. تم التحقق منه بنفس طريقة القواعد الكبيرة: مقابل ملصق FDA حقيقي أو مرجع سريري.",
     sev_major: "تفاعل كبير", sev_moderate: "تفاعل متوسط", sev_minor: "تفاعل طفيف",
     why_label: "لماذا:", mgmt_label: "ما يفعله الناس عادةً:",
     src_curated_interaction: "المصدر: مُعدّ من معلومات وصف FDA والمراجع السريرية القياسية",
@@ -6848,6 +6858,8 @@ const I18N = {
     check_checking_suffix: "médicaments par rapport à l'ensemble sélectionné et à leurs étiquettes FDA…",
     documented_interactions: "Interactions documentées",
     severity_key_label: "Légende de gravité",
+    sev_major_explain: "Peut causer un préjudice grave ou potentiellement mortel. Chaque règle « majeure » a été vérifiée à la main par rapport à une véritable étiquette FDA ou une référence clinique standard avant d'être ajoutée.",
+    sev_moderate_explain: "Généralement gérable avec une surveillance ou en espaçant les prises, mais cela vaut quand même la peine de demander à un pharmacien. Vérifiée de la même façon que les règles majeures : par rapport à une véritable étiquette FDA ou une référence clinique.",
     sev_major: "Interaction majeure", sev_moderate: "Interaction modérée", sev_minor: "Interaction mineure",
     why_label: "Pourquoi :", mgmt_label: "Ce que les gens font habituellement :",
     src_curated_interaction: "Source : sélectionné à partir des informations de prescription de la FDA &amp; des références cliniques standard",
@@ -7359,6 +7371,8 @@ const I18N = {
     check_checking_suffix: "개 약을 정리된 자료 및 FDA 라벨과 대조하는 중…",
     documented_interactions: "문서화된 상호작용",
     severity_key_label: "심각도 범례",
+    sev_major_explain: "심각하거나 생명을 위협하는 피해를 일으킬 수 있습니다. '중대' 규칙은 추가되기 전에 실제 FDA 라벨이나 표준 임상 참고자료와 직접 대조하여 확인되었습니다.",
+    sev_moderate_explain: "보통 모니터링하거나 복용 시간을 띄우는 것으로 관리할 수 있지만, 그래도 약사에게 물어볼 가치가 있습니다. 중대 규칙과 같은 방식으로, 실제 FDA 라벨이나 임상 참고자료와 대조하여 확인되었습니다.",
     sev_major: "중대한 상호작용", sev_moderate: "중등도 상호작용", sev_minor: "경미한 상호작용",
     why_label: "왜:", mgmt_label: "사람들이 보통 하는 것:",
     src_curated_interaction: "출처: FDA 처방 정보 &amp; 표준 임상 참고 자료에서 정리",
@@ -7870,6 +7884,8 @@ const I18N = {
     check_checking_suffix: "лекарств по составленному набору и их этикеткам FDA…",
     documented_interactions: "Задокументированные взаимодействия",
     severity_key_label: "Легенда серьёзности",
+    sev_major_explain: "Может причинить серьёзный или опасный для жизни вред. Каждое 'серьёзное' правило было вручную проверено по реальной этикетке FDA или стандартному клиническому источнику перед добавлением.",
+    sev_moderate_explain: "Обычно поддаётся контролю с помощью наблюдения или разнесения приёма по времени, но всё равно стоит спросить фармацевта. Проверено так же, как и серьёзные правила: по реальной этикетке FDA или клиническому источнику.",
     sev_major: "Серьёзное взаимодействие", sev_moderate: "Умеренное взаимодействие", sev_minor: "Незначительное взаимодействие",
     why_label: "Почему:", mgmt_label: "Что обычно делают:",
     src_curated_interaction: "Источник: составлено из информации о назначении FDA &amp; стандартных клинических справочников",
@@ -8381,6 +8397,8 @@ const I18N = {
     check_checking_suffix: "medicamentos com o conjunto selecionado e suas bulas da FDA…",
     documented_interactions: "Interações documentadas",
     severity_key_label: "Legenda de gravidade",
+    sev_major_explain: "Pode causar dano grave ou com risco de vida. Cada regra 'grave' foi verificada manualmente em relação a uma bula real da FDA ou referência clínica padrão antes de ser adicionada.",
+    sev_moderate_explain: "Geralmente controlável com monitoramento ou espaçando as doses, mas ainda vale a pena perguntar a um farmacêutico. Verificada da mesma forma que as regras graves: em relação a uma bula real da FDA ou referência clínica.",
     sev_major: "Interação grave", sev_moderate: "Interação moderada", sev_minor: "Interação leve",
     why_label: "Por quê:", mgmt_label: "O que as pessoas costumam fazer:",
     src_curated_interaction: "Fonte: selecionado das informações de prescrição da FDA &amp; referências clínicas padrão",
@@ -8892,6 +8910,8 @@ const I18N = {
     check_checking_suffix: "Medikamente anhand der kuratierten Sammlung und ihrer FDA-Etiketten…",
     documented_interactions: "Dokumentierte Wechselwirkungen",
     severity_key_label: "Schweregrad-Legende",
+    sev_major_explain: "Kann schweren oder lebensbedrohlichen Schaden verursachen. Jede 'schwere' Regel wurde vor der Aufnahme manuell gegen ein echtes FDA-Etikett oder eine anerkannte klinische Referenz geprüft.",
+    sev_moderate_explain: "In der Regel durch Überwachung oder zeitlichen Abstand der Einnahme beherrschbar, aber trotzdem einen Apotheker wert zu fragen. Genauso geprüft wie schwere Regeln: gegen ein echtes FDA-Etikett oder eine klinische Referenz.",
     sev_major: "Schwere Wechselwirkung", sev_moderate: "Mäßige Wechselwirkung", sev_minor: "Geringe Wechselwirkung",
     why_label: "Warum:", mgmt_label: "Was Menschen üblicherweise tun:",
     src_curated_interaction: "Quelle: kuratiert aus FDA-Verschreibungsinformationen &amp; klinischen Standardreferenzen",
@@ -9403,6 +9423,8 @@ const I18N = {
     check_checking_suffix: "件の薬を厳選セットとFDAラベルに照合しています…",
     documented_interactions: "記録された相互作用",
     severity_key_label: "重症度の凡例",
+    sev_major_explain: "重篤または命に関わる害を引き起こす可能性があります。「重大」のルールはすべて、追加される前に実際のFDAラベルまたは標準的な臨床参考資料と照合して、人の手で確認されています。",
+    sev_moderate_explain: "通常は経過観察や服用時間をずらすことで対応できますが、それでも薬剤師に相談する価値はあります。重大なルールと同じ方法で、実際のFDAラベルまたは臨床参考資料と照合して確認されています。",
     sev_major: "重大な相互作用", sev_moderate: "中等度の相互作用", sev_minor: "軽度の相互作用",
     why_label: "なぜ：", mgmt_label: "人々が通常すること：",
     src_curated_interaction: "出所：FDAの処方情報 &amp; 標準的な臨床リファレンスから厳選",
@@ -9828,6 +9850,8 @@ const I18N = {
     check_checking_suffix: "दवाओं को चयनित समूह और उनके FDA लेबल से…",
     documented_interactions: "प्रलेखित परस्पर क्रियाएँ",
     severity_key_label: "गंभीरता कुंजी",
+    sev_major_explain: "गंभीर या जानलेवा नुकसान पहुंचा सकता है। हर 'गंभीर' नियम को जोड़ने से पहले असली FDA लेबल या मानक क्लिनिकल संदर्भ के विरुद्ध हाथ से जांचा गया है।",
+    sev_moderate_explain: "आमतौर पर निगरानी या खुराक के बीच समय बढ़ाकर संभाला जा सकता है, लेकिन फिर भी फार्मासिस्ट से पूछना उचित है। गंभीर नियमों की तरह ही जांचा गया: असली FDA लेबल या क्लिनिकल संदर्भ के विरुद्ध।",
     sev_major: "गंभीर परस्पर क्रिया",
     sev_moderate: "मध्यम परस्पर क्रिया",
     sev_minor: "हल्की परस्पर क्रिया",
@@ -10314,6 +10338,8 @@ const I18N = {
     check_checking_suffix: "மருந்துகளை தேர்ந்தெடுக்கப்பட்ட தொகுப்பு மற்றும் அவற்றின் FDA லேபிள்களுடன்…",
     documented_interactions: "ஆவணப்படுத்தப்பட்ட இடைவினைகள்",
     severity_key_label: "தீவிரத்தன்மை விளக்கப்படம்",
+    sev_major_explain: "கடுமையான அல்லது உயிருக்கு ஆபத்தான சேதத்தை ஏற்படுத்தக்கூடும். ஒவ்வொரு 'பெரிய' விதியும் சேர்க்கப்படுவதற்கு முன் உண்மையான FDA லேபிள் அல்லது தரமான மருத்துவ குறிப்புடன் கைமுறையாக சரிபார்க்கப்பட்டது.",
+    sev_moderate_explain: "பொதுவாக கண்காணிப்பு அல்லது மருந்தளவுகளுக்கு இடையே நேரம் விடுவதன் மூலம் கையாளக்கூடியது, ஆனாலும் மருந்தாளரிடம் கேட்பது மதிப்புமிக்கது. பெரிய விதிகளைப் போலவே சரிபார்க்கப்பட்டது: உண்மையான FDA லேபிள் அல்லது மருத்துவ குறிப்புடன்.",
     sev_major: "பெரிய இடைவினை",
     sev_moderate: "மிதமான இடைவினை",
     sev_minor: "சிறிய இடைவினை",
@@ -10565,6 +10591,7 @@ function applyTranslations(){
   document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = decodeEntities(t(el.dataset.i18nPlaceholder)); });
   document.querySelectorAll("[data-i18n-aria-label]").forEach(el => { el.setAttribute("aria-label", decodeEntities(t(el.dataset.i18nAriaLabel))); });
+  document.querySelectorAll("[data-i18n-explain]").forEach(el => { el.setAttribute("data-explain", decodeEntities(t(el.dataset.i18nExplain))); });
   const langLabel = document.getElementById("lang-label");
   if (langLabel) langLabel.textContent = uiLang.toUpperCase();
 }
@@ -12182,11 +12209,14 @@ function showExplainPill(el){
 }
 function hideExplainPill(){ if (_explainPop){ _explainPop.remove(); _explainPop = null; } }
 document.addEventListener("mouseover", e => {
-  const el = (e.target.matches && e.target.matches("[data-explain]")) ? e.target : null;
+  // closest(), not matches() -- the severity-key chips wrap a pill + label
+  // inside the data-explain element, so the hovered e.target is often a
+  // child, not the element carrying the attribute itself
+  const el = e.target.closest && e.target.closest("[data-explain]");
   if (el){ clearTimeout(_explainHideTimer); showExplainPill(el); }
 });
 document.addEventListener("mouseout", e => {
-  const el = (e.target.matches && e.target.matches("[data-explain]")) ? e.target : null;
+  const el = e.target.closest && e.target.closest("[data-explain]");
   if (el){ _explainHideTimer = setTimeout(hideExplainPill, 120); }
 });
 document.addEventListener("focusin", e => {
