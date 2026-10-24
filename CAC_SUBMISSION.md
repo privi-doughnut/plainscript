@@ -112,19 +112,28 @@ Record the demo on the **live public URL** and say so out loud. Almost nothing i
 published record of past winners suggests competitors do this, and judges are entitled
 to verify a working app.
 
-| Time | On screen | What you say |
-|---|---|---|
-| 0:00–0:15 | You, or the homepage | Your name, school, district. "This is Plainscript. It turns the FDA's own drug labels into plain English and checks whether your medicines interact." *Gets three required elements done immediately.* |
-| 0:15–0:45 | Homepage, scrolling slowly | **"My cousin died from a medication interaction nobody ever told him about. He was on blood thinners and didn't know how they'd interact with what else he was taking."** Then the structural fact: "In January 2024 the National Library of Medicine shut down its free public drug-interaction API. The authoritative free way to check this mostly disappeared." |
-| 0:45–1:00 | "Built for people who get left out" section | Who it's for, explicitly: older adults, caregivers managing several people's medicines, non-native English speakers, anyone with low health literacy. |
-| 1:00–1:25 | Decode tab, live | Type a real drug. Point at the source line under a claim: "every fact here shows where it came from." |
-| 1:25–1:50 | Check tab, live | **warfarin + aspirin.** Real major interaction. Then do a pair with nothing documented and land on the empty state: "it says nothing was *found* — it never says you're safe. That's deliberate." |
-| 1:50–2:05 | Cabinet Scan heatmap | "Every medicine against every other one, not just a pair." The heatmap is your most distinctive visual — hold on it. |
-| 2:05–2:25 | Settings / language switcher | Tools and languages (required): JavaScript, SQL, Cloudflare Workers, Supabase/Postgres, openFDA and RxNorm. Switch the language to Arabic on camera — the whole UI flips right-to-left. Then **the AI disclosure, plainly and without apology** (see below). |
-| 2:25–2:40 | "What Plainscript will never do" | Close on the refusals. "It never diagnoses, never doses, never says a combination is safe. Knowing what a tool should refuse to do is part of designing it." |
+**Full shot-by-shot breakdown (timed, exact actions, reasoning for every beat) is in a
+separate production guide** — ask Claude for the link if it's not at hand, or regenerate
+it from this table plus the research notes below. Condensed version:
+
+| Time | Cam/Screen | On screen | What you say |
+|---|---|---|---|
+| 0:00–0:12 | 📷 Camera | You, face on camera | Name, school, district, app name, one-line purpose — all of it, fast. No intro/logo. |
+| 0:12–0:42 | 📷 Camera | Still on camera | The cousin story, then the Jan 2024 NLM API-shutdown fact. The most-retaken beat — worth it. |
+| 0:42–0:55 | 🖥️ Screen | Homepage, "Built for people who get left out" | Who it's for, explicitly: older adults, caregivers, non-native English speakers, low health literacy. |
+| 0:55–1:22 | 🖥️ Screen | Decode tab, live | Type "Tylenol." Point at the source line: "every claim shows exactly where it came from." |
+| 1:22–1:52 | 🖥️ Screen | Check tab, live — two checks | **warfarin + amiodarone** (real major hit), then **Tylenol + Vicodin** (the uncertain-duplicate safety warning) — swapped in for the originally-planned generic empty state; ties directly back to the cousin story and is the project's single most distinctive safety feature. |
+| 1:52–2:07 | 🖥️ Screen | Cabinet Scan heatmap (pre-populated, not typed live) | "Every medicine against every other one, not just a pair." Hold on it — most distinctive visual. |
+| 2:07–2:27 | 🖥️→📷 | Language switch to Arabic (RTL), then cut to camera | Tools/languages, then the AI disclosure — plainly, on camera, as its own trust moment. |
+| 2:27–2:42 | 📷 Camera | Back on camera, same framing as the open | Close on the refusals: never diagnoses, never doses, never says "safe." Bookends the video. |
+
+Total: **2:42** — within the 2:30 target with a buffer, comfortably under the 3:00 cap.
 
 **Do not** narrate the UI ("now I'll click here"). Judges watch dozens of videos that do
-that. Say what problem each thing solves.
+that. Say what problem each thing solves. Record each beat as its own short clip and
+stitch them — don't try for one unbroken take. For screen beats: record the capture
+silently first with clean, deliberate cursor moves, then narrate over the playback as a
+separate pass, rather than trying to click and talk cleanly at the same time.
 
 ---
 
