@@ -10474,8 +10474,102 @@ const INTERACTIONS = [
           zh:"如果造影剂暂时影响肾功能，二甲双胍可能在体内蓄积，极少数情况下可导致乳酸酸中毒。", vi:"Nếu thuốc cản quang tạm thời ảnh hưởng đến thận, metformin có thể tích tụ và trong một số ít trường hợp gây nhiễm toan lactic.", ar:"إذا أثّرت الصبغة مؤقتًا على الكلى، يمكن أن يتراكم الميتفورمين ويسبب نادرًا الحماض اللبني.", fr:"Si le produit de contraste affecte temporairement les reins, la metformine peut s'accumuler et rarement provoquer une acidose lactique.", ko:"조영제가 신장에 일시적으로 영향을 주면 메트포르민이 축적되어 드물게 젖산산증을 일으킬 수 있습니다.", ru:"Если контраст временно влияет на почки, метформин может накопиться и редко вызвать лактоацидоз.", pt:"Se o contraste afetar temporariamente os rins, a metformina pode se acumular e raramente causar acidose láctica.", de:"Wenn das Kontrastmittel die Nieren vorübergehend beeinträchtigt, kann sich Metformin anreichern und selten eine Laktatazidose verursachen.", ja:"造影剤が一時的に腎臓に影響すると、メトホルミンが蓄積し、まれに乳酸アシドーシスを起こすことがあります。", hi:"यदि डाई अस्थायी रूप से गुर्दों को प्रभावित करती है, तो metformin जमा हो सकती है और कभी-कभार लैक्टिक एसिडोसिस पैदा कर सकती है।", ta:"சாயம் தற்காலிகமாக சிறுநீரகங்களைப் பாதித்தால், metformin தேங்கி அரிதாக லாக்டிக் அமிலத்தன்மையை (lactic acidosis) ஏற்படுத்தலாம்."},
     mgmt:{en:"Hospitals routinely hold metformin before/after contrast imaging per protocol.",
           es:"Los hospitales rutinariamente pausan la metformina antes/después de estudios con contraste, según el protocolo.",
-          zh:"医院通常会按照规程，在使用含碘造影剂前后常规暂停二甲双胍。", vi:"Các bệnh viện thường quy định tạm ngừng metformin trước/sau khi chụp chiếu có cản quang theo đúng quy trình.", ar:"تُوقف المستشفيات الميتفورمين بشكل روتيني قبل/بعد التصوير بالتباين وفقًا للبروتوكول.", fr:"Les hôpitaux suspendent systématiquement la metformine avant/après l'imagerie avec contraste selon le protocole.", ko:"병원은 프로토콜에 따라 조영 영상 검사 전후에 메트포르민을 일상적으로 중단합니다.", ru:"Больницы по протоколу рутинно приостанавливают метформин до/после контрастной визуализации.", pt:"Os hospitais rotineiramente suspendem a metformina antes/depois de imagens com contraste, conforme o protocolo.", de:"Krankenhäuser setzen Metformin gemäß Protokoll routinemäßig vor/nach Kontrastmittel-Bildgebung aus.", ja:"病院ではプロトコルに従い、造影画像検査の前後で日常的にメトホルミンを中止します。", hi:"अस्पताल प्रोटोकॉल के अनुसार कंट्रास्ट इमेजिंग से पहले/बाद में नियमित रूप से metformin रोकते हैं।", ta:"மருத்துவமனைகள் நெறிமுறைப்படி மாறுதல் படமெடுப்புக்கு முன்/பின் metformin ஐ வழக்கமாக நிறுத்திவைக்கின்றன."} }
-  /* [PRIVI - FEATURE 1] add your new interaction rule(s) here, right above this line */
+          zh:"医院通常会按照规程，在使用含碘造影剂前后常规暂停二甲双胍。", vi:"Các bệnh viện thường quy định tạm ngừng metformin trước/sau khi chụp chiếu có cản quang theo đúng quy trình.", ar:"تُوقف المستشفيات الميتفورمين بشكل روتيني قبل/بعد التصوير بالتباين وفقًا للبروتوكول.", fr:"Les hôpitaux suspendent systématiquement la metformine avant/après l'imagerie avec contraste selon le protocole.", ko:"병원은 프로토콜에 따라 조영 영상 검사 전후에 메트포르민을 일상적으로 중단합니다.", ru:"Больницы по протоколу рутинно приостанавливают метформин до/после контрастной визуализации.", pt:"Os hospitais rotineiramente suspendem a metformina antes/depois de imagens com contraste, conforme o protocolo.", de:"Krankenhäuser setzen Metformin gemäß Protokoll routinemäßig vor/nach Kontrastmittel-Bildgebung aus.", ja:"病院ではプロトコルに従い、造影画像検査の前後で日常的にメトホルミンを中止します。", hi:"अस्पताल प्रोटोकॉल के अनुसार कंट्रास्ट इमेजिंग से पहले/बाद में नियमित रूप से metformin रोकते हैं।", ta:"மருத்துவமனைகள் நெறிமுறைப்படி மாறுதல் படமெடுப்புக்கு முன்/பின் metformin ஐ வழக்கமாக நிறுத்திவைக்கின்றன."} },
+
+  { a:["warfarin"], b:["amiodarone"], severity:"major",
+    what:{en:"Bleeding can become severe or life-threatening."},
+    why:{en:"Amiodarone slows down how fast the liver breaks down warfarin, leading to higher levels of warfarin in the body."},
+    mgmt:{en:"Consult a doctor or pharmacist for guidance on dosage adjustments and monitoring before taking these together."} },
+
+  { a:["warfarin"], b:["ciprofloxacin"], severity:"major",
+    what:{en:"Uncontrolled and potentially serious bleeding can occur."},
+    why:{en:"Ciprofloxacin interferes with warfarin breakdown."},
+    mgmt:{en:"Ask a pharmacist or doctor about alternative antibiotics or closer blood monitoring."} },
+
+  { a:["methotrexate"], b:["trimethoprim"], severity:"major",
+    what:{en:"Severe toxicity, including dangerously low blood cell counts and mouth sores."},
+    why:{en:"Both drugs block the body’s use of folic acid, dramatically increasing methotrexate’s toxic effects."},
+    mgmt:{en:"Ask a pharmacist or doctor to choose an alternative antibiotic or adjust treatment safely."} },
+
+  { a:["lithium"], b:["lisinopril"], severity:"major",
+    what:{en:"High levels of lithium in the blood can build up, leading to toxicity, confusion, and tremors."},
+    why:{en:"Lisinopril alters kidney function, causing the kidneys to clear less lithium from the body."},
+    mgmt:{en:"Ask a pharmacist or doctor to evaluate lithium blood levels and medication dosage."} },
+
+  { a:["simvastatin"], b:["amiodarone"], severity:"major",
+    what:{en:"High risk of muscle damage (rhabdomyolysis), which can cause severe muscle pain and kidney failure."},
+    why:{en:"Amiodarone blocks the enzyme responsible for clearing simvastatin, causing simvastatin levels to spike."},
+    mgmt:{en:"Ask a pharmacist or doctor about lowering the simvastatin dose or switching to a safer statin."} },
+
+  { a:["digoxin"], b:["verapamil"], severity:"major",
+    what:{en:"Digoxin buildup in the body can cause nausea, vision changes, or dangerously slow heart rhythms."},
+    why:{en:"Verapamil reduces the kidney and liver clearance of digoxin, raising its concentration in the blood."},
+    mgmt:{en:"Ask a pharmacist or doctor to monitor heart rate and check digoxin blood levels."} },
+
+  { a:["digoxin"], b:["clarithromycin"], severity:"major",
+    what:{en:"Digoxin toxicity can occur, causing irregular heartbeats, vomiting, and confusion."},
+    why:{en:"Clarithromycin blocks the intestinal transport protein (P-glycoprotein) that normally helps eliminate digoxin."},
+    mgmt:{en:"Ask a pharmacist or doctor about monitoring digoxin levels or selecting a different antibiotic."} },
+
+  { a:["lisinopril"], b:["ibuprofen"], severity:"moderate",
+    what:{en:"Reduced blood pressure control and an increased risk of sudden kidney damage or failure."},
+    why:{en:"Ibuprofen restricts blood flow inside the kidneys, opposing the protective kidney mechanism of lisinopril."},
+    mgmt:{en:"Ask a pharmacist or doctor before taking over-the-counter pain relievers while on blood pressure medication."} },
+
+  { a:["sertraline"], b:["ibuprofen"], severity:"moderate",
+    what:{en:"Increased chance of stomach ulcers and gastrointestinal bleeding."},
+    why:{en:"Both medications decrease the ability of blood platelets to clump together and form normal clots."},
+    mgmt:{en:"Ask a pharmacist or doctor about safer pain relief options."} },
+
+  { a:["tramadol"], b:["phenelzine"], severity:"major",
+    what:{en:"A dangerous, potentially fatal condition called serotonin syndrome, causing fever, seizures, and rapid changes in heart rate."},
+    why:{en:"Combining an MAO inhibitor with tramadol causes a massive accumulation of serotonin in the brain."},
+    mgmt:{en:"Ask a pharmacist or doctor immediately, as this combination should be completely avoided."} },
+
+  { a:["fluconazole"], b:["phenytoin"], severity:"major",
+    what:{en:"Phenytoin toxicity can develop, leading to clumsy movements, slurred speech, confusion, and drowsiness."},
+    why:{en:"Fluconazole strongly inhibits the liver enzymes that break down phenytoin."},
+    mgmt:{en:"Ask a pharmacist or doctor about adjusting the phenytoin dose or selecting an alternative antifungal."} },
+
+  { a:["carbamazepine"], b:["warfarin"], severity:"major",
+    what:{en:"Warfarin becomes much less effective, raising the risk of dangerous blood clots."},
+    why:{en:"Carbamazepine speeds up the liver enzymes that eliminate warfarin, lowering blood levels of the blood thinner."},
+    mgmt:{en:"Ask a pharmacist or doctor about adjusting blood thinner dosages or choosing an alternative medication."} },
+
+  { a:["phenytoin"], b:["warfarin"], severity:"moderate",
+    what:{en:"Erratic blood thinning (either increased bleeding risk or increased clotting risk) along with potential phenytoin toxicity."},
+    why:{en:"Both drugs compete for protein binding in the blood and affect each other's clearance in the liver."},
+    mgmt:{en:"Ask a pharmacist or doctor to closely monitor blood clotting times and drug levels."} },
+
+  { a:["metformin"], b:["topiramate"], severity:"moderate",
+    what:{en:"Increased risk of metabolic acidosis, causing rapid breathing, fatigue, and muscle weakness."},
+    why:{en:"Both drugs can lower bicarbonate levels in the blood, combining to increase blood acidity."},
+    mgmt:{en:"Ask a pharmacist or doctor to monitor blood chemistry and bicarbonate levels."} },
+
+  { a:["sildenafil"], b:["tamsulosin"], severity:"moderate",
+    what:{en:"A sudden drop in blood pressure, leading to dizziness, lightheadedness, or fainting upon standing."},
+    why:{en:"Both medications dilate blood vessels, producing an additive lowering effect on blood pressure."},
+    mgmt:{en:"Ask a pharmacist or doctor about spacing out doses or adjusting treatment."} },
+
+  { a:["clarithromycin"], b:["colchicine"], severity:"major",
+    what:{en:"Severe toxicity leading to muscle damage, nerve impairment, organ failure, or death. Should not be used in patients with liver/kidney impairment; may harm the patient"},
+    why:{en:"Clarithromycin blocks the main enzyme and transport protein responsible for clearing colchicine from the body."},
+    mgmt:{en:"Ask a pharmacist or doctor about alternative infection treatments."} },
+
+  { a:["warfarin"], b:["itraconazole"], severity:"major",
+    what:{en:"Significant risk of serious or fatal bleeding."},
+    why:{en:"Itraconazole inhibits CYP3A4, slowing down warfarin metabolism and elevating its blood concentration."},
+    mgmt:{en:"Ask a pharmacist or doctor about monitoring blood clotting metrics or selecting a different antifungal agent."} },
+
+  { a:["methotrexate"], b:["omeprazole"], severity:"major",
+    what:{en:"Higher blood levels of methotrexate, increasing the risk of bone marrow suppression and severe toxicity."},
+    why:{en:"Omeprazole blocks the kidney pumps that usually excrete methotrexate into the urine."},
+    mgmt:{en:"Ask a pharmacist or doctor about temporary alternative acid-reducing remedies during high-dose methotrexate treatment."} },
+
+  { a:["metoprolol"], b:["verapamil"], severity:"major",
+    what:{en:"Excessively slow heart rate, heart block, or severe drop in blood pressure."},
+    why:{en:"Both drugs slow the electrical conduction system and pumping force of the heart in complementary ways."},
+    mgmt:{en:"Ask a pharmacist or doctor to monitor heart rhythm and blood pressure regularly."} },
 ];
 
 /* ---- SYMPTOM → OTC CATEGORY (Symptoms tab) -----------------------

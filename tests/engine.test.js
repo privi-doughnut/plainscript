@@ -57,8 +57,138 @@ test("curated data", async (t) => {
     assert.ok(found, "the textbook warfarin/NSAID bleeding interaction is missing");
   });
 
-  // [PRIVI - BONUS 1] add one t.test(...) here per rule you added in Feature 1,
-  // modeled on the warfarin + NSAID test above
+  await t.test("the warfarin + amiodarone major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("warfarin") && r.b.includes("amiodarone")) ||
+      (r.b.includes("warfarin") && r.a.includes("amiodarone")));
+    assert.ok(found, "the warfarin/amiodarone rule is missing");
+  });
+
+  await t.test("the warfarin + ciprofloxacin major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("warfarin") && r.b.includes("ciprofloxacin")) ||
+      (r.b.includes("warfarin") && r.a.includes("ciprofloxacin")));
+    assert.ok(found, "the warfarin/ciprofloxacin rule is missing");
+  });
+
+  await t.test("the methotrexate + trimethoprim major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("methotrexate") && r.b.includes("trimethoprim")) ||
+      (r.b.includes("methotrexate") && r.a.includes("trimethoprim")));
+    assert.ok(found, "the methotrexate/trimethoprim rule is missing");
+  });
+
+  await t.test("the lithium + lisinopril major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("lithium") && r.b.includes("lisinopril")) ||
+      (r.b.includes("lithium") && r.a.includes("lisinopril")));
+    assert.ok(found, "the lithium/lisinopril rule is missing");
+  });
+
+  await t.test("the simvastatin + amiodarone major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("simvastatin") && r.b.includes("amiodarone")) ||
+      (r.b.includes("simvastatin") && r.a.includes("amiodarone")));
+    assert.ok(found, "the simvastatin/amiodarone rule is missing");
+  });
+
+  await t.test("the digoxin + verapamil major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("digoxin") && r.b.includes("verapamil")) ||
+      (r.b.includes("digoxin") && r.a.includes("verapamil")));
+    assert.ok(found, "the digoxin/verapamil rule is missing");
+  });
+
+  await t.test("the digoxin + clarithromycin major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("digoxin") && r.b.includes("clarithromycin")) ||
+      (r.b.includes("digoxin") && r.a.includes("clarithromycin")));
+    assert.ok(found, "the digoxin/clarithromycin rule is missing");
+  });
+
+  await t.test("the lisinopril + ibuprofen moderate rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("lisinopril") && r.b.includes("ibuprofen")) ||
+      (r.b.includes("lisinopril") && r.a.includes("ibuprofen")));
+    assert.ok(found, "the lisinopril/ibuprofen rule is missing");
+  });
+
+  await t.test("the sertraline + ibuprofen moderate rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("sertraline") && r.b.includes("ibuprofen")) ||
+      (r.b.includes("sertraline") && r.a.includes("ibuprofen")));
+    assert.ok(found, "the sertraline/ibuprofen rule is missing");
+  });
+
+  await t.test("the tramadol + phenelzine major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("tramadol") && r.b.includes("phenelzine")) ||
+      (r.b.includes("tramadol") && r.a.includes("phenelzine")));
+    assert.ok(found, "the tramadol/phenelzine rule is missing");
+  });
+
+  await t.test("the fluconazole + phenytoin major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("fluconazole") && r.b.includes("phenytoin")) ||
+      (r.b.includes("fluconazole") && r.a.includes("phenytoin")));
+    assert.ok(found, "the fluconazole/phenytoin rule is missing");
+  });
+
+  await t.test("the carbamazepine + warfarin major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("carbamazepine") && r.b.includes("warfarin")) ||
+      (r.b.includes("carbamazepine") && r.a.includes("warfarin")));
+    assert.ok(found, "the carbamazepine/warfarin rule is missing");
+  });
+
+  await t.test("the phenytoin + warfarin moderate rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("phenytoin") && r.b.includes("warfarin")) ||
+      (r.b.includes("phenytoin") && r.a.includes("warfarin")));
+    assert.ok(found, "the phenytoin/warfarin rule is missing");
+  });
+
+  await t.test("the metformin + topiramate moderate rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("metformin") && r.b.includes("topiramate")) ||
+      (r.b.includes("metformin") && r.a.includes("topiramate")));
+    assert.ok(found, "the metformin/topiramate rule is missing");
+  });
+
+  await t.test("the sildenafil + tamsulosin moderate rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("sildenafil") && r.b.includes("tamsulosin")) ||
+      (r.b.includes("sildenafil") && r.a.includes("tamsulosin")));
+    assert.ok(found, "the sildenafil/tamsulosin rule is missing");
+  });
+
+  await t.test("the clarithromycin + colchicine major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("clarithromycin") && r.b.includes("colchicine")) ||
+      (r.b.includes("clarithromycin") && r.a.includes("colchicine")));
+    assert.ok(found, "the clarithromycin/colchicine rule is missing");
+  });
+
+  await t.test("the warfarin + itraconazole major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("warfarin") && r.b.includes("itraconazole")) ||
+      (r.b.includes("warfarin") && r.a.includes("itraconazole")));
+    assert.ok(found, "the warfarin/itraconazole rule is missing");
+  });
+
+  await t.test("the methotrexate + omeprazole major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("methotrexate") && r.b.includes("omeprazole")) ||
+      (r.b.includes("methotrexate") && r.a.includes("omeprazole")));
+    assert.ok(found, "the methotrexate/omeprazole rule is missing");
+  });
+
+  await t.test("the metoprolol + verapamil major rule is present", () => {
+    const found = INTERACTIONS.some((r) =>
+      (r.a.includes("metoprolol") && r.b.includes("verapamil")) ||
+      (r.b.includes("metoprolol") && r.a.includes("verapamil")));
+    assert.ok(found, "the metoprolol/verapamil rule is missing");
+  });
 });
 
 /* ------------------------------------------------------------------ *
