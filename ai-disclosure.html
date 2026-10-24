@@ -5,7 +5,7 @@
   this build process, reviewed by Privi. If a factual claim on this page
   stops matching the repo, fix the page before it stops matching.
 -->
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -16,8 +16,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <script>
-  /* match the app's theme choice — same localStorage key, same default (light) */
-  try{ if (localStorage.getItem("plainscript.theme") === "dark") document.documentElement.setAttribute("data-theme","dark"); }catch(e){}
+  /* Match the app's theme choice — same localStorage key, same default (dark).
+     This page only has light/dark palettes (not the app's blue/green/purple/
+     rose/high-contrast options), so anything other than an explicit "light"
+     choice renders dark here — the goal is never flashing a bright white page
+     at someone who picked a dark-family theme, not a pixel-perfect match of
+     every palette. */
+  try{
+    const stored = localStorage.getItem("plainscript.theme");
+    document.documentElement.setAttribute("data-theme", stored === "light" ? "light" : "dark");
+  }catch(e){}
 </script>
 <style>
   :root{

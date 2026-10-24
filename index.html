@@ -1520,6 +1520,7 @@
       <div class="inrow">
         <input type="text" id="decode-input" data-i18n-placeholder="decode_placeholder" autocomplete="off" />
         <button class="go" id="decode-btn" data-i18n="decode_btn"></button>
+        <button class="ghost" id="decode-clear-btn" type="button" data-i18n="decode_clear_btn"></button>
       </div>
     </div>
     <div class="results" id="decode-results" aria-live="polite"></div>
@@ -4030,7 +4031,7 @@ const I18N = {
     decode_intro: "Enter a brand or generic name (for example, <em>Lipitor</em> or <em>atorvastatin</em>).",
     decode_label: "Medication name",
     decode_placeholder: "e.g. Tylenol, metformin, Xanax",
-    decode_btn: "Decode",
+    decode_btn: "Decode", decode_clear_btn: "Clear",
 
     check_intro: "Add two or more medications. Plainscript checks them against a curated set of well‑documented interactions <em>and</em> cross‑references each drug's official FDA label.",
     glossary_label: "Glossary",
@@ -4680,7 +4681,7 @@ const I18N = {
     decode_intro: "Escribe un nombre comercial o genérico (por ejemplo, <em>Lipitor</em> o <em>atorvastatina</em>).",
     decode_label: "Nombre del medicamento",
     decode_placeholder: "p. ej. Tylenol, metformina, Xanax",
-    decode_btn: "Descifrar",
+    decode_btn: "Descifrar", decode_clear_btn: "Borrar",
 
     check_intro: "Agrega dos o más medicamentos. Plainscript los revisa contra un conjunto curado de interacciones bien documentadas <em>y</em> las compara con la etiqueta oficial de la FDA de cada medicamento.",
     rule_count_prefix: "Se compara con", rule_count_suffix: "reglas de interacción curadas y verificadas.",
@@ -5178,7 +5179,7 @@ const I18N = {
     tab_decode: "解读药物", tab_check: "检查相互作用", tab_cabinet: "我的药柜", tab_symptoms: "症状",
 
     decode_intro: "输入商品名或通用名（例如 <em>Lipitor</em> 或 <em>阿托伐他汀</em>）。",
-    decode_label: "药物名称", decode_placeholder: "例如：Tylenol、二甲双胍、Xanax", decode_btn: "解读",
+    decode_label: "药物名称", decode_placeholder: "例如：Tylenol、二甲双胍、Xanax", decode_btn: "解读", decode_clear_btn: "清除",
 
     check_intro: "添加两种或更多药物。Plainscript会将它们与经过整理的、有充分记录的相互作用集合进行比对，<em>并且</em>会对照每种药物的官方FDA标签。",
     rule_count_prefix: "对照", rule_count_suffix: "条经过整理且有可靠来源的相互作用规则。",
@@ -5651,7 +5652,7 @@ const I18N = {
     tab_decode: "Giải mã thuốc", tab_check: "Kiểm tra tương tác", tab_cabinet: "Tủ thuốc của tôi", tab_symptoms: "Triệu chứng",
 
     decode_intro: "Nhập tên biệt dược hoặc tên gốc (ví dụ: <em>Lipitor</em> hoặc <em>atorvastatin</em>).",
-    decode_label: "Tên thuốc", decode_placeholder: "ví dụ: Tylenol, metformin, Xanax", decode_btn: "Giải mã",
+    decode_label: "Tên thuốc", decode_placeholder: "ví dụ: Tylenol, metformin, Xanax", decode_btn: "Giải mã", decode_clear_btn: "Xóa",
 
     check_intro: "Thêm hai loại thuốc trở lên. Plainscript sẽ đối chiếu chúng với một bộ tương tác đã được biên soạn kỹ, có nhiều dẫn chứng, <em>đồng thời</em> tham chiếu với nhãn thuốc chính thức của FDA cho từng loại.",
     rule_count_prefix: "Đối chiếu với", rule_count_suffix: "quy tắc tương tác đã được biên soạn và có nguồn rõ ràng.",
@@ -6129,7 +6130,7 @@ const I18N = {
     decode_intro: "أدخل الاسم التجاري أو العلمي (على سبيل المثال، <em>ليبيتور</em> أو <em>أتورفاستاتين</em>).",
     decode_label: "اسم الدواء",
     decode_placeholder: "مثال: تايلينول، ميتفورمين، زاناكس",
-    decode_btn: "فك الرموز",
+    decode_btn: "فك الرموز", decode_clear_btn: "مسح",
 
     check_intro: "أضف دواءين أو أكثر. يتحقق Plainscript منهما مقابل مجموعة موثّقة من التفاعلات المعروفة <em>و</em> يقارنها بملصق FDA الرسمي لكل دواء.",
     rule_count_prefix: "تُفحص هذه مقابل", rule_count_suffix: "قاعدة تفاعل منسقة وموثقة المصدر.",
@@ -6640,7 +6641,7 @@ const I18N = {
     decode_intro: "Entrez un nom de marque ou générique (par exemple, <em>Lipitor</em> ou <em>atorvastatine</em>).",
     decode_label: "Nom du médicament",
     decode_placeholder: "ex. Tylenol, metformine, Xanax",
-    decode_btn: "Décoder",
+    decode_btn: "Décoder", decode_clear_btn: "Effacer",
 
     check_intro: "Ajoutez deux médicaments ou plus. Plainscript les vérifie par rapport à un ensemble d'interactions bien documentées <em>et</em> croise chaque étiquette officielle de la FDA.",
     rule_count_prefix: "Vérifié par rapport à", rule_count_suffix: "règles d'interaction sélectionnées et sourcées.",
@@ -7151,7 +7152,7 @@ const I18N = {
     decode_intro: "상품명 또는 성분명을 입력하세요 (예: <em>리피토</em> 또는 <em>아토르바스타틴</em>).",
     decode_label: "약 이름",
     decode_placeholder: "예: 타이레놀, 메트포르민, 자낙스",
-    decode_btn: "확인하기",
+    decode_btn: "확인하기", decode_clear_btn: "지우기",
 
     check_intro: "두 가지 이상의 약을 추가하세요. Plainscript는 잘 정리된 상호작용 자료와 대조하고 <em>동시에</em> 각 약의 공식 FDA 라벨을 교차 확인합니다.",
     rule_count_prefix: "총", rule_count_suffix: "개의 선별되고 출처가 명시된 상호작용 규칙과 대조합니다.",
@@ -7662,7 +7663,7 @@ const I18N = {
     decode_intro: "Введите торговое или международное название (например, <em>Липитор</em> или <em>аторвастатин</em>).",
     decode_label: "Название лекарства",
     decode_placeholder: "напр. Тайленол, метформин, Ксанакс",
-    decode_btn: "Разобрать",
+    decode_btn: "Разобрать", decode_clear_btn: "Очистить",
 
     check_intro: "Добавьте два и более лекарства. Plainscript сверяет их с проверенным набором хорошо задокументированных взаимодействий <em>и</em> перекрёстно проверяет официальную этикетку FDA каждого препарата.",
     rule_count_prefix: "Сверяется с", rule_count_suffix: "курируемыми правилами взаимодействия с указанием источников.",
@@ -8173,7 +8174,7 @@ const I18N = {
     decode_intro: "Digite um nome comercial ou genérico (por exemplo, <em>Lipitor</em> ou <em>atorvastatina</em>).",
     decode_label: "Nome do medicamento",
     decode_placeholder: "ex. Tylenol, metformina, Xanax",
-    decode_btn: "Decodificar",
+    decode_btn: "Decodificar", decode_clear_btn: "Limpar",
 
     check_intro: "Adicione dois ou mais medicamentos. O Plainscript os verifica com um conjunto selecionado de interações bem documentadas <em>e</em> cruza a bula oficial da FDA de cada medicamento.",
     rule_count_prefix: "Verificado com", rule_count_suffix: "regras de interação selecionadas e com fontes verificadas.",
@@ -8684,7 +8685,7 @@ const I18N = {
     decode_intro: "Geben Sie einen Handels- oder Wirkstoffnamen ein (zum Beispiel <em>Lipitor</em> oder <em>Atorvastatin</em>).",
     decode_label: "Medikamentenname",
     decode_placeholder: "z. B. Tylenol, Metformin, Xanax",
-    decode_btn: "Entschlüsseln",
+    decode_btn: "Entschlüsseln", decode_clear_btn: "Löschen",
 
     check_intro: "Fügen Sie zwei oder mehr Medikamente hinzu. Plainscript prüft sie anhand einer kuratierten Sammlung gut dokumentierter Wechselwirkungen <em>und</em> gleicht das offizielle FDA-Etikett jedes Medikaments ab.",
     rule_count_prefix: "Abgeglichen mit", rule_count_suffix: "kuratierten, quellenbelegten Wechselwirkungsregeln.",
@@ -9195,7 +9196,7 @@ const I18N = {
     decode_intro: "商品名または一般名を入力してください（例：<em>リピトール</em> または <em>アトルバスタチン</em>）。",
     decode_label: "薬の名前",
     decode_placeholder: "例：タイレノール、メトホルミン、ザナックス",
-    decode_btn: "調べる",
+    decode_btn: "調べる", decode_clear_btn: "クリア",
 
     check_intro: "2つ以上の薬を追加してください。Plainscriptは、よく記録された相互作用の厳選セットと照合し、<em>さらに</em>各薬の公式FDA添付文書を相互参照します。",
     rule_count_prefix: "照合対象は", rule_count_suffix: "件の厳選された、出典明記済みの相互作用ルールです。",
@@ -9631,7 +9632,7 @@ const I18N = {
     decode_intro: "कोई ब्रांड या जेनेरिक नाम दर्ज करें (उदाहरण के लिए, <em>Lipitor</em> या <em>atorvastatin</em>)।",
     decode_label: "दवा का नाम",
     decode_placeholder: "जैसे Tylenol, metformin, Xanax",
-    decode_btn: "समझें",
+    decode_btn: "समझें", decode_clear_btn: "साफ़ करें",
     check_intro: "दो या अधिक दवाएँ जोड़ें। Plainscript इन्हें अच्छी तरह प्रलेखित परस्पर क्रियाओं के चयनित समूह से जाँचता है <em>और</em> प्रत्येक दवा के आधिकारिक FDA लेबल से मिलान करता है।",
     rule_count_prefix: "इसकी तुलना", rule_count_suffix: "चयनित, स्रोत-सहित इंटरैक्शन नियमों से की जाती है।",
     add_drug_btn: "+ एक और दवा जोड़ें",
@@ -10117,7 +10118,7 @@ const I18N = {
     decode_intro: "ஒரு பிராண்ட் அல்லது பொதுப் பெயரை உள்ளிடவும் (உதாரணமாக, <em>Lipitor</em> அல்லது <em>atorvastatin</em>).",
     decode_label: "மருந்தின் பெயர்",
     decode_placeholder: "எ.கா. Tylenol, metformin, Xanax",
-    decode_btn: "புரிந்துகொள்",
+    decode_btn: "புரிந்துகொள்", decode_clear_btn: "அழி",
     check_intro: "இரண்டு அல்லது அதற்கு மேற்பட்ட மருந்துகளைச் சேர்க்கவும். Plainscript இவற்றை நன்கு ஆவணப்படுத்தப்பட்ட இடைவினைகளின் தேர்ந்தெடுக்கப்பட்ட தொகுப்போடு சரிபார்க்கிறது <em>மேலும்</em> ஒவ்வொரு மருந்தின் அதிகாரப்பூர்வ FDA லேபிளுடன் ஒப்பிடுகிறது.",
     rule_count_prefix: "இது", rule_count_suffix: "தேர்ந்தெடுக்கப்பட்ட, ஆதாரத்துடன் கூடிய இடைவினை விதிகளுடன் ஒப்பிடப்படுகிறது.",
     add_drug_btn: "+ இன்னொரு மருந்தைச் சேர்",
@@ -13408,6 +13409,12 @@ document.addEventListener("keydown", e => {
   }
 });
 $("#decode-btn").addEventListener("click", decode);
+$("#decode-clear-btn").addEventListener("click", ()=>{
+  if (window.speechSynthesis) window.speechSynthesis.cancel(); // stop any read-aloud in progress
+  $("#decode-input").value = "";
+  $("#decode-results").innerHTML = "";
+  $("#decode-input").focus();
+});
 $("#decode-input").addEventListener("keydown", e=>{ if(e.key==="Enter") decode(); });
 addVoiceButton($("#decode-input"), decode); // auto-decodes on speech — read-only, no side effect
 addScanButton($("#decode-input"), decode);  // camera barcode scan (feature-detected)
