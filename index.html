@@ -12602,14 +12602,19 @@ function sharedIngredients(A, B){
   const norm = l => new Set(((l && l.substances) || [])
     .map(x => String(x).toLowerCase().trim()).filter(Boolean));
   const sa = norm(A.label), sb = norm(B.label);
-  if (!sa.size || !sb.size) return [];      // one label had no substance data
-  return [...sa].filter(x => sb.has(x));
+  // one side having zero substance data is NOT the same claim as "checked,
+  // no shared ingredients" — a drug can resolve with no FDA label at all
+  // (common for discontinued/delisted combination products, e.g. brand-name
+  // Vicodin), which silently blinds this exact check unless it's surfaced.
+  if (!sa.size || !sb.size) return { shared: [], unverifiable: true };
+  return { shared: [...sa].filter(x => sb.has(x)), unverifiable: false };
 }
 
 function analyzeDrugPairs(drugs){
-  const findings = [];   // curated severity hits
-  const mentions = [];   // FDA-label cross-references
-  const duplicates = []; // same active ingredient in two different products
+  const findings = [];            // curated severity hits
+  const mentions = [];            // FDA-label cross-references
+  const duplicates = [];          // same active ingredient in two different products
+  const uncertainDuplicates = []; // ingredient overlap couldn't be checked — no label data
   for (let i=0;i<drugs.length;i++){
     for (let j=i+1;j<drugs.length;j++){
       const A=drugs[i], B=drugs[j];
@@ -12617,8 +12622,9 @@ function analyzeDrugPairs(drugs){
 
       // checked before the curated rules: a double dose is its own problem and
       // shouldn't be hidden just because the pair also has an interaction rule
-      const shared = sharedIngredients(A,B);
+      const { shared, unverifiable } = sharedIngredients(A,B);
       if (shared.length) duplicates.push({A, B, shared});
+      else if (unverifiable) uncertainDuplicates.push({A, B});
 
       let matched=false;
       for (const rule of INTERACTIONS){
@@ -12632,7 +12638,7 @@ function analyzeDrugPairs(drugs){
       if (m) mentions.push(m);
     }
   }
-  return { findings, mentions, duplicates };
+  return { findings, mentions, duplicates, uncertainDuplicates };
 }
 
 async function checkInteractions(){
@@ -12648,8 +12654,8 @@ async function checkInteractions(){
 
   const drugs = await resolveAll(inputs, 5, (d0, n) => setProgress("#check-prog", d0, n));
 
-  const { findings, mentions, duplicates } = analyzeDrugPairs(drugs);
-  renderResults(box, drugs, findings, mentions, duplicates);
+  const { findings, mentions, duplicates, uncertainDuplicates } = analyzeDrugPairs(drugs);
+  renderResults(box, drugs, findings, mentions, duplicates, uncertainDuplicates);
 }
 
 /* check whether drug X's FDA interaction text names drug Y */
@@ -12692,8 +12698,9 @@ function renderDuplicates(duplicates){
   return html;
 }
 
-function renderResults(box, drugs, findings, mentions, duplicates){
+function renderResults(box, drugs, findings, mentions, duplicates, uncertainDuplicates){
   let html = renderUnverifiedWarning(drugs);
+  html += renderUncertainDuplicates(uncertainDuplicates);
   html += renderDuplicates(duplicates);
 
   // order curated findings by severity
@@ -14960,9 +14967,10 @@ async function runCabinetScan(){
 
   const drugs = await resolveAll(meds.map(m => m.generic || m.brand || m.name), 5,
     (d0, n) => setProgress("#scan-prog", d0, n));
-  const { findings, mentions, duplicates } = analyzeDrugPairs(drugs);
+  const { findings, mentions, duplicates, uncertainDuplicates } = analyzeDrugPairs(drugs);
 
   box.innerHTML = renderUnverifiedWarning(drugs)
+    + renderUncertainDuplicates(uncertainDuplicates)
     + renderDuplicates(duplicates)
     + renderScanSummary(findings, mentions)
     + renderCabinetMap(meds)
@@ -14982,6 +14990,27 @@ function renderUnverifiedWarning(drugs){
     <b>Couldn't fully check ${esc(unverified.map(d=>d.display).join(", "))}</b>
     <p style="margin-top:4px;">We couldn't reach the FDA label for ${unverified.length>1?"these drugs":"this drug"} just now (network or service issue) —
     so this result may be incomplete. This is different from "nothing found": try again in a moment before trusting it.</p>
+  </div>`;
+}
+
+/* A drug can resolve with zero FDA label data without any fetch ever
+   failing — openFDA simply has no record under that name. This is common
+   for discontinued/delisted combination products (brand-name Vicodin is
+   the one that surfaces it in practice). When that happens, the duplicate-
+   active-ingredient check above has nothing to compare, and silently
+   saying "no shared ingredients" would be indistinguishable from "checked
+   and it's clean" — exactly the conflation this app exists to avoid. */
+function renderUncertainDuplicates(uncertainDuplicates){
+  if (!uncertainDuplicates || !uncertainDuplicates.length) return "";
+  const names = [...new Set(uncertainDuplicates.flatMap(d => [d.A, d.B])
+    .filter(d => !d.label).map(d => d.display))];
+  if (!names.length) return "";
+  const plural = names.length > 1;
+  return `<div class="err" style="margin-bottom:14px;">
+    <b>Couldn't check ${esc(names.join(", "))} for overlapping ingredients</b>
+    <p style="margin-top:4px;">No FDA label was found under ${plural ? "these names" : "this name"} — this happens with some older or
+    discontinued combination products. If ${plural ? "either one combines" : "it combines"} more than one ingredient (for example, an
+    opioid with acetaminophen), try searching each ingredient separately so it can actually be checked.</p>
   </div>`;
 }
 

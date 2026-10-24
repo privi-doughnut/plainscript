@@ -62,6 +62,10 @@ test("curated data", async (t) => {
       (r.a.includes("warfarin") && r.b.includes("amiodarone")) ||
       (r.b.includes("warfarin") && r.a.includes("amiodarone")));
     assert.ok(found, "the warfarin/amiodarone rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("warfarin") && r.b.includes("amiodarone")) ||
+      (r.b.includes("warfarin") && r.a.includes("amiodarone")));
+    assert.equal(rule.severity, "major", "the warfarin/amiodarone rule exists but its severity has drifted from major");
   });
 
   await t.test("the warfarin + ciprofloxacin major rule is present", () => {
@@ -69,6 +73,10 @@ test("curated data", async (t) => {
       (r.a.includes("warfarin") && r.b.includes("ciprofloxacin")) ||
       (r.b.includes("warfarin") && r.a.includes("ciprofloxacin")));
     assert.ok(found, "the warfarin/ciprofloxacin rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("warfarin") && r.b.includes("ciprofloxacin")) ||
+      (r.b.includes("warfarin") && r.a.includes("ciprofloxacin")));
+    assert.equal(rule.severity, "major", "the warfarin/ciprofloxacin rule exists but its severity has drifted from major");
   });
 
   await t.test("the methotrexate + trimethoprim major rule is present", () => {
@@ -76,6 +84,10 @@ test("curated data", async (t) => {
       (r.a.includes("methotrexate") && r.b.includes("trimethoprim")) ||
       (r.b.includes("methotrexate") && r.a.includes("trimethoprim")));
     assert.ok(found, "the methotrexate/trimethoprim rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("methotrexate") && r.b.includes("trimethoprim")) ||
+      (r.b.includes("methotrexate") && r.a.includes("trimethoprim")));
+    assert.equal(rule.severity, "major", "the methotrexate/trimethoprim rule exists but its severity has drifted from major");
   });
 
   await t.test("the lithium + lisinopril major rule is present", () => {
@@ -83,6 +95,10 @@ test("curated data", async (t) => {
       (r.a.includes("lithium") && r.b.includes("lisinopril")) ||
       (r.b.includes("lithium") && r.a.includes("lisinopril")));
     assert.ok(found, "the lithium/lisinopril rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("lithium") && r.b.includes("lisinopril")) ||
+      (r.b.includes("lithium") && r.a.includes("lisinopril")));
+    assert.equal(rule.severity, "major", "the lithium/lisinopril rule exists but its severity has drifted from major");
   });
 
   await t.test("the simvastatin + amiodarone major rule is present", () => {
@@ -90,6 +106,10 @@ test("curated data", async (t) => {
       (r.a.includes("simvastatin") && r.b.includes("amiodarone")) ||
       (r.b.includes("simvastatin") && r.a.includes("amiodarone")));
     assert.ok(found, "the simvastatin/amiodarone rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("simvastatin") && r.b.includes("amiodarone")) ||
+      (r.b.includes("simvastatin") && r.a.includes("amiodarone")));
+    assert.equal(rule.severity, "major", "the simvastatin/amiodarone rule exists but its severity has drifted from major");
   });
 
   await t.test("the digoxin + verapamil major rule is present", () => {
@@ -97,6 +117,10 @@ test("curated data", async (t) => {
       (r.a.includes("digoxin") && r.b.includes("verapamil")) ||
       (r.b.includes("digoxin") && r.a.includes("verapamil")));
     assert.ok(found, "the digoxin/verapamil rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("digoxin") && r.b.includes("verapamil")) ||
+      (r.b.includes("digoxin") && r.a.includes("verapamil")));
+    assert.equal(rule.severity, "major", "the digoxin/verapamil rule exists but its severity has drifted from major");
   });
 
   await t.test("the digoxin + clarithromycin major rule is present", () => {
@@ -104,6 +128,10 @@ test("curated data", async (t) => {
       (r.a.includes("digoxin") && r.b.includes("clarithromycin")) ||
       (r.b.includes("digoxin") && r.a.includes("clarithromycin")));
     assert.ok(found, "the digoxin/clarithromycin rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("digoxin") && r.b.includes("clarithromycin")) ||
+      (r.b.includes("digoxin") && r.a.includes("clarithromycin")));
+    assert.equal(rule.severity, "major", "the digoxin/clarithromycin rule exists but its severity has drifted from major");
   });
 
   await t.test("the lisinopril + ibuprofen moderate rule is present", () => {
@@ -111,6 +139,10 @@ test("curated data", async (t) => {
       (r.a.includes("lisinopril") && r.b.includes("ibuprofen")) ||
       (r.b.includes("lisinopril") && r.a.includes("ibuprofen")));
     assert.ok(found, "the lisinopril/ibuprofen rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("lisinopril") && r.b.includes("ibuprofen")) ||
+      (r.b.includes("lisinopril") && r.a.includes("ibuprofen")));
+    assert.equal(rule.severity, "moderate", "the lisinopril/ibuprofen rule exists but its severity has drifted from moderate");
   });
 
   await t.test("the sertraline + ibuprofen moderate rule is present", () => {
@@ -118,6 +150,10 @@ test("curated data", async (t) => {
       (r.a.includes("sertraline") && r.b.includes("ibuprofen")) ||
       (r.b.includes("sertraline") && r.a.includes("ibuprofen")));
     assert.ok(found, "the sertraline/ibuprofen rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("sertraline") && r.b.includes("ibuprofen")) ||
+      (r.b.includes("sertraline") && r.a.includes("ibuprofen")));
+    assert.equal(rule.severity, "moderate", "the sertraline/ibuprofen rule exists but its severity has drifted from moderate");
   });
 
   await t.test("the tramadol + phenelzine major rule is present", () => {
@@ -125,6 +161,10 @@ test("curated data", async (t) => {
       (r.a.includes("tramadol") && r.b.includes("phenelzine")) ||
       (r.b.includes("tramadol") && r.a.includes("phenelzine")));
     assert.ok(found, "the tramadol/phenelzine rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("tramadol") && r.b.includes("phenelzine")) ||
+      (r.b.includes("tramadol") && r.a.includes("phenelzine")));
+    assert.equal(rule.severity, "major", "the tramadol/phenelzine rule exists but its severity has drifted from major");
   });
 
   await t.test("the fluconazole + phenytoin major rule is present", () => {
@@ -132,6 +172,10 @@ test("curated data", async (t) => {
       (r.a.includes("fluconazole") && r.b.includes("phenytoin")) ||
       (r.b.includes("fluconazole") && r.a.includes("phenytoin")));
     assert.ok(found, "the fluconazole/phenytoin rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("fluconazole") && r.b.includes("phenytoin")) ||
+      (r.b.includes("fluconazole") && r.a.includes("phenytoin")));
+    assert.equal(rule.severity, "major", "the fluconazole/phenytoin rule exists but its severity has drifted from major");
   });
 
   await t.test("the carbamazepine + warfarin major rule is present", () => {
@@ -139,6 +183,10 @@ test("curated data", async (t) => {
       (r.a.includes("carbamazepine") && r.b.includes("warfarin")) ||
       (r.b.includes("carbamazepine") && r.a.includes("warfarin")));
     assert.ok(found, "the carbamazepine/warfarin rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("carbamazepine") && r.b.includes("warfarin")) ||
+      (r.b.includes("carbamazepine") && r.a.includes("warfarin")));
+    assert.equal(rule.severity, "major", "the carbamazepine/warfarin rule exists but its severity has drifted from major");
   });
 
   await t.test("the phenytoin + warfarin moderate rule is present", () => {
@@ -146,6 +194,10 @@ test("curated data", async (t) => {
       (r.a.includes("phenytoin") && r.b.includes("warfarin")) ||
       (r.b.includes("phenytoin") && r.a.includes("warfarin")));
     assert.ok(found, "the phenytoin/warfarin rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("phenytoin") && r.b.includes("warfarin")) ||
+      (r.b.includes("phenytoin") && r.a.includes("warfarin")));
+    assert.equal(rule.severity, "moderate", "the phenytoin/warfarin rule exists but its severity has drifted from moderate");
   });
 
   await t.test("the metformin + topiramate moderate rule is present", () => {
@@ -153,6 +205,10 @@ test("curated data", async (t) => {
       (r.a.includes("metformin") && r.b.includes("topiramate")) ||
       (r.b.includes("metformin") && r.a.includes("topiramate")));
     assert.ok(found, "the metformin/topiramate rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("metformin") && r.b.includes("topiramate")) ||
+      (r.b.includes("metformin") && r.a.includes("topiramate")));
+    assert.equal(rule.severity, "moderate", "the metformin/topiramate rule exists but its severity has drifted from moderate");
   });
 
   await t.test("the sildenafil + tamsulosin moderate rule is present", () => {
@@ -160,6 +216,10 @@ test("curated data", async (t) => {
       (r.a.includes("sildenafil") && r.b.includes("tamsulosin")) ||
       (r.b.includes("sildenafil") && r.a.includes("tamsulosin")));
     assert.ok(found, "the sildenafil/tamsulosin rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("sildenafil") && r.b.includes("tamsulosin")) ||
+      (r.b.includes("sildenafil") && r.a.includes("tamsulosin")));
+    assert.equal(rule.severity, "moderate", "the sildenafil/tamsulosin rule exists but its severity has drifted from moderate");
   });
 
   await t.test("the clarithromycin + colchicine major rule is present", () => {
@@ -167,6 +227,10 @@ test("curated data", async (t) => {
       (r.a.includes("clarithromycin") && r.b.includes("colchicine")) ||
       (r.b.includes("clarithromycin") && r.a.includes("colchicine")));
     assert.ok(found, "the clarithromycin/colchicine rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("clarithromycin") && r.b.includes("colchicine")) ||
+      (r.b.includes("clarithromycin") && r.a.includes("colchicine")));
+    assert.equal(rule.severity, "major", "the clarithromycin/colchicine rule exists but its severity has drifted from major");
   });
 
   await t.test("the warfarin + itraconazole major rule is present", () => {
@@ -174,6 +238,10 @@ test("curated data", async (t) => {
       (r.a.includes("warfarin") && r.b.includes("itraconazole")) ||
       (r.b.includes("warfarin") && r.a.includes("itraconazole")));
     assert.ok(found, "the warfarin/itraconazole rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("warfarin") && r.b.includes("itraconazole")) ||
+      (r.b.includes("warfarin") && r.a.includes("itraconazole")));
+    assert.equal(rule.severity, "major", "the warfarin/itraconazole rule exists but its severity has drifted from major");
   });
 
   await t.test("the methotrexate + omeprazole major rule is present", () => {
@@ -181,6 +249,10 @@ test("curated data", async (t) => {
       (r.a.includes("methotrexate") && r.b.includes("omeprazole")) ||
       (r.b.includes("methotrexate") && r.a.includes("omeprazole")));
     assert.ok(found, "the methotrexate/omeprazole rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("methotrexate") && r.b.includes("omeprazole")) ||
+      (r.b.includes("methotrexate") && r.a.includes("omeprazole")));
+    assert.equal(rule.severity, "major", "the methotrexate/omeprazole rule exists but its severity has drifted from major");
   });
 
   await t.test("the metoprolol + verapamil major rule is present", () => {
@@ -188,6 +260,10 @@ test("curated data", async (t) => {
       (r.a.includes("metoprolol") && r.b.includes("verapamil")) ||
       (r.b.includes("metoprolol") && r.a.includes("verapamil")));
     assert.ok(found, "the metoprolol/verapamil rule is missing");
+    const rule = INTERACTIONS.find((r) =>
+      (r.a.includes("metoprolol") && r.b.includes("verapamil")) ||
+      (r.b.includes("metoprolol") && r.a.includes("verapamil")));
+    assert.equal(rule.severity, "major", "the metoprolol/verapamil rule exists but its severity has drifted from major");
   });
 });
 
@@ -647,27 +723,56 @@ test("sharedIngredients", async (t) => {
   });
 
   await t.test("flags two different products sharing an active ingredient", () => {
-    const shared = sharedIngredients(
+    const { shared, unverifiable } = sharedIngredients(
       withSubs("Tylenol", ["acetaminophen"]),
       withSubs("Vicodin", ["hydrocodone bitartrate", "acetaminophen"]));
     assert.deepEqual(Array.from(shared), ["acetaminophen"]);
+    assert.equal(unverifiable, false);
   });
 
   await t.test("is case and whitespace insensitive", () => {
-    const shared = sharedIngredients(
+    const { shared } = sharedIngredients(
       withSubs("A", ["  Acetaminophen "]), withSubs("B", ["ACETAMINOPHEN"]));
     assert.deepEqual(Array.from(shared), ["acetaminophen"]);
   });
 
   await t.test("returns nothing for genuinely unrelated drugs", () => {
-    assert.deepEqual(Array.from(sharedIngredients(
+    const { shared, unverifiable } = sharedIngredients(
       withSubs("warfarin", ["warfarin sodium"]),
-      withSubs("metformin", ["metformin hydrochloride"]))), []);
+      withSubs("metformin", ["metformin hydrochloride"]));
+    assert.deepEqual(Array.from(shared), []);
+    assert.equal(unverifiable, false);
   });
 
-  await t.test("returns nothing when either label has no substance data", () => {
-    assert.deepEqual(Array.from(sharedIngredients(withSubs("a", ["x"]), withSubs("b", []))), []);
-    assert.deepEqual(Array.from(sharedIngredients(withSubs("a", ["x"]), { name:"b", tokens:new Set(), label:null })), []);
+  await t.test("flags itself unverifiable (not a clean zero) when either label has no substance data", () => {
+    const a = sharedIngredients(withSubs("a", ["x"]), withSubs("b", []));
+    assert.deepEqual(Array.from(a.shared), []);
+    assert.equal(a.unverifiable, true, "a label resolving with zero substances must not look like a clean 'no overlap'");
+
+    const b = sharedIngredients(withSubs("a", ["x"]), { name:"b", tokens:new Set(), label:null });
+    assert.deepEqual(Array.from(b.shared), []);
+    assert.equal(b.unverifiable, true, "no FDA label at all (e.g. a discontinued product like Vicodin) must be flagged, not treated as checked-and-clean");
+  });
+
+  await t.test("regression: a drug with zero FDA label data never lets a duplicate check pass as clean", () => {
+    const { analyzeDrugPairs } = engine;
+    // reproduces the real bug: Tylenol resolves normally, but openFDA has no
+    // record at all for the Vicodin name (a discontinued/delisted product) --
+    // sharedIngredients must not silently say "no overlap" for this pair.
+    const tylenol = withSubs("Tylenol", ["acetaminophen"]);
+    const vicodin = { name: "vicodin", display: "Vicodin", tokens: new Set(["vicodin"]), label: null, labelUnverified: false };
+    const { duplicates, uncertainDuplicates } = analyzeDrugPairs([tylenol, vicodin]);
+    assert.equal(duplicates.length, 0, "must not silently report zero shared ingredients");
+    assert.equal(uncertainDuplicates.length, 1, "must flag the pair as unverifiable instead");
+  });
+
+  await t.test("renderUncertainDuplicates names the unresolved drug and explains why", () => {
+    const { renderUncertainDuplicates } = engine;
+    const tylenol = withSubs("Tylenol", ["acetaminophen"]);
+    const vicodin = { name: "vicodin", display: "Vicodin", tokens: new Set(["vicodin"]), label: null, labelUnverified: false };
+    const html = renderUncertainDuplicates([{ A: tylenol, B: vicodin }]);
+    assert.ok(html.includes("Vicodin"), "must name the specific drug that couldn't be verified");
+    assert.ok(!/\bsafe\b/i.test(html), "an uncertainty warning must never use the word 'safe'");
   });
 
   await t.test("reports it through analyzeDrugPairs", () => {
