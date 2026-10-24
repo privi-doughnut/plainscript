@@ -215,23 +215,21 @@ much shorter and not about your cousin — about you, right now, as the builder.
 
 When 8, 9, 10 are pushed, **tell me** — I translate all three in one pass.
 
-### BONUS WRITING 1 — Fill the two legal blanks · 10 min
-`privacy.html` (Cmd+F `PRIVI:`) → replace `[PRIVI: decide contact address]` with a real email
-you check (a dedicated project address is smarter than your personal one). `terms.html` →
-replace `[PRIVI: your state]` with your U.S. state. Delete the whole
-`<span class="placeholder">...</span>`, not just the bracketed text inside it.
-**Commit:** `Fill legal page placeholders`
+### ✅ BONUS WRITING 1 — DONE — Fill the two legal blanks
+`privacy.html` and `terms.html` both have a real contact email and your state filled in,
+no `[PRIVI:...]` placeholders left in either.
 
-### BONUS WRITING 2 — README "Why I built this" · 20 min
-`README.md`, Cmd+F → `## Why I built this`. Replace everything under the heading with 4–6
-sentences in your own voice — reuse your Task 6a story's *feeling*, don't paste the text
-itself. **Commit:** `Write README why-I-built-this`
+### ✅ BONUS WRITING 2 — DONE — README "Why I built this"
+`README.md`'s "Why I built this" section is filled, in your own voice.
 
-### BONUS WRITING 3 — Your contest answers
-The submission form asks six questions. Drafts for the factual two are in
-`CAC_SUBMISSION.md`. The personal four — why you built it, what was hardest, what you
-learned, what you'd build next — write from scratch in a Google Doc first, 80–150 words
-each. Send them to me; I'll check them against the contest rules, not rewrite them.
+### ✅ BONUS WRITING 3 — DONE (differently than planned) — Your contest answers
+The plan here was to draft these from scratch in a Google Doc first. What actually
+happened: you told Claude it had enough from your cousin story and your "who made this"
+dictation to answer them directly, so `CAC_SUBMISSION.md`'s personal-spark section,
+"hardest technical problem," and "what you'd do differently" are filled from that material
+instead of written fresh. Worth a read-through to confirm they still sound like you before
+the video script reuses the same lines. The one real gap left is the demo video link itself
+— nothing to fill there until the video exists.
 
 ---
 
@@ -355,7 +353,7 @@ pops up, with a working Close button and Escape key.
 (Optional: add English keys `glossary_btn_label: "Glossary"` and
 `glossary_modal_title: "Glossary"` near `check_intro:` — tell me and I'll translate them.)
 
-### BONUS CODE 7 — "/" jumps straight to the Decode search box · 20 min
+### ✅ BONUS CODE 7 — DONE — "/" jumps straight to the Decode search box
 
 **Goal:** press `/` anywhere on the page and the Decode search box gets focus — the same
 pattern GitHub uses for its search bar.
@@ -394,7 +392,7 @@ That's the whole thing — put it near the other top-level `document.addEventLis
 text field, type a literal `/` — it types normally, nothing hijacked.
 **Commit:** `Add / keyboard shortcut to focus the Decode search box`
 
-### BONUS CODE 8 — A "Copy result" button on Decode · 30 min
+### ✅ BONUS CODE 8 — DONE — A "Copy result" button on Decode
 
 **Goal:** let someone copy a drug's plain-English summary to paste into a text or email.
 
@@ -425,7 +423,7 @@ above. Call your new function right next to `addReadAloudButton(box)`.
 summary appears.
 **Commit:** `Add a copy-result button to Decode`
 
-### BONUS CODE 9 — A severity-color legend on the Check tab · 25 min
+### ✅ BONUS CODE 9 — DONE — A severity-color legend on the Check tab
 
 **Goal:** `major`/`moderate`/`minor` show in amber/orange/red on real results, but nothing
 explains the colors until you've already run a check. Add a 3-item legend above the results.
@@ -455,10 +453,14 @@ anything.
 
 ## Decide, don't build yet
 
-**FEATURE 3** — "You entered the same medicine twice." Touches the engine and its tests, so
-we do this together, not solo.
-**FEATURE 4** — the app advertises a "minor" severity tier with zero minor rules in it.
-Either find one real minor interaction from a label, or tell me to drop the tier.
+**✅ FEATURE 3 — DONE.** "You entered the same medicine twice" is now a real finding
+(`sameDrugPairs`/`renderSameDrugPairs`), not a silent `continue`. Tested, translated into
+all 13 languages.
+**✅ FEATURE 4 — DONE (dropped the tier).** Tried two real candidate "minor" interactions
+against the actual openFDA labels; neither held up as clearly minor rather than moderate
+under real scrutiny. Dropped the minor chip from the severity legend rather than add an
+under-verified medical claim — the legend now only shows major/moderate, which is honest
+about what the 36 curated rules actually contain.
 
 ## Backlog — not today
 
@@ -469,9 +471,12 @@ slightly more playful hover state on the feature cards. None of this affects jud
 pure polish. If there's real time left after Sunday's checklist is clean, tell me and I'll
 either build it or walk you through the simplest one (scroll-reveal) as a mini lesson.
 
-**Also noted:** a hover effect (lift + drop shadow) on the source/feature list items — like
-the ones in "Every fact traces back to one of three places" — so the homepage reads as more
-interactive, not just static text.
+**Partially done:** every clickable control site-wide (buttons, tabs, chips, FAQ
+disclosures, the theme/language pickers) now has a hover "pop" and a press-down, plus a
+soft click sound. Still open: the specific ask here was a hover effect on the *static*
+source/feature list items in "Every fact traces back to one of three places" — those
+aren't clickable controls, so they weren't swept up in that pass. Low priority, pure
+polish.
 
 **Do not build:** anything that diagnoses, a dose calculator, more languages, analytics.
 
@@ -619,8 +624,8 @@ ready if a judge asks "what did you write."
 | Day | Do |
 |---|---|
 | ~~Fri Oct 23~~ | ~~Feature 1 (19 rules), Bonus Code 1, Tasks 8/9/10 — all pushed.~~ |
-| **Sat Oct 24 — target submit day** | Still open: Bonus Codes 7/8/9, Bonus Writing 1 (legal blanks) and 2 (README), the two remaining contest answers, the final AI disclosure line, and — the real bottleneck — recording and editing the video. I drive the actual submission once the video's ready; see the note below. |
-| Sun Oct 25 | Buffer if Saturday slips. |
+| ~~Sat Oct 24~~ | ~~Bonus Codes 7/8/9, Bonus Writing 1/2/3, Features 3/4, the AI disclosure "what I learned" line, and a full design/polish pass (severity-key tooltips, sitewide hover/press/sound, homepage font + alternation, glossary sections, legal-page theming, read-aloud quality, mobile pass) — all done and pushed.~~ Only real thing left: the video. |
+| Sun Oct 25 | Record and edit the video; submit once it's ready. |
 | Mon Oct 26, before noon | Hard deadline: **12:00 PM EDT.** Do not treat this as the target — it's the wall. |
 
 **On submitting:** you asked me to handle the actual submission. I will — but I need the
@@ -635,12 +640,19 @@ contest answers) → the accurate AI disclosure → everything else.
 
 ### Before you submit
 
-- [ ] Video is under 3:00, **public**, plays when logged out
+*(Leaving these unchecked for you to confirm yourself rather than ticking them off on
+your behalf — status notes below each one.)*
+
+- [ ] Video is under 3:00, **public**, plays when logged out — not recorded yet
 - [ ] Video has: name, app name, one-sentence purpose, audience, tools/languages, demo
-- [ ] Six answers written (the personal ones by you)
-- [ ] AI disclosure is accurate
-- [ ] No `[PRIVI:` placeholder left anywhere
-- [ ] Live site loads on your phone
+- [ ] Six answers written (the personal ones by you) — personal ones were filled from
+  your cousin story + "who made this" material rather than written fresh; worth your own
+  read-through before you call this done
+- [ ] AI disclosure is accurate — checked against `git log` as of tonight, held up
+- [ ] No `[PRIVI:` placeholder left anywhere — true repo-wide except the demo video link,
+  which can't be filled until the video exists
+- [ ] Live site loads on your phone — tested in mobile emulation tonight (clean), not a
+  real device
 - [ ] Source link works: https://github.com/privi-doughnut/plainscript
 - [ ] Anthropic spend limit set + Cloudflare rate limit on the Worker
 - [ ] Tests still say `# pass 97` (or more)

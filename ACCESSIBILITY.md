@@ -7,10 +7,13 @@ legal preflight in `PROGRESS.md` §7 recommends exactly this.
 ## Automated audit
 
 **Tool:** axe-core 4.10.2, run in-browser against the live DOM (not a static scan).
-**Date:** 2026-09-17
-**Scope:** both views — the marketing landing and the app itself.
+**Dates:** 2026-09-17 (original), re-run 2026-10-24 after a design pass added the
+severity-key tooltips, a reorganized glossary modal, sitewide hover/press states, and a
+homepage font change.
+**Scope:** the marketing landing, the app itself, the glossary modal, and the new
+severity-key tooltip.
 
-**Result: 0 violations in both views.**
+**Result: 0 violations**, after fixing one found in the 2026-10-24 re-run.
 
 Re-run it any time:
 
@@ -35,6 +38,7 @@ exist once the animation settles. That is a measurement artifact, not a defect.
 | Pressed toggle contrast | serious | Same hardcoded white on `.themetoggle[aria-pressed="true"]`, including its hover and icon. Same fix. |
 | Safety bar outside landmarks | moderate | The persistent disclaimer sat outside every landmark in both views. Now an `<aside aria-label="Safety notice">`, which is both the correct element and a landmark. |
 | Landing had no main landmark | moderate | In landing mode the app's `<main>` is `display:none`, so the document had no main landmark and none of the landing content sat inside one. The landing now has its own `<main>`; only one of the two is ever visible, so the hidden one is excluded from the accessibility tree. |
+| Tooltip popups outside any landmark | moderate | 2026-10-24. Both tooltip popups (`.gloss-pop` for inline glossary terms, `.explain-pop` for the new severity-key hover/tap explanations) are appended directly to `document.body` for positioning reasons, landing them outside every landmark region. Tried `role="tooltip"` first — axe still flagged it. `role="status"` clears it and fits the content better anyway (non-modal, informational, not interactive itself). |
 
 Earlier, the same class of bug was fixed on severity pills: text colour was hardcoded
 white with a correction scoped only to `[data-theme="dark"]`, so every other

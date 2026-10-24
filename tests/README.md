@@ -13,13 +13,13 @@ runner (`node:test` + `node:assert`). Node 18+ required; developed on Node 22.
 > Use `tests/*.test.js`, not `tests/`. Passing the bare directory makes Node try to
 > resolve it as a module and fail.
 
-Currently **69 tests, all passing**.
+Currently **104 tests, all passing**.
 
 ---
 
 ## Why these functions and not others
 
-The app is ~12,000 lines of JavaScript. These tests deliberately cover a small
+The app is ~15,900 lines of JavaScript. These tests deliberately cover a small
 slice of it: the interaction engine. That slice is chosen because it is the part
 of Plainscript that **makes medical claims**. Everything else — a misaligned
 button, a slow spinner — is a bug. A wrong answer here is a safety problem.
@@ -45,8 +45,13 @@ Nothing was watching for either. These tests are what watches now.
 | `analyzeDrugPairs` | Every unique pair considered exactly once; curated rules take precedence over label mentions; same-drug pairs skipped; empty and single-drug inputs |
 | `resolveAll` | Order preservation, the concurrency cap on openFDA lookups, and empty input |
 | `renderUnverifiedWarning` | That an unreachable FDA label is reported as *unverified* and never silently folded into a "nothing found" result; plural/singular wording; HTML escaping |
+| `sharedIngredients` | Two different products sharing an active ingredient; case/whitespace insensitivity; and that a drug with zero FDA label data (e.g. a discontinued product) is flagged *unverifiable*, never silently treated as "no overlap" — the Tylenol/Vicodin regression |
+| `renderUncertainDuplicates` | Names the specific drug that couldn't be verified; never uses the word "safe"; translated-string interpolation |
+| `renderDuplicates` | Renders the shared ingredient, HTML-escapes the display name, renders nothing when there are no duplicates |
+| `sameDrug` / `renderSameDrugPairs` | A literal repeat vs. a brand/generic match (same rxcui) are both caught as "the same medicine," not silently skipped; the render distinguishes the two cases in its wording |
 | `renderResults` | Severity ordering (major above moderate) and that the empty state stays cautious and never asserts a combination is "safe" |
-| curated data | That `INTERACTIONS` is non-empty, every rule is well-formed with all three English explanation fields, tokens are lowercase, and the textbook warfarin/NSAID rule still exists |
+| curated data | That `INTERACTIONS` is non-empty, every rule is well-formed with all three English explanation fields, tokens are lowercase, the textbook warfarin/NSAID rule still exists, and each of the 19 most-recently-added rules has the correct severity |
+| i18n completeness | Every one of the 13 `I18N` language blocks has every key the English block does, and the safety-critical "couldn't verify this drug" warning specifically is translated, not just present |
 
 ## What is deliberately NOT covered
 
@@ -59,8 +64,10 @@ Being honest about this matters more than a big number:
   are never called; `resolveForAnalysis` is stubbed.
 - **No auth, Supabase, RLS, or share-link tests.** Those were reviewed by hand in
   the August 2026 security sweep, not automated.
-- **No i18n coverage.** `t()` and `pickLang()` are stubbed. Translation
-  completeness is checked separately.
+- **No translation *quality* coverage.** `t()` and `pickLang()` are stubbed for
+  most tests, and nothing checks that a translation is accurate or natural —
+  only that every language has every key (completeness, not correctness). A
+  native speaker is still the real check on translation quality.
 - **No service worker / offline / PWA tests.**
 - **This is not proof the medical content is correct.** The tests check that the
   engine applies the curated rules faithfully. Whether a given rule reflects real

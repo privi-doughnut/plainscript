@@ -1249,7 +1249,6 @@
      pre-paint script at the top of <body>). Deliberately NOT device-sniffed:
      a judge on a laptop and a caregiver on a phone get the same page, and the
      tool is never gated behind an account.
-     Sections marked [PRIVI] are yours to write — see YOUR_TASKS.md.
      ============================================================ -->
 <div id="landing">
   <!-- its own main landmark: in landing mode the app's <main> is display:none,
@@ -12226,6 +12225,10 @@ document.addEventListener("click", e => {
   const def = GLOSSARY[g.dataset.term]; if (!def) return;
   const pop = document.createElement("div");
   pop.className = "gloss-pop";
+  // appended to <body>, outside any landmark region — axe's "region" rule
+  // flags that unless the element has a role exempting it; tested role=tooltip
+  // (still flagged) vs role=status (clears it, and fits: non-modal, informational)
+  pop.setAttribute("role", "status");
   pop.innerHTML = `<b>${esc(g.dataset.term)}</b>${esc(def)}`;
   document.body.appendChild(pop);
   const r = g.getBoundingClientRect();
@@ -12244,6 +12247,7 @@ function showExplainPill(el){
   const text = el.getAttribute("data-explain"); if (!text) return;
   const pop = document.createElement("div");
   pop.className = "explain-pop";
+  pop.setAttribute("role", "status"); // same landmark-exemption fix as gloss-pop above
   pop.textContent = text;
   document.body.appendChild(pop);
   _explainPop = pop;
