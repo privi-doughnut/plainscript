@@ -276,19 +276,45 @@
 
   /* ---------- header ---------- */
   header.site{padding:30px 0 18px; border-bottom:1px solid var(--line);}
-  .brand{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;}
+  /* Two halves of the same width, not the logo flex-wrapping against whatever
+     controls don't fit next to it: the wordmark + its one-line subhead own
+     the left half, every toggle/picker sits in its own 3-column array on the
+     right. Order in the markup stays the same (theme, easy-read, simpler,
+     glossary, language, account), so the array's two rows land exactly where
+     they already visually grouped before -- this just gives that grouping a
+     real column grid instead of an incidental flex-wrap. */
+  .header-top{display:flex; justify-content:space-between; align-items:flex-start; gap:32px;}
+  .brand-col{flex:1 1 auto; min-width:0;}
+  .brand{display:flex; align-items:baseline; gap:13px; flex-wrap:wrap;}
   .brand h1{
-    font-family:var(--serif); font-weight:600; font-size:30px;
+    font-family:var(--serif); font-weight:600; font-size:46px;
     letter-spacing:-.01em; margin:0; line-height:1;
   }
-  .brand .tag{font-family:var(--mono); font-size:12px; color:var(--accent-deep); letter-spacing:.04em;}
-  .lede{margin:12px 0 0; color:var(--ink-soft); max-width:60ch; font-size:16px;}
+  .brand .tag{font-family:var(--mono); font-size:13.5px; color:var(--accent-deep); letter-spacing:.04em;}
+  .lede{margin:14px 0 0; color:var(--ink-soft); max-width:46ch; font-size:18px; line-height:1.5;}
+
+  /* buttons sized up and given real breathing room -- at the old tighter
+     gap/padding, a bigger logo made this half of the header look crowded
+     and mismatched next to it; both scaled up together so the two halves
+     read as one deliberate size, not two unrelated ones. */
+  .header-controls{
+    flex:0 0 auto; display:grid; grid-template-columns:repeat(3, auto);
+    gap:16px; justify-items:stretch; align-items:start;
+  }
+  .header-controls > *{justify-content:center;}
+  /* scoped, not a change to .lang-select-wrap/.mini themselves -- both
+     classes are reused elsewhere (the homepage nav, My Cabinet's sign-in
+     chip) at their original, smaller size on purpose. */
+  .header-controls .lang-select-wrap{padding:0 17px 0 18px; gap:7px;}
+  .header-controls .lang-select-wrap .ticon{font-size:14px;}
+  .header-controls .lang-select-wrap select{font-size:13.5px; padding:13px 5px;}
+  .header-controls .mini{padding:12px 19px; font-size:13.5px;}
 
   .themetoggle{
-    margin-left:auto; align-self:center; appearance:none; cursor:pointer;
-    font-family:var(--mono); font-size:12px; letter-spacing:.03em;
-    display:inline-flex; align-items:center; gap:7px; padding:8px 13px;
-    border:1px solid var(--line); border-radius:20px; background:var(--card); color:var(--ink-soft);
+    align-self:center; appearance:none; cursor:pointer;
+    font-family:var(--mono); font-size:13.5px; letter-spacing:.03em;
+    display:inline-flex; align-items:center; gap:8px; padding:12px 19px;
+    border:1px solid var(--line); border-radius:22px; background:var(--card); color:var(--ink-soft);
   }
   .themetoggle:hover{border-color:var(--accent); color:var(--accent-deep);}
   .themetoggle:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
@@ -1168,6 +1194,20 @@
   footer{border-top:1px solid var(--line); padding:22px 0 40px; color:var(--ink-faint); font-size:12.5px; font-family:var(--mono);}
   footer a{color:var(--accent-deep);}
 
+  /* the two-column header (bigger wordmark/subhead on the left, the control
+     array on the right) only has room to BE two columns above ~700px of
+     content width -- at the bigger button size this needs, a narrower
+     .wrap starts squeezing the wordmark into the first button's column
+     before the normal phone breakpoint even kicks in. This is its own,
+     wider breakpoint for exactly that squeeze, separate from the
+     560px block below (which is real phone-only concerns: the fixed
+     bottom nav, font shrinking, iOS input-zoom fixes). */
+  @media (max-width:700px){
+    .header-top{flex-direction:column; gap:14px;}
+    .header-controls{display:flex; flex-wrap:wrap; gap:14px;}
+    .header-controls > *{justify-content:flex-start;}
+  }
+
   @media (max-width:560px){
     .brand h1{font-size:25px;}
 
@@ -1502,9 +1542,15 @@
 </div>
 
 <header class="site"><div class="wrap">
+  <div class="header-top">
+  <div class="brand-col">
   <div class="brand">
     <h1>Plainscript</h1>
     <span class="tag">// medication reference</span>
+  </div>
+  <p class="lede" data-i18n="tagline"></p>
+  </div>
+  <div class="header-controls">
     <!-- Same control pattern as the language picker: one <select> rather than a
          custom swatch popover, so it's keyboard- and screen-reader-native and
          works in all 13 languages for free. -->
@@ -1551,7 +1597,7 @@
     <!-- account chip — stays empty until Supabase is configured (Phase 2) -->
     <span class="acct" id="acct"></span>
   </div>
-  <p class="lede" data-i18n="tagline"></p>
+  </div>
 
   <!-- The .tico icons are for the phone-width bottom bar only (hidden on desktop,
        where the 01-04 counters carry the instrument look instead). They're
