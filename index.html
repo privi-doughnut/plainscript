@@ -1065,6 +1065,21 @@
   .guest-banner b{font-size:14.5px;}
   .guest-banner p{margin:5px 0 10px; font-size:14px; line-height:1.5;}
 
+  /* ---------- cabinet status banner ----------
+     The "little box at the top" -- Privi's idea. Three states, three
+     colours: unchecked/unknown and genuinely-clear both use the same
+     neutral note styling (clear is NOT "safe", so it gets no green, no
+     different treatment than "we don't know yet" beyond the wording),
+     and only a real finding gets the major/warning red. */
+  .cabinet-status-banner{
+    border:1px solid var(--note-bar); border-left-width:3px; background:var(--note-bg);
+    border-radius:var(--radius); padding:14px 16px; margin:0 0 16px;
+  }
+  .cabinet-status-banner p{margin:5px 0 10px; font-size:14.5px; line-height:1.5; color:var(--note-ink);}
+  .cabinet-status-banner.cabinet-status-warn{border-color:var(--major-bar); background:var(--major-bg);}
+  .cabinet-status-banner.cabinet-status-warn p{color:var(--major-ink);}
+  .cabinet-status-banner .eyebrow{color:inherit; opacity:.85;}
+
   /* ---------- cabinet dashboard band ----------
      Turns My Cabinet from a list with a toolbar into something that answers
      "is there anything I should look at?" the moment it loads. Every number in
@@ -4548,6 +4563,14 @@ const I18N = {
     autocheck_eyebrow: "Checked against the rest of your cabinet",
     autocheck_checking: "Checking what you just added against everything else you've saved…",
     autocheck_clear: "Nothing found with what's already in your cabinet — that's not the same as a clearance. Checked against a small curated set; always confirm a new combination with a pharmacist.",
+    cabinet_status_eyebrow: "Cabinet status",
+    cabinet_status_not_checked: "This exact set of medications hasn't been checked yet.",
+    cabinet_status_check_now_btn: "Check now",
+    cabinet_status_clear: "Checked — nothing found among your saved medications. That's not the same as a clearance; always confirm a new combination with a pharmacist.",
+    cabinet_status_duplicate_prefix: "Same active ingredient:",
+    cabinet_status_uncertain_prefix: "Couldn't fully verify:",
+    cabinet_status_plus_more: "(+{{n}} more)",
+    cabinet_status_read_more_btn: "Read more",
 
     /* share-a-cabinet */
     share_checking: "Checking for an existing share link…",
@@ -5059,6 +5082,14 @@ const I18N = {
     autocheck_eyebrow: "Comparado con el resto de tu botiquín",
     autocheck_checking: "Comparando lo que acabas de agregar con todo lo demás que has guardado…",
     autocheck_clear: "No se encontró nada con lo que ya está en tu botiquín — eso no es lo mismo que una autorización. Se comparó con un conjunto pequeño y curado; siempre confirma una nueva combinación con un farmacéutico.",
+    cabinet_status_eyebrow: "Estado del botiquín",
+    cabinet_status_not_checked: "Este conjunto exacto de medicamentos aún no se ha revisado.",
+    cabinet_status_check_now_btn: "Revisar ahora",
+    cabinet_status_clear: "Revisado — no se encontró nada entre tus medicamentos guardados. Eso no es lo mismo que una autorización; siempre confirma una nueva combinación con un farmacéutico.",
+    cabinet_status_duplicate_prefix: "Mismo ingrediente activo:",
+    cabinet_status_uncertain_prefix: "No se pudo verificar completamente:",
+    cabinet_status_plus_more: "(+{{n}} más)",
+    cabinet_status_read_more_btn: "Leer más",
 
     share_checking: "Buscando un enlace para compartir existente…",
     share_intro: "Genera un enlace que muestre una copia de solo lectura de tu botiquín — no necesitan cuenta. Cualquiera con el enlace puede verlo, así que compártelo solo con personas de confianza.",
@@ -5522,6 +5553,14 @@ const I18N = {
     autocheck_eyebrow: "已与您药柜中的其他药物进行核对",
     autocheck_checking: "正在将您刚添加的药物与已保存的所有药物进行核对……",
     autocheck_clear: "未发现与您药柜中现有药物的相互作用——这不等于获得了认可。仅对照了一个精选的小型规则集；添加新组合前请务必咨询药剂师。",
+    cabinet_status_eyebrow: "药柜状态",
+    cabinet_status_not_checked: "这一组药物尚未核查过。",
+    cabinet_status_check_now_btn: "立即核查",
+    cabinet_status_clear: "已核查——在您保存的药物中未发现问题。这不等于获得了认可；添加新组合前请务必咨询药剂师。",
+    cabinet_status_duplicate_prefix: "相同有效成分：",
+    cabinet_status_uncertain_prefix: "无法完全核实：",
+    cabinet_status_plus_more: "（还有{{n}}项）",
+    cabinet_status_read_more_btn: "查看详情",
 
     share_checking: "正在查找现有的分享链接…",
     share_intro: "生成一个链接，展示你药柜的只读副本——对方无需账户即可查看。任何拥有此链接的人都能查看，所以请只分享给你信任的人。",
@@ -6001,6 +6040,14 @@ const I18N = {
     autocheck_eyebrow: "Đã đối chiếu với phần còn lại trong tủ thuốc của bạn",
     autocheck_checking: "Đang đối chiếu loại thuốc bạn vừa thêm với mọi thứ khác bạn đã lưu…",
     autocheck_clear: "Không tìm thấy gì với những gì đã có trong tủ thuốc của bạn — điều đó không có nghĩa là an toàn. Chỉ được đối chiếu với một bộ quy tắc nhỏ đã được chọn lọc; luôn xác nhận một sự kết hợp mới với dược sĩ.",
+    cabinet_status_eyebrow: "Tình trạng tủ thuốc",
+    cabinet_status_not_checked: "Bộ thuốc chính xác này chưa được kiểm tra.",
+    cabinet_status_check_now_btn: "Kiểm tra ngay",
+    cabinet_status_clear: "Đã kiểm tra — không tìm thấy gì trong các loại thuốc đã lưu của bạn. Điều đó không có nghĩa là an toàn; luôn xác nhận một sự kết hợp mới với dược sĩ.",
+    cabinet_status_duplicate_prefix: "Cùng hoạt chất:",
+    cabinet_status_uncertain_prefix: "Không thể xác minh đầy đủ:",
+    cabinet_status_plus_more: "(+{{n}} nữa)",
+    cabinet_status_read_more_btn: "Xem thêm",
 
     share_checking: "Đang tìm liên kết chia sẻ hiện có…",
     share_intro: "Tạo một liên kết hiển thị bản sao chỉ đọc của tủ thuốc của bạn — người xem không cần tài khoản. Bất kỳ ai có liên kết đều có thể xem, vì vậy chỉ chia sẻ với những người bạn tin tưởng.",
@@ -6533,6 +6580,14 @@ const I18N = {
     autocheck_eyebrow: "تمت مقارنته مع بقية خزانة أدويتك",
     autocheck_checking: "جارٍ مقارنة ما أضفته للتو مع كل شيء آخر قمت بحفظه…",
     autocheck_clear: "لم يُعثر على شيء مع ما هو موجود بالفعل في خزانتك — هذا لا يعني أنه آمن. تمت المقارنة مع مجموعة صغيرة منسقة فقط؛ تحقق دائمًا من أي تركيبة جديدة مع الصيدلي.",
+    cabinet_status_eyebrow: "حالة الخزانة",
+    cabinet_status_not_checked: "لم يتم فحص هذه المجموعة المحددة من الأدوية بعد.",
+    cabinet_status_check_now_btn: "افحص الآن",
+    cabinet_status_clear: "تم الفحص — لم يُعثر على شيء بين أدويتك المحفوظة. هذا لا يعني أنه آمن؛ تحقق دائمًا من أي تركيبة جديدة مع الصيدلي.",
+    cabinet_status_duplicate_prefix: "نفس المادة الفعالة:",
+    cabinet_status_uncertain_prefix: "تعذّر التحقق الكامل:",
+    cabinet_status_plus_more: "(+{{n}} أخرى)",
+    cabinet_status_read_more_btn: "اقرأ المزيد",
 
     /* share-a-cabinet */
     share_checking: "جارٍ التحقق من وجود رابط مشاركة سابق…",
@@ -7050,6 +7105,14 @@ const I18N = {
     autocheck_eyebrow: "Comparé au reste de votre armoire à pharmacie",
     autocheck_checking: "Comparaison de ce que vous venez d'ajouter avec tout ce que vous avez déjà enregistré…",
     autocheck_clear: "Rien trouvé avec ce qui se trouve déjà dans votre armoire — ce n'est pas la même chose qu'une autorisation. Comparé uniquement à un petit ensemble de règles sélectionnées ; confirmez toujours une nouvelle association avec un pharmacien.",
+    cabinet_status_eyebrow: "État de l'armoire",
+    cabinet_status_not_checked: "Cet ensemble exact de médicaments n'a pas encore été vérifié.",
+    cabinet_status_check_now_btn: "Vérifier maintenant",
+    cabinet_status_clear: "Vérifié — rien trouvé parmi vos médicaments enregistrés. Ce n'est pas la même chose qu'une autorisation ; confirmez toujours une nouvelle association avec un pharmacien.",
+    cabinet_status_duplicate_prefix: "Même principe actif :",
+    cabinet_status_uncertain_prefix: "Impossible de vérifier entièrement :",
+    cabinet_status_plus_more: "(+{{n}} de plus)",
+    cabinet_status_read_more_btn: "En savoir plus",
 
     /* share-a-cabinet */
     share_checking: "Vérification d'un lien de partage existant…",
@@ -7567,6 +7630,14 @@ const I18N = {
     autocheck_eyebrow: "약 보관함의 나머지 약과 대조함",
     autocheck_checking: "방금 추가한 약을 저장된 다른 모든 약과 대조하는 중…",
     autocheck_clear: "약 보관함에 이미 있는 것과는 아무것도 발견되지 않았습니다 — 안전하다는 뜻은 아닙니다. 선별된 소규모 규칙 집합과만 대조했습니다. 새로운 조합은 항상 약사에게 확인하세요.",
+    cabinet_status_eyebrow: "약 보관함 상태",
+    cabinet_status_not_checked: "이 정확한 약 조합은 아직 확인되지 않았습니다.",
+    cabinet_status_check_now_btn: "지금 확인",
+    cabinet_status_clear: "확인됨 — 저장된 약 중에서 아무것도 발견되지 않았습니다. 안전하다는 뜻은 아닙니다. 새로운 조합은 항상 약사에게 확인하세요.",
+    cabinet_status_duplicate_prefix: "동일한 유효성분:",
+    cabinet_status_uncertain_prefix: "완전히 확인할 수 없음:",
+    cabinet_status_plus_more: "(+{{n}}개 더)",
+    cabinet_status_read_more_btn: "더 보기",
 
     /* share-a-cabinet */
     share_checking: "기존 공유 링크를 확인하는 중…",
@@ -8084,6 +8155,14 @@ const I18N = {
     autocheck_eyebrow: "Сверено с остальным содержимым вашей аптечки",
     autocheck_checking: "Сверяем то, что вы только что добавили, со всем остальным, что вы сохранили…",
     autocheck_clear: "Ничего не найдено с тем, что уже есть в вашей аптечке — это не означает, что всё безопасно. Сверено только с небольшим курируемым набором правил; всегда уточняйте новую комбинацию у фармацевта.",
+    cabinet_status_eyebrow: "Статус аптечки",
+    cabinet_status_not_checked: "Этот конкретный набор лекарств ещё не проверялся.",
+    cabinet_status_check_now_btn: "Проверить сейчас",
+    cabinet_status_clear: "Проверено — среди ваших сохранённых лекарств ничего не найдено. Это не означает, что всё безопасно; всегда уточняйте новую комбинацию у фармацевта.",
+    cabinet_status_duplicate_prefix: "Одно и то же действующее вещество:",
+    cabinet_status_uncertain_prefix: "Не удалось полностью проверить:",
+    cabinet_status_plus_more: "(+ещё {{n}})",
+    cabinet_status_read_more_btn: "Подробнее",
 
     /* share-a-cabinet */
     share_checking: "Проверка существующей ссылки для доступа…",
@@ -8601,6 +8680,14 @@ const I18N = {
     autocheck_eyebrow: "Verificado com o restante do seu gabinete de medicamentos",
     autocheck_checking: "Verificando o que você acabou de adicionar com tudo o mais que você salvou…",
     autocheck_clear: "Nada encontrado com o que já está no seu gabinete — isso não é o mesmo que uma liberação. Verificado apenas com um pequeno conjunto selecionado de regras; sempre confirme uma nova combinação com um farmacêutico.",
+    cabinet_status_eyebrow: "Status do gabinete",
+    cabinet_status_not_checked: "Este conjunto exato de medicamentos ainda não foi verificado.",
+    cabinet_status_check_now_btn: "Verificar agora",
+    cabinet_status_clear: "Verificado — nada encontrado entre seus medicamentos salvos. Isso não é o mesmo que uma liberação; sempre confirme uma nova combinação com um farmacêutico.",
+    cabinet_status_duplicate_prefix: "Mesmo ingrediente ativo:",
+    cabinet_status_uncertain_prefix: "Não foi possível verificar totalmente:",
+    cabinet_status_plus_more: "(+{{n}} mais)",
+    cabinet_status_read_more_btn: "Leia mais",
 
     /* share-a-cabinet */
     share_checking: "Verificando um link de compartilhamento existente…",
@@ -9118,6 +9205,14 @@ const I18N = {
     autocheck_eyebrow: "Mit dem Rest Ihres Medikamentenschranks abgeglichen",
     autocheck_checking: "Das gerade Hinzugefügte wird mit allem anderen verglichen, was Sie gespeichert haben …",
     autocheck_clear: "Nichts gefunden im Vergleich mit dem, was bereits in Ihrem Medikamentenschrank ist — das heißt nicht, dass es unbedenklich ist. Nur mit einer kleinen, kuratierten Regelsammlung abgeglichen; besprechen Sie eine neue Kombination immer mit einem Apotheker.",
+    cabinet_status_eyebrow: "Schrank-Status",
+    cabinet_status_not_checked: "Diese genaue Medikamentenkombination wurde noch nicht geprüft.",
+    cabinet_status_check_now_btn: "Jetzt prüfen",
+    cabinet_status_clear: "Geprüft — unter Ihren gespeicherten Medikamenten wurde nichts gefunden. Das heißt nicht, dass es unbedenklich ist; besprechen Sie eine neue Kombination immer mit einem Apotheker.",
+    cabinet_status_duplicate_prefix: "Gleicher Wirkstoff:",
+    cabinet_status_uncertain_prefix: "Konnte nicht vollständig geprüft werden:",
+    cabinet_status_plus_more: "(+{{n}} weitere)",
+    cabinet_status_read_more_btn: "Mehr erfahren",
 
     /* share-a-cabinet */
     share_checking: "Prüfe auf einen vorhandenen Freigabelink…",
@@ -9635,6 +9730,14 @@ const I18N = {
     autocheck_eyebrow: "お薬手帳に保存済みの他の薬と照合済み",
     autocheck_checking: "今追加した薬を、保存済みの他のすべての薬と照合しています…",
     autocheck_clear: "お薬手帳にすでにある薬との相互作用は見つかりませんでした——ただし、これは安全だという意味ではありません。厳選された小規模なルールと照合しただけです。新しい組み合わせは必ず薬剤師に確認してください。",
+    cabinet_status_eyebrow: "お薬手帳の状態",
+    cabinet_status_not_checked: "この組み合わせの薬はまだ確認されていません。",
+    cabinet_status_check_now_btn: "今すぐ確認",
+    cabinet_status_clear: "確認済み——保存されている薬の中では何も見つかりませんでした。これは安全という意味ではありません。新しい組み合わせは必ず薬剤師に確認してください。",
+    cabinet_status_duplicate_prefix: "同じ有効成分：",
+    cabinet_status_uncertain_prefix: "完全には確認できませんでした：",
+    cabinet_status_plus_more: "（他{{n}}件）",
+    cabinet_status_read_more_btn: "詳しく見る",
 
     /* share-a-cabinet */
     share_checking: "既存の共有リンクを確認中…",
@@ -10128,6 +10231,14 @@ const I18N = {
     autocheck_eyebrow: "आपकी दवा अलमारी में बाकी दवाओं से मिलान किया गया",
     autocheck_checking: "आपने अभी जो जोड़ा है, उसकी तुलना आपकी सहेजी गई बाकी सभी दवाओं से की जा रही है…",
     autocheck_clear: "आपकी अलमारी में पहले से मौजूद चीज़ों के साथ कुछ नहीं मिला — इसका मतलब सुरक्षित होना नहीं है। केवल एक छोटे, चयनित नियम समूह से मिलान किया गया; नए संयोजन की हमेशा फार्मासिस्ट से पुष्टि करें।",
+    cabinet_status_eyebrow: "अलमारी की स्थिति",
+    cabinet_status_not_checked: "दवाओं का यह सटीक सेट अभी तक जाँचा नहीं गया है।",
+    cabinet_status_check_now_btn: "अभी जाँचें",
+    cabinet_status_clear: "जाँचा गया — आपकी सहेजी गई दवाओं में कुछ नहीं मिला। इसका मतलब सुरक्षित होना नहीं है; नए संयोजन की हमेशा फार्मासिस्ट से पुष्टि करें।",
+    cabinet_status_duplicate_prefix: "एक जैसा सक्रिय घटक:",
+    cabinet_status_uncertain_prefix: "पूरी तरह से सत्यापित नहीं हो सका:",
+    cabinet_status_plus_more: "(+{{n}} और)",
+    cabinet_status_read_more_btn: "और पढ़ें",
     share_checking: "मौजूदा साझा लिंक की जाँच की जा रही है…",
     share_intro: "एक लिंक बनाएँ जो आपकी अलमारी की केवल-पढ़ने वाली प्रति दिखाता है — उनकी ओर से किसी खाते की ज़रूरत नहीं। लिंक वाला कोई भी इसे देख सकता है, इसलिए इसे केवल भरोसेमंद लोगों के साथ साझा करें।",
     share_create_btn: "साझा लिंक बनाएँ",
@@ -10620,6 +10731,14 @@ const I18N = {
     autocheck_eyebrow: "உங்கள் மருந்தகத்தில் உள்ள மற்றவற்றுடன் ஒப்பிடப்பட்டது",
     autocheck_checking: "நீங்கள் இப்போது சேர்த்ததை நீங்கள் சேமித்த மற்ற அனைத்துடனும் ஒப்பிடுகிறது…",
     autocheck_clear: "உங்கள் மருந்தகத்தில் ஏற்கனவே உள்ளவற்றுடன் எதுவும் கிடைக்கவில்லை — இது பாதுகாப்பானது என்று அர்த்தமல்ல. ஒரு சிறிய, தேர்ந்தெடுக்கப்பட்ட விதிகளுடன் மட்டுமே ஒப்பிடப்பட்டது; புதிய கலவையை எப்போதும் மருந்தாளரிடம் உறுதிப்படுத்தவும்.",
+    cabinet_status_eyebrow: "மருந்தக நிலை",
+    cabinet_status_not_checked: "இந்த குறிப்பிட்ட மருந்துத் தொகுப்பு இன்னும் சரிபார்க்கப்படவில்லை.",
+    cabinet_status_check_now_btn: "இப்போது சரிபார்",
+    cabinet_status_clear: "சரிபார்க்கப்பட்டது — உங்கள் சேமிக்கப்பட்ட மருந்துகளில் எதுவும் கிடைக்கவில்லை. இது பாதுகாப்பானது என்று அர்த்தமல்ல; புதிய கலவையை எப்போதும் மருந்தாளரிடம் உறுதிப்படுத்தவும்.",
+    cabinet_status_duplicate_prefix: "அதே செயல்படு பொருள்:",
+    cabinet_status_uncertain_prefix: "முழுமையாக சரிபார்க்க முடியவில்லை:",
+    cabinet_status_plus_more: "(+{{n}} மேலும்)",
+    cabinet_status_read_more_btn: "மேலும் படிக்க",
     share_checking: "இருக்கும் பகிர்வு இணைப்பு சரிபார்க்கப்படுகிறது…",
     share_intro: "உங்கள் அலமாரியின் படிக்க-மட்டும் நகலைக் காட்டும் ஒரு இணைப்பை உருவாக்குங்கள் — அவர்கள் பக்கத்தில் கணக்கு தேவையில்லை. இணைப்பு உள்ள எவரும் இதைப் பார்க்க முடியும், எனவே நீங்கள் நம்பும் நபர்களுடன் மட்டுமே பகிரவும்.",
     share_create_btn: "பகிர்வு இணைப்பை உருவாக்கு",
@@ -14995,6 +15114,7 @@ function renderCabinet(){
     html += personFilterBarHTML();
     // status first, then the list — a dashboard should answer a question on
     // arrival rather than wait for you to read every row and work it out
+    html += renderCabinetStatusBanner();
     html += dashboardSummaryHTML(visible);
     html += reminderSummary(visible);
     html += todayScheduleHTML(visible);
@@ -15467,6 +15587,19 @@ async function onAddMed(){
   }
 }
 
+/* Shared cache behind the "little box at the top" status banner on My
+   Cabinet (renderCabinetStatusBanner, below). Both autoCheckNewMed (on
+   add) and runCabinetScan (manual "Scan my whole cabinet") write into
+   this after they finish a real resolveAll()+analyzeDrugPairs() pass,
+   so the banner reflects a genuinely-checked result rather than a
+   guess -- and the banner itself never re-fetches on its own, because
+   renderCabinet() runs far too often (every edit, every note save,
+   every language switch) to re-hit openFDA each time. `key` is which
+   exact set of saved-med ids the result covers, so adding or removing
+   a medicine invalidates it instead of showing a stale verdict. */
+let cabinetCheckCache = null;
+function cabinetMedKey(meds){ return meds.map(m => m.id).sort().join(","); }
+
 /* Runs right after a medication is saved to the cabinet. Reuses
    analyzeDrugPairs() (same engine as Check and Cabinet Scan) across
    whoever's currently visible, then narrows the result down to only
@@ -15484,6 +15617,8 @@ async function autoCheckNewMed(newRow){
   box.innerHTML = `<p class="status" style="padding:10px 0 0;">${esc(t("autocheck_checking"))}</p>`;
   const drugs = await resolveAll(visible.map(m => m.generic || m.brand || m.name), 5, ()=>{});
   const { findings, mentions, duplicates, uncertainDuplicates, sameDrugPairs } = analyzeDrugPairs(drugs);
+  cabinetCheckCache = { key: cabinetMedKey(visible), findings, duplicates, uncertainDuplicates, sameDrugPairs };
+  refreshCabinetStatusBanner(); // the summary box at the top just became stale -- refresh it in place
 
   // which resolved "drug" is the one just added? match the same way
   // findInCabinet() does: rxcui first, then generic/brand/name
@@ -15525,6 +15660,66 @@ async function autoCheckNewMed(newRow){
     }
   }
   box.innerHTML = html;
+}
+
+/* "The little box at the top" of My Cabinet -- Privi's idea. Three
+   honest states, never a fourth one that blurs them together:
+     1. Fewer than 2 meds, or this exact set has never been checked ->
+        a neutral prompt with a button to check now. Never silently
+        implies "checked" just because the cabinet has content.
+     2. Checked (cache key matches the current meds) and genuinely
+        nothing found -> a calm, still-cautious note (never "safe").
+     3. Checked and something real turned up -> names the specific
+        drugs and the single most important thing found, with a
+        "Read more" button that jumps to the Check tab pre-loaded with
+        exactly those medicines so the full sourced card is one click
+        away instead of a re-typing exercise. */
+function renderCabinetStatusBanner(){
+  const visible = medsForActivePerson();
+  if (visible.length < 2) return "";
+  const key = cabinetMedKey(visible);
+  let inner;
+  if (!cabinetCheckCache || cabinetCheckCache.key !== key){
+    inner = `<span class="eyebrow">${esc(t("cabinet_status_eyebrow"))}</span>
+      <p>${esc(t("cabinet_status_not_checked"))}</p>
+      <button class="ghost" data-act="banner-check-now">${esc(t("cabinet_status_check_now_btn"))}</button>`;
+  } else {
+    const { findings, duplicates, uncertainDuplicates } = cabinetCheckCache;
+    const issueCount = findings.length + duplicates.length + uncertainDuplicates.length;
+    if (!issueCount){
+      inner = `<span class="eyebrow">${esc(t("cabinet_status_eyebrow"))}</span>
+        <p>${esc(t("cabinet_status_clear"))}</p>`;
+    } else {
+      // most concrete and actionable first: an actual shared-ingredient double
+      // dose outranks "couldn't verify," which outranks a curated severity hit
+      let A, B, headline;
+      if (duplicates.length){
+        ({A, B} = duplicates[0]);
+        headline = t("cabinet_status_duplicate_prefix") + " " + A.display + " & " + B.display;
+      } else if (uncertainDuplicates.length){
+        ({A, B} = uncertainDuplicates[0]);
+        headline = t("cabinet_status_uncertain_prefix") + " " + A.display + " & " + B.display;
+      } else {
+        const rank = {major:0,moderate:1,minor:2};
+        const top = findings.slice().sort((x,y)=>rank[x.rule.severity]-rank[y.rule.severity])[0];
+        A = top.A; B = top.B;
+        const sevLabel = top.rule.severity==="major"?t("sev_major"):top.rule.severity==="moderate"?t("sev_moderate"):t("sev_minor");
+        headline = sevLabel + ": " + A.display + " & " + B.display;
+      }
+      const extra = issueCount - 1;
+      inner = `<span class="eyebrow">${esc(t("cabinet_status_eyebrow"))}</span>
+        <p><b>${esc(headline)}</b>${extra>0 ? " " + esc(t("cabinet_status_plus_more").replace("{{n}}", extra)) : ""}</p>
+        <button class="go" data-act="banner-read-more" data-a="${esc(A.display)}" data-b="${esc(B.display)}">${esc(t("cabinet_status_read_more_btn"))}</button>`;
+    }
+  }
+  const stateClass = !cabinetCheckCache || cabinetCheckCache.key !== key ? "unknown"
+    : (cabinetCheckCache.findings.length + cabinetCheckCache.duplicates.length + cabinetCheckCache.uncertainDuplicates.length) ? "warn" : "clear";
+  return `<div class="cabinet-status-banner cabinet-status-${stateClass}" id="cabinet-status-banner">${inner}</div>`;
+}
+function refreshCabinetStatusBanner(){
+  const el = $("#cabinet-status-banner");
+  if (!el) return; // cabinet isn't even on screen right now -- nothing to refresh
+  el.outerHTML = renderCabinetStatusBanner();
 }
 
 function openNoteEditor(card){
@@ -15728,6 +15923,8 @@ async function runCabinetScan(){
   const drugs = await resolveAll(meds.map(m => m.generic || m.brand || m.name), 5,
     (d0, n) => setProgress("#scan-prog", d0, n));
   const { findings, mentions, duplicates, uncertainDuplicates, sameDrugPairs } = analyzeDrugPairs(drugs);
+  cabinetCheckCache = { key: cabinetMedKey(meds), findings, duplicates, uncertainDuplicates, sameDrugPairs };
+  refreshCabinetStatusBanner(); // the top-of-page summary just became stale -- refresh it in place
 
   box.innerHTML = renderUnverifiedWarning(drugs)
     + renderUncertainDuplicates(uncertainDuplicates)
@@ -15946,6 +16143,17 @@ $("#cabinet-body").addEventListener("click", e => {
   else if (act === "magic-send") onSendMagicLink(btn);
   else if (act === "add")     onAddMed();
   else if (act === "scan")    runCabinetScan();
+  else if (act === "banner-check-now") runCabinetScan(); // same real check as the manual Scan button -- the banner just offers it inline, no separate logic path
+  else if (act === "banner-read-more"){
+    // jump to Check, pre-loaded with exactly the two medicines the banner
+    // named, and run it immediately -- the full sourced card a click away
+    // instead of a re-typing exercise
+    const list = $("#drug-list");
+    list.innerHTML = "";
+    list.append(drugRow(btn.dataset.a), drugRow(btn.dataset.b));
+    selectTab("check");
+    checkInteractions();
+  }
   else if (act === "print")   printCabinet();
   else if (act === "wallet")  openWalletCard();
   else if (act === "regimen") openRegimenStory();
