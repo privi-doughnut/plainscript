@@ -12243,7 +12243,13 @@ const GLOSSARY = {
 function applyGlossary(scope){
   const terms = Object.keys(GLOSSARY).sort((a,b)=>b.length-a.length);
   const re = new RegExp("\\b(" + terms.join("|") + ")\\b", "gi");
-  scope.querySelectorAll("p[data-role='text'], p[data-role='full']").forEach(p=>{
+  // The data-role attribute lives on the wrapping <div> that renderStructure()
+  // builds (see makeRow), not on the text elements themselves -- content
+  // renders as either <p> (prose) or <ul><li> (list) inside that div, so the
+  // actual leaf elements to scan are descendants, never a <p> carrying the
+  // attribute directly. The old selector (p[data-role=...]) could never match
+  // anything, silently disabling the whole "tap a hard word" feature.
+  scope.querySelectorAll("[data-role='text'] p, [data-role='full'] p, [data-role='text'] li, [data-role='full'] li").forEach(p=>{
     if (p.dataset.glossed) return;
     const raw = p.textContent || "";
     let out = "", last = 0, any = false, m;
