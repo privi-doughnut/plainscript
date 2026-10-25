@@ -226,11 +226,27 @@
     -webkit-mask-repeat:repeat; mask-repeat:repeat;
   }
   /* content has to sit above the watermark layer */
-  .safetybar, #landing, header.site, main, footer{position:relative; z-index:1;}
+  .safetybar, #landing, main, footer{position:relative; z-index:1;}
+  /* header gets its own step above main, not the same z-index:1 main has.
+     header.site contains .tabs, which goes position:fixed at phone widths to
+     become the bottom nav bar (see the max-width:560px block below) — but a
+     position:fixed descendant can't escape an ancestor's stacking context,
+     only its normal-flow position. With header.site pinned to the SAME
+     z-index as main, the two are equal and DOM order decides the winner —
+     main (later in the markup) painted over the entire header, including the
+     fixed tab bar, any time page content scrolled under where the bar sits.
+     The tab bar was then genuinely invisible-but-present there: taps landed
+     on whatever FAQ/methodology text was actually on top instead of a tab. */
+  header.site{position:relative; z-index:2;}
   @media print{ .bg-pattern{display:none !important;} }
 
   *{box-sizing:border-box;}
   html{-webkit-text-size-adjust:100%;}
+  /* Belt-and-suspenders against a sideways scrollbar: nothing on the page is
+     meant to scroll horizontally except .hm-scroll's own heatmap (which keeps
+     its scroll here too — overflow-x:hidden on an ancestor doesn't reach into
+     a descendant that sets its own overflow-x:auto). */
+  html, body{overflow-x:hidden; max-width:100%;}
   body{
     margin:0; background:var(--paper); color:var(--ink);
     font-family:var(--sans); font-size:16px; line-height:1.55;
