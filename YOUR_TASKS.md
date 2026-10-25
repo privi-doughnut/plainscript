@@ -45,12 +45,17 @@ rephrases, never decides if drugs interact · never show a green "safe" — "not
 safe · every claim shows its source · severity colors (amber/orange/red) are reserved for
 real severity · never diagnoses, doses, or says start/stop a medicine.
 
-**Severity scale, least to greatest:** `minor` → `moderate` → `major`.
+**Severity scale:** the engine still supports three tiers (`minor` → `moderate` → `major`),
+but the curated `INTERACTIONS` set currently has zero verified `minor` entries — two real
+candidates were checked against actual FDA labels and neither held up under scrutiny, so
+the severity-key legend was deliberately narrowed to major/moderate only rather than
+advertise a tier nothing actually uses (see Feature 4 below).
 
-**Files:** `index.html` is the whole app (~15,000 lines). `tests/engine.test.js` is 97
-automated checks. `worker.js` is the locked AI proxy. `privacy.html`/`terms.html` are the
-legal pages. `README.md` is the public overview. `CAC_SUBMISSION.md` has contest-answer
-drafts + the video script.
+**Files:** `index.html` is the whole app (~16,000 lines). `tests/engine.test.js` is 104
+automated checks (`node --test tests/*.test.js`). `worker.js` is the locked AI proxy.
+`privacy.html`/`terms.html` are the legal pages. `README.md` is the public overview.
+`CAC_SUBMISSION.md` has contest-answer drafts + the video script (full beat-by-beat shot
+list is a separate linked artifact now, much more detailed than the table in that file).
 
 ## Setup — every time you sit down
 
@@ -60,7 +65,8 @@ drafts + the video script.
 **C.** Chrome → `http://localhost:8899/index.html`. Once per session: Cmd+Option+I →
 Application → Service Workers → Unregister, then Cmd+Shift+R.
 **D.** Before starting: `node --test tests/*.test.js` (or the full nvm path below if that
-errors) — look for `# pass 97` or more (started at 78, grew after Feature 1 + Bonus Code 1).
+errors) — look for `# pass 104` or more (started at 78, grew after Feature 1 + Bonus Code 1,
+and again after Features 3/4 and the i18n-completeness suite).
 ```sh
 /Users/privivijayakumar/.nvm/versions/node/v22.23.1/bin/node --test tests/*.test.js
 ```
@@ -655,5 +661,5 @@ your behalf — status notes below each one.)*
   real device
 - [ ] Source link works: https://github.com/privi-doughnut/plainscript
 - [ ] Anthropic spend limit set + Cloudflare rate limit on the Worker
-- [ ] Tests still say `# pass 97` (or more)
+- [ ] Tests still say `# pass 104` (or more)
 - [ ] Submitted at least a day before Monday noon

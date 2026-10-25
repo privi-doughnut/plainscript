@@ -166,7 +166,7 @@ undisclosed, it is disqualifying.
 > of interface features — things like the rule-counter and remembering your last tab.
 >
 > I also asked for the parts that could hurt someone to be tested, and they are: the
-> functions that decide whether two medicines interact have 102 automated tests, which is
+> functions that decide whether two medicines interact have 104 automated tests, which is
 > in the repository and which I can walk through.
 >
 > Honestly, the thing that stuck with me most building this: a missing answer and a safe

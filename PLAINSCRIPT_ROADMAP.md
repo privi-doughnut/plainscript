@@ -68,7 +68,10 @@
 - ✅ **"Report an error"** feedback loop — a footer link to a pre-filled GitHub Issues form (not a mailto, to avoid baking a personal email into public source — swap it for something else if you'd rather).
 - ✅ Accessibility pass — computed real WCAG contrast ratios for every core color pair in both themes (found and fixed several failures), added missing focus-visible states, fixed a pre-existing unstyled remove button, corrected ARIA roles on the similar/related modal's tabs.
 - ⬜ Light, privacy-respecting analytics.
-- ⬜ **CAC packaging** — demo video, written description, deploy check.
+- 🔨 **CAC packaging** — written description is done (`CAC_SUBMISSION.md`, including the AI
+  disclosure draft and prep notes for the six contest questions); the demo video has a full,
+  detailed beat-by-beat shot list (linked from `CAC_SUBMISSION.md`) but hasn't been recorded
+  yet — that's the one real thing left before submission.
 
 ## Stretch / investigate 🔬
 - 🔬 **Pill imprint identifier** — verify a current free image API exists (NLM's RxImage was deprecated; confirm the replacement before promising it).

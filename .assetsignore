@@ -1,7 +1,10 @@
 # Only the public site needs to ship: index.html, config.js, sw.js,
-# manifest.webmanifest, and the PWA icons. Everything below is dev docs,
-# the separate proxy Worker's source, tooling, or repo internals — NEVER
-# serve these from the public static site.
+# manifest.webmanifest, the PWA icons, and the three standalone legal/
+# disclosure pages (privacy.html, terms.html, ai-disclosure.html — not
+# listed below, since they're real pages the footer links to, not dev
+# docs). Everything below is dev docs, the separate proxy Worker's
+# source, tooling, or repo internals — NEVER serve these from the
+# public static site.
 #
 # ⚠️ .git MUST stay listed here — without it the whole repo history is
 # publicly downloadable at /.git/*.

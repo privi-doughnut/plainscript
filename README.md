@@ -16,7 +16,7 @@ Open `index.html` in a browser, or serve the folder (`python3 -m http.server`). 
 - **Check interactions** — enter 2+ meds; get severity-rated, plain-English, sourced warnings from a curated interaction set plus a cross-reference of each drug's FDA label.
 - **Light / dark theme** — sober clinical styling; dark by default, and your choice survives reloads.
 - Mobile-first and accessible.
-- **My Cabinet** *(needs the free Supabase setup below)* — sign in with Google or a passwordless email link, save the meds you actually take with your own notes. Your list is protected by row-level security: only you can read it.
+- **My Cabinet** *(needs the free Supabase setup below)* — sign in with Google or a passwordless email link, save the meds you actually take with your own notes. The moment you save a new one, it's automatically checked against everything else already in your cabinet — no need to remember to run a separate scan. Your list is protected by row-level security: only you can read it.
 - **Cabinet Scan** — one tap scans everything in My Cabinet against everything else (not just a pair), with a severity summary, a scannable cabinet map, and a "what to ask your pharmacist" question list grounded in what was actually found.
 - **Symptoms** — an always-visible "seek care now" emergency checklist, plus a symptom → general OTC-category lookup (pain, allergies, cough, etc.) for everyday, non-emergency symptoms. Deliberately not a diagnosis tool — no ranked causes, no severity score.
 

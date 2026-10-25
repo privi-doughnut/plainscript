@@ -37,7 +37,7 @@ Companion docs: `CLAUDE.md` = architecture + safety rules · `PLAINSCRIPT_ROADMA
 
 **Two pre-existing bugs fixed along the way:** severity pill text was hardcoded white with a `[data-theme="dark"]`-scoped correction, so every other dark-ground theme had white-on-bright-bar at ~3:1; and the high-contrast theme's major bar failed at 2.79:1 (caught by verifying the palette rather than trusting it).
 
-**Still open:** homepage sections 6-10 are Privi's (`YOUR_TASKS.md`); landing copy is English-only while the page claims 13 languages — translate once copy is final.
+**Resolved:** homepage sections 6a/8/9/10 are all written (Privi's own content, see `YOUR_TASKS.md`), and the English-only-landing-copy gap this note used to flag is closed — see the 2026-10-24 resolution note further down this file.
 
 ## 0. Shipped 2026-09-16/17 (all live)
 - **Homepage** — landing view for signed-out first-time visitors, inside `index.html` (the i18n dictionary and theme machinery live there, so a separate file would have meant duplicating the whole 13-language system). Skipped for `?share=` links, installed PWA, signed-in users, and returning visitors. Content sections deliberately left for Privi — see `YOUR_TASKS.md`.
@@ -139,10 +139,10 @@ Risk-spotting pass only (no legal skill/plugin exists on this machine). Get an a
 
 | Item | Status | Risk | Recommendation |
 |---|---|---|---|
-| Privacy Policy + Terms of Service | **Absent** — no page, no footer link | Med | Write and link from the footer next to "Report an error," in all 13 languages eventually. |
-| Washington My Health My Data Act (+ similar state consumer-health-data laws) | **Absent protection** | **Med-High, highest priority** | No small-app exemption — "what medications a user takes" is consumer health data. Requires a prominently-linked privacy policy + opt-in consent at signup. Nevada/Connecticut have similar statutes; one well-written policy covers the superset. |
+| Privacy Policy + Terms of Service | **Resolved (2026-10)** — `privacy.html`/`terms.html` both exist, are linked from the footer in all 13 languages, and both legal blanks (contact email, governing-law state) are filled in. Was "Absent" when this table was written 2026-09-16. | ~~Med~~ Closed | — |
+| Washington My Health My Data Act (+ similar state consumer-health-data laws) | Privacy policy now exists (see row above) and the Phase 6 roadmap calls for a signup consent moment — worth confirming that specific consent step is actually wired, not just the policy page existing. | Med (was Med-High) | No small-app exemption — "what medications a user takes" is consumer health data. Nevada/Connecticut have similar statutes; one well-written policy covers the superset. |
 | COPPA | Low real exposure | Low | Not directed at under-13s; no action needed. |
-| ADA/WCAG 2.1 AA | Partially addressed, undocumented | Med | Contrast/focus/reduced-motion/ARIA already done per `CLAUDE.md`; run an automated axe/Lighthouse audit and keep the output on file. |
+| ADA/WCAG 2.1 AA | **Documented (2026-10-24)** — `ACCESSIBILITY.md` has a real axe-core audit, re-run live as of tonight, 0 violations after fixing one real landmark-region issue found in the re-run. Was "Partially addressed, undocumented" when this table was written. | ~~Med~~ Closed | — |
 | FDA Software-as-a-Medical-Device / CDS boundary | Likely fine | Low-Med | Current non-goals (no diagnosis, no dosing, never "safe," always sourced, always routes emergencies out) keep it in the low-risk zone. Don't add anything that recommends a course of action. |
 | App store requirements (if native/PWA-wrapped later) | Not ready | Med-High, only if pursued | Apple/Google both require a live privacy-policy URL and **in-app self-service account deletion** for account-creating apps — Plainscript has neither yet; deletion needs a service-role-key server function (can't be done from the anon client key). Deferred per the 2026-09-16 mobile-scope decision (PWA-only for CAC). |
 
@@ -223,15 +223,15 @@ Sampled 18 district winners from 2025, 2 from 2024, and the 2025 national/region
 - [ ] Four tabs is a lot of surface to explain in under 3 minutes — real risk of a diffuse feature-tour video that lands no single idea.
 - [ ] **Direct precedent exists:** "Your Medicine" (GA-01, 2024) is a close concept that already won. Differentiation has to be explicit, not assumed.
 
-**Recommended demo video structure (target 2:30, hard cap 3:00):** 0:00-0:15 name/app/purpose in one sentence · 0:15-0:45 personal story then the Jan-2024 NLM API shutdown · 0:45-1:00 who it's for, stated explicitly · 1:00-2:00 live demo *on the public URL, said out loud* (decode a real drug → warfarin+aspirin → Cabinet Scan heatmap, deliberately showing the "nothing found isn't the same as safe" state and saying why) · 2:00-2:20 tools/languages + the AI disclosure · 2:20-2:40 reach and restraint. Cheapest edge available: demo the real deployed URL and invite verification — almost nothing in the published record suggests competitors do.
+**Recommended demo video structure:** superseded — see `CAC_SUBMISSION.md`'s video script section and the full beat-by-beat shot-list artifact (link in that file) for the current, much more detailed plan. The table that used to be here is stale; don't use it.
 
 **Also:** the six written submission questions are published in the rulebook — pre-draft them instead of writing under deadline pressure.
 
-## 11. Engineering debt worth knowing about (2026-09-16)
+## 11. Engineering debt worth knowing about (2026-09-16, test count updated 2026-10-25)
 
-Measured, not estimated:
-- [ ] **Zero automated tests** across ~12,000 lines of JS and 157 functions — which is why the duplicate-drug and silent-failure bugs survived months. A suite for the interaction engine (`analyzeDrugPairs`, `sameDrug`, `sideHit`, `labelMentions`) is in progress; it's also the most defensible thing to show a judge: *"the parts that could hurt someone have tests."*
-- [ ] **Ad-hoc design values:** 27 distinct spacing values, 20 font sizes (including six half-pixel steps like 13.5/14.5/15.5 that are too close to perceive), and 11 border radii despite a `--radius` token existing and being used 17×. Mechanical fix: add spacing/type/radius tokens beside the existing colour tokens and sweep to the nearest. Nothing looks dramatically different in any one spot; the whole thing starts feeling deliberate.
+Measured, not estimated — though the design-value counts below are from 2026-09-16 and the file has changed substantially since (homepage font pass, severity-legend restyle, sitewide hover/press additions, glossary restyle), so treat those specific numbers as dated, not current:
+- [X] **Automated tests — resolved.** The suite exists now: **104 tests**, `node --test tests/*.test.js`, covering the interaction engine (`analyzeDrugPairs`, `sameDrug`, `sideHit`, `labelMentions`, `sharedIngredients`, `renderSameDrugPairs`, i18n completeness, and more). `index.html` is now ~16,030 lines (grown since the ~12,000-line figure below was measured).
+- [ ] **Ad-hoc design values (as of 2026-09-16, likely stale):** 27 distinct spacing values, 20 font sizes (including six half-pixel steps like 13.5/14.5/15.5 that are too close to perceive), and 11 border radii despite a `--radius` token existing and being used 17×. Mechanical fix: add spacing/type/radius tokens beside the existing colour tokens and sweep to the nearest. Nothing looks dramatically different in any one spot; the whole thing starts feeling deliberate. Worth re-measuring before trusting these exact numbers.
 - Already strong and worth not breaking: colour rationing (severity colours mean severity and nothing else), 17 `:focus-visible` rules, computed-and-corrected WCAG contrast, 44×44px primary tap targets. `.mini` buttons compute to ~32px — legal under WCAG AA but under Apple's comfortable-thumb threshold; worth bumping the ones used on phones.
 
 ## 9. Mobile/web design direction (decided 2026-09-16)
