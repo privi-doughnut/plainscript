@@ -2,6 +2,8 @@
 
 A plain-English medication reference. Decode what a drug actually is, and check whether your medications interact — in language a normal person understands, sourced from FDA and NIH data, and honest about what it doesn't know.
 
+**Try the full working app: https://plainscript.its-the-prithivi-show.workers.dev/** (Decode and Check interactions work without an account.)
+
 > **Educational reference only. Not medical advice.** Always confirm with a pharmacist or doctor. Emergencies: 911 · Poison Control 1-800-222-1222.
 
 ## Why I built this
