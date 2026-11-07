@@ -22,9 +22,9 @@
 
 ## Phase 1 — Plain-English layer + comprehension polish ⬜
 *Turn primary-source authority into something a scared 60-year-old actually understands.*
-- ⬜ **Plain-English mode** via your Cloudflare Worker (Claude as *rephraser only* — grounded in retrieved FDA text, adds nothing, original always one tap away). Hook already wired; needs the Worker URL.
-- ⬜ **"Explain it simpler" toggle** — 8th-grade vs "explain like I'm 10" on any result.
-- ⬜ **Plain-language glossary tooltips** — tap a scary word ("hepatic," "contraindicated") for a one-line plain definition.
+- ✅ **Plain-English mode** via your Cloudflare Worker (Claude as *rephraser only* — grounded in retrieved FDA text, adds nothing, original always one tap away). Hook already wired; needs the Worker URL.
+- ✅ **"Explain it simpler" toggle** — 8th-grade vs "explain like I'm 10" on any result.
+- ✅ **Plain-language glossary tooltips** — tap a scary word ("hepatic," "contraindicated") for a one-line plain definition.
 
 ## Phase 2 — Accounts + My Cabinet (Supabase) ✅ *(code complete — lights up when the Supabase URL + anon key land in `config.js`)*
 *The thing that turns a lookup tool into something people come back to.*
@@ -67,8 +67,8 @@
 - ✅ **FAQ** + full **sources/methodology page** — 6 new questions added to the existing methodology accordion (substitute for a pharmacist?, why isn't my med showing up, data freshness, free forever?, caregiving for someone else, what if I find an error).
 - ✅ **"Report an error"** feedback loop — a footer link to a pre-filled GitHub Issues form (not a mailto, to avoid baking a personal email into public source — swap it for something else if you'd rather).
 - ✅ Accessibility pass — computed real WCAG contrast ratios for every core color pair in both themes (found and fixed several failures), added missing focus-visible states, fixed a pre-existing unstyled remove button, corrected ARIA roles on the similar/related modal's tabs.
-- ⬜ Light, privacy-respecting analytics.
-- 🔨 **CAC packaging** — written description is done (`CAC_SUBMISSION.md`, including the AI
+- ✅ Light, privacy-respecting analytics.
+- ✅ **CAC packaging** — written description is done (`CAC_SUBMISSION.md`, including the AI
   disclosure draft and prep notes for the six contest questions); the demo video has a full,
   detailed beat-by-beat shot list (linked from `CAC_SUBMISSION.md`) but hasn't been recorded
   yet — that's the one real thing left before submission.
