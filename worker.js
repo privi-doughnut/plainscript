@@ -18,10 +18,10 @@
  *      ALLOWED_ORIGIN -c wrangler.worker.jsonc. NOTE this only sets a CORS
  *      response header — it stops other WEBSITES using this endpoint from a
  *      browser, and does nothing against a script. See the throttle note below.
- *   4b. REQUIRED, and neither is in this file: set an Anthropic account spend
- *      cap, and add a Cloudflare Rate Limiting rule on this Worker's route.
- *      Those are the only things that actually bound abuse of a public proxy
- *      holding your API key.
+ *   4b. REQUIRED: set an Anthropic account spend cap (that lives in the Anthropic
+ *      console, not in this file). The Cloudflare rate limiter is the RATE_LIMITER
+ *      binding in wrangler.worker.jsonc and is applied below. Those two are what
+ *      actually bound abuse of a public proxy holding your API key.
  *   5. Copy the deployed URL (printed by step 2) into config.js as
  *      CLAUDE_PROXY_URL, then commit so the live site picks it up.
  * The old dashboard "Edit code / Quick edit" button is gone for many Workers
@@ -196,7 +196,7 @@ If nothing in the label answers the question, output exactly: {"quotes":[]}`;
 
    THE ACTUAL CONTROLS, both outside this file:
      1. An Anthropic account spend cap. Bounds the damage no matter what.
-     2. A Cloudflare Rate Limiting rule on this Worker's route.
+     2. The Cloudflare RATE_LIMITER binding (wrangler.worker.jsonc), used in fetch().
    --------------------------------------------------------------------------- */
 const RATE_WINDOW_MS = 60_000;
 const RATE_MAX       = 20;        // per IP per window, per isolate
@@ -230,6 +230,14 @@ export default {
     if (request.method !== "POST") return json({ error: "POST only" }, 405, cors);
 
     if (rateLimited(request)) return json({ error: "rate limited" }, 429, cors);
+
+    // Cloudflare's shared rate limiter (binding in wrangler.worker.jsonc). Unlike the
+    // in-memory counter above, it holds across isolates within a location.
+    if (env.RATE_LIMITER) {
+      const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+      const { success } = await env.RATE_LIMITER.limit({ key: ip });
+      if (!success) return json({ error: "rate limited" }, 429, cors);
+    }
 
     // reject oversized payloads before they can cost anything upstream
     const declared = Number(request.headers.get("Content-Length") || 0);

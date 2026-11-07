@@ -11,5 +11,14 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "plainscript-proxy",
   "main": "worker.js",
-  "compatibility_date": "2026-07-21"
+  "compatibility_date": "2026-07-21",
+  // Cloudflare rate limiter, used in worker.js. 20 requests per 60s per IP, counted
+  // per Cloudflare location. Needs Wrangler 4.36.0 or later.
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 20, "period": 60 }
+    }
+  ]
 }
