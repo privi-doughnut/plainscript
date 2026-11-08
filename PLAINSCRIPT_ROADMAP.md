@@ -20,15 +20,15 @@
 - ✅ **Dark theme** — sober clinical dark, light by default, accessible toggle.
 - ✅ Mobile-first, accessible, single-file, GitHub-Pages-ready.
 
-## Phase 1 — Plain-English layer + comprehension polish ⬜
+## Phase 1 — Plain-English layer + comprehension polish ✅ *(done)*
 *Turn primary-source authority into something a scared 60-year-old actually understands.*
-- ✅ **Plain-English mode** via your Cloudflare Worker (Claude as *rephraser only* — grounded in retrieved FDA text, adds nothing, original always one tap away). Hook already wired; needs the Worker URL.
+- ✅ **Plain-English mode** via your Cloudflare Worker (Claude as *rephraser only* — grounded in retrieved FDA text, adds nothing, original always one tap away). Live, with a request size cap and a Cloudflare rate-limiting rule on the Worker.
 - ✅ **"Explain it simpler" toggle** — 8th-grade vs "explain like I'm 10" on any result.
 - ✅ **Plain-language glossary tooltips** — tap a scary word ("hepatic," "contraindicated") for a one-line plain definition.
 
-## Phase 2 — Accounts + My Cabinet (Supabase) ✅ *(code complete — lights up when the Supabase URL + anon key land in `config.js`)*
+## Phase 2 — Accounts + My Cabinet (Supabase) ✅ *(live)*
 *The thing that turns a lookup tool into something people come back to.*
-- ✅ Supabase auth — Google OAuth + passwordless email magic link (no GitHub — this audience doesn't have developer accounts). Google needs enabling in the Supabase dashboard (setup steps at the top of `supabase/schema.sql`); email sign-in is on by default, no dashboard step needed. Dependency-free: the app talks straight to Supabase's auth + REST APIs with `fetch` — no supabase-js.
+- ✅ Supabase auth — Google OAuth + passwordless email magic link (no GitHub — this audience doesn't have developer accounts). Both sign-in paths are live and tested end to end. Dependency-free: the app talks straight to Supabase's auth + REST APIs with `fetch` — no supabase-js.
 - ✅ **My Cabinet** — save meds from a decoded card or by typing a name; every save resolves against the real FDA label so the row carries sourced identifiers (generic, brand, RxCUI, class), with RxCUI-based duplicate detection.
 - ✅ Per-med personal notes ("morning, with food").
 - ✅ Theme persists — localStorage for everyone, plus the Supabase profile when signed in, so dark mode follows you across devices.
@@ -55,23 +55,22 @@
 - ✅ **Pregnancy / breastfeeding label info** — factual label data (`pregnancy`, `nursing_mothers` fields), shown only when openFDA actually has it for that drug.
 - 🔬 **Symptom checker** — requested 2026-07-21; conflicts directly with the Non-goals below ("No diagnosis or symptom-checker"). Declined; built the Symptoms tab (red-flag checklist + OTC-category lookup) as the safer alternative instead — see Phase 3.5 note in `PROGRESS.md`.
 
-## Phase 5 — Breadth & reach 🔨
+## Phase 5 — Breadth & reach ✅ *(complete)*
 - ✅ **PWA** — installable (manifest + icons), a service worker caches the app shell for offline use, and My Cabinet falls back to a locally cached copy (read-only) when offline.
 - ✅ **Spanish** — a full i18n pass: a 🌐 language toggle (header, persists to localStorage + your profile like theme does), a translation dictionary covering every static UI string, and every curated medical data array (INTERACTIONS, FOOD_INTERACTIONS, CROSS_SENSITIVITY, DRUG_CLASS_EXPLAINERS, SYMPTOM_CATEGORIES) restructured with real `{en, es}` translations — not machine-translated on the fly, reviewed content like everything else here. Live FDA label text (fetched fresh per drug, always in English) routes through the Phase 1 Worker with a `lang` parameter to translate it; without the Worker configured, that text stays in English with a visible note explaining why, rather than silently looking broken. Built so the next language is "add one more dictionary column," per Privi's plan to do more languages as separate passes.
 - ✅ **Printable caregiver one-pager** — a "🖨️ Print / save as PDF" button in My Cabinet prints a clean, plain black-on-white sheet (name, notes, dosing info) with all the app chrome stripped out — scoped so it never affects printing from any other tab.
 - ✅ **Share a read-only cabinet** via link/QR (for caregivers) — a new `cabinet_shares` table + a `get_shared_cabinet()` SECURITY DEFINER function (see `supabase/schema.sql` §5 for the full security model: anon has zero direct table access, the token is a random uuid, and the function returns a deliberately narrow, non-identifying column set). Needs the updated schema re-run in Supabase before it'll work live.
 - ✅ **Voice input** — a mic button next to Decode, Check, and My Cabinet's inputs (Web Speech API, feature-detected — silently absent in browsers that don't support it, like Firefox). Decode auto-searches on speech since it's read-only; My Cabinet just fills the field so you can review before saving.
 
-## Phase 6 — Trust & launch polish 🔨
+## Phase 6 — Trust & launch polish ✅ *(complete)*
 - ✅ **"Why I built this"** — filled in `README.md`, in Privi's own voice.
 - ✅ **FAQ** + full **sources/methodology page** — 6 new questions added to the existing methodology accordion (substitute for a pharmacist?, why isn't my med showing up, data freshness, free forever?, caregiving for someone else, what if I find an error).
 - ✅ **"Report an error"** feedback loop — a footer link to a pre-filled GitHub Issues form (not a mailto, to avoid baking a personal email into public source — swap it for something else if you'd rather).
 - ✅ Accessibility pass — computed real WCAG contrast ratios for every core color pair in both themes (found and fixed several failures), added missing focus-visible states, fixed a pre-existing unstyled remove button, corrected ARIA roles on the similar/related modal's tabs.
 - ✅ Light, privacy-respecting analytics.
-- ✅ **CAC packaging** — written description is done (`CAC_SUBMISSION.md`, including the AI
-  disclosure draft and prep notes for the six contest questions); the demo video has a full,
-  detailed beat-by-beat shot list (linked from `CAC_SUBMISSION.md`) but hasn't been recorded
-  yet — that's the one real thing left before submission.
+- ✅ **CAC packaging** — written description (`CAC_SUBMISSION.md`, including the AI disclosure
+  and the six contest questions), demo video, and every required step on the submission
+  portal are done.
 
 ## Stretch / investigate 🔬
 - 🔬 **Pill imprint identifier** — verify a current free image API exists (NLM's RxImage was deprecated; confirm the replacement before promising it).
@@ -99,10 +98,6 @@ Writing these down *is* the project's maturity. An ISEF judge or pharmacist will
 
 ---
 
-## What I need from you to start Phase 2
-1. Your **Supabase project URL + anon (public) key** — new project or reuse an existing one?
-2. Your **Google OAuth client ID/secret** to enable Google sign-in (email magic-link needs nothing extra).
-3. Your **Cloudflare Worker URL** for the Claude proxy whenever you want to flip on Phase 1's plain-English mode.
-
-## Suggested sequence to Oct 26
-**0 → 2 → 3** is the spine. Get accounts + the cabinet scan working, because that's the demo that wins. Slot **Phase 1** (plain-English) in alongside 2 since the Worker's already wired. Everything from Phase 4 on is post-core — real value, but not worth risking the deadline for.
+## Where things stand
+Phases 0–6 are all live. Supabase, Google OAuth, and the Cloudflare Worker proxy are deployed
+and wired into `config.js`. Remaining ideas live in the Stretch section above.
